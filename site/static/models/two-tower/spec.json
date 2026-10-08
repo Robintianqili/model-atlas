@@ -1,0 +1,711 @@
+{
+ "slug": "two-tower",
+ "name": {
+  "en": "Two-tower retrieval",
+  "zh": "双塔召回"
+ },
+ "version": "2026-10-07",
+ "params": 960,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "item.fc1.weight",
+   "shape": [
+    16,
+    8
+   ],
+   "offset": 0,
+   "length": 128
+  },
+  {
+   "name": "item.fc1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 128,
+   "length": 16
+  },
+  {
+   "name": "item.fc2.weight",
+   "shape": [
+    8,
+    16
+   ],
+   "offset": 144,
+   "length": 128
+  },
+  {
+   "name": "item.fc2.bias",
+   "shape": [
+    8
+   ],
+   "offset": 272,
+   "length": 8
+  },
+  {
+   "name": "user.fc1.weight",
+   "shape": [
+    16,
+    15
+   ],
+   "offset": 280,
+   "length": 240
+  },
+  {
+   "name": "user.fc1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 520,
+   "length": 16
+  },
+  {
+   "name": "user.fc2.weight",
+   "shape": [
+    8,
+    16
+   ],
+   "offset": 536,
+   "length": 128
+  },
+  {
+   "name": "user.fc2.bias",
+   "shape": [
+    8
+   ],
+   "offset": 664,
+   "length": 8
+  },
+  {
+   "name": "scores.weight",
+   "shape": [
+    36,
+    8
+   ],
+   "offset": 672,
+   "length": 288
+  }
+ ],
+ "layers": [
+  {
+   "id": "item",
+   "op": "input",
+   "label": {
+    "en": "Your new movie: 8 numbers",
+    "zh": "你的新电影：8 个数"
+   },
+   "in": [
+    "item"
+   ],
+   "outShape": [
+    8
+   ],
+   "desc": {
+    "en": "Its genre as 6 switches (1 = this genre), then its year and its length, scaled to about −1 … 1.",
+    "zh": "它的类型用 6 个开关表示（1 = 这个类型），然后是它的年份和片长，缩放到大约 −1 … 1。"
+   },
+   "axes": [
+    "f"
+   ]
+  },
+  {
+   "id": "user",
+   "op": "input",
+   "label": {
+    "en": "You: 15 numbers",
+    "zh": "你：15 个数"
+   },
+   "in": [
+    "user"
+   ],
+   "outShape": [
+    15
+   ],
+   "desc": {
+    "en": "The genres you like (6 switches), the genre shares of the movies you picked (6), their mean year and length, and 1 if you picked any.",
+    "zh": "你喜欢的类型（6 个开关）、你所选电影的类型占比（6 个）、它们的平均年份和片长，以及选过电影时为 1。"
+   },
+   "axes": [
+    "f"
+   ]
+  },
+  {
+   "id": "item.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Item tower: layer 1",
+    "zh": "物品塔：第 1 层"
+   },
+   "in": [
+    "item"
+   ],
+   "outShape": [
+    16
+   ],
+   "params": {
+    "inFeatures": 8,
+    "outFeatures": 16
+   },
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 25
+   }
+  },
+  {
+   "id": "item.relu",
+   "op": "relu",
+   "label": {
+    "en": "Item tower: ReLU",
+    "zh": "物品塔：ReLU"
+   },
+   "in": [
+    "item.fc1"
+   ],
+   "outShape": [
+    16
+   ],
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "item.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Item tower: the movie’s vector",
+    "zh": "物品塔：电影的向量"
+   },
+   "in": [
+    "item.relu"
+   ],
+   "outShape": [
+    8
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 8
+   },
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "user.fc1",
+   "op": "linear",
+   "label": {
+    "en": "User tower: layer 1",
+    "zh": "用户塔：第 1 层"
+   },
+   "in": [
+    "user"
+   ],
+   "outShape": [
+    16
+   ],
+   "params": {
+    "inFeatures": 15,
+    "outFeatures": 16
+   },
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 25
+   }
+  },
+  {
+   "id": "user.relu",
+   "op": "relu",
+   "label": {
+    "en": "User tower: ReLU",
+    "zh": "用户塔：ReLU"
+   },
+   "in": [
+    "user.fc1"
+   ],
+   "outShape": [
+    16
+   ],
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "user.fc2",
+   "op": "linear",
+   "label": {
+    "en": "User tower: your vector",
+    "zh": "用户塔：你的向量"
+   },
+   "in": [
+    "user.relu"
+   ],
+   "outShape": [
+    8
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 8
+   },
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "scores",
+   "op": "linear",
+   "label": {
+    "en": "Scores: you against every movie",
+    "zh": "分数：你对每部电影"
+   },
+   "in": [
+    "user.fc2"
+   ],
+   "outShape": [
+    36
+   ],
+   "params": {
+    "inFeatures": 8,
+    "outFeatures": 36
+   },
+   "desc": {
+    "en": "One dot product per movie: your vector times each row of the item table, the 36 movies’ vectors computed in advance.",
+    "zh": "每部电影一个点积：你的向量乘以物品表的每一行，也就是提前算好的 36 部电影的向量。"
+   },
+   "axes": [
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/two-tower/model.py",
+    "line": 40
+   }
+  }
+ ],
+ "training": {
+  "dataset": "synthetic logs from world.ts: 5,000 viewers, 22,498 (viewer, liked movie) pairs",
+  "steps": 14040,
+  "metrics": {
+   "test_recall8": 0.6116666666666666,
+   "test_recall8_pop": 0.39375,
+   "test_recall8_random": 0.23979526848862712
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 2.98e-7,
+  "checked": "2026-10-07",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 9,
+  "edgeCases": [
+   "none",
+   "genres-only",
+   "one-pick",
+   "twelve",
+   "twin"
+  ],
+  "perLayer": {
+   "item.fc1": 5.96e-8,
+   "item.relu": 5.96e-8,
+   "item.fc2": 5.96e-8,
+   "user.fc1": 1.19e-7,
+   "user.relu": 1.19e-7,
+   "user.fc2": 1.79e-7,
+   "scores": 2.98e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/two-tower/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "item",
+   "adapter": "prefs",
+   "kind": "ratings",
+   "shape": [
+    8
+   ],
+   "dtype": "f32",
+   "axes": [
+    "f"
+   ]
+  },
+  {
+   "name": "user",
+   "adapter": "prefs",
+   "kind": "ratings",
+   "shape": [
+    15
+   ],
+   "dtype": "f32",
+   "axes": [
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "scores",
+  "item.fc2"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "likes": [
+  580,
+  571,
+  397,
+  779,
+  512,
+  1204,
+  793,
+  1279,
+  849,
+  654,
+  1362,
+  563,
+  1248,
+  1020,
+  732,
+  1248,
+  1751,
+  1200,
+  602,
+  560,
+  1420,
+  1226,
+  1324,
+  976,
+  580,
+  656,
+  1534,
+  1586,
+  2141,
+  283,
+  705,
+  924,
+  883,
+  559,
+  1111,
+  1128
+ ],
+ "ranker": {
+  "w": [
+   0.47634017836189796,
+   0.4186877810575096
+  ],
+  "b": -1.1236272806302554,
+  "popMean": 6.784773629320998,
+  "popStd": 0.4445113711044782
+ },
+ "rankerRef": [
+  {
+   "case": "space",
+   "shortlist": [
+    27,
+    28,
+    29,
+    5,
+    3,
+    24,
+    2,
+    1
+   ],
+   "order": [
+    28,
+    27,
+    5,
+    3,
+    24,
+    1,
+    2,
+    29
+   ],
+   "z": [
+    0.04841610744719249,
+    -0.1726635871129254,
+    -0.5242493673580728,
+    -1.0365151424068688,
+    -1.317600156563305,
+    -1.4219150076643885,
+    -1.7201441994594187,
+    -1.854724091974008
+   ]
+  },
+  {
+   "case": "laughs",
+   "shortlist": [
+    7,
+    8,
+    6,
+    16,
+    28,
+    29,
+    27,
+    5
+   ],
+   "order": [
+    7,
+    28,
+    8,
+    16,
+    6,
+    27,
+    5,
+    29
+   ],
+   "z": [
+    -0.10912066682571209,
+    -0.4629445746980666,
+    -0.5620654341266207,
+    -0.6270409376196728,
+    -0.7738253372797657,
+    -0.839225184353245,
+    -1.1414322132595411,
+    -2.366084774119267
+   ]
+  },
+  {
+   "case": "classic",
+   "shortlist": [
+    16,
+    14,
+    15,
+    31,
+    17,
+    34,
+    32,
+    33
+   ],
+   "order": [
+    16,
+    15,
+    17,
+    34,
+    31,
+    32,
+    14,
+    33
+   ],
+   "z": [
+    0.5827616523213197,
+    0.13408377037184538,
+    0.028214895553321462,
+    -0.0625356562760333,
+    -0.2098497275080663,
+    -0.2869421166946383,
+    -0.3338170092547079,
+    -0.7746894688511106
+   ]
+  },
+  {
+   "case": "scary",
+   "shortlist": [
+    23,
+    18,
+    28,
+    29,
+    16,
+    26,
+    27,
+    17
+   ],
+   "order": [
+    28,
+    16,
+    27,
+    26,
+    23,
+    17,
+    18,
+    29
+   ],
+   "z": [
+    -0.4439171774348978,
+    -0.6351711963160555,
+    -0.7802909483285854,
+    -0.8074945425977746,
+    -0.9602637927347337,
+    -1.1148526330535233,
+    -1.5277916677725571,
+    -2.3470573768560983
+   ]
+  },
+  {
+   "case": "none",
+   "shortlist": [
+    16,
+    28,
+    29,
+    27,
+    26,
+    7,
+    22,
+    17
+   ],
+   "order": [
+    28,
+    16,
+    27,
+    26,
+    22,
+    7,
+    17,
+    29
+   ],
+   "z": [
+    -0.2312653922010106,
+    -0.40004302115347545,
+    -0.5563481056131387,
+    -0.6205651152411059,
+    -0.7929010770933635,
+    -0.8021170787814837,
+    -0.8861242153281371,
+    -2.134405591622211
+   ]
+  },
+  {
+   "case": "genres-only",
+   "shortlist": [
+    28,
+    29,
+    27,
+    16,
+    5,
+    26,
+    17,
+    15
+   ],
+   "order": [
+    28,
+    16,
+    27,
+    26,
+    5,
+    15,
+    17,
+    29
+   ],
+   "z": [
+    -0.37863660013595624,
+    -0.5999527145091821,
+    -0.6786462685073369,
+    -0.8422716410182259,
+    -1.0044223355212085,
+    -1.1263036667690052,
+    -1.1264548891040216,
+    -2.2817767995571567
+   ]
+  },
+  {
+   "case": "one-pick",
+   "shortlist": [
+    20,
+    22,
+    23,
+    19,
+    18,
+    28,
+    29,
+    16
+   ],
+   "order": [
+    28,
+    20,
+    22,
+    16,
+    23,
+    18,
+    19,
+    29
+   ],
+   "z": [
+    -0.5061985566105478,
+    -0.6185927957478826,
+    -0.686949708046677,
+    -0.6974767939420217,
+    -1.0295367375605908,
+    -1.658424739527124,
+    -1.690094844531958,
+    -2.4093387560317483
+   ]
+  },
+  {
+   "case": "twelve",
+   "shortlist": [
+    20,
+    22,
+    23,
+    19,
+    16,
+    28,
+    29,
+    26
+   ],
+   "order": [
+    20,
+    22,
+    28,
+    16,
+    23,
+    26,
+    19,
+    29
+   ],
+   "z": [
+    -0.299029676609576,
+    -0.4086344995130531,
+    -0.5925890339789931,
+    -0.7283092377379685,
+    -0.7606782234456291,
+    -0.9189371329407355,
+    -1.292085652119278,
+    -2.4957292334001933
+   ]
+  },
+  {
+   "case": "twin",
+   "shortlist": [
+    28,
+    29,
+    27,
+    25,
+    24,
+    16,
+    35,
+    7
+   ],
+   "order": [
+    28,
+    27,
+    16,
+    25,
+    24,
+    7,
+    35,
+    29
+   ],
+   "z": [
+    0.6570719294307708,
+    0.3733107402072149,
+    -0.3501487262966355,
+    -0.5182396376540441,
+    -0.690137629009769,
+    -0.7406921398158928,
+    -0.8579706379010268,
+    -1.2460682699904297
+   ]
+  }
+ ]
+}

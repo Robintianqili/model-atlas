@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tinyseq2seq",
+ "checked": "2026-10-06",
+ "sources": {
+  "decode": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 2.28e-15,
+   "frames": 23,
+   "fixtures": 16,
+   "checked": "2026-10-06"
+  }
+ }
+}

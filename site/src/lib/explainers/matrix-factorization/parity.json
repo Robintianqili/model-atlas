@@ -1,0 +1,36 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "matrix-factorization",
+ "checked": "2026-10-07",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 5.55e-17,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "cold": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 5.55e-17,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "nudge": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 4,
+   "fixtures": 8,
+   "checked": "2026-10-07"
+  }
+ }
+}

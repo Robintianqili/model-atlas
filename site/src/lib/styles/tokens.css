@@ -1,0 +1,241 @@
+/*
+ * Model Atlas design tokens. Light is the default; dark applies when the OS asks for it
+ * (unless the page is forced light) or when <html data-theme="dark">.
+ * Value ramps (diverging / sequential) live in $lib/kit/color.ts so canvas code and CSS agree;
+ * the few ramp stops repeated here are for CSS-only legends and chips.
+ */
+
+:root {
+	color-scheme: light;
+
+	/* type */
+	--font-cjk: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+	--font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'PingFang SC', 'Hiragino Sans GB',
+		'Microsoft YaHei', 'Noto Sans CJK SC', serif;
+	--font-body: 'Atkinson Hyperlegible Next Variable', system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+		'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, 'PingFang SC',
+		'Microsoft YaHei', monospace;
+
+	--fs-xs: 0.75rem;
+	--fs-sm: 0.875rem;
+	--fs-md: 1rem;
+	--fs-lg: 1.1875rem;
+	--fs-xl: 1.5rem;
+	--fs-2xl: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem);
+	--fs-3xl: clamp(2.1rem, 1.4rem + 3.2vw, 3.6rem);
+	--lh-body: 1.6;
+	--measure: 68ch;
+
+	/* space, radius, layout */
+	--s1: 4px;
+	--s2: 8px;
+	--s3: 12px;
+	--s4: 16px;
+	--s5: 24px;
+	--s6: 32px;
+	--s7: 48px;
+	--s8: 72px;
+	--r1: 4px;
+	--r2: 8px;
+	--r3: 14px;
+	--r-pill: 999px;
+	--page-max: 1240px;
+	--gutter: clamp(16px, 4vw, 40px);
+	--header-h: 60px;
+
+	/* surfaces and ink (paper atlas) */
+	--bg: #f6f3ea;
+	--surface: #fffdf8;
+	--surface-2: #f0ece1;
+	--surface-3: #e6e0d1;
+	--ink: #1d1c18;
+	--ink-2: #46433b;
+	--muted: #67635a;
+	--rule: #dcd5c3;
+	--rule-strong: #b9af98;
+	--shadow-1: 0 1px 2px rgb(40 33 15 / 0.08), 0 1px 1px rgb(40 33 15 / 0.04);
+	--shadow-2: 0 8px 28px rgb(40 33 15 / 0.14), 0 2px 6px rgb(40 33 15 / 0.08);
+
+	/* UI accent (links, focus, current layer, trainable outline). Not a data color. */
+	--accent: #0b6b70;
+	--accent-strong: #074f53;
+	--accent-soft: #d9ecea;
+	--accent-ink: #ffffff;
+
+	/* provenance and status */
+	--live: #17723f;
+	--live-soft: #dcf1e3;
+	--pre: #3a5596;
+	--pre-soft: #e2e8f6;
+	--illus: #94530a;
+	--illus-soft: #fbead0;
+	--planned: #67635a;
+	--planned-soft: #ebe6da;
+
+	/* data grammar (brief §4.7) */
+	--div-neg: #1155a9;
+	--div-mid: #f2efec;
+	--div-pos: #b95100;
+	--seq-lo: #f8f5fc;
+	--seq-mid: #ac89dd;
+	--seq-hi: #4e1b8b;
+	--q: #2a78d6;
+	--k: #d93b3b;
+	--v: #1a8a4a;
+	/* text versions of the data colors: 4.5:1 or more on --bg, --surface and --surface-2 (WCAG AA) */
+	--div-neg-text: #1155a9;
+	--div-pos-text: #a54900;
+	--q-text: #1d62b8;
+	--k-text: #b8302f;
+	--v-text: #137038;
+	--real-text: #137038;
+	--generated-text: #b02d7d;
+	--real: #1a8a4a;
+	--generated: #c2338a;
+	--param: #46433b;
+	--grad: #a23b72;
+	--mask-hatch: #c9c0aa;
+	--highlight: #1d1c18;
+	--highlight-halo: #fffdf8;
+
+	/* categorical classes (validated order, see color.ts) */
+	--cat-0: #2a78d6;
+	--cat-1: #eb6834;
+	--cat-2: #1baf7a;
+	--cat-3: #eda100;
+	--cat-4: #e87ba4;
+	--cat-5: #008300;
+	--cat-6: #4a3aa7;
+	--cat-7: #e34948;
+	--cat-8: #0aa2c0;
+	--cat-9: #9b5a14;
+
+	/* motion */
+	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+	--dur-1: 120ms;
+	--dur-2: 220ms;
+	--dur-3: 420ms;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+		--bg: #121417;
+		--surface: #1a1d21;
+		--surface-2: #22262b;
+		--surface-3: #2c3137;
+		--ink: #ece8de;
+		--ink-2: #c6c1b4;
+		--muted: #a8a397;
+		--rule: #30353b;
+		--rule-strong: #4a5058;
+		--shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+		--shadow-2: 0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+		--accent: #4fc4c0;
+		--accent-strong: #7fd9d5;
+		--accent-soft: #173a3b;
+		--accent-ink: #0b1415;
+		--live: #62d394;
+		--live-soft: #173326;
+		--pre: #9db3ec;
+		--pre-soft: #1f2a45;
+		--illus: #f1b65c;
+		--illus-soft: #3a2b14;
+		--planned: #a29d91;
+		--planned-soft: #262a2f;
+		--div-neg: #7cbdff;
+		--div-mid: #2e2a27;
+		--div-pos: #ffb160;
+		--seq-lo: #23202a;
+		--seq-mid: #8456bd;
+		--seq-hi: #e3ccff;
+		--q: #5b9cf0;
+		--k: #f07070;
+		--v: #3cb371;
+		--div-neg-text: #7cbdff;
+		--div-pos-text: #ffb160;
+		--q-text: #6ba6f2;
+		--k-text: #f38282;
+		--v-text: #47bf7c;
+		--real-text: #47bf7c;
+		--generated-text: #ec78b9;
+		--real: #3cb371;
+		--generated: #e05aa8;
+		--param: #c6c1b4;
+		--grad: #e28ab9;
+		--mask-hatch: #3d434a;
+		--highlight: #ffffff;
+		--highlight-halo: #121417;
+		--cat-0: #3987e5;
+		--cat-1: #d95926;
+		--cat-2: #199e70;
+		--cat-3: #c98500;
+		--cat-4: #d55181;
+		--cat-5: #008300;
+		--cat-6: #9085e9;
+		--cat-7: #e66767;
+		--cat-8: #1597ad;
+		--cat-9: #b06a2a;
+	}
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--bg: #121417;
+	--surface: #1a1d21;
+	--surface-2: #22262b;
+	--surface-3: #2c3137;
+	--ink: #ece8de;
+	--ink-2: #c6c1b4;
+	--muted: #a8a397;
+	--rule: #30353b;
+	--rule-strong: #4a5058;
+	--shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+	--shadow-2: 0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+	--accent: #4fc4c0;
+	--accent-strong: #7fd9d5;
+	--accent-soft: #173a3b;
+	--accent-ink: #0b1415;
+	--live: #62d394;
+	--live-soft: #173326;
+	--pre: #9db3ec;
+	--pre-soft: #1f2a45;
+	--illus: #f1b65c;
+	--illus-soft: #3a2b14;
+	--planned: #a29d91;
+	--planned-soft: #262a2f;
+	--div-neg: #7cbdff;
+	--div-mid: #2e2a27;
+	--div-pos: #ffb160;
+	--seq-lo: #23202a;
+	--seq-mid: #8456bd;
+	--seq-hi: #e3ccff;
+	--q: #5b9cf0;
+	--k: #f07070;
+	--v: #3cb371;
+	--div-neg-text: #7cbdff;
+	--div-pos-text: #ffb160;
+	--q-text: #6ba6f2;
+	--k-text: #f38282;
+	--v-text: #47bf7c;
+	--real-text: #47bf7c;
+	--generated-text: #ec78b9;
+	--real: #3cb371;
+	--generated: #e05aa8;
+	--param: #c6c1b4;
+	--grad: #e28ab9;
+	--mask-hatch: #3d434a;
+	--highlight: #ffffff;
+	--highlight-halo: #121417;
+	--cat-0: #3987e5;
+	--cat-1: #d95926;
+	--cat-2: #199e70;
+	--cat-3: #c98500;
+	--cat-4: #d55181;
+	--cat-5: #008300;
+	--cat-6: #9085e9;
+	--cat-7: #e66767;
+	--cat-8: #1597ad;
+	--cat-9: #b06a2a;
+}

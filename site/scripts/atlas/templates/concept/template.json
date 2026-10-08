@@ -1,0 +1,12 @@
+{
+	"name": "concept",
+	"description": "A concept package (K2): `atlas new concept <slug>` overlays these files on the base scaffold. explainer.ts declares type 'concept' (routed at /train/<slug>/), lesson.ts is the primary path, concept.ts holds the page around it (hook, toy, real, compare, pitfalls, further) and concept.test.ts lints it. Not a model template: `new model --template concept` is refused.",
+	"kinds": ["process"],
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "package/concept.ts.tmpl", "to": "package/concept.ts" },
+		{ "from": "package/concept.test.ts.tmpl", "to": "package/concept.test.ts" },
+		{ "from": "notes.md.tmpl", "to": "notes" }
+	]
+}

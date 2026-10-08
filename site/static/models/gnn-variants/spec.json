@@ -1,0 +1,1186 @@
+{
+ "slug": "gnn-variants",
+ "name": {
+  "en": "GAT / GraphSAGE / GIN",
+  "zh": "GAT / GraphSAGE / GIN"
+ },
+ "version": "2026-10-06",
+ "params": 808,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "gcn.gc1.weight",
+   "shape": [
+    4,
+    34
+   ],
+   "offset": 0,
+   "length": 136
+  },
+  {
+   "name": "gcn.gc1.bias",
+   "shape": [
+    4
+   ],
+   "offset": 136,
+   "length": 4
+  },
+  {
+   "name": "gcn.gc2.weight",
+   "shape": [
+    2,
+    4
+   ],
+   "offset": 140,
+   "length": 8
+  },
+  {
+   "name": "gcn.gc2.bias",
+   "shape": [
+    2
+   ],
+   "offset": 148,
+   "length": 2
+  },
+  {
+   "name": "gcn.head.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 150,
+   "length": 4
+  },
+  {
+   "name": "gcn.head.bias",
+   "shape": [
+    2
+   ],
+   "offset": 154,
+   "length": 2
+  },
+  {
+   "name": "sage.gc1.weight",
+   "shape": [
+    4,
+    68
+   ],
+   "offset": 156,
+   "length": 272
+  },
+  {
+   "name": "sage.gc1.bias",
+   "shape": [
+    4
+   ],
+   "offset": 428,
+   "length": 4
+  },
+  {
+   "name": "sage.gc2.weight",
+   "shape": [
+    2,
+    8
+   ],
+   "offset": 432,
+   "length": 16
+  },
+  {
+   "name": "sage.gc2.bias",
+   "shape": [
+    2
+   ],
+   "offset": 448,
+   "length": 2
+  },
+  {
+   "name": "sage.head.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 450,
+   "length": 4
+  },
+  {
+   "name": "sage.head.bias",
+   "shape": [
+    2
+   ],
+   "offset": 454,
+   "length": 2
+  },
+  {
+   "name": "gin.gc1.agg.eps",
+   "shape": [
+    1
+   ],
+   "offset": 456,
+   "length": 1
+  },
+  {
+   "name": "gin.gc1.mlp.0.weight",
+   "shape": [
+    4,
+    34
+   ],
+   "offset": 457,
+   "length": 136
+  },
+  {
+   "name": "gin.gc1.mlp.0.bias",
+   "shape": [
+    4
+   ],
+   "offset": 593,
+   "length": 4
+  },
+  {
+   "name": "gin.gc1.mlp.2.weight",
+   "shape": [
+    4,
+    4
+   ],
+   "offset": 597,
+   "length": 16
+  },
+  {
+   "name": "gin.gc1.mlp.2.bias",
+   "shape": [
+    4
+   ],
+   "offset": 613,
+   "length": 4
+  },
+  {
+   "name": "gin.gc2.agg.eps",
+   "shape": [
+    1
+   ],
+   "offset": 617,
+   "length": 1
+  },
+  {
+   "name": "gin.gc2.mlp.0.weight",
+   "shape": [
+    2,
+    4
+   ],
+   "offset": 618,
+   "length": 8
+  },
+  {
+   "name": "gin.gc2.mlp.0.bias",
+   "shape": [
+    2
+   ],
+   "offset": 626,
+   "length": 2
+  },
+  {
+   "name": "gin.gc2.mlp.2.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 628,
+   "length": 4
+  },
+  {
+   "name": "gin.gc2.mlp.2.bias",
+   "shape": [
+    2
+   ],
+   "offset": 632,
+   "length": 2
+  },
+  {
+   "name": "gin.head.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 634,
+   "length": 4
+  },
+  {
+   "name": "gin.head.bias",
+   "shape": [
+    2
+   ],
+   "offset": 638,
+   "length": 2
+  },
+  {
+   "name": "gat.gc1.weight",
+   "shape": [
+    4,
+    34
+   ],
+   "offset": 640,
+   "length": 136
+  },
+  {
+   "name": "gat.gc1.att_src",
+   "shape": [
+    4
+   ],
+   "offset": 776,
+   "length": 4
+  },
+  {
+   "name": "gat.gc1.att_dst",
+   "shape": [
+    4
+   ],
+   "offset": 780,
+   "length": 4
+  },
+  {
+   "name": "gat.gc1.bias",
+   "shape": [
+    4
+   ],
+   "offset": 784,
+   "length": 4
+  },
+  {
+   "name": "gat.gc2.weight",
+   "shape": [
+    2,
+    4
+   ],
+   "offset": 788,
+   "length": 8
+  },
+  {
+   "name": "gat.gc2.att_src",
+   "shape": [
+    2
+   ],
+   "offset": 796,
+   "length": 2
+  },
+  {
+   "name": "gat.gc2.att_dst",
+   "shape": [
+    2
+   ],
+   "offset": 798,
+   "length": 2
+  },
+  {
+   "name": "gat.gc2.bias",
+   "shape": [
+    2
+   ],
+   "offset": 800,
+   "length": 2
+  },
+  {
+   "name": "gat.head.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 802,
+   "length": 4
+  },
+  {
+   "name": "gat.head.bias",
+   "shape": [
+    2
+   ],
+   "offset": 806,
+   "length": 2
+  }
+ ],
+ "layers": [
+  {
+   "id": "adj",
+   "op": "input",
+   "label": {
+    "en": "Friendships (adjacency A)",
+    "zh": "朋友关系（邻接矩阵 A）"
+   },
+   "in": [
+    "adj"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "desc": {
+    "en": "Row i has a 1 in column j when members i and j are friends.",
+    "zh": "成员 i 和 j 是朋友时，第 i 行第 j 列是 1。"
+   },
+   "axes": [
+    "n",
+    "k"
+   ]
+  },
+  {
+   "id": "x",
+   "op": "input",
+   "label": {
+    "en": "One-hot features X",
+    "zh": "独热特征 X"
+   },
+   "in": [
+    "x"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "desc": {
+    "en": "Row i is all 0 except a 1 in column i: member i knows only who it is.",
+    "zh": "第 i 行除了第 i 列是 1 以外全是 0：成员 i 只知道自己是谁。"
+   },
+   "axes": [
+    "n",
+    "f"
+   ]
+  },
+  {
+   "id": "gcn.gc1",
+   "op": "gcn_conv",
+   "label": {
+    "en": "GCN: graph layer 1",
+    "zh": "GCN：图网络层 1"
+   },
+   "in": [
+    "x",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 38
+   },
+   "sub": [
+    "ahat",
+    "xw"
+   ]
+  },
+  {
+   "id": "gcn.act1",
+   "op": "tanh",
+   "label": {
+    "en": "GCN: tanh 1",
+    "zh": "GCN：tanh 1"
+   },
+   "in": [
+    "gcn.gc1"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gcn.gc2",
+   "op": "gcn_conv",
+   "label": {
+    "en": "GCN: graph layer 2",
+    "zh": "GCN：图网络层 2"
+   },
+   "in": [
+    "gcn.act1",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 38
+   },
+   "sub": [
+    "ahat",
+    "xw"
+   ]
+  },
+  {
+   "id": "gcn.act2",
+   "op": "tanh",
+   "label": {
+    "en": "GCN: 2-D embedding",
+    "zh": "GCN：二维嵌入"
+   },
+   "in": [
+    "gcn.gc2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gcn.head",
+   "op": "linear",
+   "label": {
+    "en": "GCN: faction scores",
+    "zh": "GCN：派别分数"
+   },
+   "in": [
+    "gcn.act2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 120
+   }
+  },
+  {
+   "id": "sage.gc1",
+   "op": "sage_conv",
+   "label": {
+    "en": "GraphSAGE: graph layer 1",
+    "zh": "GraphSAGE：图网络层 1"
+   },
+   "in": [
+    "x",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 50
+   },
+   "sub": [
+    "mean"
+   ]
+  },
+  {
+   "id": "sage.act1",
+   "op": "tanh",
+   "label": {
+    "en": "GraphSAGE: tanh 1",
+    "zh": "GraphSAGE：tanh 1"
+   },
+   "in": [
+    "sage.gc1"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "sage.gc2",
+   "op": "sage_conv",
+   "label": {
+    "en": "GraphSAGE: graph layer 2",
+    "zh": "GraphSAGE：图网络层 2"
+   },
+   "in": [
+    "sage.act1",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 50
+   },
+   "sub": [
+    "mean"
+   ]
+  },
+  {
+   "id": "sage.act2",
+   "op": "tanh",
+   "label": {
+    "en": "GraphSAGE: 2-D embedding",
+    "zh": "GraphSAGE：二维嵌入"
+   },
+   "in": [
+    "sage.gc2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "sage.head",
+   "op": "linear",
+   "label": {
+    "en": "GraphSAGE: faction scores",
+    "zh": "GraphSAGE：派别分数"
+   },
+   "in": [
+    "sage.act2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 120
+   }
+  },
+  {
+   "id": "gin.gc1.agg",
+   "op": "gin_agg",
+   "label": {
+    "en": "GIN: sum of layer 1",
+    "zh": "GIN：第 1 层的求和"
+   },
+   "in": [
+    "x",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 71
+   }
+  },
+  {
+   "id": "gin.gc1.mlp.0",
+   "op": "linear",
+   "label": {
+    "en": "GIN: MLP 1, linear 1",
+    "zh": "GIN：MLP 1 的线性层 1"
+   },
+   "in": [
+    "gin.gc1.agg"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "params": {
+    "inFeatures": 34,
+    "outFeatures": 4
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 69
+   }
+  },
+  {
+   "id": "gin.gc1.mlp.1",
+   "op": "relu",
+   "label": {
+    "en": "GIN: MLP 1, ReLU",
+    "zh": "GIN：MLP 1 的 ReLU"
+   },
+   "in": [
+    "gin.gc1.mlp.0"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ]
+  },
+  {
+   "id": "gin.gc1.mlp.2",
+   "op": "linear",
+   "label": {
+    "en": "GIN: MLP 1, linear 2",
+    "zh": "GIN：MLP 1 的线性层 2"
+   },
+   "in": [
+    "gin.gc1.mlp.1"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "params": {
+    "inFeatures": 4,
+    "outFeatures": 4
+   },
+   "axes": [
+    "n",
+    "d"
+   ]
+  },
+  {
+   "id": "gin.act1",
+   "op": "tanh",
+   "label": {
+    "en": "GIN: tanh 1",
+    "zh": "GIN：tanh 1"
+   },
+   "in": [
+    "gin.gc1.mlp.2"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gin.gc2.agg",
+   "op": "gin_agg",
+   "label": {
+    "en": "GIN: sum of layer 2",
+    "zh": "GIN：第 2 层的求和"
+   },
+   "in": [
+    "gin.act1",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 71
+   }
+  },
+  {
+   "id": "gin.gc2.mlp.0",
+   "op": "linear",
+   "label": {
+    "en": "GIN: MLP 2, linear 1",
+    "zh": "GIN：MLP 2 的线性层 1"
+   },
+   "in": [
+    "gin.gc2.agg"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 4,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 69
+   }
+  },
+  {
+   "id": "gin.gc2.mlp.1",
+   "op": "relu",
+   "label": {
+    "en": "GIN: MLP 2, ReLU",
+    "zh": "GIN：MLP 2 的 ReLU"
+   },
+   "in": [
+    "gin.gc2.mlp.0"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ]
+  },
+  {
+   "id": "gin.gc2.mlp.2",
+   "op": "linear",
+   "label": {
+    "en": "GIN: MLP 2, linear 2",
+    "zh": "GIN：MLP 2 的线性层 2"
+   },
+   "in": [
+    "gin.gc2.mlp.1"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ]
+  },
+  {
+   "id": "gin.act2",
+   "op": "tanh",
+   "label": {
+    "en": "GIN: 2-D embedding",
+    "zh": "GIN：二维嵌入"
+   },
+   "in": [
+    "gin.gc2.mlp.2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gin.head",
+   "op": "linear",
+   "label": {
+    "en": "GIN: faction scores",
+    "zh": "GIN：派别分数"
+   },
+   "in": [
+    "gin.act2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 120
+   }
+  },
+  {
+   "id": "gat.gc1",
+   "op": "gat_conv",
+   "label": {
+    "en": "GAT: graph layer 1",
+    "zh": "GAT：图网络层 1"
+   },
+   "in": [
+    "x",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "params": {
+    "slope": 0.2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 78
+   },
+   "sub": [
+    "z",
+    "e",
+    "alpha"
+   ]
+  },
+  {
+   "id": "gat.act1",
+   "op": "tanh",
+   "label": {
+    "en": "GAT: tanh 1",
+    "zh": "GAT：tanh 1"
+   },
+   "in": [
+    "gat.gc1"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gat.gc2",
+   "op": "gat_conv",
+   "label": {
+    "en": "GAT: graph layer 2",
+    "zh": "GAT：图网络层 2"
+   },
+   "in": [
+    "gat.act1",
+    "adj"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "slope": 0.2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 78
+   },
+   "sub": [
+    "z",
+    "e",
+    "alpha"
+   ]
+  },
+  {
+   "id": "gat.act2",
+   "op": "tanh",
+   "label": {
+    "en": "GAT: 2-D embedding",
+    "zh": "GAT：二维嵌入"
+   },
+   "in": [
+    "gat.gc2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "gat.head",
+   "op": "linear",
+   "label": {
+    "en": "GAT: faction scores",
+    "zh": "GAT：派别分数"
+   },
+   "in": [
+    "gat.act2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gnn-variants/model.py",
+    "line": 120
+   }
+  }
+ ],
+ "training": {
+  "dataset": "Zachary's karate club (networkx, unweighted), labels of members 0 and 33 only",
+  "steps": 200,
+  "optimizer": "Adam lr 0.01, full graph every step, seed 0, the same for all four networks",
+  "hardware": "CPU float32",
+  "metrics": {
+   "gcn": {
+    "unlabelled_acc": 0.96875,
+    "wrong": [
+     8
+    ],
+    "loss_final": 0.008981735445559025
+   },
+   "sage": {
+    "unlabelled_acc": 0.96875,
+    "wrong": [
+     8
+    ],
+    "loss_final": 0.00940263457596302
+   },
+   "gin": {
+    "unlabelled_acc": 0.8125,
+    "wrong": [
+     8,
+     9,
+     24,
+     25,
+     26,
+     28
+    ],
+    "loss_final": 0.011118944734334946
+   },
+   "gat": {
+    "unlabelled_acc": 0.9375,
+    "wrong": [
+     2,
+     8
+    ],
+    "loss_final": 0.00796558428555727
+   }
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000143,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 4,
+  "edgeCases": [
+   "isolated",
+   "none"
+  ],
+  "perLayer": {
+   "gcn.gc1": 1.19e-7,
+   "gcn.gc1#ahat": 2.98e-8,
+   "gcn.act1": 8.94e-8,
+   "gcn.gc2": 2.38e-7,
+   "gcn.gc2#ahat": 2.98e-8,
+   "gcn.gc2#xw": 2.38e-7,
+   "gcn.act2": 8.94e-8,
+   "gcn.head": 2.38e-7,
+   "sage.gc1": 1.19e-7,
+   "sage.act1": 5.96e-8,
+   "sage.gc2": 2.38e-7,
+   "sage.gc2#mean": 1.19e-7,
+   "sage.act2": 5.96e-8,
+   "sage.head": 2.38e-7,
+   "gin.gc1.mlp.0": 2.38e-7,
+   "gin.gc1.mlp.1": 2.38e-7,
+   "gin.gc1.mlp.2": 2.38e-7,
+   "gin.act1": 8.94e-8,
+   "gin.gc2.agg": 9.54e-7,
+   "gin.gc2.mlp.0": 0.00000143,
+   "gin.gc2.mlp.1": 0.00000143,
+   "gin.gc2.mlp.2": 0.00000143,
+   "gin.act2": 1.79e-7,
+   "gin.head": 3.61e-7,
+   "gat.gc1": 1.19e-7,
+   "gat.gc1#e": 2.38e-7,
+   "gat.gc1#alpha": 1.19e-7,
+   "gat.act1": 1.19e-7,
+   "gat.gc2": 4.77e-7,
+   "gat.gc2#z": 4.77e-7,
+   "gat.gc2#e": 9.54e-7,
+   "gat.gc2#alpha": 1.79e-7,
+   "gat.act2": 5.96e-8,
+   "gat.head": 2.38e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/gnn-variants/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "adj",
+   "adapter": "graph",
+   "kind": "graph",
+   "shape": [
+    34,
+    34
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "k"
+   ]
+  },
+  {
+   "name": "x",
+   "adapter": "graph",
+   "kind": "graph",
+   "shape": [
+    34,
+    34
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "gcn.head",
+  "sage.head",
+  "gin.head",
+  "gat.head"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "rowNames": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31",
+  "32",
+  "33"
+ ],
+ "factions": [
+  "Mr. Hi",
+  "Officer"
+ ],
+ "variants": [
+  "gcn",
+  "sage",
+  "gin",
+  "gat"
+ ]
+}

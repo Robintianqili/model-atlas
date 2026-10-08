@@ -1,0 +1,947 @@
+{
+ "slug": "tiny-unet-seg",
+ "name": {
+  "en": "Tiny U-Net without skip connections",
+  "zh": "去掉跳跃连接的小型 U-Net"
+ },
+ "version": "2026-10-07",
+ "params": 26764,
+ "precision": "fp32",
+ "input": {
+  "kind": "drawing",
+  "shape": [
+   1,
+   32,
+   32
+  ]
+ },
+ "tensors": [
+  {
+   "name": "enc1.conv1.weight",
+   "shape": [
+    8,
+    1,
+    3,
+    3
+   ],
+   "offset": 0,
+   "length": 72
+  },
+  {
+   "name": "enc1.conv1.bias",
+   "shape": [
+    8
+   ],
+   "offset": 72,
+   "length": 8
+  },
+  {
+   "name": "enc1.conv2.weight",
+   "shape": [
+    8,
+    8,
+    3,
+    3
+   ],
+   "offset": 80,
+   "length": 576
+  },
+  {
+   "name": "enc1.conv2.bias",
+   "shape": [
+    8
+   ],
+   "offset": 656,
+   "length": 8
+  },
+  {
+   "name": "enc2.conv1.weight",
+   "shape": [
+    16,
+    8,
+    3,
+    3
+   ],
+   "offset": 664,
+   "length": 1152
+  },
+  {
+   "name": "enc2.conv1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1816,
+   "length": 16
+  },
+  {
+   "name": "enc2.conv2.weight",
+   "shape": [
+    16,
+    16,
+    3,
+    3
+   ],
+   "offset": 1832,
+   "length": 2304
+  },
+  {
+   "name": "enc2.conv2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 4136,
+   "length": 16
+  },
+  {
+   "name": "bott.conv1.weight",
+   "shape": [
+    32,
+    16,
+    3,
+    3
+   ],
+   "offset": 4152,
+   "length": 4608
+  },
+  {
+   "name": "bott.conv1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 8760,
+   "length": 32
+  },
+  {
+   "name": "bott.conv2.weight",
+   "shape": [
+    32,
+    32,
+    3,
+    3
+   ],
+   "offset": 8792,
+   "length": 9216
+  },
+  {
+   "name": "bott.conv2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 18008,
+   "length": 32
+  },
+  {
+   "name": "dec2.conv1.weight",
+   "shape": [
+    16,
+    32,
+    3,
+    3
+   ],
+   "offset": 18040,
+   "length": 4608
+  },
+  {
+   "name": "dec2.conv1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 22648,
+   "length": 16
+  },
+  {
+   "name": "dec2.conv2.weight",
+   "shape": [
+    16,
+    16,
+    3,
+    3
+   ],
+   "offset": 22664,
+   "length": 2304
+  },
+  {
+   "name": "dec2.conv2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 24968,
+   "length": 16
+  },
+  {
+   "name": "dec1.conv1.weight",
+   "shape": [
+    8,
+    16,
+    3,
+    3
+   ],
+   "offset": 24984,
+   "length": 1152
+  },
+  {
+   "name": "dec1.conv1.bias",
+   "shape": [
+    8
+   ],
+   "offset": 26136,
+   "length": 8
+  },
+  {
+   "name": "dec1.conv2.weight",
+   "shape": [
+    8,
+    8,
+    3,
+    3
+   ],
+   "offset": 26144,
+   "length": 576
+  },
+  {
+   "name": "dec1.conv2.bias",
+   "shape": [
+    8
+   ],
+   "offset": 26720,
+   "length": 8
+  },
+  {
+   "name": "logits.weight",
+   "shape": [
+    4,
+    8,
+    1,
+    1
+   ],
+   "offset": 26728,
+   "length": 32
+  },
+  {
+   "name": "logits.bias",
+   "shape": [
+    4
+   ],
+   "offset": 26760,
+   "length": 4
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your picture",
+    "zh": "你的图"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    32,
+    32
+   ],
+   "desc": {
+    "en": "32×32 grey numbers: dark noisy background, brighter shapes.",
+    "zh": "32×32 个灰度数：带噪声的暗背景，更亮的形状。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "enc1.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Down 1: conv 3×3 → 8 maps",
+    "zh": "下行第 1 层：3×3 卷积 → 8 张图"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 1,
+    "outChannels": 8
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 44
+   }
+  },
+  {
+   "id": "enc1.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Down 1: ReLU",
+    "zh": "下行第 1 层：ReLU"
+   },
+   "in": [
+    "enc1.conv1"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ]
+  },
+  {
+   "id": "enc1.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Down 1: second conv 3×3",
+    "zh": "下行第 1 层：第二个 3×3 卷积"
+   },
+   "in": [
+    "enc1.relu1"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 8,
+    "outChannels": 8
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 44
+   }
+  },
+  {
+   "id": "enc1",
+   "op": "relu",
+   "label": {
+    "en": "Down 1: 8 maps of 32×32",
+    "zh": "下行第 1 层：8 张 32×32 的图"
+   },
+   "in": [
+    "enc1.conv2"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ]
+  },
+  {
+   "id": "pool1",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Max pool 2×2 → 16×16",
+    "zh": "2×2 最大池化 → 16×16"
+   },
+   "in": [
+    "enc1"
+   ],
+   "outShape": [
+    8,
+    16,
+    16
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "enc2.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Down 2: conv 3×3 → 16 maps",
+    "zh": "下行第 2 层：3×3 卷积 → 16 张图"
+   },
+   "in": [
+    "pool1"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 8,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "enc2.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Down 2: ReLU",
+    "zh": "下行第 2 层：ReLU"
+   },
+   "in": [
+    "enc2.conv1"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ]
+  },
+  {
+   "id": "enc2.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Down 2: second conv 3×3",
+    "zh": "下行第 2 层：第二个 3×3 卷积"
+   },
+   "in": [
+    "enc2.relu1"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "enc2",
+   "op": "relu",
+   "label": {
+    "en": "Down 2: 16 maps of 16×16",
+    "zh": "下行第 2 层：16 张 16×16 的图"
+   },
+   "in": [
+    "enc2.conv2"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ]
+  },
+  {
+   "id": "pool2",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Max pool 2×2 → 8×8",
+    "zh": "2×2 最大池化 → 8×8"
+   },
+   "in": [
+    "enc2"
+   ],
+   "outShape": [
+    16,
+    8,
+    8
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "bott.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Bottleneck: conv 3×3 → 32 maps",
+    "zh": "瓶颈：3×3 卷积 → 32 张图"
+   },
+   "in": [
+    "pool2"
+   ],
+   "outShape": [
+    32,
+    8,
+    8
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "bott.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Bottleneck: ReLU",
+    "zh": "瓶颈：ReLU"
+   },
+   "in": [
+    "bott.conv1"
+   ],
+   "outShape": [
+    32,
+    8,
+    8
+   ]
+  },
+  {
+   "id": "bott.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Bottleneck: second conv 3×3",
+    "zh": "瓶颈：第二个 3×3 卷积"
+   },
+   "in": [
+    "bott.relu1"
+   ],
+   "outShape": [
+    32,
+    8,
+    8
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 32,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "bott",
+   "op": "relu",
+   "label": {
+    "en": "Bottleneck: 32 maps of 8×8",
+    "zh": "瓶颈：32 张 8×8 的图"
+   },
+   "in": [
+    "bott.conv2"
+   ],
+   "outShape": [
+    32,
+    8,
+    8
+   ]
+  },
+  {
+   "id": "up2",
+   "op": "upsample",
+   "label": {
+    "en": "Upsample ×2 → 16×16",
+    "zh": "上采样 ×2 → 16×16"
+   },
+   "in": [
+    "bott"
+   ],
+   "outShape": [
+    32,
+    16,
+    16
+   ],
+   "params": {
+    "scale": 2
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "dec2.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Up 2: conv 3×3 → 16 maps",
+    "zh": "上行第 2 层：3×3 卷积 → 16 张图"
+   },
+   "in": [
+    "up2"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 32,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 50
+   }
+  },
+  {
+   "id": "dec2.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Up 2: ReLU",
+    "zh": "上行第 2 层：ReLU"
+   },
+   "in": [
+    "dec2.conv1"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ]
+  },
+  {
+   "id": "dec2.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Up 2: second conv 3×3",
+    "zh": "上行第 2 层：第二个 3×3 卷积"
+   },
+   "in": [
+    "dec2.relu1"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 50
+   }
+  },
+  {
+   "id": "dec2",
+   "op": "relu",
+   "label": {
+    "en": "Up 2: 16 maps of 16×16",
+    "zh": "上行第 2 层：16 张 16×16 的图"
+   },
+   "in": [
+    "dec2.conv2"
+   ],
+   "outShape": [
+    16,
+    16,
+    16
+   ]
+  },
+  {
+   "id": "up1",
+   "op": "upsample",
+   "label": {
+    "en": "Upsample ×2 → 32×32",
+    "zh": "上采样 ×2 → 32×32"
+   },
+   "in": [
+    "dec2"
+   ],
+   "outShape": [
+    16,
+    32,
+    32
+   ],
+   "params": {
+    "scale": 2
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 51
+   }
+  },
+  {
+   "id": "dec1.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Up 1: conv 3×3 → 8 maps",
+    "zh": "上行第 1 层：3×3 卷积 → 8 张图"
+   },
+   "in": [
+    "up1"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 8
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 54
+   }
+  },
+  {
+   "id": "dec1.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Up 1: ReLU",
+    "zh": "上行第 1 层：ReLU"
+   },
+   "in": [
+    "dec1.conv1"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ]
+  },
+  {
+   "id": "dec1.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Up 1: second conv 3×3",
+    "zh": "上行第 1 层：第二个 3×3 卷积"
+   },
+   "in": [
+    "dec1.relu1"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 8,
+    "outChannels": 8
+   },
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 54
+   }
+  },
+  {
+   "id": "dec1",
+   "op": "relu",
+   "label": {
+    "en": "Up 1: 8 maps of 32×32",
+    "zh": "上行第 1 层：8 张 32×32 的图"
+   },
+   "in": [
+    "dec1.conv2"
+   ],
+   "outShape": [
+    8,
+    32,
+    32
+   ]
+  },
+  {
+   "id": "logits",
+   "op": "conv2d",
+   "label": {
+    "en": "Class scores: conv 1×1 → 4 per pixel",
+    "zh": "类别分数：1×1 卷积 → 每个像素 4 个"
+   },
+   "in": [
+    "dec1"
+   ],
+   "outShape": [
+    4,
+    32,
+    32
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 8,
+    "outChannels": 4
+   },
+   "axes": [
+    "class",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 55
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Per-pixel softmax: 4 shares per pixel",
+    "zh": "逐像素 softmax：每个像素 4 个份额"
+   },
+   "in": [
+    "logits"
+   ],
+   "outShape": [
+    4,
+    32,
+    32
+   ],
+   "params": {
+    "axis": 0
+   },
+   "axes": [
+    "class",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tiny-unet-seg/model.py",
+    "line": 58
+   }
+  }
+ ],
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000916,
+  "checked": "2026-10-07",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 3,
+  "edgeCases": [
+   "blank",
+   "giant"
+  ],
+  "perLayer": {
+   "enc1.conv1": 1.79e-7,
+   "enc1.relu1": 1.19e-7,
+   "enc1.conv2": 7.15e-7,
+   "enc1": 3.58e-7,
+   "pool1": 3.58e-7,
+   "enc2.conv1": 5.96e-7,
+   "enc2.relu1": 5.96e-7,
+   "enc2.conv2": 9.54e-7,
+   "enc2": 9.54e-7,
+   "pool2": 9.54e-7,
+   "bott.conv1": 0.00000119,
+   "bott.relu1": 9.54e-7,
+   "bott.conv2": 0.00000191,
+   "bott": 0.00000167,
+   "up2": 9.54e-7,
+   "dec2.conv1": 0.00000429,
+   "dec2.relu1": 0.00000286,
+   "dec2.conv2": 0.00000572,
+   "dec2": 0.00000572,
+   "up1": 0.00000572,
+   "dec1.conv1": 0.0000305,
+   "dec1.relu1": 0.0000229,
+   "dec1.conv2": 0.0000916,
+   "dec1": 0.0000916,
+   "logits": 0.0000558,
+   "probs": 0.00000119
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tiny-unet-seg/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "shapes32",
+   "kind": "drawing",
+   "shape": [
+    1,
+    32,
+    32
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json"
+ },
+ "classes": [
+  {
+   "id": "background",
+   "en": "background",
+   "zh": "背景"
+  },
+  {
+   "id": "circle",
+   "en": "circle",
+   "zh": "圆"
+  },
+  {
+   "id": "square",
+   "en": "square",
+   "zh": "正方形"
+  },
+  {
+   "id": "triangle",
+   "en": "triangle",
+   "zh": "三角形"
+  }
+ ]
+}

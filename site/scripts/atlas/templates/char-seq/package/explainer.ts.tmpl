@@ -1,0 +1,56 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%} --template char-seq` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// Sources: fwd (kind A: the LSTM on the learner's text, gate sub-steps lstm#i ... lstm#h); sample (kind C: text written
+// one character at a time on the same model).
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+	assets: { dir: 'models/{%slug%}', auto: ['spec.json', 'weights.bin'] }, // written by pipeline/{%slug%}/export.py
+	input: { adapter: '{%adapter%}', start: 'Once upon a time' },
+	sources: {
+		fwd: { kind: 'trace' },
+		sample: {
+			kind: 'process',
+			process: '{%processId%}',
+			run: 'main',
+			input: (rt) => ({ ids: Array.from((rt.pre?.tensors.input?.data ?? []) as ArrayLike<number>), model: rt.model })
+		}
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain what the forget gate does to the memory, with numbers', zh: 'TODO：用数字说明遗忘门对记忆做了什么' },
+			{ en: 'TODO: predict how temperature changes the written text', zh: 'TODO：预测温度如何改变写出的文字' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	credits: [
+		{
+			name: 'TinyStories (TinyStoriesV2-GPT4)',
+			url: 'https://huggingface.co/datasets/roneneldan/TinyStories',
+			license: 'CDLA-Sharing-1.0',
+			usedFor: 'TODO: training text for {%slug%}',
+			attribution: "Ronen Eldan and Yuanzhi Li, 'TinyStories: How Small Can Language Models Be and Still Speak Coherent English?' (2023)"
+		}
+	]
+};
+
+export default manifest;

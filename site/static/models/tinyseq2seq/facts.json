@@ -1,0 +1,134 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testExact": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "testN": {
+   "value": 5000,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "dates",
+   "measured": "2026-10-06"
+  },
+  "testUnseenExact": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "testUnseenN": {
+   "value": 4724,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "dates",
+   "measured": "2026-10-06"
+  },
+  "trainPairs": {
+   "value": 60000,
+   "source": "pipeline/tinyseq2seq/make_data.ts",
+   "unit": "pairs",
+   "measured": "2026-10-06"
+  },
+  "trainSteps": {
+   "value": 6000,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "steps",
+   "measured": "2026-10-06"
+  },
+  "batch": {
+   "value": 256,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "pairs",
+   "measured": "2026-10-06"
+  },
+  "hidden": {
+   "value": 32,
+   "source": "model.py",
+   "measured": "2026-10-06"
+  },
+  "noAttnExact": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "h8": {
+   "value": 8,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "measured": "2026-10-06"
+  },
+  "h8AttnExact": {
+   "value": 0.8482,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "h8NoAttnExact": {
+   "value": 0.1044,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offYearFirst": {
+   "value": 0.171,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offDashes": {
+   "value": 0.085,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offNoComma": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offSpelled": {
+   "value": 0.045,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offImpossible": {
+   "value": 0.356,
+   "source": "pipeline/tinyseq2seq/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "offN": {
+   "value": 1000,
+   "source": "pipeline/tinyseq2seq/make_data.ts",
+   "unit": "dates",
+   "measured": "2026-10-06"
+  },
+  "yearInside": {
+   "value": 0.9984,
+   "source": "export.py year_look()",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "yearSecond": {
+   "value": 0.9982,
+   "source": "export.py year_look()",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "yearSecondN": {
+   "value": 4991,
+   "source": "export.py year_look()",
+   "unit": "dates",
+   "measured": "2026-10-06"
+  },
+  "dataSha": {
+   "value": "c84b0a576baa40660c4b2e08a28f04b14b9c2109b054da921151e380eec59ef2",
+   "source": "pipeline/tinyseq2seq/make_data.ts (sha256 of the training pairs)",
+   "measured": "2026-10-06"
+  }
+ }
+}

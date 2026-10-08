@@ -1,0 +1,229 @@
+{
+ "slug": "hello-xor-2",
+ "name": {
+  "en": "Hello XOR 2 (sigmoid output)",
+  "zh": "你好 XOR 2（sigmoid 输出）"
+ },
+ "version": "2026-10-06",
+ "params": 9,
+ "precision": "fp32",
+ "input": {
+  "kind": "points2d",
+  "shape": [
+   2
+  ]
+ },
+ "tensors": [
+  {
+   "name": "fc1.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 0,
+   "length": 4
+  },
+  {
+   "name": "fc1.bias",
+   "shape": [
+    2
+   ],
+   "offset": 4,
+   "length": 2
+  },
+  {
+   "name": "fc2.weight",
+   "shape": [
+    1,
+    2
+   ],
+   "offset": 6,
+   "length": 2
+  },
+  {
+   "name": "fc2.bias",
+   "shape": [
+    1
+   ],
+   "offset": 8,
+   "length": 1
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your point",
+    "zh": "你的点"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    2
+   ],
+   "desc": {
+    "en": "The two numbers x1 and x2 of the point.",
+    "zh": "这个点的两个数 x1 和 x2。"
+   },
+   "axes": [
+    "f"
+   ]
+  },
+  {
+   "id": "fc1",
+   "op": "linear",
+   "label": {
+    "en": "Hidden layer",
+    "zh": "隐藏层"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "desc": {
+    "en": "Two weighted sums of x1 and x2, each plus a bias.",
+    "zh": "x1 和 x2 的两个加权和，各自再加一个偏置。"
+   },
+   "code": {
+    "file": "pipeline/hello-xor-2/model.py",
+    "line": 22
+   }
+  },
+  {
+   "id": "act1",
+   "op": "tanh",
+   "label": {
+    "en": "Tanh",
+    "zh": "Tanh"
+   },
+   "in": [
+    "fc1"
+   ],
+   "outShape": [
+    2
+   ],
+   "desc": {
+    "en": "Squashes each sum into the range -1 to 1.",
+    "zh": "把每个和压到 -1 到 1 之间。"
+   }
+  },
+  {
+   "id": "fc2",
+   "op": "linear",
+   "label": {
+    "en": "Output score",
+    "zh": "输出分数"
+   },
+   "in": [
+    "act1"
+   ],
+   "outShape": [
+    1
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 1
+   },
+   "desc": {
+    "en": "One weighted sum of the two hidden values: any number, positive for XOR true.",
+    "zh": "两个隐藏值的一个加权和：可以是任意数，正数表示 XOR 为真。"
+   },
+   "code": {
+    "file": "pipeline/hello-xor-2/model.py",
+    "line": 23
+   }
+  },
+  {
+   "id": "out",
+   "op": "sigmoid",
+   "label": {
+    "en": "Sigmoid: the probability",
+    "zh": "Sigmoid：概率"
+   },
+   "in": [
+    "fc2"
+   ],
+   "outShape": [
+    1
+   ],
+   "desc": {
+    "en": "Squashes the score into 0 to 1: the chance that XOR is true.",
+    "zh": "把分数压到 0 到 1 之间：XOR 为真的概率。"
+   },
+   "code": {
+    "file": "pipeline/hello-xor-2/model.py",
+    "line": 29
+   }
+  }
+ ],
+ "training": {
+  "dataset": "the XOR truth table (4 points)",
+  "steps": 1500,
+  "optimizer": "Adam lr 0.05, full batch, binary cross-entropy",
+  "metrics": {
+   "final_loss": 0.00031885935459285975,
+   "correct": 4
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 9.54e-7,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 6,
+  "edgeCases": [
+   "p00",
+   "mid",
+   "far"
+  ],
+  "perLayer": {
+   "fc2": 9.54e-7,
+   "out": 2.18e-10
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "train",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/hello-xor-2/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "xor-point",
+   "kind": "points2d",
+   "shape": [
+    2
+   ],
+   "dtype": "f32",
+   "axes": [
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "target": "XOR(x1, x2) for x1, x2 in {0, 1}"
+}

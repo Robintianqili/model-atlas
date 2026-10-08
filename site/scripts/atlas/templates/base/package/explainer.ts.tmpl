@@ -1,0 +1,54 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%}` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+{%#trace%}
+	assets: { dir: 'models/{%slug%}', auto: ['spec.json', 'weights.bin'] }, // written by pipeline/{%slug%}/export.py
+{%/trace%}
+{%#hasInput%}
+	input: { adapter: '{%adapter%}' }, // add presets: 'presets.json' and start: <raw input> when you have them
+{%/hasInput%}
+	sources: {
+{%#trace%}
+		fwd: { kind: 'trace' },
+{%/trace%}
+{%#train%}
+		train: { kind: 'train', trainer: '{%trainerId%}', detail: 'coarse' },
+		step1: { kind: 'train', trainer: '{%trainerId%}', detail: 'fine', opt: { optimizer: 'sgd' } }, // the slowed-down step
+{%/train%}
+{%#process%}
+		run: { kind: 'process', process: '{%processId%}', run: 'main' },
+{%/process%}
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain how {%nameEn%} turns its input into its output, step by step', zh: 'TODO：一步步说明{%nameZh%}如何把输入变成输出' },
+			{ en: 'TODO: predict what changes when you change the input', zh: 'TODO：预测改变输入时会发生什么' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	// Every dataset, ported code or idea-with-code (AK704). promote appends these to static/licenses.json.
+	credits: []
+};
+
+export default manifest;

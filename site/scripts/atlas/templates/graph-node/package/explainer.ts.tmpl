@@ -1,0 +1,40 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%} --template graph-node` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// The input adapter 'graph' is local to this package (adapters/graph/); add its Capture.svelte (an edge editor).
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+	input: { adapter: 'graph' },
+	sources: {
+		train: { kind: 'train', trainer: '{%trainerId%}', detail: 'coarse', opt: { seed: 1 } }
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain how a node gets a class from its neighbours', zh: 'TODO：解释一个节点如何从邻居那里得到类别' },
+			{ en: 'TODO: predict which unlabelled nodes the network gets wrong', zh: 'TODO：预测网络会把哪些未标注的节点分错' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	credits: []
+};
+
+export default manifest;

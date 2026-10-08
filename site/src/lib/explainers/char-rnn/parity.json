@@ -1,0 +1,34 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "char-rnn",
+ "checked": "2026-10-06",
+ "sources": {
+  "unroll": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 9.88e-15,
+   "frames": 212,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  },
+  "sample": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 5.5e-15,
+   "frames": 61,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  },
+  "greedy": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 4.44e-15,
+   "frames": 61,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,28 @@
+"""{%slug%}: the PyTorch float64 twin of trainer '{%trainerId%}' (kind B parity, design §4.11).
+
+`npm run atlas -- parity {%slug%}` writes the TS init params and batches (windows of the series: TS is the source of
+truth for data) and runs `python -m atlas_kit.train_reference` with this twin. State_dict names equal the TS names:
+MLP('net', [L, hidden, 1], 'tanh') -> net.0.*, net.2.*.
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+
+
+class Net(nn.Module):
+    def __init__(self, L: int, hidden: int):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(L, hidden), nn.Tanh(), nn.Linear(hidden, 1))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+def build(cfg: dict) -> nn.Module:
+    return Net(int(cfg.get("L", 8)), int(cfg.get("hidden", 16))).double()
+
+
+def loss(model: nn.Module, batch: dict, cfg: dict) -> tuple[torch.Tensor, dict]:
+    """batch: {'x': [B, L], 'y': [B, 1]} float64. Mean squared error, as the TS mse()."""
+    return torch.mean((model(batch["x"]) - batch["y"]) ** 2), {}

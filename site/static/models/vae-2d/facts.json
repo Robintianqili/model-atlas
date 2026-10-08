@@ -1,0 +1,125 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testN": {
+   "value": 7500,
+   "unit": "drawings",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "classesN": {
+   "value": 5,
+   "unit": "classes",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "testRec": {
+   "value": 207.97,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "testRecMu": {
+   "value": 207.04,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "testKl": {
+   "value": 6.559,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "testLoss": {
+   "value": 214.53,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "knnK": {
+   "value": 10,
+   "unit": "drawings",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "knnAgree": {
+   "value": 0.9016,
+   "unit": "share",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "sigmaMedian": {
+   "value": 0.0399,
+   "unit": "latent units",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "muStd": {
+   "value": 1.09,
+   "unit": "latent units",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "greyIn": {
+   "value": 0.4402,
+   "unit": "share",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "greyOut": {
+   "value": 0.6741,
+   "unit": "share",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "mapPerClass": {
+   "value": 400,
+   "unit": "drawings",
+   "source": "pipeline/vae-2d/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "z16Dim": {
+   "value": 16,
+   "unit": "latent numbers",
+   "source": "pipeline/vae-2d/stats.py on model_z16.pt (train.py --zdim 16; not shipped)",
+   "measured": "2026-10-06"
+  },
+  "z16Rec": {
+   "value": 159.22,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py on model_z16.pt (train.py --zdim 16; not shipped)",
+   "measured": "2026-10-06"
+  },
+  "z16Kl": {
+   "value": 20.189,
+   "unit": "nats",
+   "source": "pipeline/vae-2d/stats.py on model_z16.pt (train.py --zdim 16; not shipped)",
+   "measured": "2026-10-06"
+  },
+  "z16GreyOut": {
+   "value": 0.671,
+   "unit": "share",
+   "source": "pipeline/vae-2d/stats.py on model_z16.pt (train.py --zdim 16; not shipped)",
+   "measured": "2026-10-06"
+  },
+  "params": {
+   "value": 435988,
+   "unit": "numbers",
+   "source": "pipeline/vae-2d/model.py",
+   "measured": "2026-10-06"
+  },
+  "epochs": {
+   "value": 80,
+   "unit": "epochs",
+   "source": "pipeline/vae-2d/train.py",
+   "measured": "2026-10-06"
+  },
+  "trainN": {
+   "value": 60000,
+   "unit": "drawings",
+   "source": "ak.data.quickdraw (TinyCNN split)",
+   "measured": "2026-10-06"
+  }
+ }
+}

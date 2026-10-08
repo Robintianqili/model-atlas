@@ -1,0 +1,1988 @@
+{
+ "slug": "tinygpt",
+ "name": {
+  "en": "TinyGPT",
+  "zh": "TinyGPT（微型 GPT）"
+ },
+ "version": "2026-10-05",
+ "params": 364040,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ],
+  "notes": "Token ids from tokenizer.json (byte-level BPE, 1024 tokens). At most 64 tokens: longer input keeps the last 64 (forward) and the cut is reported."
+ },
+ "vocabSize": 1024,
+ "context": 64,
+ "nLayer": 4,
+ "nHead": 4,
+ "dModel": 76,
+ "dHead": 19,
+ "dMLP": 304,
+ "lnEps": 0.00001,
+ "eotId": 1023,
+ "tokenizer": "tokenizer.json",
+ "tiedHead": true,
+ "activation": "gelu_tanh",
+ "tensors": [
+  {
+   "name": "tok_emb.weight",
+   "shape": [
+    1024,
+    76
+   ],
+   "offset": 0,
+   "length": 77824
+  },
+  {
+   "name": "pos_emb.weight",
+   "shape": [
+    64,
+    76
+   ],
+   "offset": 77824,
+   "length": 4864
+  },
+  {
+   "name": "L0.ln1.weight",
+   "shape": [
+    76
+   ],
+   "offset": 82688,
+   "length": 76
+  },
+  {
+   "name": "L0.ln1.bias",
+   "shape": [
+    76
+   ],
+   "offset": 82764,
+   "length": 76
+  },
+  {
+   "name": "L0.attn.q.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 82840,
+   "length": 5776
+  },
+  {
+   "name": "L0.attn.q.bias",
+   "shape": [
+    76
+   ],
+   "offset": 88616,
+   "length": 76
+  },
+  {
+   "name": "L0.attn.k.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 88692,
+   "length": 5776
+  },
+  {
+   "name": "L0.attn.k.bias",
+   "shape": [
+    76
+   ],
+   "offset": 94468,
+   "length": 76
+  },
+  {
+   "name": "L0.attn.v.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 94544,
+   "length": 5776
+  },
+  {
+   "name": "L0.attn.v.bias",
+   "shape": [
+    76
+   ],
+   "offset": 100320,
+   "length": 76
+  },
+  {
+   "name": "L0.attn.proj.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 100396,
+   "length": 5776
+  },
+  {
+   "name": "L0.attn.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 106172,
+   "length": 76
+  },
+  {
+   "name": "L0.ln2.weight",
+   "shape": [
+    76
+   ],
+   "offset": 106248,
+   "length": 76
+  },
+  {
+   "name": "L0.ln2.bias",
+   "shape": [
+    76
+   ],
+   "offset": 106324,
+   "length": 76
+  },
+  {
+   "name": "L0.mlp.fc.weight",
+   "shape": [
+    304,
+    76
+   ],
+   "offset": 106400,
+   "length": 23104
+  },
+  {
+   "name": "L0.mlp.fc.bias",
+   "shape": [
+    304
+   ],
+   "offset": 129504,
+   "length": 304
+  },
+  {
+   "name": "L0.mlp.proj.weight",
+   "shape": [
+    76,
+    304
+   ],
+   "offset": 129808,
+   "length": 23104
+  },
+  {
+   "name": "L0.mlp.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 152912,
+   "length": 76
+  },
+  {
+   "name": "L1.ln1.weight",
+   "shape": [
+    76
+   ],
+   "offset": 152988,
+   "length": 76
+  },
+  {
+   "name": "L1.ln1.bias",
+   "shape": [
+    76
+   ],
+   "offset": 153064,
+   "length": 76
+  },
+  {
+   "name": "L1.attn.q.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 153140,
+   "length": 5776
+  },
+  {
+   "name": "L1.attn.q.bias",
+   "shape": [
+    76
+   ],
+   "offset": 158916,
+   "length": 76
+  },
+  {
+   "name": "L1.attn.k.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 158992,
+   "length": 5776
+  },
+  {
+   "name": "L1.attn.k.bias",
+   "shape": [
+    76
+   ],
+   "offset": 164768,
+   "length": 76
+  },
+  {
+   "name": "L1.attn.v.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 164844,
+   "length": 5776
+  },
+  {
+   "name": "L1.attn.v.bias",
+   "shape": [
+    76
+   ],
+   "offset": 170620,
+   "length": 76
+  },
+  {
+   "name": "L1.attn.proj.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 170696,
+   "length": 5776
+  },
+  {
+   "name": "L1.attn.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 176472,
+   "length": 76
+  },
+  {
+   "name": "L1.ln2.weight",
+   "shape": [
+    76
+   ],
+   "offset": 176548,
+   "length": 76
+  },
+  {
+   "name": "L1.ln2.bias",
+   "shape": [
+    76
+   ],
+   "offset": 176624,
+   "length": 76
+  },
+  {
+   "name": "L1.mlp.fc.weight",
+   "shape": [
+    304,
+    76
+   ],
+   "offset": 176700,
+   "length": 23104
+  },
+  {
+   "name": "L1.mlp.fc.bias",
+   "shape": [
+    304
+   ],
+   "offset": 199804,
+   "length": 304
+  },
+  {
+   "name": "L1.mlp.proj.weight",
+   "shape": [
+    76,
+    304
+   ],
+   "offset": 200108,
+   "length": 23104
+  },
+  {
+   "name": "L1.mlp.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 223212,
+   "length": 76
+  },
+  {
+   "name": "L2.ln1.weight",
+   "shape": [
+    76
+   ],
+   "offset": 223288,
+   "length": 76
+  },
+  {
+   "name": "L2.ln1.bias",
+   "shape": [
+    76
+   ],
+   "offset": 223364,
+   "length": 76
+  },
+  {
+   "name": "L2.attn.q.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 223440,
+   "length": 5776
+  },
+  {
+   "name": "L2.attn.q.bias",
+   "shape": [
+    76
+   ],
+   "offset": 229216,
+   "length": 76
+  },
+  {
+   "name": "L2.attn.k.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 229292,
+   "length": 5776
+  },
+  {
+   "name": "L2.attn.k.bias",
+   "shape": [
+    76
+   ],
+   "offset": 235068,
+   "length": 76
+  },
+  {
+   "name": "L2.attn.v.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 235144,
+   "length": 5776
+  },
+  {
+   "name": "L2.attn.v.bias",
+   "shape": [
+    76
+   ],
+   "offset": 240920,
+   "length": 76
+  },
+  {
+   "name": "L2.attn.proj.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 240996,
+   "length": 5776
+  },
+  {
+   "name": "L2.attn.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 246772,
+   "length": 76
+  },
+  {
+   "name": "L2.ln2.weight",
+   "shape": [
+    76
+   ],
+   "offset": 246848,
+   "length": 76
+  },
+  {
+   "name": "L2.ln2.bias",
+   "shape": [
+    76
+   ],
+   "offset": 246924,
+   "length": 76
+  },
+  {
+   "name": "L2.mlp.fc.weight",
+   "shape": [
+    304,
+    76
+   ],
+   "offset": 247000,
+   "length": 23104
+  },
+  {
+   "name": "L2.mlp.fc.bias",
+   "shape": [
+    304
+   ],
+   "offset": 270104,
+   "length": 304
+  },
+  {
+   "name": "L2.mlp.proj.weight",
+   "shape": [
+    76,
+    304
+   ],
+   "offset": 270408,
+   "length": 23104
+  },
+  {
+   "name": "L2.mlp.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 293512,
+   "length": 76
+  },
+  {
+   "name": "L3.ln1.weight",
+   "shape": [
+    76
+   ],
+   "offset": 293588,
+   "length": 76
+  },
+  {
+   "name": "L3.ln1.bias",
+   "shape": [
+    76
+   ],
+   "offset": 293664,
+   "length": 76
+  },
+  {
+   "name": "L3.attn.q.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 293740,
+   "length": 5776
+  },
+  {
+   "name": "L3.attn.q.bias",
+   "shape": [
+    76
+   ],
+   "offset": 299516,
+   "length": 76
+  },
+  {
+   "name": "L3.attn.k.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 299592,
+   "length": 5776
+  },
+  {
+   "name": "L3.attn.k.bias",
+   "shape": [
+    76
+   ],
+   "offset": 305368,
+   "length": 76
+  },
+  {
+   "name": "L3.attn.v.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 305444,
+   "length": 5776
+  },
+  {
+   "name": "L3.attn.v.bias",
+   "shape": [
+    76
+   ],
+   "offset": 311220,
+   "length": 76
+  },
+  {
+   "name": "L3.attn.proj.weight",
+   "shape": [
+    76,
+    76
+   ],
+   "offset": 311296,
+   "length": 5776
+  },
+  {
+   "name": "L3.attn.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 317072,
+   "length": 76
+  },
+  {
+   "name": "L3.ln2.weight",
+   "shape": [
+    76
+   ],
+   "offset": 317148,
+   "length": 76
+  },
+  {
+   "name": "L3.ln2.bias",
+   "shape": [
+    76
+   ],
+   "offset": 317224,
+   "length": 76
+  },
+  {
+   "name": "L3.mlp.fc.weight",
+   "shape": [
+    304,
+    76
+   ],
+   "offset": 317300,
+   "length": 23104
+  },
+  {
+   "name": "L3.mlp.fc.bias",
+   "shape": [
+    304
+   ],
+   "offset": 340404,
+   "length": 304
+  },
+  {
+   "name": "L3.mlp.proj.weight",
+   "shape": [
+    76,
+    304
+   ],
+   "offset": 340708,
+   "length": 23104
+  },
+  {
+   "name": "L3.mlp.proj.bias",
+   "shape": [
+    76
+   ],
+   "offset": 363812,
+   "length": 76
+  },
+  {
+   "name": "ln_f.weight",
+   "shape": [
+    76
+   ],
+   "offset": 363888,
+   "length": 76
+  },
+  {
+   "name": "ln_f.bias",
+   "shape": [
+    76
+   ],
+   "offset": 363964,
+   "length": 76
+  }
+ ],
+ "layers": [
+  {
+   "id": "tok_emb",
+   "op": "embedding",
+   "label": {
+    "en": "Token embedding",
+    "zh": "词元嵌入"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "tok_emb.weight"
+   }
+  },
+  {
+   "id": "pos_emb",
+   "op": "position_embedding",
+   "label": {
+    "en": "Position embedding",
+    "zh": "位置嵌入"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "pos_emb.weight"
+   }
+  },
+  {
+   "id": "embed",
+   "op": "add",
+   "label": {
+    "en": "Token + position",
+    "zh": "词元 + 位置"
+   },
+   "in": [
+    "tok_emb",
+    "pos_emb"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L0.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 1",
+    "zh": "第 1 块 · 层归一化 1"
+   },
+   "in": [
+    "embed"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.ln1.weight",
+    "bias": "L0.ln1.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L0.attn.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Query Q",
+    "zh": "第 1 块 · 查询 Q"
+   },
+   "in": [
+    "L0.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.attn.q.weight",
+    "bias": "L0.attn.q.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L0.attn.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Key K",
+    "zh": "第 1 块 · 键 K"
+   },
+   "in": [
+    "L0.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.attn.k.weight",
+    "bias": "L0.attn.k.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L0.attn.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Value V",
+    "zh": "第 1 块 · 值 V"
+   },
+   "in": [
+    "L0.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.attn.v.weight",
+    "bias": "L0.attn.v.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L0.attn.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 1 · Scores QKᵀ/√d",
+    "zh": "第 1 块 · 注意力分数 QKᵀ/√d"
+   },
+   "in": [
+    "L0.attn.q",
+    "L0.attn.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19,
+    "scale": 0.22941573387056174
+   }
+  },
+  {
+   "id": "L0.attn.masked",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 1 · Causal mask",
+    "zh": "第 1 块 · 因果掩码"
+   },
+   "in": [
+    "L0.attn.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "fill": "-Infinity above the diagonal"
+   }
+  },
+  {
+   "id": "L0.attn.weights",
+   "op": "softmax",
+   "label": {
+    "en": "Block 1 · Attention weights",
+    "zh": "第 1 块 · 注意力权重"
+   },
+   "in": [
+    "L0.attn.masked"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "axis": -1
+   }
+  },
+  {
+   "id": "L0.attn.heads",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 1 · Weighted values (heads joined)",
+    "zh": "第 1 块 · 值的加权和（多头拼接）"
+   },
+   "in": [
+    "L0.attn.weights",
+    "L0.attn.v"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L0.attn.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Attention output",
+    "zh": "第 1 块 · 注意力输出投影"
+   },
+   "in": [
+    "L0.attn.heads"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.attn.proj.weight",
+    "bias": "L0.attn.proj.bias"
+   }
+  },
+  {
+   "id": "L0.resid1",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Residual add 1",
+    "zh": "第 1 块 · 残差相加 1"
+   },
+   "in": [
+    "embed",
+    "L0.attn.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L0.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 2",
+    "zh": "第 1 块 · 层归一化 2"
+   },
+   "in": [
+    "L0.resid1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.ln2.weight",
+    "bias": "L0.ln2.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L0.mlp.fc",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · MLP expand (4×)",
+    "zh": "第 1 块 · MLP 扩展（4 倍）"
+   },
+   "in": [
+    "L0.ln2"
+   ],
+   "outShape": [
+    "T",
+    304
+   ],
+   "params": {
+    "weight": "L0.mlp.fc.weight",
+    "bias": "L0.mlp.fc.bias"
+   }
+  },
+  {
+   "id": "L0.mlp.gelu",
+   "op": "gelu_tanh",
+   "label": {
+    "en": "Block 1 · GELU",
+    "zh": "第 1 块 · GELU 激活"
+   },
+   "in": [
+    "L0.mlp.fc"
+   ],
+   "outShape": [
+    "T",
+    304
+   ]
+  },
+  {
+   "id": "L0.mlp.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · MLP project back",
+    "zh": "第 1 块 · MLP 投影回原维度"
+   },
+   "in": [
+    "L0.mlp.gelu"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L0.mlp.proj.weight",
+    "bias": "L0.mlp.proj.bias"
+   }
+  },
+  {
+   "id": "L0.resid2",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Residual add 2",
+    "zh": "第 1 块 · 残差相加 2"
+   },
+   "in": [
+    "L0.resid1",
+    "L0.mlp.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L1.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 1",
+    "zh": "第 2 块 · 层归一化 1"
+   },
+   "in": [
+    "L0.resid2"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.ln1.weight",
+    "bias": "L1.ln1.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L1.attn.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Query Q",
+    "zh": "第 2 块 · 查询 Q"
+   },
+   "in": [
+    "L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.attn.q.weight",
+    "bias": "L1.attn.q.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L1.attn.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Key K",
+    "zh": "第 2 块 · 键 K"
+   },
+   "in": [
+    "L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.attn.k.weight",
+    "bias": "L1.attn.k.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L1.attn.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Value V",
+    "zh": "第 2 块 · 值 V"
+   },
+   "in": [
+    "L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.attn.v.weight",
+    "bias": "L1.attn.v.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L1.attn.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 2 · Scores QKᵀ/√d",
+    "zh": "第 2 块 · 注意力分数 QKᵀ/√d"
+   },
+   "in": [
+    "L1.attn.q",
+    "L1.attn.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19,
+    "scale": 0.22941573387056174
+   }
+  },
+  {
+   "id": "L1.attn.masked",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 2 · Causal mask",
+    "zh": "第 2 块 · 因果掩码"
+   },
+   "in": [
+    "L1.attn.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "fill": "-Infinity above the diagonal"
+   }
+  },
+  {
+   "id": "L1.attn.weights",
+   "op": "softmax",
+   "label": {
+    "en": "Block 2 · Attention weights",
+    "zh": "第 2 块 · 注意力权重"
+   },
+   "in": [
+    "L1.attn.masked"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "axis": -1
+   }
+  },
+  {
+   "id": "L1.attn.heads",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 2 · Weighted values (heads joined)",
+    "zh": "第 2 块 · 值的加权和（多头拼接）"
+   },
+   "in": [
+    "L1.attn.weights",
+    "L1.attn.v"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L1.attn.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Attention output",
+    "zh": "第 2 块 · 注意力输出投影"
+   },
+   "in": [
+    "L1.attn.heads"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.attn.proj.weight",
+    "bias": "L1.attn.proj.bias"
+   }
+  },
+  {
+   "id": "L1.resid1",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Residual add 1",
+    "zh": "第 2 块 · 残差相加 1"
+   },
+   "in": [
+    "L0.resid2",
+    "L1.attn.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L1.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 2",
+    "zh": "第 2 块 · 层归一化 2"
+   },
+   "in": [
+    "L1.resid1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.ln2.weight",
+    "bias": "L1.ln2.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L1.mlp.fc",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · MLP expand (4×)",
+    "zh": "第 2 块 · MLP 扩展（4 倍）"
+   },
+   "in": [
+    "L1.ln2"
+   ],
+   "outShape": [
+    "T",
+    304
+   ],
+   "params": {
+    "weight": "L1.mlp.fc.weight",
+    "bias": "L1.mlp.fc.bias"
+   }
+  },
+  {
+   "id": "L1.mlp.gelu",
+   "op": "gelu_tanh",
+   "label": {
+    "en": "Block 2 · GELU",
+    "zh": "第 2 块 · GELU 激活"
+   },
+   "in": [
+    "L1.mlp.fc"
+   ],
+   "outShape": [
+    "T",
+    304
+   ]
+  },
+  {
+   "id": "L1.mlp.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · MLP project back",
+    "zh": "第 2 块 · MLP 投影回原维度"
+   },
+   "in": [
+    "L1.mlp.gelu"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L1.mlp.proj.weight",
+    "bias": "L1.mlp.proj.bias"
+   }
+  },
+  {
+   "id": "L1.resid2",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Residual add 2",
+    "zh": "第 2 块 · 残差相加 2"
+   },
+   "in": [
+    "L1.resid1",
+    "L1.mlp.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L2.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 3 · LayerNorm 1",
+    "zh": "第 3 块 · 层归一化 1"
+   },
+   "in": [
+    "L1.resid2"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.ln1.weight",
+    "bias": "L2.ln1.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L2.attn.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Query Q",
+    "zh": "第 3 块 · 查询 Q"
+   },
+   "in": [
+    "L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.attn.q.weight",
+    "bias": "L2.attn.q.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L2.attn.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Key K",
+    "zh": "第 3 块 · 键 K"
+   },
+   "in": [
+    "L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.attn.k.weight",
+    "bias": "L2.attn.k.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L2.attn.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Value V",
+    "zh": "第 3 块 · 值 V"
+   },
+   "in": [
+    "L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.attn.v.weight",
+    "bias": "L2.attn.v.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L2.attn.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 3 · Scores QKᵀ/√d",
+    "zh": "第 3 块 · 注意力分数 QKᵀ/√d"
+   },
+   "in": [
+    "L2.attn.q",
+    "L2.attn.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19,
+    "scale": 0.22941573387056174
+   }
+  },
+  {
+   "id": "L2.attn.masked",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 3 · Causal mask",
+    "zh": "第 3 块 · 因果掩码"
+   },
+   "in": [
+    "L2.attn.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "fill": "-Infinity above the diagonal"
+   }
+  },
+  {
+   "id": "L2.attn.weights",
+   "op": "softmax",
+   "label": {
+    "en": "Block 3 · Attention weights",
+    "zh": "第 3 块 · 注意力权重"
+   },
+   "in": [
+    "L2.attn.masked"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "axis": -1
+   }
+  },
+  {
+   "id": "L2.attn.heads",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 3 · Weighted values (heads joined)",
+    "zh": "第 3 块 · 值的加权和（多头拼接）"
+   },
+   "in": [
+    "L2.attn.weights",
+    "L2.attn.v"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L2.attn.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Attention output",
+    "zh": "第 3 块 · 注意力输出投影"
+   },
+   "in": [
+    "L2.attn.heads"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.attn.proj.weight",
+    "bias": "L2.attn.proj.bias"
+   }
+  },
+  {
+   "id": "L2.resid1",
+   "op": "add",
+   "label": {
+    "en": "Block 3 · Residual add 1",
+    "zh": "第 3 块 · 残差相加 1"
+   },
+   "in": [
+    "L1.resid2",
+    "L2.attn.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L2.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 3 · LayerNorm 2",
+    "zh": "第 3 块 · 层归一化 2"
+   },
+   "in": [
+    "L2.resid1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.ln2.weight",
+    "bias": "L2.ln2.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L2.mlp.fc",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · MLP expand (4×)",
+    "zh": "第 3 块 · MLP 扩展（4 倍）"
+   },
+   "in": [
+    "L2.ln2"
+   ],
+   "outShape": [
+    "T",
+    304
+   ],
+   "params": {
+    "weight": "L2.mlp.fc.weight",
+    "bias": "L2.mlp.fc.bias"
+   }
+  },
+  {
+   "id": "L2.mlp.gelu",
+   "op": "gelu_tanh",
+   "label": {
+    "en": "Block 3 · GELU",
+    "zh": "第 3 块 · GELU 激活"
+   },
+   "in": [
+    "L2.mlp.fc"
+   ],
+   "outShape": [
+    "T",
+    304
+   ]
+  },
+  {
+   "id": "L2.mlp.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · MLP project back",
+    "zh": "第 3 块 · MLP 投影回原维度"
+   },
+   "in": [
+    "L2.mlp.gelu"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L2.mlp.proj.weight",
+    "bias": "L2.mlp.proj.bias"
+   }
+  },
+  {
+   "id": "L2.resid2",
+   "op": "add",
+   "label": {
+    "en": "Block 3 · Residual add 2",
+    "zh": "第 3 块 · 残差相加 2"
+   },
+   "in": [
+    "L2.resid1",
+    "L2.mlp.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L3.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 4 · LayerNorm 1",
+    "zh": "第 4 块 · 层归一化 1"
+   },
+   "in": [
+    "L2.resid2"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.ln1.weight",
+    "bias": "L3.ln1.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L3.attn.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Query Q",
+    "zh": "第 4 块 · 查询 Q"
+   },
+   "in": [
+    "L3.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.attn.q.weight",
+    "bias": "L3.attn.q.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L3.attn.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Key K",
+    "zh": "第 4 块 · 键 K"
+   },
+   "in": [
+    "L3.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.attn.k.weight",
+    "bias": "L3.attn.k.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L3.attn.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Value V",
+    "zh": "第 4 块 · 值 V"
+   },
+   "in": [
+    "L3.ln1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.attn.v.weight",
+    "bias": "L3.attn.v.bias",
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L3.attn.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 4 · Scores QKᵀ/√d",
+    "zh": "第 4 块 · 注意力分数 QKᵀ/√d"
+   },
+   "in": [
+    "L3.attn.q",
+    "L3.attn.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19,
+    "scale": 0.22941573387056174
+   }
+  },
+  {
+   "id": "L3.attn.masked",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 4 · Causal mask",
+    "zh": "第 4 块 · 因果掩码"
+   },
+   "in": [
+    "L3.attn.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "fill": "-Infinity above the diagonal"
+   }
+  },
+  {
+   "id": "L3.attn.weights",
+   "op": "softmax",
+   "label": {
+    "en": "Block 4 · Attention weights",
+    "zh": "第 4 块 · 注意力权重"
+   },
+   "in": [
+    "L3.attn.masked"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "axis": -1
+   }
+  },
+  {
+   "id": "L3.attn.heads",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 4 · Weighted values (heads joined)",
+    "zh": "第 4 块 · 值的加权和（多头拼接）"
+   },
+   "in": [
+    "L3.attn.weights",
+    "L3.attn.v"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 19
+   }
+  },
+  {
+   "id": "L3.attn.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Attention output",
+    "zh": "第 4 块 · 注意力输出投影"
+   },
+   "in": [
+    "L3.attn.heads"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.attn.proj.weight",
+    "bias": "L3.attn.proj.bias"
+   }
+  },
+  {
+   "id": "L3.resid1",
+   "op": "add",
+   "label": {
+    "en": "Block 4 · Residual add 1",
+    "zh": "第 4 块 · 残差相加 1"
+   },
+   "in": [
+    "L2.resid2",
+    "L3.attn.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "L3.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 4 · LayerNorm 2",
+    "zh": "第 4 块 · 层归一化 2"
+   },
+   "in": [
+    "L3.resid1"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.ln2.weight",
+    "bias": "L3.ln2.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "L3.mlp.fc",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · MLP expand (4×)",
+    "zh": "第 4 块 · MLP 扩展（4 倍）"
+   },
+   "in": [
+    "L3.ln2"
+   ],
+   "outShape": [
+    "T",
+    304
+   ],
+   "params": {
+    "weight": "L3.mlp.fc.weight",
+    "bias": "L3.mlp.fc.bias"
+   }
+  },
+  {
+   "id": "L3.mlp.gelu",
+   "op": "gelu_tanh",
+   "label": {
+    "en": "Block 4 · GELU",
+    "zh": "第 4 块 · GELU 激活"
+   },
+   "in": [
+    "L3.mlp.fc"
+   ],
+   "outShape": [
+    "T",
+    304
+   ]
+  },
+  {
+   "id": "L3.mlp.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · MLP project back",
+    "zh": "第 4 块 · MLP 投影回原维度"
+   },
+   "in": [
+    "L3.mlp.gelu"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "L3.mlp.proj.weight",
+    "bias": "L3.mlp.proj.bias"
+   }
+  },
+  {
+   "id": "L3.resid2",
+   "op": "add",
+   "label": {
+    "en": "Block 4 · Residual add 2",
+    "zh": "第 4 块 · 残差相加 2"
+   },
+   "in": [
+    "L3.resid1",
+    "L3.mlp.proj"
+   ],
+   "outShape": [
+    "T",
+    76
+   ]
+  },
+  {
+   "id": "ln_f",
+   "op": "layernorm",
+   "label": {
+    "en": "Final LayerNorm",
+    "zh": "最终层归一化"
+   },
+   "in": [
+    "L3.resid2"
+   ],
+   "outShape": [
+    "T",
+    76
+   ],
+   "params": {
+    "weight": "ln_f.weight",
+    "bias": "ln_f.bias",
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "logits",
+   "op": "linear_tied",
+   "label": {
+    "en": "Logits (tied to token embedding)",
+    "zh": "Logits（与词元嵌入共享权重）"
+   },
+   "in": [
+    "ln_f"
+   ],
+   "outShape": [
+    "T",
+    1024
+   ],
+   "params": {
+    "weight": "tok_emb.weight",
+    "transposed": true
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Next-token probabilities",
+    "zh": "下一个词元的概率"
+   },
+   "in": [
+    "logits"
+   ],
+   "outShape": [
+    "T",
+    1024
+   ],
+   "params": {
+    "axis": -1
+   }
+  }
+ ],
+ "training": {
+  "dataset": "TinyStories (Eldan & Li 2023, CDLA-Sharing-1.0): first 100 MiB of TinyStoriesV2-GPT4-train; validation = official TinyStoriesV2-GPT4-valid",
+  "trainTokens": 32540880,
+  "valTokens": 6976765,
+  "bytesPerToken": 3.163,
+  "steps": 30000,
+  "batch": 512,
+  "tokensSeen": 983040000,
+  "epochs": 30.21,
+  "optimizer": "AdamW (betas 0.9/0.95, weight decay 0.1), lr 0.006, 300 warm-up steps then cosine to 0.1x, grad clip 1.0, bf16 autocast",
+  "hardware": "RTX 5090 Laptop GPU",
+  "metrics": {
+   "val_loss": 1.9189,
+   "val_perplexity": 6.814,
+   "val_tokens_scored": 6976704,
+   "train_loss": 1.9086,
+   "train_perplexity": 6.743,
+   "train_tokens_scored": 6976704,
+   "val_bits_per_byte": 0.8752,
+   "loss_unit": "nats per token (cross-entropy), mean over non-overlapping 64-token windows",
+   "uniform_baseline_loss": 6.9315
+  },
+  "samples": [
+   {
+    "prompt": "Once upon a time, there was a little",
+    "temperature": 0.8,
+    "seed": 100,
+    "maxNew": 120,
+    "continuation": " girl named Sue. Sue loved to play with her toys. One day, Sue had a big bag of toys. She wanted to play with the toys every day.\nSue's mom told her they would act very important. Sue would even think we would be okay if they could play too.\nOne day, Sue's mom asked Sue, \"Can I buy your toys with them?\" Sue was sad, but Sue said, \"Yes, you can buy some yummy food.\"\nSue and Sue worked together to buy the y",
+    "endedWithEot": false
+   },
+   {
+    "prompt": "One day, a girl named Mia found a",
+    "temperature": 0.8,
+    "seed": 101,
+    "maxNew": 120,
+    "continuation": " cooler. She loved to imagine it was a pretty thing. She was very excited to play with the cooler.\nMia asked her friend, Tom, for help. \"Tom, can you help me whistle with the cooler?\" Tom said. Tom liked to follow the cooler. They walked and walked until they reached the park. All the animals were happy.\nAt last, they saw a shiny sign on the ground. It was so pretty. Tom and Tom were very curious",
+    "endedWithEot": false
+   },
+   {
+    "prompt": "Tom and his dog went to the",
+    "temperature": 0.8,
+    "seed": 102,
+    "maxNew": 120,
+    "continuation": " park. They got meadowed and lay down on the grass. They said, \"Thank you, Mom and Dad, for making me dress. You are the best.\"\nHis mom smiled. She said, \"Let's take turns with the doll and make a reliable spicy spicy spicy spicy soup to make your clothes. Now, take a spicy spoon and sat down in the bushes. Blue will always enjoyion.",
+    "endedWithEot": false
+   },
+   {
+    "prompt": "The little bird was sad because",
+    "temperature": 0.8,
+    "seed": 103,
+    "maxNew": 120,
+    "continuation": " he thought the ball was difficult.\nThe little bird decided to run away from the ball. He gazed at the ball and ran away. The big tree began to cry. The big dog tried to cry, but the big cat was too small. The big dog leaned and hungry. The big dog heard the small bird's loud. The big dog wanted to help the little boy.\nThe small dog put his toy on the window. The dog caught the big dog and took the toy away.",
+    "endedWithEot": false
+   },
+   {
+    "prompt": "Once upon a time, in a big forest,",
+    "temperature": 0.8,
+    "seed": 104,
+    "maxNew": 120,
+    "continuation": " there lived a very friendly bear named Ben. Ben loved to play with his friends in the forest.\nOne day, Ben met a bird named Bow crying. Bow said, \"Bow's dog, I heard you hurt me. I was polished a little tail and broke you.\" Ben told the bird, \"You are too small to play with us.\" Bow said, \"The tail is hurt things. We can't play with our toys. We will stay here and wide. We will be safe and happy.\"\n",
+    "endedWithEot": false
+   }
+  ]
+ },
+ "parity": {
+  "against": "pytorch-fp32",
+  "max_abs_diff": 0.00001907,
+  "checked": "2026-10-06",
+  "tolerance": 0.0001,
+  "tensorsChecked": 198,
+  "prompts": 3,
+  "promptLengths": [
+   9,
+   22,
+   37
+  ],
+  "truncation": {
+   "ok": true,
+   "lastLogitsMaxAbsDiff": 0.00001431
+  },
+  "sampling": "4/4 generate() runs identical to the Python sampler",
+  "checkpointFp16": {
+   "step": 1000,
+   "maxAbsDiffLogitsVsSameFp16Weights": 0.00001144,
+   "maxAbsDiffLogitsVsOriginalFp32Weights": 0.008154
+  },
+  "replay": {
+   "checkpoints": 10,
+   "probes": 6,
+   "top10": 60,
+   "greedy": 60,
+   "sampled": 60,
+   "of": 60
+  },
+  "script": "pipeline/parity/tinygpt.parity.ts",
+  "passed": true,
+  "freshPromptCheck": {
+   "script": "pipeline/parity/verify_tinygpt/verify_model.check.ts (references from verify_model.py)",
+   "checked": "2026-10-05",
+   "prompts": 7,
+   "promptLengths": [
+    1,
+    1,
+    39,
+    19,
+    21,
+    64,
+    64
+   ],
+   "note": "fresh prompts written by the verifier, incl. full 64-token context, T=1, Chinese + emoji, <|endoftext|> inside, and a 186-token input cut to the last 64",
+   "tensorsChecked": 462,
+   "max_abs_diff": 0.00004196,
+   "worstTensor": "L2.attn.scores (T64)",
+   "maxAbsDiffVsPytorchFp64": 0.00001001,
+   "generate": "greedy 8/8, sampled 24/24 identical to an independent Python loop (60 new tokens each)",
+   "surprisal": "189 tokens, 5 windows: max |bits diff| 2.40e-5, ranks identical 188/188",
+   "passed": true
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "tokenizer": "tokenizer.json",
+  "reference": "reference.json",
+  "checkpoints": "checkpoints/index.json",
+  "curve": "checkpoints/curve.json",
+  "replay": "replay.json"
+ }
+}

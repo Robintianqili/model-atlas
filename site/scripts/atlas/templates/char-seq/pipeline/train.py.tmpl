@@ -1,0 +1,63 @@
+"""{%slug%}: train the character LSTM on TinyStories text (fixed seed). Scaffolded on {%today%}.
+
+    npm run atlas -- py pipeline/{%slug%}/train.py [--chars 2000000] [--steps 3000]
+
+Data: ak.data.tinystories_chars (the file downloaded for TinyGPT; no new download). The alphabet is every character
+that appears at least 20 times; rarer ones map to '?'. Writes model_final.pt, alphabet.json and train_metrics.json.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import torch
+import torch.nn.functional as F
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from model import CharLSTM  # noqa: E402
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--chars", type=int, default=2_000_000)
+    ap.add_argument("--steps", type=int, default=3000)
+    ap.add_argument("--seed", type=int, default=0)
+    a = ap.parse_args()
+    torch.manual_seed(a.seed)
+    text = ak.data.tinystories_chars(n_chars=a.chars)
+    counts = Counter(text)
+    alphabet = ["?"] + sorted(c for c, n in counts.items() if n >= 20 and c != "?")
+    index = {c: i for i, c in enumerate(alphabet)}
+    ids = torch.tensor([index.get(c, 0) for c in text])
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    m = CharLSTM(len(alphabet)).to(dev)
+    opt = torch.optim.Adam(m.parameters(), lr=3e-3)
+    T, B = 64, 32
+    for step in range(a.steps):
+        starts = torch.randint(0, len(ids) - T - 1, (B,))
+        x = torch.stack([ids[s:s + T] for s in starts]).T.to(dev)          # [T, B]
+        y = torch.stack([ids[s + 1:s + T + 1] for s in starts]).T.to(dev)
+        h, _ = m.lstm(m.emb(x))
+        loss = F.cross_entropy(m.head(h).reshape(-1, len(alphabet)), y.reshape(-1))
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+        if step % 500 == 0:
+            print(f"step {step}: loss {loss.item():.3f}")
+    m = m.cpu().eval()
+    torch.save(m.state_dict(), HERE / "model_final.pt")
+    with open(HERE / "alphabet.json", "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(alphabet, ensure_ascii=False) + "\n")
+    report = {"chars": len(text), "vocab": len(alphabet), "steps": a.steps, "final_loss": loss.item()}
+    with open(HERE / "train_metrics.json", "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(report, indent=1) + "\n")
+    print(json.dumps(report))

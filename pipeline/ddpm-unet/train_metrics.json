@@ -1,0 +1,26 @@
+{
+ "classes": [
+  "star",
+  "umbrella",
+  "house"
+ ],
+ "ch": [
+  16,
+  32,
+  64
+ ],
+ "T": 100,
+ "params": 60001,
+ "macs": 8354304,
+ "epochs": 600,
+ "steps": 84600,
+ "batch": 256,
+ "lr": 0.001,
+ "ema": 0.999,
+ "seed": 0,
+ "seconds": 981.2,
+ "pm1": true,
+ "val_loss": 0.03950251614317602,
+ "val_n": 4500,
+ "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)"
+}

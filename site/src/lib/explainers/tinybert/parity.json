@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tinybert",
+ "checked": "2026-10-06",
+ "sources": {
+  "hide": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 20,
+   "fixtures": 10,
+   "checked": "2026-10-06"
+  }
+ }
+}

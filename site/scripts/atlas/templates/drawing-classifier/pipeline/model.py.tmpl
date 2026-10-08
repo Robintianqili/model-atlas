@@ -1,0 +1,33 @@
+"""{%slug%}: the PyTorch model (kind A). Scaffolded by `atlas new model {%slug%} --template drawing-classifier` on {%today%}.
+
+A small CNN for 28x28 drawings (white strokes on black, value = pixel / 255, as TinyCNN). Submodule names become layer
+ids and tensor names in spec.json. Replace it with your architecture; keep every step something describe() can name
+with a builder call (conv2d, relu, maxpool2d, flatten, linear, softmax, ...) or a local op.
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+CLASSES = ["apple", "house", "sun"]   # TODO: classes from ak.data.quickdraw.available() (no new downloads)
+
+
+class Net(nn.Module):
+    """conv 3x3 (8) -> ReLU -> max pool 2 -> conv 3x3 (16) -> ReLU -> max pool 2 -> flatten -> linear -> classes."""
+
+    def __init__(self, n_classes: int = len(CLASSES)):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 8, 3)
+        self.conv2 = nn.Conv2d(8, 16, 3)
+        self.fc = nn.Linear(16 * 5 * 5, n_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = F.max_pool2d(F.relu(self.conv1(x)), 2)
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        return self.fc(x.flatten(1))
+
+
+if __name__ == "__main__":
+    m = Net()
+    print(m, sum(p.numel() for p in m.parameters()), "params")

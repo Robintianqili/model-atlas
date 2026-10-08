@@ -1,0 +1,144 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "positions": {
+   "value": 5478,
+   "source": "pipeline/alphazero-ttt/game.py",
+   "unit": "positions reachable from the empty board",
+   "measured": "2026-10-06"
+  },
+  "openPositions": {
+   "value": 4520,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "positions with a move still to make",
+   "measured": "2026-10-06"
+  },
+  "games": {
+   "value": 255168,
+   "source": "pipeline/alphazero-ttt/game.py",
+   "unit": "lines of play from the empty board",
+   "measured": "2026-10-06"
+  },
+  "treeNodes": {
+   "value": 549946,
+   "source": "pipeline/alphazero-ttt/game.py",
+   "unit": "positions in the full game tree",
+   "measured": "2026-10-06"
+  },
+  "priorPerfect": {
+   "value": 0.9404867256637168,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "searchPerfect": {
+   "value": 0.9860619469026549,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "search10": {
+   "value": 0.9730088495575221,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "search200": {
+   "value": 0.9929203539823008,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "fixedBySearch": {
+   "value": 206,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "positions",
+   "measured": "2026-10-06"
+  },
+  "brokenBySearch": {
+   "value": 0,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "positions",
+   "measured": "2026-10-06"
+  },
+  "searchLosses": {
+   "value": 0,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "games lost against every possible opponent",
+   "measured": "2026-10-06"
+  },
+  "searchGames": {
+   "value": 727,
+   "source": "pipeline/alphazero-ttt/evaluate.py",
+   "unit": "games against every possible opponent (as X and as O)",
+   "measured": "2026-10-06"
+  },
+  "rounds": {
+   "value": 40,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "measured": "2026-10-06"
+  },
+  "gamesPerRound": {
+   "value": 120,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "measured": "2026-10-06"
+  },
+  "selfplayGames": {
+   "value": 4800,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "measured": "2026-10-06"
+  },
+  "trainSims": {
+   "value": 50,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "unit": "simulations per move",
+   "measured": "2026-10-06"
+  },
+  "examples": {
+   "value": 41798,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "unit": "positions",
+   "measured": "2026-10-06"
+  },
+  "accStart": {
+   "value": 0.5353982300884956,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "accEnd": {
+   "value": 0.9404867256637168,
+   "source": "pipeline/alphazero-ttt/train.py",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "azSims": {
+   "value": 800,
+   "source": "Silver et al. 2018, Science 362:1140 (AlphaZero)",
+   "unit": "simulations per move",
+   "measured": "2026-10-06"
+  },
+  "azGoGames": {
+   "value": {
+    "en": "21 million",
+    "zh": "2,100 万"
+   },
+   "source": "Silver et al. 2018, Science 362:1140 (AlphaZero), table S3",
+   "measured": "2026-10-06"
+  },
+  "azTpus": {
+   "value": 5000,
+   "source": "Silver et al. 2018, Science 362:1140 (AlphaZero)",
+   "unit": "first-generation TPUs for self-play",
+   "measured": "2026-10-06"
+  },
+  "goPositions": {
+   "value": {
+    "en": "about 2 × 10¹⁷⁰",
+    "zh": "大约 2 × 10¹⁷⁰"
+   },
+   "source": "Tromp 2016, The number of legal Go positions",
+   "measured": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,212 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 2474,
+   "source": "export.py",
+   "measured": "2026-10-06"
+  },
+  "steps": {
+   "value": 20000,
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "batch": {
+   "value": 256,
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "trainExamples": {
+   "value": 200000,
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "valAcc": {
+   "value": 1.0,
+   "source": "train.py: 5,000 new rows (seed 2), answers at the ?",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "valExact": {
+   "value": 1.0,
+   "source": "train.py: rows with every answer right",
+   "unit": "share",
+   "measured": "2026-10-06"
+  },
+  "kMax": {
+   "value": 4,
+   "source": "data.py",
+   "measured": "2026-10-06"
+  },
+  "bodyMin": {
+   "value": 6,
+   "source": "data.py",
+   "measured": "2026-10-06"
+  },
+  "bodyMax": {
+   "value": 16,
+   "source": "data.py",
+   "measured": "2026-10-06"
+  },
+  "valExamples": {
+   "value": 5000,
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "accK1": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK1": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK2": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK2": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK3": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK3": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK4": {
+   "value": 0.999875,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK4": {
+   "value": 0.9995,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK5": {
+   "value": 0.7878,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK5": {
+   "value": 0.1995,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK6": {
+   "value": 0.62325,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK6": {
+   "value": 0.0275,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK7": {
+   "value": 0.4847142857142857,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK7": {
+   "value": 0.0005,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accK8": {
+   "value": 0.3955625,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "exactK8": {
+   "value": 0.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap2": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap4": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap8": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap12": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap16": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap20": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap24": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap30": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "accGap38": {
+   "value": 1.0,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaDot1": {
+   "value": 0.006246372126042843,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaDot2": {
+   "value": 0.005250383597349317,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaLetter1": {
+   "value": 0.05703742856020529,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaLetter2": {
+   "value": 0.2234551497069895,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaAsk1": {
+   "value": 0.017920653694587996,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  },
+  "deltaAsk2": {
+   "value": 0.13704988412035043,
+   "source": "stats.py",
+   "measured": "2026-10-06"
+  }
+ }
+}

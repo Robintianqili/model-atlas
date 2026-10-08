@@ -1,0 +1,79 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "gridworld",
+ "checked": "2026-10-06",
+ "sources": {
+  "you": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "greedy": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 401,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "eps": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 401,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "ucb": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 401,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "race": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 200,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "q": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1955,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "vi05": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 11,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  },
+  "vi95": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 11,
+   "fixtures": 7,
+   "checked": "2026-10-06"
+  }
+ }
+}

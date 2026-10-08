@@ -1,0 +1,143 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 9424,
+   "unit": "numbers",
+   "source": "pipeline/ecg-autoencoder/model.py",
+   "measured": "2026-10-08"
+  },
+  "code": {
+   "value": 4,
+   "unit": "numbers",
+   "source": "pipeline/ecg-autoencoder/model.py",
+   "measured": "2026-10-08"
+  },
+  "trainN": {
+   "value": 4000,
+   "unit": "beats",
+   "source": "beats.ts via the TS process data (train.py read them)",
+   "measured": "2026-10-08"
+  },
+  "valNormalN": {
+   "value": 400,
+   "unit": "beats",
+   "source": "beats.ts via the TS process data",
+   "measured": "2026-10-08"
+  },
+  "epochs": {
+   "value": 150,
+   "unit": "epochs",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "trainScore": {
+   "value": 0.02251481120684229,
+   "unit": "root of the mean squared error over the training beats",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "medianNormal": {
+   "value": 0.02182612009346485,
+   "unit": "score",
+   "source": "pipeline/ecg-autoencoder/export.py (PyTorch float32 on the CPU)",
+   "measured": "2026-10-08"
+  },
+  "medianOdd": {
+   "value": 0.0368385948240757,
+   "unit": "score",
+   "source": "pipeline/ecg-autoencoder/export.py (PyTorch float32 on the CPU)",
+   "measured": "2026-10-08"
+  },
+  "thr95": {
+   "value": 0.029963134322315454,
+   "unit": "score: 95th percentile of the normal validation beats' scores",
+   "source": "pipeline/ecg-autoencoder/export.py (PyTorch float32 on the CPU)",
+   "measured": "2026-10-08"
+  },
+  "testAuc": {
+   "value": 0.939075,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "auc_noP": {
+   "value": 0.8945,
+   "unit": "area under the ROC curve, this kind against the normal test beats",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "auc_wideQRS": {
+   "value": 0.9963,
+   "unit": "area under the ROC curve, this kind against the normal test beats",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "auc_stUp": {
+   "value": 0.8873,
+   "unit": "area under the ROC curve, this kind against the normal test beats",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "auc_noisy": {
+   "value": 0.9782,
+   "unit": "area under the ROC curve, this kind against the normal test beats",
+   "source": "pipeline/ecg-autoencoder/train.py",
+   "measured": "2026-10-08"
+  },
+  "c2Auc": {
+   "value": 0.87935,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 2 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c2TrainScore": {
+   "value": 0.02966088318200858,
+   "unit": "root of the mean squared error over the training beats",
+   "source": "pipeline/ecg-autoencoder/train.py --code 2 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c2AucNoP": {
+   "value": 0.8072,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 2 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c8Auc": {
+   "value": 0.917025,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 8 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c8TrainScore": {
+   "value": 0.0183570192606211,
+   "unit": "root of the mean squared error over the training beats",
+   "source": "pipeline/ecg-autoencoder/train.py --code 8 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c8AucNoP": {
+   "value": 0.9119,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 8 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c16Auc": {
+   "value": 0.8468,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 16 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c16TrainScore": {
+   "value": 0.016273477074116693,
+   "unit": "root of the mean squared error over the training beats",
+   "source": "pipeline/ecg-autoencoder/train.py --code 16 (not shipped)",
+   "measured": "2026-10-08"
+  },
+  "c16AucNoP": {
+   "value": 0.6819,
+   "unit": "area under the ROC curve",
+   "source": "pipeline/ecg-autoencoder/train.py --code 16 (not shipped)",
+   "measured": "2026-10-08"
+  }
+ }
+}

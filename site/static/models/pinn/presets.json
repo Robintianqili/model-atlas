@@ -1,0 +1,1 @@
+{"format":"pinn-presets/1","presets":[{"id":"oscillator","en":"Eight points","zh":"八个点","seed":1,"noise":0.02},{"id":"seed2","en":"Eight other points","zh":"另外八个点","seed":2,"noise":0.02},{"id":"noisy","en":"Eight noisier points","zh":"八个噪声更大的点","seed":3,"noise":0.05}]}

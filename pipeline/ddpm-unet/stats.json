@@ -1,0 +1,15 @@
+{
+ "judgedN": 1000,
+ "judgedIn": 0.71,
+ "judgedInFew": 0.538,
+ "judgedReal": 0.9733,
+ "greyFull": 0.4366,
+ "greyFew": 0.4485,
+ "greyReal": 0.4366,
+ "inkFull": 0.1585,
+ "inkFew": 0.1709,
+ "inkReal": 0.1643,
+ "judged_star": 0.197,
+ "judged_umbrella": 0.242,
+ "judged_house": 0.271
+}

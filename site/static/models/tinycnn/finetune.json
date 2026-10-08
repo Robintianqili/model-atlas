@@ -1,0 +1,528 @@
+{
+ "note": "Precomputed on the RTX 5090 from the same TinyCNN (pipeline/tinycnn/finetune.py). Task: tell the two held-out classes apart. Accuracy on their test split (1,500 drawings each, 3,000 total). Training examples are N drawings per class from their train split; subsets are nested (N=16 contains N=8) and differ per seed.",
+ "task": {
+  "classes": [
+   {
+    "id": "ladder",
+    "en": "ladder",
+    "zh": "梯子"
+   },
+   {
+    "id": "envelope",
+    "en": "envelope",
+    "zh": "信封"
+   }
+  ],
+  "testN": 3000
+ },
+ "budget": {
+  "optimizer": "Adam",
+  "steps": 300,
+  "batch": "all 2N examples (full batch)",
+  "augmentation": "none",
+  "lr": {
+   "head": 0.01,
+   "full": 0.001,
+   "scratch": 0.001
+  },
+  "lrChosenOn": "held-out classes' validation split (1,500 per class), seeds 0-2, N in {2,16,128}",
+  "init": "PyTorch default init under torch.manual_seed(seed) for the new head (head, full) or the whole net (scratch)"
+ },
+ "methods": {
+  "head": {
+   "label": {
+    "en": "Head only (frozen features)",
+    "zh": "只训练输出头（冻结特征）"
+   },
+   "trainableParams": 514,
+   "desc": {
+    "en": "Freeze the pretrained conv layers. Train a new 2-way dense layer on the 256 flatten features.",
+    "zh": "冻结预训练的卷积层，只在 256 维展平特征上训练一个新的二分类全连接层。"
+   }
+  },
+  "full": {
+   "label": {
+    "en": "Full fine-tune",
+    "zh": "全量微调"
+   },
+   "trainableParams": 4666,
+   "desc": {
+    "en": "Start from the pretrained weights with a new head; every layer is trained.",
+    "zh": "从预训练权重出发，换一个新输出头，所有层都参与训练。"
+   }
+  },
+  "scratch": {
+   "label": {
+    "en": "From scratch",
+    "zh": "从零训练"
+   },
+   "trainableParams": 4666,
+   "desc": {
+    "en": "Same architecture, random initial weights, every layer trained.",
+    "zh": "同样的结构，随机初始权重，所有层都训练。"
+   }
+  }
+ },
+ "ns": [
+  1,
+  2,
+  4,
+  8,
+  16,
+  32,
+  64,
+  128,
+  512,
+  2048
+ ],
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "results": {
+  "head": [
+   {
+    "n": 1,
+    "acc": [
+     0.9513,
+     0.935,
+     0.934,
+     0.8833,
+     0.9523
+    ],
+    "mean": 0.9312,
+    "std": 0.0252
+   },
+   {
+    "n": 2,
+    "acc": [
+     0.95,
+     0.9417,
+     0.9657,
+     0.9487,
+     0.9543
+    ],
+    "mean": 0.9521,
+    "std": 0.0079
+   },
+   {
+    "n": 4,
+    "acc": [
+     0.976,
+     0.973,
+     0.9477,
+     0.967,
+     0.9757
+    ],
+    "mean": 0.9679,
+    "std": 0.0106
+   },
+   {
+    "n": 8,
+    "acc": [
+     0.9773,
+     0.977,
+     0.9587,
+     0.976,
+     0.9787
+    ],
+    "mean": 0.9735,
+    "std": 0.0075
+   },
+   {
+    "n": 16,
+    "acc": [
+     0.9797,
+     0.9787,
+     0.9823,
+     0.981,
+     0.9727
+    ],
+    "mean": 0.9789,
+    "std": 0.0033
+   },
+   {
+    "n": 32,
+    "acc": [
+     0.98,
+     0.979,
+     0.9773,
+     0.9797,
+     0.974
+    ],
+    "mean": 0.978,
+    "std": 0.0022
+   },
+   {
+    "n": 64,
+    "acc": [
+     0.9803,
+     0.9773,
+     0.978,
+     0.98,
+     0.9717
+    ],
+    "mean": 0.9775,
+    "std": 0.0031
+   },
+   {
+    "n": 128,
+    "acc": [
+     0.9763,
+     0.9773,
+     0.9833,
+     0.977,
+     0.9747
+    ],
+    "mean": 0.9777,
+    "std": 0.0029
+   },
+   {
+    "n": 512,
+    "acc": [
+     0.9827,
+     0.986,
+     0.982,
+     0.9837,
+     0.9833
+    ],
+    "mean": 0.9835,
+    "std": 0.0014
+   },
+   {
+    "n": 2048,
+    "acc": [
+     0.986,
+     0.9853,
+     0.9807,
+     0.983,
+     0.9857
+    ],
+    "mean": 0.9841,
+    "std": 0.002
+   }
+  ],
+  "full": [
+   {
+    "n": 1,
+    "acc": [
+     0.9107,
+     0.7647,
+     0.906,
+     0.781,
+     0.9313
+    ],
+    "mean": 0.8587,
+    "std": 0.0708
+   },
+   {
+    "n": 2,
+    "acc": [
+     0.8693,
+     0.8927,
+     0.955,
+     0.9447,
+     0.8903
+    ],
+    "mean": 0.9104,
+    "std": 0.0334
+   },
+   {
+    "n": 4,
+    "acc": [
+     0.9427,
+     0.954,
+     0.908,
+     0.962,
+     0.9617
+    ],
+    "mean": 0.9457,
+    "std": 0.0201
+   },
+   {
+    "n": 8,
+    "acc": [
+     0.9787,
+     0.9587,
+     0.9547,
+     0.9707,
+     0.9717
+    ],
+    "mean": 0.9669,
+    "std": 0.0089
+   },
+   {
+    "n": 16,
+    "acc": [
+     0.976,
+     0.9743,
+     0.9783,
+     0.9763,
+     0.9753
+    ],
+    "mean": 0.976,
+    "std": 0.0013
+   },
+   {
+    "n": 32,
+    "acc": [
+     0.9747,
+     0.9763,
+     0.9727,
+     0.9763,
+     0.9767
+    ],
+    "mean": 0.9753,
+    "std": 0.0015
+   },
+   {
+    "n": 64,
+    "acc": [
+     0.9763,
+     0.9767,
+     0.973,
+     0.9793,
+     0.974
+    ],
+    "mean": 0.9759,
+    "std": 0.0022
+   },
+   {
+    "n": 128,
+    "acc": [
+     0.9763,
+     0.974,
+     0.982,
+     0.976,
+     0.9783
+    ],
+    "mean": 0.9773,
+    "std": 0.0027
+   },
+   {
+    "n": 512,
+    "acc": [
+     0.979,
+     0.985,
+     0.985,
+     0.9783,
+     0.985
+    ],
+    "mean": 0.9825,
+    "std": 0.0031
+   },
+   {
+    "n": 2048,
+    "acc": [
+     0.9833,
+     0.9877,
+     0.984,
+     0.9863,
+     0.9883
+    ],
+    "mean": 0.9859,
+    "std": 0.002
+   }
+  ],
+  "scratch": [
+   {
+    "n": 1,
+    "acc": [
+     0.9397,
+     0.698,
+     0.8987,
+     0.4397,
+     0.96
+    ],
+    "mean": 0.7872,
+    "std": 0.1971
+   },
+   {
+    "n": 2,
+    "acc": [
+     0.8923,
+     0.886,
+     0.903,
+     0.5667,
+     0.9303
+    ],
+    "mean": 0.8357,
+    "std": 0.1353
+   },
+   {
+    "n": 4,
+    "acc": [
+     0.9343,
+     0.9143,
+     0.8207,
+     0.8913,
+     0.9537
+    ],
+    "mean": 0.9029,
+    "std": 0.046
+   },
+   {
+    "n": 8,
+    "acc": [
+     0.9523,
+     0.9297,
+     0.8597,
+     0.9177,
+     0.9597
+    ],
+    "mean": 0.9238,
+    "std": 0.0354
+   },
+   {
+    "n": 16,
+    "acc": [
+     0.9603,
+     0.959,
+     0.9613,
+     0.9303,
+     0.9503
+    ],
+    "mean": 0.9522,
+    "std": 0.0116
+   },
+   {
+    "n": 32,
+    "acc": [
+     0.9723,
+     0.967,
+     0.966,
+     0.96,
+     0.9457
+    ],
+    "mean": 0.9622,
+    "std": 0.0091
+   },
+   {
+    "n": 64,
+    "acc": [
+     0.969,
+     0.969,
+     0.9707,
+     0.9627,
+     0.962
+    ],
+    "mean": 0.9667,
+    "std": 0.0036
+   },
+   {
+    "n": 128,
+    "acc": [
+     0.9673,
+     0.967,
+     0.9727,
+     0.9707,
+     0.9643
+    ],
+    "mean": 0.9684,
+    "std": 0.003
+   },
+   {
+    "n": 512,
+    "acc": [
+     0.9767,
+     0.973,
+     0.974,
+     0.9677,
+     0.9757
+    ],
+    "mean": 0.9734,
+    "std": 0.0031
+   },
+   {
+    "n": 2048,
+    "acc": [
+     0.9793,
+     0.9863,
+     0.9793,
+     0.9837,
+     0.9827
+    ],
+    "mean": 0.9823,
+    "std": 0.0027
+   }
+  ]
+ },
+ "baseModelGuesses": {
+  "note": "What the frozen 10-class model predicts for the held-out test drawings (it has never seen these classes).",
+  "classes": [
+   "apple",
+   "bicycle",
+   "car",
+   "clock",
+   "fish",
+   "house",
+   "star",
+   "sun",
+   "tree",
+   "umbrella"
+  ],
+  "byHeldOutClass": {
+   "ladder": {
+    "top1Share": {
+     "house": 0.61,
+     "star": 0.1607,
+     "tree": 0.124,
+     "sun": 0.06
+    },
+    "meanProbs": [
+     0.0115,
+     0.0206,
+     0.0184,
+     0.0056,
+     0.0091,
+     0.5676,
+     0.1604,
+     0.0674,
+     0.1252,
+     0.0141
+    ]
+   },
+   "envelope": {
+    "top1Share": {
+     "fish": 0.568,
+     "house": 0.3547,
+     "clock": 0.0447,
+     "star": 0.0127
+    },
+    "meanProbs": [
+     0.0052,
+     0.0024,
+     0.0146,
+     0.0557,
+     0.5319,
+     0.3557,
+     0.0285,
+     0.0021,
+     0.0022,
+     0.0017
+    ]
+   }
+  }
+ },
+ "jsHeadCheck": {
+  "note": "tinycnn_finetune.ts trainHead (full-batch gradient descent, 200 epochs, lr 0.5 on scale-normalised features, l2 1e-4) on the same N=16 per class subsets as the Python head-only runs; accuracy on the 3,000 held-out test drawings. Script: pipeline/parity/tinycnn_finetune.check.ts",
+  "n": 16,
+  "jsAcc": [
+   0.9793,
+   0.9793,
+   0.9803,
+   0.981,
+   0.9763
+  ],
+  "jsMean": 0.9793,
+  "pythonMean": 0.9789,
+  "timingMs": {
+   "64 examples, 200 epochs (ms)": 13.1,
+   "128 examples, 200 epochs (ms)": 26.7
+  },
+  "checked": "2026-10-05"
+ }
+}

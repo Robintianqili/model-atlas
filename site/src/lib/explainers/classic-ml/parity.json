@@ -1,0 +1,52 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "classic-ml",
+ "checked": "2026-10-07",
+ "sources": {
+  "knn": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 3,
+   "fixtures": 9,
+   "checked": "2026-10-07"
+  },
+  "map": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 6,
+   "fixtures": 9,
+   "checked": "2026-10-07"
+  },
+  "tree": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 49,
+   "fixtures": 9,
+   "checked": "2026-10-07"
+  },
+  "km": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 11,
+   "fixtures": 9,
+   "checked": "2026-10-07"
+  },
+  "rings": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 23,
+   "fixtures": 9,
+   "checked": "2026-10-07"
+  }
+ }
+}

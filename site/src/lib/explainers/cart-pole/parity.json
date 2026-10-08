@@ -1,0 +1,55 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "cart-pole",
+ "checked": "2026-10-07",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 3.75e-14,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "fresh": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 3.75e-14,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "step1": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.22e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "episode": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 122,
+   "fixtures": 6,
+   "checked": "2026-10-07"
+  },
+  "seeds": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 52,
+   "fixtures": 6,
+   "checked": "2026-10-07"
+  }
+ }
+}

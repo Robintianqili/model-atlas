@@ -1,0 +1,49 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%} --template points2d-train` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// Sources:
+//   train  the trainer at the page's settings (Adam), coarse: a snapshot every few steps, metrics on every step
+//   sgd1   the same trainer with plain SGD in fine detail: forward -> loss -> backward -> update, for the slowed-down
+//          step (narrate the update rule only on an SGD source: train/helpers.ts updateOf refuses Adam)
+// The run's seed is the source's opt.seed (default 1): two sources with the same seed start from the same weights.
+// To trace one point through the live weights, add  pt: { kind: 'live-model', of: 'train' }  (its input is the
+// adapter's 'input' tensor).
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+import { presetRaw } from '../../atlas/adapters/points2d/adapter.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+	input: { adapter: '{%adapter%}', start: presetRaw('moons') }, // the learner's points, two moons to start (trainer.ts pointsOf)
+	sources: {
+		train: { kind: 'train', trainer: '{%trainerId%}', detail: 'coarse', opt: { seed: 1 } },
+		sgd1: { kind: 'train', trainer: '{%trainerId%}', detail: 'fine', opt: { seed: 1, optimizer: 'sgd', lr: 0.1, steps: 5 } }
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain how one training step changes one weight, with the numbers', zh: 'TODO：用具体数字说明一步训练如何改变一个权重' },
+			{ en: 'TODO: predict when the network will fail to separate the points', zh: 'TODO：预测网络什么时候分不开这些点' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	// Every dataset, ported code or idea-with-code (AK704). promote appends these to static/licenses.json.
+	credits: []
+};
+
+export default manifest;

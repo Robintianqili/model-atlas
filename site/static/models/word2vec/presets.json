@@ -1,0 +1,30 @@
+{
+ "format": "word2vec-presets/1",
+ "source": "TinyStoriesV2-GPT4-valid.txt (CDLA-Sharing-1.0); rules in pipeline/word2vec/presets.py",
+ "presets": [
+  {
+   "id": "pets",
+   "en": "Cats, dogs and birds",
+   "zh": "猫、狗和鸟",
+   "text": "The cat was very happy. The cat was sad. The cat was happy. The cat wanted to catch the bird. The cat wanted to climb the tree. The dog was sad. The dog was very happy. The dog was not nice. The dog wanted to play too. The dog wanted the ball. The bird was very happy. The bird was sad. The bird was happy. The bird wanted to help. The bird wanted to play too."
+  },
+  {
+   "id": "kids",
+   "en": "Tim, Lily and Sue",
+   "zh": "Tim、Lily 和 Sue",
+   "text": "Tim was very happy. Tim was sad. Tim was very sad. Tim wanted to help the bird. Tim wanted to help Sue. Lily was very happy. Lily was sad. Lily was happy. Lily wanted to help the bird. Lily wanted to help the cat. Sue was sad. Sue was very happy. Sue was so happy. Sue wanted to play too. Sue wanted to help the cat."
+  },
+  {
+   "id": "story",
+   "en": "A real story",
+   "zh": "一个真实的故事",
+   "text": "John and Holly were best friends. They loved to play together. One day, they were playing in the park. John had a chubby, furry baseball with him. They threw it back and forth, laughing and having fun. John ran fast to catch the ball while Holly laughed loudly. They played until they were tired. After they were done playing, they said goodbye and went home. John couldn't wait to play with Holly again."
+  },
+  {
+   "id": "pets-zh",
+   "en": "Cats, dogs and birds (Chinese)",
+   "zh": "猫、狗和鸟（中文）",
+   "text": "猫非常开心。猫很难过。猫很开心。猫想抓鸟。猫想爬树。狗很难过。狗非常开心。狗不友好。狗也想玩。狗想要球。鸟非常开心。鸟很难过。鸟很开心。鸟想帮忙。鸟也想玩。"
+  }
+ ]
+}

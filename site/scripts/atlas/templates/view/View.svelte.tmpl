@@ -1,0 +1,53 @@
+<!--
+	View '{%viewKey%}' (design §4.8). Scaffolded by `atlas new view {%key%}` on {%today%}.
+	Gets StageProps from StageHost. Rules: no autoplay when ctx.reduced; call onend() when an autoplay finishes;
+	nothing understandable only while animating; no horizontal scroll at 360 px; do not trap keys.
+-->
+<script lang="ts">
+	import type { StageProps } from '{%typesPath%}';
+
+	let { props, provenance }: StageProps = $props();
+	const values = $derived((props.values as number[] | undefined) ?? []);
+	const max = $derived(values.length ? Math.max(...values.map(Math.abs)) : 1);
+</script>
+
+<figure class="view">
+	<ul class="bars">
+		{#each values as v, i (i)}
+			<li>
+				<span class="bar" style:width="{(100 * Math.abs(v)) / (max || 1)}%"></span>
+				<span class="num">{v.toPrecision(3)}</span>
+			</li>
+		{/each}
+	</ul>
+	<figcaption>TODO: what the learner should look at ({provenance})</figcaption>
+</figure>
+
+<style>
+	.view {
+		margin: 0;
+		min-height: 120px;
+	}
+	.bars {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 4px;
+	}
+	.bars li {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 8px;
+	}
+	.bar {
+		display: block;
+		height: 12px;
+		background: var(--accent, currentColor);
+		border-radius: 2px;
+	}
+	.num {
+		font-variant-numeric: tabular-nums;
+	}
+</style>

@@ -1,0 +1,47 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "gan-2d",
+ "checked": "2026-10-07",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.14e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "slow": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.14e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "same": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 6.53e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "slower": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.19e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  }
+ }
+}

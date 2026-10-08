@@ -1,0 +1,12 @@
+{
+	"name": "points2d-train",
+	"description": "Kind B, live training on 2-D points (the MLP-playground shape): an MLP classifier trained with Adam on the learner's points (two moons until the input has some), a slowed-down plain-SGD step for the update arithmetic, and the PyTorch float64 twin.",
+	"kinds": ["train"],
+	"input": "points2d",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/trainer.ts.tmpl", "to": "package/trainer.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "pipeline/twin.py.tmpl", "to": "pipeline/twin.py" }
+	]
+}

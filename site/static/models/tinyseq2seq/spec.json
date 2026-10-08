@@ -1,0 +1,420 @@
+{
+ "slug": "tinyseq2seq",
+ "name": {
+  "en": "Tiny seq2seq with attention",
+  "zh": "带注意力的小型 seq2seq"
+ },
+ "version": "2026-10-06",
+ "params": 16941,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "emb.weight",
+   "shape": [
+    69,
+    16
+   ],
+   "offset": 0,
+   "length": 1104
+  },
+  {
+   "name": "enc.weight_ih",
+   "shape": [
+    96,
+    16
+   ],
+   "offset": 1104,
+   "length": 1536
+  },
+  {
+   "name": "enc.weight_hh",
+   "shape": [
+    96,
+    32
+   ],
+   "offset": 2640,
+   "length": 3072
+  },
+  {
+   "name": "enc.bias_ih",
+   "shape": [
+    96
+   ],
+   "offset": 5712,
+   "length": 96
+  },
+  {
+   "name": "enc.bias_hh",
+   "shape": [
+    96
+   ],
+   "offset": 5808,
+   "length": 96
+  },
+  {
+   "name": "dec.emb",
+   "shape": [
+    13,
+    16
+   ],
+   "offset": 5904,
+   "length": 208
+  },
+  {
+   "name": "dec.wq",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 6112,
+   "length": 1024
+  },
+  {
+   "name": "dec.wk",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 7136,
+   "length": 1024
+  },
+  {
+   "name": "dec.bk",
+   "shape": [
+    32
+   ],
+   "offset": 8160,
+   "length": 32
+  },
+  {
+   "name": "dec.v",
+   "shape": [
+    1,
+    32
+   ],
+   "offset": 8192,
+   "length": 32
+  },
+  {
+   "name": "dec.weight_ih",
+   "shape": [
+    96,
+    48
+   ],
+   "offset": 8224,
+   "length": 4608
+  },
+  {
+   "name": "dec.weight_hh",
+   "shape": [
+    96,
+    32
+   ],
+   "offset": 12832,
+   "length": 3072
+  },
+  {
+   "name": "dec.bias_ih",
+   "shape": [
+    96
+   ],
+   "offset": 15904,
+   "length": 96
+  },
+  {
+   "name": "dec.bias_hh",
+   "shape": [
+    96
+   ],
+   "offset": 16000,
+   "length": 96
+  },
+  {
+   "name": "dec.wo",
+   "shape": [
+    13,
+    64
+   ],
+   "offset": 16096,
+   "length": 832
+  },
+  {
+   "name": "dec.bo",
+   "shape": [
+    13
+   ],
+   "offset": 16928,
+   "length": 13
+  }
+ ],
+ "layers": [
+  {
+   "id": "emb",
+   "op": "embedding",
+   "label": {
+    "en": "Character vectors",
+    "zh": "字符向量"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "enc",
+   "op": "gru",
+   "label": {
+    "en": "Encoder states",
+    "zh": "编码器状态"
+   },
+   "in": [
+    "emb"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "hidden": 32
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "sub": [
+    "r",
+    "z",
+    "n"
+   ]
+  },
+  {
+   "id": "dec",
+   "op": "attn_decoder",
+   "label": {
+    "en": "Decoder with attention",
+    "zh": "带注意力的解码器"
+   },
+   "in": [
+    "enc"
+   ],
+   "outShape": [
+    11,
+    13
+   ],
+   "params": {
+    "steps": 11,
+    "bos": 0
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "sub": [
+    "keys",
+    "query",
+    "scores",
+    "weights",
+    "context",
+    "state",
+    "next"
+   ]
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Chances of each symbol, per step",
+    "zh": "每一步各个符号的概率"
+   },
+   "in": [
+    "dec"
+   ],
+   "outShape": [
+    11,
+    13
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "synthetic dates (make_data.ts)",
+  "steps": 6000,
+  "metrics": {
+   "Training pairs": "60,000",
+   "Exact dates, test (5,000)": "100.0%",
+   "Exact dates, a format it never saw (year first)": "17.1%"
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000062,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 9,
+  "edgeCases": [
+   "one",
+   "max"
+  ],
+  "perLayer": {
+   "enc": 4.25e-7,
+   "enc#r": 1.19e-7,
+   "enc#z": 2.38e-7,
+   "enc#n": 4.77e-7,
+   "dec": 0.0000062,
+   "dec#keys": 0.00000143,
+   "dec#query": 0.00000262,
+   "dec#scores": 0.00000572,
+   "dec#context": 0.00000121,
+   "dec#state": 0.00000188,
+   "probs": 4.88e-7,
+   "dec#weights": 7.15e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tinyseq2seq/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "date-text",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 32,
+   "label": {
+    "en": "characters",
+    "zh": "字符"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "alphabet": [
+  "<pad>",
+  "?",
+  " ",
+  ",",
+  ".",
+  "/",
+  "-",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
+ ],
+ "unk": 1,
+ "symbols": [
+  "<s>",
+  "</s>",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "-"
+ ],
+ "steps": 11,
+ "bos": 0,
+ "eos": 1
+}

@@ -1,0 +1,46 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "node2vec",
+ "checked": "2026-10-07",
+ "sources": {
+  "run": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.45e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "one": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.45e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "base": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.45e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "walks": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 3060,
+   "fixtures": 5,
+   "checked": "2026-10-07"
+  }
+ }
+}

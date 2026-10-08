@@ -1,0 +1,44 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%} --template series-train` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// Sources: windows (kind C: the series cut into examples), train (kind B: the forecaster trained live on them).
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+import { seriesPresetRaw } from '../../atlas/adapters/series/adapter.ts';
+import { seriesOf } from './data.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+	input: { adapter: '{%adapter%}', start: seriesPresetRaw('sine') }, // the learner's series, a sine wave to start
+	sources: {
+		// the process gets the series as numbers (data.ts seriesOf): the Python reference reads the same list (--input)
+		windows: { kind: 'process', process: '{%processId%}', run: 'main', input: (rt) => Array.from(seriesOf(rt.input)) },
+		train: { kind: 'train', trainer: '{%trainerId%}', detail: 'coarse', opt: { seed: 1 } }
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain how a series becomes (window, next value) training examples', zh: 'TODO：解释一条序列如何变成（窗口，下一个值）训练样例' },
+			{ en: 'TODO: judge a forecast against a simple baseline', zh: 'TODO：拿一个简单基准来评判预测' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	credits: []
+};
+
+export default manifest;

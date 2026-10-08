@@ -1,0 +1,493 @@
+[
+  {
+    "name": "TinyStories (TinyStoriesV2-GPT4)",
+    "url": "https://huggingface.co/datasets/roneneldan/TinyStories",
+    "license": "CDLA-Sharing-1.0",
+    "usedFor": "TinyGPT training data (first 100 MiB of TinyStoriesV2-GPT4-train.txt) and validation (TinyStoriesV2-GPT4-valid.txt); TinyGPT's BPE tokenizer was learned from the same text. word2vec's preset mini-corpora are short sentences from TinyStoriesV2-GPT4-valid.txt (about 1.9 KB, chosen by pipeline/word2vec/presets.py), plus a Chinese translation of one of them. Apart from those sentences, only trained weights, the tokenizer and short generated samples ship with the site, not the dataset.",
+    "attribution": "Ronen Eldan and Yuanzhi Li, 'TinyStories: How Small Can Language Models Be and Still Speak Coherent English?' (2023), arXiv:2305.07759"
+  },
+  {
+    "name": "nanoGPT / minGPT (ideas)",
+    "url": "https://github.com/karpathy/nanoGPT",
+    "license": "MIT",
+    "usedFor": "Ideas for TinyGPT's model and training loop (pre-LN GPT-2 block, tied head, init scaling, AdamW + warm-up + cosine). Code written fresh for this project.",
+    "attribution": "Andrej Karpathy, nanoGPT and minGPT (MIT License)"
+  },
+  {
+    "name": "minbpe and GPT-2 encoder (ideas)",
+    "url": "https://github.com/karpathy/minbpe",
+    "license": "MIT",
+    "usedFor": "Ideas for TinyGPT's byte-level BPE tokenizer (byte fallback, GPT-2-style pre-tokenize regex, rank-ordered merges). Code written fresh for this project.",
+    "attribution": "Andrej Karpathy, minbpe (MIT); OpenAI, GPT-2 encoder.py (MIT)"
+  },
+  {
+    "name": "Transformer Explainer (ideas)",
+    "url": "https://github.com/poloclub/transformer-explainer",
+    "license": "MIT",
+    "usedFor": "Ideas for what the TinyGPT page traces and shows (Q/K/V, scores, causal mask, softmax, sampling with temperature / top-k / top-p). No code copied.",
+    "attribution": "Cho et al., Georgia Tech Polo Club, Transformer Explainer (MIT License)"
+  },
+  {
+    "name": "Quick, Draw! dataset (numpy bitmaps)",
+    "url": "https://github.com/googlecreativelab/quickdraw-dataset",
+    "license": "CC BY 4.0",
+    "usedFor": "TinyCNN training, validation and test data (first 15,000 drawings of 12 classes: apple, bicycle, car, clock, fish, house, star, sun, tree, umbrella, plus held-out ladder and envelope for the transfer-learning page). Shipped: trained weights and a few hundred 28x28 drawings as presets, channel patches, fine-tuning examples and reference inputs (site/static/models/tinycnn/). Also the VAE’s training and test drawings (star, ladder, umbrella, eyeglasses, t-shirt), its latent map and presets (site/static/models/vae-2d/).",
+    "attribution": "Quick, Draw! dataset by Google Creative Lab, https://quickdraw.withgoogle.com/data (CC BY 4.0)"
+  },
+  {
+    "name": "CNN Explainer (layout idea)",
+    "url": "https://github.com/poloclub/cnn-explainer",
+    "license": "MIT",
+    "usedFor": "Idea for the TinyCNN layout (TinyVGG: two blocks of conv-ReLU-conv-ReLU-maxpool, then a dense softmax layer) and for showing per-cell convolution arithmetic. No code copied.",
+    "attribution": "Wang et al., Georgia Tech Polo Club, CNN Explainer (MIT License)"
+  },
+  {
+    "name": "Fraunces (font)",
+    "url": "https://github.com/undercasetype/Fraunces",
+    "license": "OFL-1.1",
+    "usedFor": "Display face for headings (self-hosted woff2 via @fontsource-variable/fraunces).",
+    "attribution": "Copyright 2020 The Fraunces Project Authors (Undercase Type)",
+    "licenseText": "LICENSES/OFL-1.1-Fraunces.txt"
+  },
+  {
+    "name": "Atkinson Hyperlegible Next (font)",
+    "url": "https://github.com/googlefonts/atkinson-hyperlegible-next",
+    "license": "OFL-1.1",
+    "usedFor": "Body text face (self-hosted woff2 via @fontsource-variable/atkinson-hyperlegible-next).",
+    "attribution": "Copyright 2020-2024 The Atkinson Hyperlegible Next Project Authors (Braille Institute of America)",
+    "licenseText": "LICENSES/OFL-1.1-Atkinson-Hyperlegible-Next.txt"
+  },
+  {
+    "name": "JetBrains Mono (font)",
+    "url": "https://github.com/JetBrains/JetBrainsMono",
+    "license": "OFL-1.1",
+    "usedFor": "Monospace face for numbers, shapes and code (self-hosted woff2 via @fontsource-variable/jetbrains-mono).",
+    "attribution": "Copyright 2020 The JetBrains Mono Project Authors",
+    "licenseText": "LICENSES/OFL-1.1-JetBrains-Mono.txt"
+  },
+  {
+    "name": "Fontsource",
+    "url": "https://github.com/fontsource/fontsource",
+    "license": "MIT",
+    "usedFor": "npm packaging and @font-face CSS for the three self-hosted fonts.",
+    "attribution": "Fontsource contributors"
+  },
+  {
+    "name": "KaTeX",
+    "url": "https://github.com/KaTeX/KaTeX",
+    "license": "MIT",
+    "usedFor": "Math rendering in formula cards (JavaScript, CSS and KaTeX fonts bundled and self-hosted).",
+    "attribution": "Copyright (c) 2013-2020 Khan Academy and other contributors",
+    "licenseText": "LICENSES/MIT-KaTeX.txt"
+  },
+  {
+    "name": "Svelte",
+    "url": "https://github.com/sveltejs/svelte",
+    "license": "MIT",
+    "usedFor": "UI framework; its runtime is bundled into the site.",
+    "attribution": "Copyright (c) 2016-present Svelte contributors"
+  },
+  {
+    "name": "SvelteKit",
+    "url": "https://github.com/sveltejs/kit",
+    "license": "MIT",
+    "usedFor": "App framework and static site generation (adapter-static); its client router is bundled into the site.",
+    "attribution": "Copyright (c) 2020 Svelte contributors"
+  },
+  {
+    "name": "GLTR (idea)",
+    "url": "https://github.com/HendrikStrobelt/detecting-fake-text",
+    "license": "Apache-2.0",
+    "usedFor": "Idea for coloring each token of the learner's text by the rank the language model gave it (top 1 / 10 / 100 / beyond) on the next-token-prediction page. Reimplemented with TinyGPT and the site's sequential color scale; no GLTR code or text copied.",
+    "attribution": "Hendrik Strobelt, Sebastian Gehrmann, Alexander M. Rush, GLTR: Statistical Detection and Visualization of Generated Text (ACL 2019 demo), Apache License 2.0"
+  },
+  {
+    "name": "AnimatedLLM (idea)",
+    "url": "https://github.com/kasnerz/animated-llm",
+    "license": "MIT",
+    "usedFor": "Idea for replaying a language model's training from random weights to fluent text with precomputed traces (the checkpoint replay on the next-token-prediction page). Our replay uses TinyGPT's own checkpoints; no code copied.",
+    "attribution": "Zdeněk Kasner, AnimatedLLM (MIT License)"
+  },
+  {
+    "name": "BertViz (ideas)",
+    "url": "https://github.com/jessevig/bertviz",
+    "license": "Apache-2.0",
+    "usedFor": "Idea for the TinyGPT page's layers x heads grid of small attention maps with click-to-zoom and the query/key dot-product detail. No code copied; the page draws its own maps from the live model.",
+    "attribution": "Jesse Vig, BertViz"
+  },
+  {
+    "name": "The logit lens (ideas)",
+    "url": "https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens",
+    "license": "ideas only (blog post; no code or text used)",
+    "usedFor": "Idea for the TinyGPT page's logit lens: applying the final LayerNorm and the output head to the residual stream after every sub-layer. Computed live by the page's own code.",
+    "attribution": "nostalgebraist (2020), interpreting GPT: the logit lens"
+  },
+  {
+    "name": "GPT-2 tokenizer vocabulary (byte-level BPE, 50,257 tokens)",
+    "url": "https://github.com/openai/gpt-2",
+    "license": "Modified MIT (OpenAI GPT-2)",
+    "usedFor": "Tokenization page: GPT-2 token bytes, converted to static/pages/tokenization/tok/gpt2.tokb (from huggingface.co/openai-community/gpt2 tokenizer.json)",
+    "attribution": "OpenAI, GPT-2 (Radford et al., 2019)",
+    "licenseText": "LICENSES/MIT-GPT-2.txt"
+  },
+  {
+    "name": "bert-base-uncased vocabulary (WordPiece, 30,522 tokens)",
+    "url": "https://github.com/google-research/bert",
+    "license": "Apache-2.0",
+    "usedFor": "Tokenization page: BERT WordPiece vocabulary, static/pages/tokenization/tok/bert-base-uncased.txt (vocab.txt from huggingface.co/google-bert/bert-base-uncased)",
+    "attribution": "Google Research, BERT (Devlin et al., 2019)",
+    "licenseText": "LICENSES/Apache-2.0.txt"
+  },
+  {
+    "name": "tiktoken cl100k_base encoding",
+    "url": "https://github.com/openai/tiktoken",
+    "license": "MIT",
+    "usedFor": "Tokenization page: GPT-4 / GPT-3.5 cl100k_base token bytes, converted to static/pages/tokenization/tok/cl100k_base.tokb; tiktoken's byte-pair merge and pre-tokenizer regex re-implemented in TypeScript (realtok.ts)",
+    "attribution": "OpenAI, tiktoken",
+    "licenseText": "LICENSES/MIT-tiktoken.txt"
+  },
+  {
+    "name": "Qwen2.5 tokenizer (byte-level BPE, 151,665 tokens)",
+    "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B",
+    "license": "Apache-2.0",
+    "usedFor": "Tokenization page: Qwen2.5 token bytes, converted to static/pages/tokenization/tok/qwen2.5.tokb; pre-tokenizer regex and NFC normalizer re-implemented in TypeScript",
+    "attribution": "Qwen Team, Alibaba Cloud",
+    "licenseText": "LICENSES/Apache-2.0-Qwen2.5.txt"
+  },
+  {
+    "name": "Hugging Face tokenizers (BERT normalizer, BertPreTokenizer, WordPiece; ideas)",
+    "url": "https://github.com/huggingface/tokenizers",
+    "license": "Apache-2.0",
+    "usedFor": "Tokenization page: WordPiece algorithm and BERT text normalization re-implemented in TypeScript (realtok.ts); used as the parity reference",
+    "attribution": "Hugging Face"
+  },
+  {
+    "name": "Quick, Draw! dataset",
+    "url": "https://github.com/googlecreativelab/quickdraw-dataset",
+    "license": "CC BY 4.0",
+    "usedFor": "TinyViT training and test drawings (TinyCNN’s 10 classes and split) and the preset drawings",
+    "attribution": "Quick, Draw! dataset by Google Creative Lab"
+  },
+  {
+    "name": "TensorFlow Playground",
+    "url": "https://github.com/tensorflow/playground",
+    "license": "Apache-2.0",
+    "usedFor": "Layout ideas for the neuron heatmaps and the network diagram; reimplemented on the Model Atlas autograd core",
+    "attribution": "Daniel Smilkov and Shan Carter, Google (TensorFlow Playground)"
+  },
+  {
+    "name": "Sutton & Barto, Reinforcement Learning: An Introduction (2nd ed., 2018)",
+    "url": "http://incompleteideas.net/book/the-book-2nd.html",
+    "license": "Book, CC BY-NC-ND 2.0; ideas only (no text, figures or code used)",
+    "usedFor": "the cliff board (Example 6.6) and the order of ideas: bandits, then Q-learning",
+    "attribution": "Richard S. Sutton and Andrew G. Barto"
+  },
+  {
+    "name": "Zachary’s karate club (from NetworkX)",
+    "url": "https://networkx.org/documentation/stable/reference/generated/networkx.generators.social.karate_club_graph.html",
+    "license": "NetworkX: BSD-3-Clause; the graph is the published data of Zachary (1977)",
+    "usedFor": "The graph: 34 members, 78 friendships (unweighted) and the faction each member joined",
+    "attribution": "W. W. Zachary, “An information flow model for conflict and fission in small groups”, Journal of Anthropological Research 33(4), 452–473 (1977); graph from NetworkX karate_club_graph()"
+  },
+  {
+    "name": "Kipf & Welling, Semi-Supervised Classification with Graph Convolutional Networks (ICLR 2017)",
+    "url": "https://arxiv.org/abs/1609.02907",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The graph layer Â (H Wᵀ) + b with Â = D^−1/2 (A + I) D^−1/2, the two-layer semi-supervised setup, and the limits step’s remark that two or three layers work best (their appendix B on model depth)",
+    "attribution": "Thomas N. Kipf and Max Welling"
+  },
+  {
+    "name": "Li, Han & Wu, Deeper Insights into Graph Convolutional Networks for Semi-Supervised Learning (AAAI 2018)",
+    "url": "https://arxiv.org/abs/1801.07606",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The over-smoothing picture of the limits step: averaging with Â again and again makes the members’ rows alike",
+    "attribution": "Qimai Li, Zhichao Han and Xiao-Ming Wu"
+  },
+  {
+    "name": "Lipman et al., Flow Matching for Generative Modeling (ICLR 2023)",
+    "url": "https://arxiv.org/abs/2210.02747",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "the training objective: a network regresses the velocity of paths from noise to data",
+    "attribution": "Yaron Lipman, Ricky T. Q. Chen, Heli Ben-Hamu, Maximilian Nickel, Matt Le"
+  },
+  {
+    "name": "Liu et al., Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow (ICLR 2023)",
+    "url": "https://arxiv.org/abs/2209.03003",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "straight paths x_t = (1 − t)·x0 + t·x1 with target x1 − x0, and few-step Euler sampling",
+    "attribution": "Xingchao Liu, Chengyue Gong, Qiang Liu"
+  },
+  {
+    "name": "CLIP: Radford et al., Learning Transferable Visual Models From Natural Language Supervision (2021)",
+    "url": "https://arxiv.org/abs/2103.00020",
+    "license": "Paper (arXiv); ideas only (no code, weights or data used)",
+    "usedFor": "the two towers, the batch score table, the symmetric InfoNCE loss and the learned temperature, reimplemented at toy size",
+    "attribution": "Alec Radford, Jong Wook Kim, Chris Hallacy and others (OpenAI)"
+  },
+  {
+    "name": "Hyndman & Athanasopoulos, Forecasting: Principles and Practice (3rd ed., 2021)",
+    "url": "https://otexts.com/fpp3/",
+    "license": "Book, free online; ideas only (no text, figures or code used)",
+    "usedFor": "the seasonal-naive baseline and checking forecasts on held-out values",
+    "attribution": "Rob J. Hyndman and George Athanasopoulos"
+  },
+  {
+    "name": "Raissi, Perdikaris & Karniadakis, Physics-informed neural networks (J. Comput. Phys. 378, 2019)",
+    "url": "https://doi.org/10.1016/j.jcp.2018.10.045",
+    "license": "Journal article; ideas only (no text, figures or code used)",
+    "usedFor": "The idea of a physics-informed loss: a data term plus the residual of the governing equation at collocation points, with derivatives by automatic differentiation",
+    "attribution": "Maziar Raissi, Paris Perdikaris and George Em Karniadakis"
+  },
+  {
+    "name": "Ben Moseley, harmonic-oscillator-pinn",
+    "url": "https://github.com/benmoseley/harmonic-oscillator-pinn",
+    "license": "MIT; ideas only (no code copied)",
+    "usedFor": "The teaching setup: a damped harmonic oscillator, a plain network trained on early points against a PINN that extrapolates",
+    "attribution": "Ben Moseley"
+  },
+  {
+    "name": "Koren, Bell & Volinsky, “Matrix Factorization Techniques for Recommender Systems” (IEEE Computer, 2009)",
+    "url": "https://doi.org/10.1109/MC.2009.263",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the model (a rating as the dot product of a user vector and an item vector) and its stochastic-gradient-descent training",
+    "attribution": "Yehuda Koren, Robert Bell and Chris Volinsky"
+  },
+  {
+    "name": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (ideas)",
+    "url": "https://arxiv.org/abs/1810.04805",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the input layout ([CLS], [SEP], segments) and the 15% / 80-10-10 masking rule; code written fresh",
+    "attribution": "Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova (2019)"
+  },
+  {
+    "name": "wevi: word embedding visual inspector",
+    "url": "https://github.com/ronxin/wevi",
+    "license": "MIT",
+    "usedFor": "The idea of training skip-gram live on a tiny corpus with both weight matrices, the softmax and a PCA map in view; reimplemented, no code copied",
+    "attribution": "Xin Rong (wevi; and “word2vec Parameter Learning Explained”, arXiv:1411.2738)"
+  },
+  {
+    "name": "word2vec (skip-gram)",
+    "url": "https://arxiv.org/abs/1301.3781",
+    "license": "Paper (ideas only; no text, figures or code used)",
+    "usedFor": "The skip-gram model this page trains (with a full softmax instead of the paper’s faster approximations)",
+    "attribution": "Tomas Mikolov, Kai Chen, Greg Corrado and Jeffrey Dean, “Efficient Estimation of Word Representations in Vector Space” (2013)"
+  },
+  {
+    "name": "GAN Lab",
+    "url": "https://github.com/poloclub/ganlab",
+    "license": "Apache-2.0",
+    "usedFor": "Visualization ideas (discriminator heat map, generator manifold, gradient arrows, slow-motion steps); reimplemented on the Model Atlas autograd core",
+    "attribution": "Minsuk Kahng, Nikhil Thorat, Duen Horng (Polo) Chau, Fernanda Viégas and Martin Wattenberg (GAN Lab, Georgia Tech and Google)"
+  },
+  {
+    "name": "TensorFlow.js examples: cart-pole (REINFORCE)",
+    "url": "https://github.com/tensorflow/tfjs-examples/tree/master/cart-pole",
+    "license": "Apache-2.0",
+    "usedFor": "The idea and the setup (a policy network giving p(left), discounted and normalized rewards, training in the browser); reimplemented on the Model Atlas autograd core, no code copied",
+    "attribution": "The TensorFlow.js authors, Google"
+  },
+  {
+    "name": "Barto, Sutton & Anderson (1983), Neuronlike adaptive elements that can solve difficult learning control problems",
+    "url": "https://doi.org/10.1109/TSMC.1983.6313077",
+    "license": "Paper; ideas only (the cart-pole equations and constants, as OpenAI Gym states them)",
+    "usedFor": "The cart-pole physics: masses, pole length, 10 N pushes, 0.02 s steps, the 12° and 2.4 m limits",
+    "attribution": "Andrew G. Barto, Richard S. Sutton and Charles W. Anderson"
+  },
+  {
+    "name": "R2D3, A visual introduction to machine learning (2015)",
+    "url": "http://www.r2d3.us/visual-intro-to-machine-learning-part-1/",
+    "license": "Ideas only (no text, figures or code used)",
+    "usedFor": "the idea of showing each tree split on the data next to the growing tree",
+    "attribution": "Stephanie Yee and Tony Chu (R2D3)"
+  },
+  {
+    "name": "VAE Explainer",
+    "url": "https://github.com/xnought/vae-explainer",
+    "license": "MIT",
+    "usedFor": "Ideas only (no code): the reparameterization trick as its own step, and dragging a point through the latent space",
+    "attribution": "VAE Explainer (github.com/xnought/vae-explainer), MIT License"
+  },
+  {
+    "name": "Neural Machine Translation by Jointly Learning to Align and Translate (ideas)",
+    "url": "https://arxiv.org/abs/1409.0473",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "additive (Bahdanau) attention: scores v·tanh(W_q s + W_k h), softmax weights, the context vector; code written fresh",
+    "attribution": "Dzmitry Bahdanau, Kyunghyun Cho and Yoshua Bengio (2015)"
+  },
+  {
+    "name": "Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation (ideas)",
+    "url": "https://arxiv.org/abs/1406.1078",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the GRU and the encoder-decoder without attention (the bottleneck baseline); PyTorch’s nn.GRU is used as is",
+    "attribution": "Kyunghyun Cho, Bart van Merriënboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi Bougares, Holger Schwenk and Yoshua Bengio (2014)"
+  },
+  {
+    "name": "R. E. Kalman, “A New Approach to Linear Filtering and Prediction Problems” (Journal of Basic Engineering, 1960)",
+    "url": "https://doi.org/10.1115/1.3662552",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the predict and update equations of the filter",
+    "attribution": "Rudolf E. Kálmán"
+  },
+  {
+    "name": "Hamilton, Ying & Leskovec, Inductive Representation Learning on Large Graphs (NeurIPS 2017)",
+    "url": "https://arxiv.org/abs/1706.02216",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The GraphSAGE layer with the mean aggregator and concatenation",
+    "attribution": "William L. Hamilton, Rex Ying and Jure Leskovec"
+  },
+  {
+    "name": "Xu, Hu, Leskovec & Jegelka, How Powerful are Graph Neural Networks? (ICLR 2019)",
+    "url": "https://arxiv.org/abs/1810.00826",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The GIN layer (sum, 1 + ε, MLP) and why a sum tells apart more neighbourhoods than a mean",
+    "attribution": "Keyulu Xu, Weihua Hu, Jure Leskovec and Stefanie Jegelka"
+  },
+  {
+    "name": "Veličković et al., Graph Attention Networks (ICLR 2018)",
+    "url": "https://arxiv.org/abs/1710.10903",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The GAT layer: LeakyReLU scores and a softmax over the neighbours (one head, as PyTorch Geometric’s GATConv)",
+    "attribution": "Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò and Yoshua Bengio"
+  },
+  {
+    "name": "Jain & Wallace, Attention is not Explanation (NAACL 2019)",
+    "url": "https://arxiv.org/abs/1902.10186",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The limits step: attention weights compared with the effect of removing an input",
+    "attribution": "Sarthak Jain and Byron C. Wallace"
+  },
+  {
+    "name": "AlphaZero (Silver et al., Science 2018)",
+    "url": "https://doi.org/10.1126/science.aar6404",
+    "license": "Paper; ideas only (no code or figures used)",
+    "usedFor": "The method: a policy/value network trained by self-play, Monte Carlo tree search with the PUCT rule, visit counts as the policy target; its simulation and TPU counts in the limits step",
+    "attribution": "David Silver, Thomas Hubert, Julian Schrittwieser et al. (DeepMind)"
+  },
+  {
+    "name": "AlphaGo Zero (Silver et al., Nature 2017)",
+    "url": "https://doi.org/10.1038/nature24270",
+    "license": "Paper; ideas only (no code or figures used)",
+    "usedFor": "The search details: select, expand and evaluate, back up; Dirichlet noise at the root and the eight board symmetries in training",
+    "attribution": "David Silver, Julian Schrittwieser, Karen Simonyan et al. (DeepMind)"
+  },
+  {
+    "name": "The number of legal Go positions (Tromp, 2016)",
+    "url": "https://tromp.github.io/go/legal.html",
+    "license": "Web page; one number quoted",
+    "usedFor": "The count of legal Go positions in the limits step",
+    "attribution": "John Tromp"
+  },
+  {
+    "name": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces (ideas)",
+    "url": "https://arxiv.org/abs/2312.00752",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the selective scan (input-dependent Δ, B, C; diagonal A = −exp(A_log); softplus Δ), its initialization and the selective-copying task; code written fresh",
+    "attribution": "Albert Gu and Tri Dao (2023)"
+  },
+  {
+    "name": "The Hidden Attention of Mamba Models (ideas)",
+    "url": "https://arxiv.org/abs/2403.01590",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "reading the scan of one channel as a matrix of look-back weights (step 9); code written fresh",
+    "attribution": "Ameen Ali, Itamar Zimerman and Lior Wolf (2024)"
+  },
+  {
+    "name": "Goodfellow, Shlens & Szegedy, Explaining and Harnessing Adversarial Examples (ICLR 2015)",
+    "url": "https://arxiv.org/abs/1412.6572",
+    "license": "arXiv paper; ideas only (no text, figures or code used)",
+    "usedFor": "The fast gradient sign method (FGSM) and adversarial training",
+    "attribution": "Ian J. Goodfellow, Jonathon Shlens and Christian Szegedy"
+  },
+  {
+    "name": "Madry et al., Towards Deep Learning Models Resistant to Adversarial Attacks (ICLR 2018)",
+    "url": "https://arxiv.org/abs/1706.06083",
+    "license": "arXiv paper; ideas only (no text, figures or code used)",
+    "usedFor": "Projected gradient descent (PGD) inside an ε box, and adversarial training with it",
+    "attribution": "Aleksander Madry, Aleksandar Makelov, Ludwig Schmidt, Dimitris Tsipras and Adrian Vladu"
+  },
+  {
+    "name": "U-Net: Ronneberger, Fischer and Brox, Convolutional Networks for Biomedical Image Segmentation (MICCAI 2015)",
+    "url": "https://arxiv.org/abs/1505.04597",
+    "license": "Paper (arXiv); ideas only (no code, weights or data used)",
+    "usedFor": "the down path, the bottleneck, the up path with concatenated skip connections and the per-pixel softmax, reimplemented at toy size",
+    "attribution": "Olaf Ronneberger, Philipp Fischer and Thomas Brox"
+  },
+  {
+    "name": "Ho, Jain and Abbeel, Denoising Diffusion Probabilistic Models (NeurIPS 2020)",
+    "url": "https://arxiv.org/abs/2006.11239",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "the forward process, the noise-prediction loss, the sampling formula with σ_t² = β_t, the linear β schedule, sinusoidal timestep embeddings and the EMA of weights",
+    "attribution": "Jonathan Ho, Ajay Jain, Pieter Abbeel"
+  },
+  {
+    "name": "Nichol and Dhariwal, Improved Denoising Diffusion Probabilistic Models (ICML 2021)",
+    "url": "https://arxiv.org/abs/2102.09672",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "scaling the linear schedule to fewer steps (1000 / T) and sampling on a subset of the steps (respacing)",
+    "attribution": "Alex Nichol, Prafulla Dhariwal"
+  },
+  {
+    "name": "Song and Ermon, Generative Modeling by Estimating Gradients of the Data Distribution (NeurIPS 2019)",
+    "url": "https://arxiv.org/abs/1907.05600",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "a noise-conditional score network trained at many noise levels, and annealed Langevin sampling with step α·σ²/σ_L²",
+    "attribution": "Yang Song, Stefano Ermon"
+  },
+  {
+    "name": "Vincent, A Connection Between Score Matching and Denoising Autoencoders (Neural Computation 2011)",
+    "url": "https://doi.org/10.1162/NECO_a_00142",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "denoising score matching: the target (x − x̃) / σ² for a noisy point x̃",
+    "attribution": "Pascal Vincent"
+  },
+  {
+    "name": "Grover & Leskovec, node2vec: Scalable Feature Learning for Networks (KDD 2016)",
+    "url": "https://arxiv.org/abs/1607.00653",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The biased second-order walk with the return parameter p and the in-out parameter q, and the walks-to-skip-gram recipe (here with a full softmax instead of negative sampling)",
+    "attribution": "Aditya Grover and Jure Leskovec"
+  },
+  {
+    "name": "Perozzi, Al-Rfou & Skiena, DeepWalk: Online Learning of Social Representations (KDD 2014)",
+    "url": "https://arxiv.org/abs/1403.6652",
+    "license": "Paper; ideas only (no code used)",
+    "usedFor": "The idea of treating random walks on a graph as sentences for word2vec (node2vec with p = q = 1)",
+    "attribution": "Bryan Perozzi, Rami Al-Rfou and Steven Skiena"
+  },
+  {
+    "name": "Yi, Yang, Hong, Cheng, Heldt, Kumthekar, Zhao, Wei & Chi, “Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations” (RecSys 2019)",
+    "url": "https://doi.org/10.1145/3298689.3346996",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the two-tower retrieval model trained with in-batch negatives (softmax over the items of a batch), at toy size",
+    "attribution": "Xinyang Yi, Ji Yang, Lichan Hong, Derek Zhiyuan Cheng, Lukasz Heldt, Aditee Kumthekar, Zhe Zhao, Li Wei and Ed Chi (Google)"
+  },
+  {
+    "name": "Covington, Adams & Sargin, “Deep Neural Networks for YouTube Recommendations” (RecSys 2016)",
+    "url": "https://doi.org/10.1145/2959100.2959190",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the two stages: candidate retrieval by dot products over the whole catalog, then ranking of the short list",
+    "attribution": "Paul Covington, Jay Adams and Emre Sargin (Google)"
+  },
+  {
+    "name": "Anomagram",
+    "url": "https://github.com/victordibia/anomagram",
+    "license": "MIT",
+    "usedFor": "Ideas only (no code or data): an autoencoder trained on normal ECG beats of 140 points flags the beats it cannot rebuild; drawing a beat, the rebuild overlay, the threshold, the error histogram and the ROC curve",
+    "attribution": "Anomagram by Victor Dibia (Cloudera Fast Forward Labs), MIT License"
+  },
+  {
+    "name": "Human-level control through deep reinforcement learning (Mnih et al., Nature 2015)",
+    "url": "https://doi.org/10.1038/nature14236",
+    "license": "Paper; ideas only (no code or figures used)",
+    "usedFor": "The method: a Q-network trained from a replay buffer against a periodically copied target network, with ε-greedy exploration",
+    "attribution": "Volodymyr Mnih, Koray Kavukcuoglu, David Silver et al. (DeepMind)"
+  },
+  {
+    "name": "TensorFlow.js examples: snake-dqn",
+    "url": "https://github.com/tensorflow/tfjs-examples/tree/master/snake-dqn",
+    "license": "Apache-2.0; idea only, reimplemented (no code or weights copied)",
+    "usedFor": "The idea of the page: snake on a small board read as planes by a convolutional Q-network, with three moves relative to the heading",
+    "attribution": "The TensorFlow.js authors (Google)"
+  }
+]

@@ -1,0 +1,73 @@
+// {%slug%}: process '{%processId%}' (kind C, design §4.4). Scaffolded by `atlas new model {%slug%} --template process-blank`
+// on {%today%}. A minimal process to replace with your algorithm: a walker on a line of cells takes random steps and
+// counts its visits. The parts every process has:
+//   phases    each with a label, a kind and a narration; {frame.<metric>} placeholders read the frame's metrics
+//   schema    every stored field: 'visits' is tracked by `changes` (each edit reported), 'pos' is a snapshot
+//   run()     a generator: yield one frame per event; randomness only from ctx.rng; controls via gen.next(control)
+// Check it in Node:  npm run atlas -- run {%slug%} run --frames 0..12
+// Its Python twin:   pipeline/{%slug%}/reference.py (npm run atlas -- parity {%slug%} compares the two tapes)
+import type { Control, Frame, ProcessDef, Tensor } from '../../atlas/types/index.ts';
+
+export type WalkOpt = { cells: number; steps: number };
+export type WalkState = { pos: number; visits: Tensor };
+type Run = Generator<Frame<WalkState>, void, Control<WalkOpt> | undefined>;
+
+export const {%processIdent%}: ProcessDef<unknown, WalkOpt, WalkState> = {
+	id: '{%processId%}',
+	kind: 'algorithm',
+	title: { en: 'TODO: A random walk on a line', zh: 'TODO：直线上的随机游走' },
+	phases: {
+		start: {
+			label: { en: 'Start', zh: '开始' },
+			kind: 'input',
+			narration: {
+				what: {
+					en: 'The walker starts in cell {frame.pos|int} of a line of {frame.cells|int} cells, numbered from 0. So far it has visited only this cell.',
+					zh: '游走者从一排 {frame.cells|int} 个格子（从 0 开始编号）中的第 {frame.pos|int} 格出发。到目前为止它只到过这一格。'
+				}
+			}
+		},
+		move: {
+			label: { en: 'One random step', zh: '随机走一步' },
+			kind: 'act',
+			formula: {
+				tex: 'x_{t+1} = x_t + s = {{from}} + ({{s}}) = {{to}}',
+				values: (f) => ({ from: f.metrics!.from, s: f.metrics!.s, to: f.metrics!.to })
+			},
+			narration: {
+				what: {
+					en: 'Step {frame.t|int}: the coin says {frame.s}, so the walker moves from cell {frame.from|int} to cell {frame.to|int}. The walls stop it at both ends.',
+					zh: '第 {frame.t|int} 步：随机数决定走 {frame.s}，于是游走者从第 {frame.from|int} 格走到第 {frame.to|int} 格。两端的墙会挡住它。'
+				}
+			}
+		}
+	},
+	schema: {
+		pos: { kind: 'int', label: { en: 'Current cell', zh: '当前格子' }, tol: 'exact' },
+		visits: { kind: 'tensor', label: { en: 'Visits per cell', zh: '每格的访问次数' }, track: 'changes', scale: 'sequential', tol: 'exact' }
+	},
+	defaults: { cells: 7, steps: 30 },
+	*run(_input, ctx): Run {
+		const { cells } = ctx.opt;
+		let steps = ctx.opt.steps;
+		const visits: Tensor = { shape: [cells], data: new Float64Array(cells) };
+		let pos = Math.floor(cells / 2);
+		visits.data[pos] = 1;
+		yield { phase: 'start', state: { pos, visits }, metrics: { pos, cells } };
+		for (let t = 1; t <= steps && !ctx.signal.cancelled; t++) {
+			const s = ctx.rng.int(2) === 0 ? -1 : 1;
+			const from = pos;
+			pos = Math.min(cells - 1, Math.max(0, pos + s));
+			const old = visits.data[pos];
+			visits.data[pos] = old + 1;
+			const c = yield {
+				phase: 'move',
+				step: t,
+				state: { pos, visits },
+				changes: [{ field: 'visits', index: [pos], from: old, to: old + 1 }],
+				metrics: { t, s, from, to: pos }
+			};
+			if (c?.type === 'set' && typeof c.opt.steps === 'number') steps = c.opt.steps;
+		}
+	}
+};

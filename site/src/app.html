@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
+		<style>
+			/* Saved language is Chinese: keep the (English) prerendered content hidden until the app has
+			   rendered Chinese (initLang removes the attribute), with a failsafe below. Without JavaScript
+			   the attribute is never set, so the English page shows as usual. */
+			html[data-lang-pending] body > div {
+				visibility: hidden;
+			}
+			/* 404.html (SPA fallback) without JavaScript: the body is empty, so show a plain message */
+			.nojs-404 {
+				display: none;
+			}
+			body:not(:has(main)) .nojs-404 {
+				display: block;
+				max-width: 36rem;
+				margin: 15vh auto;
+				padding: 0 16px;
+				font-family: system-ui, sans-serif;
+				line-height: 1.6;
+			}
+		</style>
+		<script>
+			// Apply the saved theme and language before first paint (no flash).
+			// Everything is wrapped in try/catch: storage can be blocked.
+			(function () {
+				var d = document.documentElement;
+				try {
+					var th = localStorage.getItem('atlas.theme');
+					if (th === 'light' || th === 'dark') d.setAttribute('data-theme', th);
+				} catch (e) {}
+				try {
+					var q = /[?&]lang=(zh|en)\b/.exec(location.search);
+					var lg = q ? q[1] : localStorage.getItem('atlas.lang');
+					if (lg === 'zh') {
+						d.setAttribute('lang', 'zh-CN');
+						d.setAttribute('data-lang-pending', 'zh');
+						// failsafe: never keep the page hidden for long (slow devices see English briefly instead)
+						setTimeout(function () {
+							d.removeAttribute('data-lang-pending');
+						}, 2500);
+					}
+				} catch (e) {}
+			})();
+		</script>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<noscript>
+			<div class="nojs-404" lang="en">
+				<h1>This page is not here<br /><span lang="zh-CN">找不到这个页面</span></h1>
+				<p>The link may be old, or the page may not exist yet.<br /><span lang="zh-CN">链接可能已过期，或者这个页面还不存在。</span></p>
+				<p><a href="%sveltekit.assets%/">Model Atlas home · <span lang="zh-CN">首页</span></a> · <a href="%sveltekit.assets%/atlas/">Atlas · <span lang="zh-CN">图鉴</span></a></p>
+			</div>
+		</noscript>
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

@@ -1,0 +1,54 @@
+// {%slug%}: trainer '{%trainerId%}' (kind B, design §4.5). Scaffolded by `atlas new model {%slug%} --template points2d-train`
+// on {%today%}. An MLP that sorts 2-D points into classes, trained live. The loaders wrap this TrainerDef with
+// trainingProcess() and register it as process 'train:{%trainerId%}'.
+//   npm run atlas -- run {%slug%} train --frames 0..20
+//   npm run atlas -- run {%slug%} sgd1 --frames 0..8          (fine detail: forward, loss, backward, update)
+// Python twin: pipeline/{%slug%}/twin.py (npm run atlas -- parity {%slug%}: SGD <= 1e-10 and Adam <= 1e-7 relative).
+//
+// Randomness: model() gets the run's rng.fork('init'); batch() gets one rng.fork('batch') stream for the whole run.
+// Draw from the rng you are given; never fork it again per step (that would repeat the same batch every step).
+// Weight decay: optimizer 'adam' with decoupled: true is AdamW (TrainOpt has no 'adamw').
+import type { Tensor, TrainOpt, TrainerDef } from '../../atlas/types/index.ts';
+import { MLP } from '../../atlas/autograd/nn.ts';
+import { crossEntropy } from '../../atlas/autograd/loss.ts';
+import { input, noGrad } from '../../atlas/autograd/var.ts';
+import { createRng } from '../../atlas/core/rng.ts';
+import { moons, sampleBatch, type Points2D } from '../../atlas/data/points2d.ts';
+import { pointsOf as learnerPoints } from '../../atlas/adapters/points2d/adapter.ts';
+
+export type Opt = TrainOpt & { hidden: number };
+
+/** The points to learn. A trainer receives the learner's RAW input (rt.input: the points2d adapter's { preset } or
+ *  painted points), so the adapter's pointsOf() turns it into a Points2D. Fewer than 2 points: two moons. */
+const FALLBACK: Points2D = moons(200, createRng(7), { noise: 0.1 });
+export function pointsOf(data: unknown): Points2D {
+	const p = learnerPoints(data);
+	return p.n > 1 ? p : FALLBACK;
+}
+
+/** Share of the points the network classifies right (a metric, recorded at snapshots). */
+export function accuracy(m: MLP, p: Points2D): number {
+	const y = noGrad(() => m.forward(input({ shape: [p.n, 2], data: p.xy }))).value.data;
+	const C = y.length / p.n;
+	let ok = 0;
+	for (let i = 0; i < p.n; i++) {
+		let best = 0;
+		for (let c = 1; c < C; c++) if (y[i * C + c] > y[i * C + best]) best = c;
+		if (best === p.label[i]) ok++;
+	}
+	return ok / p.n;
+}
+
+export const {%trainerIdent%}: TrainerDef<unknown, MLP, { x: Tensor; y: Int32Array }, Opt> = {
+	id: '{%trainerId%}',
+	title: { en: 'TODO: Train a network to sort the points', zh: 'TODO：训练一个网络给点分类' },
+	defaults: { seed: 1, lr: 0.03, batch: 16, steps: 300, snapshotEvery: 5, optimizer: 'adam', hidden: 6 },
+	// rng is the run's fork('init'): sources with the same seed start from the same weights
+	model: (rng, opt) => new MLP('net', [2, opt.hidden, opt.hidden, 2], 'tanh', rng),
+	batch(data, _step, rng, opt) {
+		const b = sampleBatch(pointsOf(data), opt.batch, rng);
+		return { x: b.x, y: b.label };
+	},
+	loss: (m, b, rec) => ({ loss: crossEntropy(m.forward(input(b.x), rec), b.y) }),
+	metrics: (m, data) => ({ accuracy: accuracy(m, pointsOf(data)) })
+};

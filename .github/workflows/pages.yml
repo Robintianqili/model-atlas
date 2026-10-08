@@ -1,0 +1,68 @@
+# Builds the static site in site/ and deploys it to GitHub Pages:
+# https://robintianqili.github.io/model-atlas/
+# Repository settings: Pages > Build and deployment > Source: GitHub Actions.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The deploy job needs to write Pages and to request an OIDC token; nothing needs write access to the code.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. A queued run waits instead of cancelling one that is deploying.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # a project site is served under /<repository name>/
+          BASE_PATH: /model-atlas
+
+      - name: Check the build (pages, no third-party requests, size budgets)
+        run: npm run check:build
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

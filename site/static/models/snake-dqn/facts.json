@@ -1,0 +1,219 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 171235,
+   "source": "pipeline/snake-dqn/model.py",
+   "measured": "2026-10-07"
+  },
+  "gamma": {
+   "value": 0.95,
+   "source": "pipeline/snake-dqn/train.py",
+   "measured": "2026-10-07"
+  },
+  "buffer": {
+   "value": 100000,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "batch": {
+   "value": 256,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "lr": {
+   "value": 0.0005,
+   "source": "pipeline/snake-dqn/train.py",
+   "measured": "2026-10-07"
+  },
+  "sync": {
+   "value": 500,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "updates",
+   "measured": "2026-10-07"
+  },
+  "epsEnd": {
+   "value": 0.02,
+   "source": "pipeline/snake-dqn/train.py",
+   "measured": "2026-10-07"
+  },
+  "epsMoves": {
+   "value": 600000,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "trainMoves": {
+   "value": 1500000,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "minutes": {
+   "value": 18,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "minutes (RTX 5090 laptop GPU, shared)",
+   "measured": "2026-10-07"
+  },
+  "ckMoves": {
+   "value": 1450048,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "ckUpdates": {
+   "value": 44690,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "updates",
+   "measured": "2026-10-07"
+  },
+  "ckSinceSync": {
+   "value": 190,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "updates",
+   "measured": "2026-10-07"
+  },
+  "evalEvery": {
+   "value": 50000,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "evalGames": {
+   "value": 200,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "games",
+   "measured": "2026-10-07"
+  },
+  "evalBest": {
+   "value": 23.465,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "food per test game",
+   "measured": "2026-10-07"
+  },
+  "evalHalf": {
+   "value": 11.7,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "food per test game",
+   "measured": "2026-10-07"
+  },
+  "halfMoves": {
+   "value": 500032,
+   "source": "pipeline/snake-dqn/train.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "agentGames": {
+   "value": 1000,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "games (seeds 1 to 1,000)",
+   "measured": "2026-10-07"
+  },
+  "agentMean": {
+   "value": 24.151,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "food per game",
+   "measured": "2026-10-07"
+  },
+  "agentMedian": {
+   "value": 24.0,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "measured": "2026-10-07"
+  },
+  "agentMax": {
+   "value": 41,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "food",
+   "measured": "2026-10-07"
+  },
+  "agentMoves": {
+   "value": 214.891,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "moves per game",
+   "measured": "2026-10-07"
+  },
+  "agentCrashes": {
+   "value": 995,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "games",
+   "measured": "2026-10-07"
+  },
+  "agentHungry": {
+   "value": 5,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "games",
+   "measured": "2026-10-07"
+  },
+  "agentFull": {
+   "value": 0,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "games",
+   "measured": "2026-10-07"
+  },
+  "agentAvoidable": {
+   "value": 0.7648241206030151,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "share of crashes",
+   "measured": "2026-10-07"
+  },
+  "randomMean": {
+   "value": 0.196,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "food per game",
+   "measured": "2026-10-07"
+  },
+  "randomSafeMean": {
+   "value": 1.529,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "food per game",
+   "measured": "2026-10-07"
+  },
+  "maxFood": {
+   "value": 78,
+   "source": "pipeline/snake-dqn/game.py",
+   "unit": "food to fill the board",
+   "measured": "2026-10-07"
+  },
+  "hunger": {
+   "value": 100,
+   "source": "pipeline/snake-dqn/game.py",
+   "unit": "moves",
+   "measured": "2026-10-07"
+  },
+  "hurryStep": {
+   "value": {
+    "en": "−0.1",
+    "zh": "−0.1"
+   },
+   "source": "pipeline/snake-dqn/game.py: REWARDS['hurry']",
+   "unit": "reward per move",
+   "measured": "2026-10-07"
+  },
+  "hurryMean": {
+   "value": 17.755,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "food per game",
+   "measured": "2026-10-07"
+  },
+  "hurryMoves": {
+   "value": 128.311,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "moves per game",
+   "measured": "2026-10-07"
+  },
+  "hurryAvoidable": {
+   "value": 0.856,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "share of crashes",
+   "measured": "2026-10-07"
+  },
+  "hurryCrashes": {
+   "value": 1000,
+   "source": "pipeline/snake-dqn/evaluate.py",
+   "unit": "games",
+   "measured": "2026-10-07"
+  }
+ }
+}

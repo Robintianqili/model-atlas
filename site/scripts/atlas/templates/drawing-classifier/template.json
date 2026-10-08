@@ -1,0 +1,13 @@
+{
+	"name": "drawing-classifier",
+	"description": "Kind A on drawings (the TinyCNN / TinyViT shape): a small CNN trained on Quick, Draw! with ak.data.quickdraw (TinyCNN's split and scaling), exported with conv2d / relu / maxpool2d / flatten / linear / softmax builder calls, blank and dot edge cases, presets in TinyCNN's format.",
+	"kinds": ["trace"],
+	"input": "drawing28",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "pipeline/model.py.tmpl", "to": "pipeline/model.py" },
+		{ "from": "pipeline/train.py.tmpl", "to": "pipeline/train.py" },
+		{ "from": "pipeline/export.py.tmpl", "to": "pipeline/export.py" }
+	]
+}

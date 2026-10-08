@@ -1,0 +1,61 @@
+"""{%slug%}: train the CNN on Quick, Draw! (CPU or GPU; fixed seed). Scaffolded on {%today%}.
+
+    npm run atlas -- py pipeline/{%slug%}/train.py [--epochs 3] [--seed 0]
+
+Data: ak.data.quickdraw(CLASSES, split) (TinyCNN's split and pixel/255 scaling; no download). Writes
+pipeline/{%slug%}/model_final.pt and train_metrics.json, and prints the test accuracy: report it honestly in notes.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import torch
+import torch.nn.functional as F
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from model import CLASSES, Net  # noqa: E402
+
+
+def tensors(split: str):
+    X, y, _ = ak.data.quickdraw(CLASSES, split)
+    return torch.tensor(X).float().unsqueeze(1) / 255, torch.tensor(y)
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--epochs", type=int, default=3)
+    ap.add_argument("--seed", type=int, default=0)
+    a = ap.parse_args()
+    torch.manual_seed(a.seed)
+    dev = "cuda" if torch.cuda.is_available() else "cpu"   # training may use the GPU; export is CPU only (AK102)
+    Xtr, ytr = tensors("train")
+    Xte, yte = tensors("test")
+    m = Net().to(dev)
+    opt = torch.optim.Adam(m.parameters(), lr=2e-3)
+    for epoch in range(a.epochs):
+        perm = torch.randperm(len(Xtr))
+        for i in range(0, len(perm), 256):
+            idx = perm[i:i + 256]
+            opt.zero_grad()
+            loss = F.cross_entropy(m(Xtr[idx].to(dev)), ytr[idx].to(dev))
+            loss.backward()
+            opt.step()
+        print(f"epoch {epoch + 1}: last batch loss {loss.item():.4f}")
+    m = m.cpu().eval()
+    with torch.no_grad():
+        acc = float((m(Xte).argmax(1) == yte).float().mean())
+    torch.save(m.state_dict(), HERE / "model_final.pt")
+    report = {"classes": CLASSES, "epochs": a.epochs, "seed": a.seed, "test_acc": acc, "test_n": len(yte)}
+    with open(HERE / "train_metrics.json", "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(report, indent=1) + "\n")
+    print(json.dumps(report))

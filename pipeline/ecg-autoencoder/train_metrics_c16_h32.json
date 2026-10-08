@@ -1,0 +1,44 @@
+{
+ "code": 16,
+ "hidden": 32,
+ "params": 10204,
+ "best_epoch": 148,
+ "epochs": 150,
+ "seconds": 49.0,
+ "steps": 4800,
+ "batch": 128,
+ "lr": 0.002,
+ "seed": 0,
+ "train_mse": 0.00026482605608180165,
+ "val_mse": 0.0002734981826506555,
+ "val_auc": 0.828775,
+ "val_auc_kind": {
+  "noP": 0.67855,
+  "wideQRS": 0.8073,
+  "stUp": 0.843,
+  "noisy": 0.98625
+ },
+ "test_auc": 0.8468,
+ "test_auc_kind": {
+  "noP": 0.6819,
+  "wideQRS": 0.8376,
+  "stUp": 0.8865,
+  "noisy": 0.9812
+ },
+ "n": {
+  "train": 4000,
+  "val": 600,
+  "test": 400
+ },
+ "data": {
+  "seed": 2026,
+  "opt": {
+   "nTrain": 4000,
+   "nVal": 400,
+   "nTest": 200,
+   "nOdd": 50,
+   "chunk": 500
+  }
+ },
+ "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)"
+}

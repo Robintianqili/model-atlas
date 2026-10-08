@@ -1,0 +1,54 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tinyforecaster",
+ "checked": "2026-10-06",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 3.89e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "init": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 3.89e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "windows": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 73,
+   "fixtures": 9,
+   "checked": "2026-10-06"
+  },
+  "forecast": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.94e-10,
+   "frames": 228,
+   "fixtures": 9,
+   "checked": "2026-10-06"
+  },
+  "walks": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 4.54e-13,
+   "frames": 3,
+   "fixtures": 9,
+   "checked": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,143 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 15905,
+   "unit": "count",
+   "source": "spec",
+   "measured": "2026-10-06"
+  },
+  "vocab": {
+   "value": 23,
+   "unit": "words",
+   "source": "model.py VOCAB (without the pad)",
+   "measured": "2026-10-06"
+  },
+  "trainN": {
+   "value": 20000,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "valN": {
+   "value": 2000,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "testN": {
+   "value": 2000,
+   "unit": "pairs",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "epochs": {
+   "value": 60,
+   "unit": "epochs",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "batch": {
+   "value": 256,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "scale": {
+   "value": 21.105669021606445,
+   "unit": "s = e^t",
+   "source": "model_final.pt",
+   "measured": "2026-10-06"
+  },
+  "rowAcc6": {
+   "value": 0.9544544544544544,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "colAcc6": {
+   "value": 0.9104104104104104,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "loss6": {
+   "value": 0.1168865269210401,
+   "unit": "nats",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "batches6": {
+   "value": 333,
+   "unit": "batches",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "loss6Init": {
+   "value": 3.0340614078997135,
+   "unit": "nats",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off), starting weights",
+   "measured": "2026-10-06"
+  },
+  "rowAcc6Init": {
+   "value": 0.15715715715715717,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off), starting weights",
+   "measured": "2026-10-06"
+  },
+  "oneN": {
+   "value": 1493,
+   "unit": "drawings",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "shapeAcc": {
+   "value": 1.0,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "sizeAcc": {
+   "value": 0.999330207635633,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "placeAcc": {
+   "value": 1.0,
+   "unit": "share",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "twoN": {
+   "value": 507,
+   "unit": "drawings",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "orderTies": {
+   "value": 507,
+   "unit": "drawings",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "orderMaxGap": {
+   "value": 3.814697265625e-06,
+   "unit": "score",
+   "source": "pipeline/tinyclip/stats.py (CPU float32, TF32 off)",
+   "measured": "2026-10-06"
+  },
+  "chunkHash0": {
+   "value": 1486835376,
+   "unit": "crc32",
+   "source": "synth tape, chunk 0, as read by Python",
+   "measured": "2026-10-06"
+  },
+  "fixedHash": {
+   "value": 531833906,
+   "unit": "crc32",
+   "source": "synth tape, fixed drawings, as read by Python",
+   "measured": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,3 @@
+<!-- matrix-factorization: the page's Training section, the map and the error curve after training on your ratings -->
+<script lang="ts">import Explore from '../parts/Explore.svelte'; let { store } = $props();</script>
+<Explore {store} view="matrix-factorization/map" props={{ people: true, loss: true, kinds: true }} note={{ en: 'Your ratings and everyone else’s, after 4,000 steps of stochastic gradient descent (one random known rating per step, learning rate 0.05). Change a rating above and it trains again from the same start.', zh: '用你和其他所有人的评分，做完 4,000 步随机梯度下降之后的样子（每步随机取一个已知评分，学习率 0.05）。在上面改一个评分，它会从同样的起点重新训练。' }} />

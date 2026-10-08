@@ -1,0 +1,31 @@
+"""{%slug%}: the PyTorch float64 twin of trainer '{%trainerId%}' (kind B parity, design §4.11).
+
+`npm run atlas -- parity {%slug%}` runs the TS trainer in fine detail, writes its init params and batches to
+site/.atlas/{%slug%}/train_fixture.{%trainerId%}.<optimizer>.json, then runs `python -m atlas_kit.train_reference` with
+this twin: losses, step-1 gradients and final params must agree (SGD 1e-10, Adam 1e-7 relative, over 50 steps).
+State_dict names equal the TS Module.named() names: MLP('net', [2, h, h, 2], 'tanh') -> net.0.*, net.2.*, net.4.*.
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Net(nn.Module):
+    def __init__(self, hidden: int):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(2, hidden), nn.Tanh(), nn.Linear(hidden, hidden), nn.Tanh(), nn.Linear(hidden, 2))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+def build(cfg: dict) -> nn.Module:
+    """The TS model: MLP('net', [2, hidden, hidden, 2], 'tanh')."""
+    return Net(int(cfg.get("hidden", 6))).double()
+
+
+def loss(model: nn.Module, batch: dict, cfg: dict) -> tuple[torch.Tensor, dict]:
+    """batch: {'x': [B, 2], 'y': [B]} float64 (labels arrive as floats). Mean cross-entropy, as the TS crossEntropy()."""
+    return F.cross_entropy(model(batch["x"]), batch["y"].long()), {}

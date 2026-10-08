@@ -1,0 +1,65 @@
+"""{%slug%}: Python reference for process '{%processId%}' (kind C parity, design §4.11).
+
+An independent run of site/src/lib/explainers/{%slug%}/process.ts: the same walk with ak.Rng (rng.int(2) is
+bit-identical to the TS ctx.rng.int(2)), written as an atlas-tape/1 file. `npm run atlas -- parity {%slug%}` runs it
+with the arguments below and compares the tapes frame by frame (AK204 names the first difference).
+
+CLI contract (every reference.py): --process <id> --seed <n> --opt <json> --draws <draws.json> --input <json> --out <stem>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:  # run without PYTHONPATH: use the repo's pipeline/ folder
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import numpy as np
+
+SCHEMA = {
+    "pos": {"kind": "int", "label": ("Current cell", "当前格子"), "tol": "exact"},
+    "visits": {"kind": "tensor", "label": ("Visits per cell", "每格的访问次数"), "track": "changes", "scale": "sequential", "tol": "exact"},
+}
+PHASES = {
+    "start": {"label": ("Start", "开始"), "kind": "input"},
+    "move": {"label": ("One random step", "随机走一步"), "kind": "act", "tex": "x_{t+1} = x_t + s = {{from}} + ({{s}}) = {{to}}"},
+}
+
+
+def run(seed: int = 1, cells: int = 7, steps: int = 30) -> "ak.TapeWriter":
+    w = ak.TapeWriter("{%processId%}", SCHEMA, seed=seed, opt={"cells": cells, "steps": steps}, phases=PHASES, provenance="live")
+    rng = ak.Rng(seed)
+    visits = np.zeros(cells, dtype=np.float64)
+    pos = cells // 2
+    visits[pos] = 1
+    w.frame("start", {"pos": pos, "visits": visits}, metrics={"pos": pos, "cells": cells})
+    for t in range(1, steps + 1):
+        s = -1 if rng.int(2) == 0 else 1
+        frm = pos
+        pos = min(cells - 1, max(0, pos + s))
+        old = visits[pos]
+        visits[pos] = old + 1
+        w.frame("move", {"pos": pos, "visits": visits}, step=t,
+                changes=[{"field": "visits", "index": [pos], "from": float(old), "to": float(old + 1)}],
+                metrics={"t": t, "s": s, "from": frm, "to": pos})
+    return w
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--process", default="{%processId%}")
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--opt", default="{}")
+    ap.add_argument("--draws", default=None)
+    ap.add_argument("--input", default="null", help="JSON input of the TS run, or @<file> (read it with ak.json_arg)")
+    ap.add_argument("--out", default=None)
+    a = ap.parse_args()
+    opt = {"cells": 7, "steps": 30, **json.loads(a.opt)}
+    tape = run(seed=a.seed, cells=int(opt["cells"]), steps=int(opt["steps"]))
+    jpath, _ = tape.write(a.out or ak.site_path(".atlas", "{%slug%}", "{%processId%}.ref"))
+    print(f"wrote {jpath} ({len(tape.frames)} frames)")

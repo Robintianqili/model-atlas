@@ -1,0 +1,69 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template series-train` on {%today%}.
+// `npm run atlas -- lesson {%slug%} draft` lists the auto steps (proc:event.<phase>@windows, train:*@train).
+// Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`, one kindOf 'limits' | 'breakIt'.
+import type { LessonDef } from '../../atlas/types/index.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{ auto: 'proc:event.series@windows' },
+		{ auto: 'proc:event.window@windows' },
+		{
+			id: 'second-window',
+			source: 'windows',
+			at: { phase: 'window', step: 1 },
+			view: 'zoom.formula',
+			provenance: 'live',
+			title: { en: 'TODO: the next window overlaps the first', zh: 'TODO：下一个窗口和第一个重叠' },
+			predict: {
+				id: '{%slug%}-overlap',
+				question: { en: 'TODO: do two neighbouring windows share values?', zh: 'TODO：相邻的两个窗口有共同的值吗？' },
+				options: [
+					{ en: 'Yes', zh: '有' },
+					{ en: 'No', zh: '没有' }
+				],
+				answer: 0,
+				explain: { en: 'TODO: the windows slide by the stride, which is shorter than the window.', zh: 'TODO：窗口每次滑动的步长比窗口本身短。' }
+			},
+			narration: {
+				en: 'The next window starts at position {start|int}, so it shares values with the first one. Its target is {target}.',
+				zh: '下一个窗口从第 {start|int} 个位置开始，所以和第一个窗口有共同的值。它的目标是 {target}。',
+				vars: (_rt, at) => ({ start: at.frame!.metrics!.start, target: at.frame!.metrics!.target })
+			}
+		},
+		{
+			id: 'trained',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			title: { en: 'TODO: the trained forecaster', zh: 'TODO：训练好的预测模型' },
+			narration: {
+				en: 'After {step|int} steps the loss is {loss}; the average forecast error over all windows is {mae}.',
+				zh: '训练 {step|int} 步之后，损失是 {loss}；在所有窗口上，预测的平均误差是 {mae}。',
+				vars: (_rt, at) => ({ step: at.frame!.step ?? 0, loss: at.frame!.metrics!.loss, mae: at.frame!.metrics!.mae })
+			},
+			task: {
+				prompt: { en: 'TODO: draw a series the forecaster cannot learn.', zh: 'TODO：画一条预测模型学不会的序列。' },
+				done: (_rt, at) => (at.frame?.metrics?.mae ?? 0) > 0.3
+			}
+		},
+		{
+			id: 'limits',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: what a window cannot see', zh: 'TODO：窗口看不到什么' },
+			narration: {
+				en: 'TODO: the model only sees {L|int} values at a time, so it cannot learn a pattern longer than that.',
+				zh: 'TODO：模型一次只看 {L|int} 个值，所以学不到比这更长的规律。',
+				vars: (_rt, at) => ({ L: (at.tape!.opt as { L?: number }).L ?? 8 })
+			}
+		}
+	]
+};
+
+export default lesson;

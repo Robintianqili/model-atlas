@@ -1,0 +1,8 @@
+# Model Atlas pipeline (atlas_kit and the model folders). Python >= 3.10.
+# Kinds B and C need no Python at all; a Python twin or reference only gives a stronger badge.
+#   pip install -r pipeline/requirements.txt
+# A CPU wheel of torch is enough: references and goldens are computed on the CPU with TF32 off. For a CPU-only
+# install: pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.1
+numpy>=1.24
+networkx>=3.0

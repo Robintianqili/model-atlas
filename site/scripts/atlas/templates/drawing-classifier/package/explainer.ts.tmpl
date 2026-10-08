@@ -1,0 +1,52 @@
+// {%slug%}: the package manifest (design §4.9). Scaffolded by `atlas new model {%slug%} --template drawing-classifier` on {%today%}.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// Sources: fwd (the trace of the exported CNN on the learner's drawing). A scan of one conv layer is implicit:
+// a lesson step may use source 'scan:conv1' to slide over every output cell.
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+
+const manifest: ExplainerManifest = {
+	slug: '{%slug%}',
+	type: 'model',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /m/
+{%/dev%}
+	assets: { dir: 'models/{%slug%}', auto: ['spec.json', 'weights.bin'] }, // written by pipeline/{%slug%}/export.py
+	input: { adapter: '{%adapter%}', presets: 'presets.json' },
+	output: { view: 'kit.probbars' },
+	sources: {
+		fwd: { kind: 'trace' }
+	},
+	page: {
+		// What the learner can do after the page (measurable). Seeded from the catalog: {%hookEn%}
+		goals: [
+			{ en: 'TODO: explain how a kernel turns the drawing into a feature map', zh: 'TODO：解释一个卷积核如何把画变成特征图' },
+			{ en: 'TODO: predict which drawings the model will get wrong', zh: 'TODO：预测模型会认错哪些画' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	// Every dataset, ported code or idea-with-code (AK704). promote appends these to static/licenses.json.
+	credits: [
+		{
+			name: 'Quick, Draw! dataset',
+			url: 'https://github.com/googlecreativelab/quickdraw-dataset',
+			license: 'CC BY 4.0',
+			usedFor: 'TODO: training and test drawings for {%slug%}',
+			attribution: 'Quick, Draw! dataset by Google Creative Lab'
+		}
+	]
+};
+
+export default manifest;

@@ -1,0 +1,771 @@
+{
+ "slug": "tinymamba",
+ "name": {
+  "en": "Tiny Mamba (state-space model)",
+  "zh": "小型 Mamba（状态空间模型）"
+ },
+ "version": "2026-10-06",
+ "params": 2474,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "emb.weight",
+   "shape": [
+    10,
+    16
+   ],
+   "offset": 0,
+   "length": 160
+  },
+  {
+   "name": "B1.norm.weight",
+   "shape": [
+    16
+   ],
+   "offset": 160,
+   "length": 16
+  },
+  {
+   "name": "B1.norm.bias",
+   "shape": [
+    16
+   ],
+   "offset": 176,
+   "length": 16
+  },
+  {
+   "name": "B1.in.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 192,
+   "length": 256
+  },
+  {
+   "name": "B1.in.bias",
+   "shape": [
+    16
+   ],
+   "offset": 448,
+   "length": 16
+  },
+  {
+   "name": "B1.dt.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 464,
+   "length": 256
+  },
+  {
+   "name": "B1.dt.bias",
+   "shape": [
+    16
+   ],
+   "offset": 720,
+   "length": 16
+  },
+  {
+   "name": "B1.B.weight",
+   "shape": [
+    4,
+    16
+   ],
+   "offset": 736,
+   "length": 64
+  },
+  {
+   "name": "B1.C.weight",
+   "shape": [
+    4,
+    16
+   ],
+   "offset": 800,
+   "length": 64
+  },
+  {
+   "name": "B1.scan.A_log",
+   "shape": [
+    16,
+    4
+   ],
+   "offset": 864,
+   "length": 64
+  },
+  {
+   "name": "B1.scan.D",
+   "shape": [
+    16
+   ],
+   "offset": 928,
+   "length": 16
+  },
+  {
+   "name": "B1.out.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 944,
+   "length": 256
+  },
+  {
+   "name": "B1.out.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1200,
+   "length": 16
+  },
+  {
+   "name": "B2.norm.weight",
+   "shape": [
+    16
+   ],
+   "offset": 1216,
+   "length": 16
+  },
+  {
+   "name": "B2.norm.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1232,
+   "length": 16
+  },
+  {
+   "name": "B2.in.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1248,
+   "length": 256
+  },
+  {
+   "name": "B2.in.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1504,
+   "length": 16
+  },
+  {
+   "name": "B2.dt.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1520,
+   "length": 256
+  },
+  {
+   "name": "B2.dt.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1776,
+   "length": 16
+  },
+  {
+   "name": "B2.B.weight",
+   "shape": [
+    4,
+    16
+   ],
+   "offset": 1792,
+   "length": 64
+  },
+  {
+   "name": "B2.C.weight",
+   "shape": [
+    4,
+    16
+   ],
+   "offset": 1856,
+   "length": 64
+  },
+  {
+   "name": "B2.scan.A_log",
+   "shape": [
+    16,
+    4
+   ],
+   "offset": 1920,
+   "length": 64
+  },
+  {
+   "name": "B2.scan.D",
+   "shape": [
+    16
+   ],
+   "offset": 1984,
+   "length": 16
+  },
+  {
+   "name": "B2.out.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 2000,
+   "length": 256
+  },
+  {
+   "name": "B2.out.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2256,
+   "length": 16
+  },
+  {
+   "name": "norm.weight",
+   "shape": [
+    16
+   ],
+   "offset": 2272,
+   "length": 16
+  },
+  {
+   "name": "norm.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2288,
+   "length": 16
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    10,
+    16
+   ],
+   "offset": 2304,
+   "length": 160
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    10
+   ],
+   "offset": 2464,
+   "length": 10
+  }
+ ],
+ "layers": [
+  {
+   "id": "emb",
+   "op": "embedding",
+   "label": {
+    "en": "Token vectors",
+    "zh": "词元向量"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "B1.norm",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1: layer normalization",
+    "zh": "第 1 块：层归一化"
+   },
+   "in": [
+    "emb"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "B1.in",
+   "op": "linear",
+   "label": {
+    "en": "Block 1: into channels",
+    "zh": "第 1 块：进入通道"
+   },
+   "in": [
+    "B1.norm"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B1.u",
+   "op": "silu",
+   "label": {
+    "en": "Block 1: channels u",
+    "zh": "第 1 块：通道 u"
+   },
+   "in": [
+    "B1.in"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "B1.dt",
+   "op": "linear",
+   "label": {
+    "en": "Block 1: step size before softplus",
+    "zh": "第 1 块：softplus 之前的步长"
+   },
+   "in": [
+    "B1.u"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B1.B",
+   "op": "linear",
+   "label": {
+    "en": "Block 1: write strengths B",
+    "zh": "第 1 块：写入强度 B"
+   },
+   "in": [
+    "B1.u"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 4
+   }
+  },
+  {
+   "id": "B1.C",
+   "op": "linear",
+   "label": {
+    "en": "Block 1: read strengths C",
+    "zh": "第 1 块：读出强度 C"
+   },
+   "in": [
+    "B1.u"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 4
+   }
+  },
+  {
+   "id": "B1.scan",
+   "op": "ssm_scan",
+   "label": {
+    "en": "Block 1: selective scan",
+    "zh": "第 1 块：选择性扫描"
+   },
+   "in": [
+    "B1.u",
+    "B1.dt",
+    "B1.B",
+    "B1.C"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "state": 4
+   },
+   "sub": [
+    "delta",
+    "h"
+   ]
+  },
+  {
+   "id": "B1.out",
+   "op": "linear",
+   "label": {
+    "en": "Block 1: back to the row",
+    "zh": "第 1 块：回到这一行"
+   },
+   "in": [
+    "B1.scan"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B1.res",
+   "op": "add",
+   "label": {
+    "en": "Block 1: add to the input",
+    "zh": "第 1 块：加回输入"
+   },
+   "in": [
+    "emb",
+    "B1.out"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "B2.norm",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2: layer normalization",
+    "zh": "第 2 块：层归一化"
+   },
+   "in": [
+    "B1.res"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "B2.in",
+   "op": "linear",
+   "label": {
+    "en": "Block 2: into channels",
+    "zh": "第 2 块：进入通道"
+   },
+   "in": [
+    "B2.norm"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B2.u",
+   "op": "silu",
+   "label": {
+    "en": "Block 2: channels u",
+    "zh": "第 2 块：通道 u"
+   },
+   "in": [
+    "B2.in"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "B2.dt",
+   "op": "linear",
+   "label": {
+    "en": "Block 2: step size before softplus",
+    "zh": "第 2 块：softplus 之前的步长"
+   },
+   "in": [
+    "B2.u"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B2.B",
+   "op": "linear",
+   "label": {
+    "en": "Block 2: write strengths B",
+    "zh": "第 2 块：写入强度 B"
+   },
+   "in": [
+    "B2.u"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 4
+   }
+  },
+  {
+   "id": "B2.C",
+   "op": "linear",
+   "label": {
+    "en": "Block 2: read strengths C",
+    "zh": "第 2 块：读出强度 C"
+   },
+   "in": [
+    "B2.u"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 4
+   }
+  },
+  {
+   "id": "B2.scan",
+   "op": "ssm_scan",
+   "label": {
+    "en": "Block 2: selective scan",
+    "zh": "第 2 块：选择性扫描"
+   },
+   "in": [
+    "B2.u",
+    "B2.dt",
+    "B2.B",
+    "B2.C"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "state": 4
+   },
+   "sub": [
+    "delta",
+    "h"
+   ]
+  },
+  {
+   "id": "B2.out",
+   "op": "linear",
+   "label": {
+    "en": "Block 2: back to the row",
+    "zh": "第 2 块：回到这一行"
+   },
+   "in": [
+    "B2.scan"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   }
+  },
+  {
+   "id": "B2.res",
+   "op": "add",
+   "label": {
+    "en": "Block 2: add to the input",
+    "zh": "第 2 块：加回输入"
+   },
+   "in": [
+    "B1.res",
+    "B2.out"
+   ],
+   "outShape": [
+    "T",
+    16
+   ]
+  },
+  {
+   "id": "norm",
+   "op": "layernorm",
+   "label": {
+    "en": "Layer normalization",
+    "zh": "层归一化"
+   },
+   "in": [
+    "B2.res"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   }
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Scores of the 10 tokens",
+    "zh": "10 个词元的分数"
+   },
+   "in": [
+    "norm"
+   ],
+   "outShape": [
+    "T",
+    10
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 10
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Chances of the 10 tokens",
+    "zh": "10 个词元的概率"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    "T",
+    10
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "selective copy (synthetic, task.ts / data.py)",
+  "steps": 20000,
+  "metrics": {
+   "valAcc": 1,
+   "valExact": 1
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000734,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 7,
+  "edgeCases": [
+   "ask",
+   "max"
+  ],
+  "perLayer": {
+   "B1.norm": 2.38e-7,
+   "B1.in": 3.58e-7,
+   "B1.u": 4.77e-7,
+   "B1.dt": 9.54e-7,
+   "B1.B": 2.38e-7,
+   "B1.C": 2.38e-7,
+   "B1.scan": 0.00000232,
+   "B1.scan#delta": 1.19e-7,
+   "B1.scan#h": 6.26e-7,
+   "B1.out": 5.96e-7,
+   "B1.res": 5.96e-7,
+   "B2.norm": 0.00000739,
+   "B2.in": 0.0000103,
+   "B2.u": 0.0000106,
+   "B2.dt": 0.0000165,
+   "B2.B": 0.00000475,
+   "B2.C": 0.0000121,
+   "B2.scan": 0.000061,
+   "B2.scan#delta": 0.00000209,
+   "B2.scan#h": 0.00000834,
+   "B2.out": 0.0000105,
+   "B2.res": 0.0000105,
+   "norm": 0.0000381,
+   "head": 0.0000734,
+   "probs": 0.00000322
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tinymamba/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "seq",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 40,
+   "label": {
+    "en": "tokens",
+    "zh": "词元"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "alphabet": ".abcdefgh?",
+ "context": 40,
+ "config": {
+  "vocab": 10,
+  "d": 16,
+  "D": 16,
+  "N": 4,
+  "layers": 2
+ }
+}

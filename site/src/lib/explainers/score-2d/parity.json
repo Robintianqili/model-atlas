@@ -1,0 +1,63 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "score-2d",
+ "checked": "2026-10-07",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.55e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "sgd1": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.66e-15,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-07"
+  },
+  "walk": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 6.93e-16,
+   "frames": 101,
+   "fixtures": 0,
+   "checked": "2026-10-07"
+  },
+  "plain": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 5.03e-16,
+   "frames": 241,
+   "fixtures": 0,
+   "checked": "2026-10-07"
+  },
+  "annealed": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.1e-15,
+   "frames": 241,
+   "fixtures": 0,
+   "checked": "2026-10-07"
+  },
+  "still": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 4.63e-16,
+   "frames": 241,
+   "fixtures": 0,
+   "checked": "2026-10-07"
+  }
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "kalman-filter",
+ "checked": "2026-10-06",
+ "sources": {
+  "cycle": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 238,
+   "fixtures": 10,
+   "checked": "2026-10-06"
+  },
+  "run": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 238,
+   "fixtures": 10,
+   "checked": "2026-10-06"
+  },
+  "turn": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 238,
+   "fixtures": 10,
+   "checked": "2026-10-06"
+  },
+  "turnQ": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 238,
+   "fixtures": 10,
+   "checked": "2026-10-06"
+  }
+ }
+}

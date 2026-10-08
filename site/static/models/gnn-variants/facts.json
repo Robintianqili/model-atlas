@@ -1,0 +1,167 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "steps": {
+   "value": 200,
+   "unit": "steps",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "lr": {
+   "value": 0.01,
+   "unit": "learning rate (Adam)",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "seeds": {
+   "value": 10,
+   "unit": "random starts",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gcnParams": {
+   "value": 156,
+   "unit": "parameters",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gcnAcc": {
+   "value": 0.96875,
+   "unit": "share of the 32 unlabelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gcnLoss": {
+   "value": 0.008982,
+   "unit": "cross-entropy of the 2 labelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gcnMean": {
+   "value": 0.953125,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gcnMin": {
+   "value": 0.9375,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gcnMax": {
+   "value": 0.96875,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "sageParams": {
+   "value": 300,
+   "unit": "parameters",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "sageAcc": {
+   "value": 0.96875,
+   "unit": "share of the 32 unlabelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "sageLoss": {
+   "value": 0.009403,
+   "unit": "cross-entropy of the 2 labelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "sageMean": {
+   "value": 0.740625,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "sageMin": {
+   "value": 0.15625,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "sageMax": {
+   "value": 0.96875,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "ginParams": {
+   "value": 184,
+   "unit": "parameters",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "ginAcc": {
+   "value": 0.8125,
+   "unit": "share of the 32 unlabelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "ginLoss": {
+   "value": 0.011119,
+   "unit": "cross-entropy of the 2 labelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "ginMean": {
+   "value": 0.80625,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "ginMin": {
+   "value": 0.5,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "ginMax": {
+   "value": 0.96875,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gatParams": {
+   "value": 168,
+   "unit": "parameters",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gatAcc": {
+   "value": 0.9375,
+   "unit": "share of the 32 unlabelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gatLoss": {
+   "value": 0.007966,
+   "unit": "cross-entropy of the 2 labelled members",
+   "source": "pipeline/gnn-variants/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "gatMean": {
+   "value": 0.88125,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gatMin": {
+   "value": 0.8125,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "gatMax": {
+   "value": 0.96875,
+   "unit": "share",
+   "source": "pipeline/gnn-variants/train.py (the same recipe, seeds 0-9; share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  }
+ }
+}

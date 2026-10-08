@@ -1,0 +1,55 @@
+// View '{%viewKey%}' (design §4.8). Scaffolded by `atlas new view {%key%}` on {%today%}.
+// meta.ts is pure TS (Node reads it for lint and the contract test); the component is View.svelte (lazy).
+// Contract (types/contract.test.ts): key = '{%viewKey%}', title in en and zh, demo() resolves in Node with
+// provenance 'illustrative', describe(demo) non-empty in en and zh (AK504).
+{%#fake%}
+import type { StageProps, ViewMeta } from '{%typesPath%}';
+import { fakeRuntime } from '{%fakePath%}';
+{%/fake%}
+{%^fake%}
+import type { ExplainerRuntime, StageProps, ViewMeta } from '{%typesPath%}';
+
+// A stand-in runtime for the demo (this tree has no atlas/runtime/fake.ts).
+const demoRuntime: ExplainerRuntime = {
+	slug: 'demo',
+	spec: null,
+	model: null,
+	input: null,
+	pre: null,
+	sources: {},
+	sel: {},
+	fact: () => undefined,
+	num: () => NaN,
+	ensure: async () => 0,
+	setInput: () => {}
+};
+{%/fake%}
+
+const meta = {
+	key: '{%viewKey%}',
+	title: { en: 'TODO: {%key%}', zh: 'TODO：{%key%}' },
+	kinds: ['trace', 'train', 'process'], // the kinds of step this view can draw: keep the ones it does
+	describe: (p: Omit<StageProps, 'ctx'>) => {
+		const values = (p.props.values as number[] | undefined) ?? [];
+		return {
+			en: `TODO: ${values.length} values, largest ${values.length ? Math.max(...values) : 'none'}.`,
+			zh: `TODO：${values.length} 个数，最大的是 ${values.length ? Math.max(...values) : '无'}。`
+		};
+	},
+	async demo() {
+		return {
+			rt: {%#fake%}fakeRuntime({ slug: 'demo' }){%/fake%}{%^fake%}demoRuntime{%/fake%},
+			source: 'demo',
+			at: { index: 0 },
+			focus: [],
+			sel: {},
+			provenance: 'illustrative' as const,
+			autoplay: false,
+			onend: () => {},
+			props: { values: [0.2, 0.7, 0.1] }
+		};
+	},
+	minHeight: 120
+} satisfies ViewMeta;
+
+export default meta;

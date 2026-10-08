@@ -1,0 +1,40 @@
+// {%slug%}: the concept page around the lesson (K2 concept packages; the page's order is goals, hook, lesson, toy, real,
+// compare, pitfalls, checkpoint, links). Scaffolded by `atlas new concept {%slug%}` on {%today%}.
+// hook is a text (or a StepDef); toy, real and compare are StepDefs: the lesson's own format (source, at, view, narration
+// with {placeholders}, provenance, task, predict, compare), played on the lesson's runtime as free-standing stages. The
+// toy section shows the input widget (manifest.input) above the toy. concept.test.ts lints all of it on every fixture.
+import type { I18n, StepDef } from '../../atlas/types/index.ts';
+
+export const hook: I18n = {
+	en: 'TODO: the question that opens the page, in two or three sentences',
+	zh: 'TODO：用两三句话提出本页的问题'
+};
+
+/** Every variable visible: the learner changes the input (the widget above) and sees the numbers move. */
+export const toy: StepDef = {
+	id: 'toy',
+	title: { en: 'TODO: what the learner plays with', zh: 'TODO：学习者在玩什么' },
+	source: '{%toySource%}',
+	at: 'last',
+	view: '{%toyView%}',
+	provenance: 'live',
+	narration: {
+		en: 'TODO: what the stage shows, with live numbers such as {frames}.',
+		zh: 'TODO：舞台显示的内容，用实时数值，例如 {frames}。',
+		vars: (_rt, at) => ({ frames: at.tape?.length ?? NaN })
+	}
+};
+
+// The same idea on a real model: a live model's assets (a trace source { kind: 'trace', assets: 'models/tinycnn' }) or a
+// bigger network trained live (a train source, or a process wrapping trainingProcess(trainer) so it ignores the input).
+// export const real: StepDef = { id: 'real', title: {...}, source: '...', at: 'last', view: 'loss-curve', provenance: 'live', narration: {...} };
+
+// Two runs side by side: one process that runs both in lockstep and records the second's numbers as metrics (one plot,
+// one narration), or a step `compare: { a, b, label }` (two panels).
+// export const compare: StepDef = { id: 'compare', ..., view: { key: 'loss-curve', props: () => ({ metrics: ['loss', 'loss2'] }) } };
+
+/** Misconceptions after manifest.page.misconception; `step` links the lesson step that shows it. */
+export const pitfalls: { claim: I18n; truth: I18n; step?: string }[] = [];
+
+/** Further reading under the links (absolute URLs, or site paths starting with '/'). */
+export const further: { label: I18n; href: string }[] = [];

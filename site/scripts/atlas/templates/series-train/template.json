@@ -1,0 +1,15 @@
+{
+	"name": "series-train",
+	"description": "Kinds B + C on a time series (the forecaster shape): a 'windows' process that cuts the series into (last L values -> next value) examples, and a small MLP forecaster trained live on them; the Python reference of the process and the PyTorch twin of the trainer.",
+	"kinds": ["train", "process"],
+	"input": "series",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/data.ts.tmpl", "to": "package/data.ts" },
+		{ "from": "package/trainer.ts.tmpl", "to": "package/trainer.ts" },
+		{ "from": "package/process.ts.tmpl", "to": "package/process.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "pipeline/twin.py.tmpl", "to": "pipeline/twin.py" },
+		{ "from": "pipeline/reference.py.tmpl", "to": "pipeline/reference.py" }
+	]
+}

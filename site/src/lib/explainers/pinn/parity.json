@@ -1,0 +1,67 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "pinn",
+ "checked": "2026-10-06",
+ "sources": {
+  "pinn": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 4.44e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "lam100": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 4.44e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "plain": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 2.5e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "lam0": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.21e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "lam001": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 8.53e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "wrongC": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 3.36e-13,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  }
+ }
+}

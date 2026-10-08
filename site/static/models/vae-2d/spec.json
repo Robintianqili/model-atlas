@@ -1,0 +1,633 @@
+{
+ "slug": "vae-2d",
+ "name": {
+  "en": "VAE with a 2D latent space",
+  "zh": "二维隐空间 VAE"
+ },
+ "version": "2026-10-06",
+ "params": 435988,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "enc1.weight",
+   "shape": [
+    256,
+    784
+   ],
+   "offset": 0,
+   "length": 200704
+  },
+  {
+   "name": "enc1.bias",
+   "shape": [
+    256
+   ],
+   "offset": 200704,
+   "length": 256
+  },
+  {
+   "name": "enc2.weight",
+   "shape": [
+    64,
+    256
+   ],
+   "offset": 200960,
+   "length": 16384
+  },
+  {
+   "name": "enc2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 217344,
+   "length": 64
+  },
+  {
+   "name": "mu.weight",
+   "shape": [
+    2,
+    64
+   ],
+   "offset": 217408,
+   "length": 128
+  },
+  {
+   "name": "mu.bias",
+   "shape": [
+    2
+   ],
+   "offset": 217536,
+   "length": 2
+  },
+  {
+   "name": "logvar.weight",
+   "shape": [
+    2,
+    64
+   ],
+   "offset": 217538,
+   "length": 128
+  },
+  {
+   "name": "logvar.bias",
+   "shape": [
+    2
+   ],
+   "offset": 217666,
+   "length": 2
+  },
+  {
+   "name": "dec1.weight",
+   "shape": [
+    64,
+    2
+   ],
+   "offset": 217668,
+   "length": 128
+  },
+  {
+   "name": "dec1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 217796,
+   "length": 64
+  },
+  {
+   "name": "dec2.weight",
+   "shape": [
+    256,
+    64
+   ],
+   "offset": 217860,
+   "length": 16384
+  },
+  {
+   "name": "dec2.bias",
+   "shape": [
+    256
+   ],
+   "offset": 234244,
+   "length": 256
+  },
+  {
+   "name": "dec3.weight",
+   "shape": [
+    784,
+    256
+   ],
+   "offset": 234500,
+   "length": 200704
+  },
+  {
+   "name": "dec3.bias",
+   "shape": [
+    784
+   ],
+   "offset": 435204,
+   "length": 784
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your drawing",
+    "zh": "你的画"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28x28 numbers: 0 is empty, 1 is full ink.",
+    "zh": "28x28 个数：0 是空白，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "flat",
+   "op": "flatten",
+   "label": {
+    "en": "784 numbers in a row",
+    "zh": "排成一行的 784 个数"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    784
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 38
+   }
+  },
+  {
+   "id": "enc1",
+   "op": "linear",
+   "label": {
+    "en": "Encoder layer 1 (256)",
+    "zh": "编码器第 1 层（256）"
+   },
+   "in": [
+    "flat"
+   ],
+   "outShape": [
+    256
+   ],
+   "params": {
+    "inFeatures": 784,
+    "outFeatures": 256
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "enc1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Encoder ReLU 1",
+    "zh": "编码器 ReLU 1"
+   },
+   "in": [
+    "enc1"
+   ],
+   "outShape": [
+    256
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 38
+   }
+  },
+  {
+   "id": "enc2",
+   "op": "linear",
+   "label": {
+    "en": "Encoder layer 2 (64)",
+    "zh": "编码器第 2 层（64）"
+   },
+   "in": [
+    "enc1.relu"
+   ],
+   "outShape": [
+    64
+   ],
+   "params": {
+    "inFeatures": 256,
+    "outFeatures": 64
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 30
+   }
+  },
+  {
+   "id": "enc2.relu",
+   "op": "relu",
+   "label": {
+    "en": "Encoder ReLU 2",
+    "zh": "编码器 ReLU 2"
+   },
+   "in": [
+    "enc2"
+   ],
+   "outShape": [
+    64
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 39
+   }
+  },
+  {
+   "id": "mu",
+   "op": "linear",
+   "label": {
+    "en": "μ: the centre (2 numbers)",
+    "zh": "μ：中心（2 个数）"
+   },
+   "in": [
+    "enc2.relu"
+   ],
+   "outShape": [
+    2
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 2
+   },
+   "desc": {
+    "en": "Where the encoder puts your drawing on the 2-D map.",
+    "zh": "编码器把你的画放在二维地图上的位置。"
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 31
+   }
+  },
+  {
+   "id": "logvar",
+   "op": "linear",
+   "label": {
+    "en": "log σ²: the spread (2 numbers)",
+    "zh": "log σ²：散布（2 个数）"
+   },
+   "in": [
+    "enc2.relu"
+   ],
+   "outShape": [
+    2
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 2
+   },
+   "desc": {
+    "en": "How unsure the encoder is, as the log of the variance σ².",
+    "zh": "编码器有多不确定，用方差 σ² 的对数表示。"
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 32
+   }
+  },
+  {
+   "id": "eps",
+   "op": "input",
+   "label": {
+    "en": "Noise ε (2 numbers)",
+    "zh": "噪声 ε（2 个数）"
+   },
+   "in": [
+    "eps"
+   ],
+   "outShape": [
+    2
+   ],
+   "desc": {
+    "en": "Drawn from a standard bell curve N(0, 1).",
+    "zh": "从标准钟形曲线 N(0, 1) 中抽取。"
+   },
+   "axes": [
+    "f"
+   ]
+  },
+  {
+   "id": "z",
+   "op": "reparam",
+   "label": {
+    "en": "z = μ + σ·ε: one point of the cloud",
+    "zh": "z = μ + σ·ε：云中的一个点"
+   },
+   "in": [
+    "mu",
+    "logvar",
+    "eps"
+   ],
+   "outShape": [
+    2
+   ],
+   "axes": [
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 52
+   },
+   "sub": [
+    "sigma"
+   ]
+  },
+  {
+   "id": "dec1",
+   "op": "linear",
+   "label": {
+    "en": "Decoder layer 1 (64)",
+    "zh": "解码器第 1 层（64）"
+   },
+   "in": [
+    "z"
+   ],
+   "outShape": [
+    64
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 64
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 33
+   }
+  },
+  {
+   "id": "dec1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder ReLU 1",
+    "zh": "解码器 ReLU 1"
+   },
+   "in": [
+    "dec1"
+   ],
+   "outShape": [
+    64
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 43
+   }
+  },
+  {
+   "id": "dec2",
+   "op": "linear",
+   "label": {
+    "en": "Decoder layer 2 (256)",
+    "zh": "解码器第 2 层（256）"
+   },
+   "in": [
+    "dec1.relu"
+   ],
+   "outShape": [
+    256
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 256
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "dec2.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder ReLU 2",
+    "zh": "解码器 ReLU 2"
+   },
+   "in": [
+    "dec2"
+   ],
+   "outShape": [
+    256
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 44
+   }
+  },
+  {
+   "id": "dec3",
+   "op": "linear",
+   "label": {
+    "en": "784 pixel scores",
+    "zh": "784 个像素分数"
+   },
+   "in": [
+    "dec2.relu"
+   ],
+   "outShape": [
+    784
+   ],
+   "params": {
+    "inFeatures": 256,
+    "outFeatures": 784
+   },
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 35
+   }
+  },
+  {
+   "id": "img",
+   "op": "to_image",
+   "label": {
+    "en": "Scores as a 28×28 picture",
+    "zh": "排成 28×28 的分数图"
+   },
+   "in": [
+    "dec3"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "out",
+   "op": "sigmoid",
+   "label": {
+    "en": "The redrawing",
+    "zh": "重画出的画"
+   },
+   "in": [
+    "img"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/vae-2d/model.py",
+    "line": 48
+   }
+  }
+ ],
+ "training": {
+  "dataset": "Quick, Draw! numpy bitmaps, 5 classes (star, ladder, umbrella, eyeglasses, t-shirt), TinyCNN's split",
+  "steps": 37520,
+  "batchSize": 128,
+  "epochs": 80,
+  "bestEpoch": 77,
+  "optimizer": "Adam lr 0.001, cosine decay to 0; loss = BCE summed over 784 pixels + KL, mean over the batch",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)",
+  "metrics": {
+   "test_bce": 207.97,
+   "test_bce_at_mu": 207.04,
+   "test_kl": 6.559,
+   "test_loss": 214.53,
+   "test_n": 7500
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000858,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 13,
+  "edgeCases": [
+   "star-1464-big-eps",
+   "blank",
+   "dot"
+  ],
+  "perLayer": {
+   "enc1": 0.00000191,
+   "enc1.relu": 4.77e-7,
+   "enc2": 0.00000381,
+   "enc2.relu": 4.77e-7,
+   "mu": 2.38e-7,
+   "logvar": 9.54e-7,
+   "z": 2.98e-7,
+   "z#sigma": 2.98e-8,
+   "dec1": 4.77e-7,
+   "dec1.relu": 3.58e-7,
+   "dec2": 0.00000334,
+   "dec2.relu": 0.00000123,
+   "dec3": 0.00000858,
+   "img": 0.00000858,
+   "out": 4.77e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/vae-2d/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "drawing28",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "name": "eps",
+   "adapter": "drawing28",
+   "kind": "noise",
+   "shape": [
+    2
+   ],
+   "dtype": "f32",
+   "axes": [
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "kinds": [
+  {
+   "id": "star",
+   "en": "star",
+   "zh": "星星"
+  },
+  {
+   "id": "ladder",
+   "en": "ladder",
+   "zh": "梯子"
+  },
+  {
+   "id": "umbrella",
+   "en": "umbrella",
+   "zh": "雨伞"
+  },
+  {
+   "id": "eyeglasses",
+   "en": "eyeglasses",
+   "zh": "眼镜"
+  },
+  {
+   "id": "t-shirt",
+   "en": "t-shirt",
+   "zh": "T 恤"
+  }
+ ],
+ "heldOutKinds": [
+  "house",
+  "fish"
+ ]
+}

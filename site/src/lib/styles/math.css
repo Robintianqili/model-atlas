@@ -1,0 +1,52 @@
+/* Symbol colors for KaTeX output (classes from $lib/kit/tex.ts sym()). Not scoped on purpose. */
+.sym-act {
+	color: var(--ink);
+}
+.sym-param {
+	color: var(--param);
+	font-weight: 700;
+}
+.sym-grad {
+	color: var(--grad);
+}
+.sym-in {
+	color: var(--ink-2);
+}
+.sym-out {
+	color: var(--accent);
+}
+.sym-q {
+	color: var(--q-text);
+}
+.sym-k {
+	color: var(--k-text);
+}
+.sym-v {
+	color: var(--v-text);
+}
+.sym-prob {
+	color: var(--seq-hi);
+}
+.sym-neg {
+	color: var(--div-neg-text);
+}
+.sym-pos {
+	color: var(--div-pos-text);
+}
+.sym-accent {
+	color: var(--accent);
+}
+.num-live {
+	background: var(--accent-soft);
+	border-radius: 3px;
+	padding: 0 0.12em;
+}
+.katex {
+	font-size: 1.12em;
+}
+.katex-display {
+	margin: 0.4em 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 2px 0;
+}

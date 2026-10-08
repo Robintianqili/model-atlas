@@ -1,0 +1,34 @@
+"""{%slug%}: the PyTorch float64 twin of trainer '{%trainerId%}' (kind B parity, design §4.11).
+
+The TS trainer writes the graph tensors it trained on (Â, X, labels, labelled nodes) into the fixture, so this twin
+needs no graph code: H = tanh(Â X W1ᵀ), logits = Â H W2ᵀ, cross-entropy over the labelled nodes.
+For a real graph such as the karate club, build the TS graph from ak.data.karate() output (UNWEIGHTED A; cite
+Zachary 1977 in credits) and keep this twin as it is.
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Gcn(nn.Module):
+    def __init__(self, nodes: int, hidden: int, classes: int):
+        super().__init__()
+        self.gc1 = nn.Linear(nodes, hidden, bias=False)
+        self.gc2 = nn.Linear(hidden, classes, bias=False)
+
+    def forward(self, ahat: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
+        h = torch.tanh(ahat @ self.gc1(x))
+        return ahat @ self.gc2(h)
+
+
+def build(cfg: dict) -> nn.Module:
+    return Gcn(int(cfg.get("nodes", 16)), int(cfg.get("hidden", 4)), int(cfg.get("classes", 2))).double()
+
+
+def loss(model: nn.Module, batch: dict, cfg: dict) -> tuple[torch.Tensor, dict]:
+    """batch: {'ahat': [n, n], 'x': [n, nodes], 'y': [n], 'labelled': [k]} float64 (indices arrive as floats)."""
+    logits = model(batch["ahat"], batch["x"])
+    idx = batch["labelled"].long()
+    return F.cross_entropy(logits[idx], batch["y"].long()[idx]), {}

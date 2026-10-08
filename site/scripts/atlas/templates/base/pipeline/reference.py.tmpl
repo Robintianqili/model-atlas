@@ -1,0 +1,75 @@
+"""{%slug%}: Python reference for process '{%processId%}' (kind C parity, design §4.11).
+
+An independent implementation of site/src/lib/explainers/{%slug%}/process.ts. It uses ak.Rng (bit-identical to the TS
+rng for next/int/fork) and writes an atlas-tape/1 file that `atlas parity` compares frame by frame with the TS tape
+(discrete fields exact, floats within each field's tol; AK204 names the first difference).
+If the process draws with normal() or another transcendental transform, replay the TS draws instead of drawing:
+`--draws` names .atlas/{%slug%}/{%processId%}.draws.json ({frames: [[draws of frame 0], [draws of frame 1], ...]}).
+
+    npm run atlas -- parity {%slug%}             # records the TS tape, runs this file with the arguments below, compares
+    npm run atlas -- py pipeline/{%slug%}/reference.py    # by hand (the configured Python; or PYTHONPATH=pipeline)
+
+CLI contract (every reference.py): --process <id> --seed <n> --opt <json> --draws <draws.json> --input <json> --out <stem>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:  # run without PYTHONPATH: use the repo's pipeline/ folder
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import numpy as np
+
+SCHEMA = {
+    "counts": {"kind": "tensor", "label": ("Tails and heads so far", "目前反面和正面的次数"), "shape": [2], "track": "changes", "tol": "exact"},
+    "flip": {"kind": "int", "label": ("This flip (1 = heads)", "这一次（1 = 正面）"), "tol": "exact"},
+    "estimate": {"kind": "scalar", "label": ("Estimated chance of heads", "正面概率的估计"), "tol": 1e-12},
+}
+PHASES = {
+    "flip": {"label": ("Flip the coin", "抛硬币"), "kind": "act"},
+    "update": {"label": ("Update the estimate", "更新估计"), "kind": "update", "tex": "\\hat p = \\frac{ {{heads}} }{ {{n}} } = {{estimate}}"},
+}
+
+
+def run(seed: int = 1, n: int = 20, p: float = 0.7, record_draws: bool = False, draws: list | None = None) -> "ak.TapeWriter":
+    """draws: the TS draws per frame (replayed instead of drawing; unnecessary here, next() is bit-identical)."""
+    w = ak.TapeWriter("{%processId%}", SCHEMA, seed=seed, opt={"n": n, "p": p}, phases=PHASES, provenance="live")
+    rng = ak.Rng(seed)
+    counts = np.zeros(2, dtype=np.float64)
+    frame = 0
+    for i in range(n):
+        u = draws[frame][0] if draws else rng.next()
+        flip = 1 if u < p else 0
+        w.frame("flip", {"counts": counts, "flip": flip}, step=i, metrics={"u": u, "n": i + 1, "p": p}, draws=[u] if record_draws else None)
+        frame += 1
+        old = counts[flip]
+        counts[flip] = old + 1
+        heads = counts[1]
+        estimate = heads / (i + 1)
+        w.frame("update", {"counts": counts, "estimate": float(estimate)}, step=i,
+                changes=[{"field": "counts", "index": [flip], "from": float(old), "to": float(old + 1)}],
+                metrics={"heads": float(heads), "n": i + 1, "estimate": float(estimate)}, draws=[] if record_draws else None)
+        frame += 1
+    return w
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--process", default="{%processId%}")
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--opt", default="{}", help="JSON options the TS source ran with")
+    ap.add_argument("--draws", default=None, help="draws.json from the TS run (replayed when given)")
+    ap.add_argument("--input", default="null", help="JSON input of the TS run, or @<file> for a long one: read it with ak.json_arg(a.input) (this example has none)")
+    ap.add_argument("--out", default=None, help="output stem (default $ATLAS_SITE/.atlas/{%slug%}/{%processId%}.ref)")
+    a = ap.parse_args()
+    opt = {"n": 20, "p": 0.7, **json.loads(a.opt)}
+    replay = json.loads(Path(a.draws).read_text(encoding="utf-8"))["frames"] if a.draws and Path(a.draws).is_file() else None
+    tape = run(seed=a.seed, n=int(opt["n"]), p=float(opt["p"]), draws=replay)
+    jpath, _ = tape.write(a.out or ak.site_path(".atlas", "{%slug%}", "{%processId%}.ref"))
+    print(f"wrote {jpath} ({len(tape.frames)} frames)")

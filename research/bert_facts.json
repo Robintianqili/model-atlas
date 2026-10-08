@@ -1,0 +1,399 @@
+{
+ "_about": "Facts for the results-first restructure (2026-10-05): new slides r-setup (what we reproduced, data, recipe), r-pretrain-claims (pre-training claims), r-finetune-claims (fine-tuning claims). Every number is verified against our BERT reproduction's results/runs.jsonl, results/summary.md, results/demo.json, results/viz_pretrain.json, ckpt/mini_*/log.json and the paper text (arXiv 1810.04805v2). Paper numbers: dev unless marked test. Our numbers: GLUE dev, mean +/- sample std over n seeds.",
+ "paper_pipeline": {
+  "pretraining": {
+   "data": "BooksCorpus (800M words) + English Wikipedia (2,500M words) = 3.3 billion words",
+   "steps": "1,000,000 steps of 256 sequences x 512 tokens, about 40 passes over the 3.3-billion-word corpus",
+   "compute": "BERT-base: 4 Cloud TPUs in Pod configuration (16 TPU chips total), 4 days",
+   "what_we_did": "NOT redone at full size: we use Google's released checkpoint google-bert/bert-base-uncased (110M parameters; 109,483,778 counted with an MRPC head). Its claims are tested at small scale (mini BERTs) and against GPT-1."
+  },
+  "finetuning": {
+   "paper_tasks": "GLUE (8 tasks; WNLI excluded), SQuAD v1.1/v2.0, SWAG, CoNLL-2003 NER",
+   "recipe": "batch 32, 3 epochs, learning rate = best of {5e-5, 4e-5, 3e-5, 2e-5} on dev (Sec. 4.1); max length 128 in our runs",
+   "what_we_did": "Redone on 7 of the 8 GLUE tasks (no QQP; no SQuAD/SWAG/NER): batch 32 and 3 epochs as in the paper; learning rate fixed at 2e-5 (one of the paper's four candidates); the paper's full 4-rate search re-run only for MRPC and RTE"
+  }
+ },
+ "our_three_tracks": [
+  {
+   "track": "Reproduce",
+   "what": "fine-tune the released BERT-base on 7 GLUE tasks with the paper's recipe, compare with the paper",
+   "slide": "results (r-metrics)"
+  },
+  {
+   "track": "Test the pre-training claims",
+   "what": "pre-train 4-layer BERTs from scratch on WikiText-103 with different objectives (masked LM with/without NSP, left-to-right); fine-tune GPT-1 with the same loop; run the released model on the paper's own MLM/NSP examples",
+   "slide": "r-pretrain-claims"
+  },
+  {
+   "track": "Test the fine-tuning claims",
+   "what": "frozen features vs full fine-tuning; the 4-learning-rate search; BERT-Large stability on RTE",
+   "slide": "r-finetune-claims"
+  }
+ ],
+ "glue_data": {
+  "_source": "Hugging Face nyu-mll/glue; sizes are n_train / n_eval from our runs. Test labels are hidden (GLUE evaluation server), so every score is on the dev set.",
+  "rows": [
+   {
+    "task": "MNLI",
+    "asks": "does A entail B? (3 classes)",
+    "train": "392,702",
+    "dev": "9,815",
+    "metric": "accuracy"
+   },
+   {
+    "task": "QNLI",
+    "asks": "does the sentence answer the question?",
+    "train": "104,743",
+    "dev": "5,463",
+    "metric": "accuracy"
+   },
+   {
+    "task": "SST-2",
+    "asks": "is the movie review positive?",
+    "train": "67,349",
+    "dev": "872",
+    "metric": "accuracy"
+   },
+   {
+    "task": "CoLA",
+    "asks": "is the sentence grammatical?",
+    "train": "8,551",
+    "dev": "1,043",
+    "metric": "MCC"
+   },
+   {
+    "task": "STS-B",
+    "asks": "how similar are A and B? (0-5)",
+    "train": "5,749",
+    "dev": "1,500",
+    "metric": "Spearman"
+   },
+   {
+    "task": "MRPC",
+    "asks": "do A and B mean the same?",
+    "train": "3,668",
+    "dev": "408",
+    "metric": "accuracy, F1"
+   },
+   {
+    "task": "RTE",
+    "asks": "does A entail B? (2 classes)",
+    "train": "2,490",
+    "dev": "277",
+    "metric": "accuracy"
+   }
+  ],
+  "mnli_dev_mismatched": "9,832",
+  "not_run": "QQP (363k pairs; GLUE's 8th task in the paper)",
+  "mnli_note": "MNLI training data covers 5 genres; the matched dev set uses the same 5",
+  "not_run_reason": "QQP skipped by choice (not a technical limit): the paper reports QQP only as a test-server score (Table 1, F1 71.2; no dev number in Tables 5/6), so a dev run could not be compared; it is large (363k pairs, about one MNLI-sized run); and MRPC already covers paraphrase detection."
+ },
+ "mini_pretraining": {
+  "data": "WikiText-103 (raw): 28,472 Wikipedia articles, 109,192,978 WordPiece tokens (bert-base-uncased vocabulary), 1,196,547 sentence pairs of up to 128 tokens",
+  "model": "4-layer BERT, 11,169,596 parameters (about 11M; BERT-base has 110M)",
+  "training": "20,000 steps x 256 pairs each; the same data, order and initial weights for every variant; only the objective differs",
+  "variants": "mlm15_nsp (masked LM 15% + NSP), mlm15 (masked LM only), ltr (left-to-right LM, causal mask, no NSP), mlm40 (40% masking)",
+  "minutes": {
+   "mlm15_nsp": 18.9,
+   "mlm15": 18.7,
+   "mlm40": 28.2,
+   "ltr": 54.2,
+   "total_hours": 2.0
+  }
+ },
+ "scale": {
+  "fine_tuning_runs": "218 (222 rows in runs.jsonl minus 4 invalid frozen-head runs whose head never trained)",
+  "gpu_hours": "8.9 in total: 6.85 h fine-tuning + 2.0 h mini pre-training, one RTX 5090 laptop GPU",
+  "note": "the summary slide said 209 runs / 8.7 h before the last 9 GPT-1 runs (CoLA x5, STS-B x3, one CoLA re-run); update it to 218 / 8.9"
+ },
+ "pretrain_claims": {
+  "paper_examples": {
+   "_about": "The paper's own MLM/NSP examples (Sec. 3.1 / Appendix A.1), run through the released pre-trained BERT-base heads (results/demo.json); GPT-1 contrast from results/viz_pretrain.json",
+   "mlm": {
+    "input": "the man went to the [MASK] to buy a gallon of milk.",
+    "bert_top": [
+     [
+      "store",
+      0.47
+     ],
+     [
+      "refrigerator",
+      0.08
+     ],
+     [
+      "fridge",
+      0.07
+     ]
+    ],
+    "gpt1_left_only_top": [
+     [
+      "door",
+      0.15
+     ],
+     [
+      "window",
+      0.05
+     ]
+    ],
+    "gpt1_store_rank": 84
+   },
+   "nsp": [
+    {
+     "a": "the man went to the store.",
+     "b": "he bought a gallon of milk.",
+     "p_isnext": "1.000",
+     "paper_label": "IsNext"
+    },
+    {
+     "a": "the man went to the store.",
+     "b": "penguins are flightless birds.",
+     "p_isnext": "0.000",
+     "paper_label": "NotNext"
+    }
+   ],
+   "verdict": "the released model behaves as the paper describes"
+  },
+  "ablation_table5": {
+   "_about": "Paper Table 5 (BERT-base, dev) vs our 4-layer BERTs (WikiText-103, dev; QNLI 2 seeds, SST-2 and MRPC 3 seeds). Compare DIRECTIONS, not sizes: our models are 10x smaller and trained on 30x less text.",
+   "rows": [
+    {
+     "change": "remove NSP",
+     "task": "QNLI",
+     "paper": "88.4 -> 84.9 (-3.5)",
+     "ours": "82.6 -> 77.4 (-5.2)",
+     "agree": true
+    },
+    {
+     "change": "remove NSP",
+     "task": "MRPC",
+     "paper": "86.7 -> 86.5 (-0.2)",
+     "ours": "73.3 -> 70.1 (-3.2)",
+     "agree": true
+    },
+    {
+     "change": "left-to-right instead of masked LM (both without NSP)",
+     "task": "QNLI",
+     "paper": "84.9 -> 84.3 (-0.6)",
+     "ours": "77.4 -> 66.2 (-11.2)",
+     "agree": true
+    },
+    {
+     "change": "left-to-right instead of masked LM",
+     "task": "MRPC",
+     "paper": "86.5 -> 77.5 (-9.0)",
+     "ours": "70.1 -> 70.4 (+0.3)",
+     "agree": false
+    },
+    {
+     "change": "left-to-right instead of masked LM",
+     "task": "SST-2 (single sentence)",
+     "paper": "92.6 -> 92.1 (-0.5)",
+     "ours": "85.2 -> 85.7 (+0.5)",
+     "agree": true
+    }
+   ],
+   "full_mini_results": {
+    "mlm15_nsp": {
+     "sst2": "82.9",
+     "qnli": "82.6",
+     "mrpc": "73.3"
+    },
+    "mlm15": {
+     "sst2": "85.2",
+     "qnli": "77.4",
+     "mrpc": "70.1"
+    },
+    "ltr": {
+     "sst2": "85.7",
+     "qnli": "66.2",
+     "mrpc": "70.4"
+    },
+    "mlm40": {
+     "sst2": "84.6",
+     "qnli": "77.3",
+     "mrpc": "69.8"
+    }
+   },
+   "paper_table5": {
+    "BERT-base": {
+     "MNLI-m": 84.4,
+     "QNLI": 88.4,
+     "MRPC": 86.7,
+     "SST-2": 92.7,
+     "SQuAD": 88.5
+    },
+    "No NSP": {
+     "MNLI-m": 83.9,
+     "QNLI": 84.9,
+     "MRPC": 86.5,
+     "SST-2": 92.6,
+     "SQuAD": 87.9
+    },
+    "LTR & No NSP": {
+     "MNLI-m": 82.1,
+     "QNLI": 84.3,
+     "MRPC": 77.5,
+     "SST-2": 92.1,
+     "SQuAD": 77.8
+    }
+   },
+   "verdict": "Direction reproduced: dropping NSP hurts the pair tasks, and a left-to-right model loses a pair task (QNLI -11.2) but not the single-sentence task (SST-2). Not reproduced: the paper's big left-to-right drop is on MRPC (-9.0); ours is on QNLI, MRPC barely moves (small models, small data)."
+  },
+  "bert_vs_gpt1": {
+   "_about": "Same fine-tuning loop, same dev sets. GPT-1 = openai-gpt with its paper's lr 6.25e-5. BERT = our BERT-base means. Paper Table 1 compares them on the TEST server.",
+   "rows": [
+    {
+     "task": "MRPC acc",
+     "bert": "84.1",
+     "gpt1": "77.6"
+    },
+    {
+     "task": "QNLI acc",
+     "bert": "91.4",
+     "gpt1": "86.0"
+    },
+    {
+     "task": "STS-B Spearman",
+     "bert": "88.3",
+     "gpt1": "85.3"
+    },
+    {
+     "task": "RTE acc",
+     "bert": "63.0",
+     "gpt1": "60.4"
+    },
+    {
+     "task": "SST-2 acc",
+     "bert": "93.0",
+     "gpt1": "92.3"
+    },
+    {
+     "task": "CoLA MCC",
+     "bert": "57.8",
+     "gpt1": "51.3*",
+     "note": "*4 of 5 seeds; seed 3 failed (MCC 0, all 'acceptable'; re-run failed again)"
+    },
+    {
+     "task": "MRPC F1",
+     "bert": "88.9",
+     "gpt1": "84.9",
+     "note": "gap +4.0 (results/summary.md controls table); paper Table 1 test F1 88.9 vs 82.3 = +6.6"
+    }
+   ],
+   "paper_table1_test": {
+    "GPT": {
+     "QNLI": 87.4,
+     "SST-2": 91.3,
+     "CoLA": 45.4,
+     "STS-B": 80.0,
+     "MRPC F1": 82.3,
+     "RTE": 56.0
+    },
+    "BERT-base": {
+     "QNLI": 90.5,
+     "SST-2": 93.5,
+     "CoLA": 52.1,
+     "STS-B": 85.8,
+     "MRPC F1": 88.9,
+     "RTE": 66.4
+    }
+   },
+   "verdict": "Reproduced: BERT higher on all 6 tasks we ran both on. Caveat: GPT-1 was also pre-trained on less text (BooksCorpus only), so this compares the two released models, not attention direction alone."
+  }
+ },
+ "finetune_claims": {
+  "features_vs_finetuning": {
+   "paper": "Sec. 5.3, Table 7, CoNLL-2003 NER dev F1: fine-tuning BERT-base 96.4; best feature-based (concat last four hidden layers, frozen) 96.1; gap 0.3. The paper's point: BERT is effective for BOTH approaches (features are almost as good).",
+   "ours": "SST-2 dev accuracy: full fine-tuning 93.0 +/- 0.2 (3 seeds); best frozen features + logistic regression 86.8 (mean-pooled, last four layers concatenated); gap 6.2. MRPC: fine-tuning 84.1 vs best frozen-layer probe 76.0 (gap 8.1)",
+   "per_layer_sst2_mean_pooling": [
+    77.9,
+    78.1,
+    78.7,
+    79.5,
+    80.4,
+    80.6,
+    82.0,
+    83.0,
+    84.4,
+    85.4,
+    85.4,
+    85.1,
+    85.3
+   ],
+   "per_layer_sst2_cls": [
+    50.9,
+    74.8,
+    78.1,
+    77.9,
+    77.0,
+    76.6,
+    79.4,
+    81.8,
+    82.6,
+    83.6,
+    85.0,
+    86.5,
+    86.7
+   ],
+   "majority_baseline_sst2": 50.9,
+   "verdict": "NOT reproduced for sentence classification: the paper finds frozen features almost as good as fine-tuning on NER (-0.3 F1); on SST-2 our best frozen features are 6.2 points behind fine-tuning (different task and a smaller probe training set, so this is a limit of the claim's scope, not a contradiction of the NER result).",
+   "caveats": "our frozen-feature probe is logistic regression trained on a 20,000-sentence subsample of SST-2 train (fine-tuning used all 67,349), and 86.8 is the best of 27 layer/pooling combinations picked on dev; different task type (sentence classification vs NER tagging)"
+  },
+  "lr_search": {
+   "paper": "Sec. 4.1: for each task the best of {5e-5, 4e-5, 3e-5, 2e-5} on dev",
+   "mrpc_acc": {
+    "2e-5": "84.1 +/- 1.3",
+    "3e-5": "85.4 +/- 0.6",
+    "4e-5": "86.1 +/- 1.3 (best)",
+    "5e-5": "85.8 +/- 0.5",
+    "paper": "86.7 (dev)"
+   },
+   "rte_acc": {
+    "2e-5": "63.0 +/- 2.7",
+    "3e-5": "63.5 +/- 1.8",
+    "4e-5": "64.8 +/- 0.8 (best)",
+    "5e-5": "64.2 +/- 1.6",
+    "paper": "66.4 (test only)"
+   },
+   "verdict": "The search is worth +2.0 on MRPC and +1.8 on RTE, and it is chosen on the same dev set it is reported on, so the paper's small-task numbers are slightly optimistic."
+  },
+  "bert_large_stability": {
+   "paper": "Sec. 4.1: 'for BERT-LARGE we found that fine-tuning was sometimes unstable on small datasets, so we ran several random restarts and selected the best model on the Dev set'",
+   "ours": "BERT-Large on RTE, 6 seeds each, 3 epochs, lr 2e-5",
+   "original_optimizer_no_bias_correction": {
+    "per_seed": [
+     47.3,
+     47.3,
+     52.7,
+     67.5,
+     47.3,
+     63.9
+    ],
+    "mean": "54.3 +/- 9.1",
+    "collapsed": "4 of 6"
+   },
+   "adamw_with_bias_correction": {
+    "per_seed": [
+     70.8,
+     73.3,
+     69.0,
+     66.4,
+     71.1,
+     70.8
+    ],
+    "mean": "70.2 +/- 2.3",
+    "collapsed": "0 of 6"
+   },
+   "collapse_meaning": "predicts one class for every RTE pair, so accuracy = that class's share: 47.3 or 52.7",
+   "cause": "Google's released BERT optimizer (AdamWeightDecayOptimizer) skips Adam's bias correction, so early updates are up to ~6x larger; Mosbach et al. (ICLR 2021) link the instability to this and to too few steps. The BERT paper itself does not mention bias correction.",
+   "verdict": "Instability reproduced (4 of 6 runs collapse); adding bias correction removes it (0 of 6) and lifts the mean by 15.9."
+  }
+ },
+ "summary_slide_fix": "r-summary: '209' fine-tuning runs -> '218'; '8.7 GPU hours' -> '8.9 GPU hours'",
+ "notes_from_script_check": [
+  "GPT-1 ran through the same fine-tuning LOOP but with its own lr 6.25e-5 and 0.2% warm-up: say 'same loop', never 'same recipe'",
+  "Hugging Face reference numbers are the run_glue README results for bert-base-CASED (one seeded run); we use bert-base-uncased",
+  "The paper labels test (Table 1) and dev (Tables 5-7) correctly; the weakness is that small tasks (RTE, CoLA, STS-B) are reported on test only, so they cannot be checked on dev",
+  "The r-metrics CoLA animation shows 57.3 from re-scoring the saved seed-1 visualisation checkpoint; the main seed-1 log says 56.8; table mean 57.8 over 3 seeds"
+ ]
+}

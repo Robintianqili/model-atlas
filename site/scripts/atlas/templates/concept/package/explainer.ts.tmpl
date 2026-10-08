@@ -1,0 +1,65 @@
+// {%slug%}: the manifest of a CONCEPT package (K2), routed at /train/{%slug%}/. Scaffolded by `atlas new concept {%slug%}`
+// on {%today%}. The concept route renders the auto concept page: goals, the hook, the lesson (lesson.ts), then the toy,
+// the real model and the comparison (concept.ts), pitfalls, the checkpoint (page.quiz) and links.
+// Pure TS: import only src/lib/atlas/** (outside ui/) and src/lib/i18n/types.ts, relative paths with .ts.
+// Fill every TODO: `atlas check` fails while TODO markers remain (AK501). Lint asks for zh on every label (AK406).
+// Catalog: {%titleEn%}. The interaction it promises: {%interactionEn%}
+import type { ExplainerManifest } from '../../atlas/types/index.ts';
+
+/** A concept package's manifest: the frozen ExplainerManifest with type 'concept' (until a types revision admits it). */
+type ConceptManifest = Omit<ExplainerManifest, 'type'> & { type: 'concept' };
+
+const manifest: ConceptManifest = {
+	slug: '{%slug%}',
+	type: 'concept',
+	kinds: [{%kindsList%}],
+	quality: 'draft',
+{%#dev%}
+	devOnly: true, // lab only (/dev/atlas/lab/{%slug%}/): exempt from the catalog rules, never routed under /train/
+{%/dev%}
+{%#trace%}
+	// a trace source reads an exported model: your own (pipeline/{%slug%}/export.py writes static/models/{%slug%}/), or a
+	// live model's folder, e.g. { kind: 'trace', assets: 'models/tinycnn' } with the 'drawing28' input
+	assets: { dir: 'models/{%slug%}', auto: ['spec.json', 'weights.bin'] },
+{%/trace%}
+{%#hasInput%}
+	input: { adapter: '{%adapter%}' }, // the learner's input; the toy section shows its widget (the adapter's Capture)
+{%/hasInput%}
+	sources: {
+{%#trace%}
+		fwd: { kind: 'trace' },
+{%/trace%}
+{%#train%}
+		train: { kind: 'train', trainer: '{%trainerId%}', detail: 'coarse' },
+		step1: { kind: 'train', trainer: '{%trainerId%}', detail: 'fine', opt: { optimizer: 'sgd' } }, // the slowed-down step
+{%/train%}
+{%#process%}
+		run: { kind: 'process', process: '{%processId%}' },
+{%/process%}
+	},
+	page: {
+		goals: [
+			{ en: 'TODO: what the learner can do after this page (measurable)', zh: 'TODO：学完本页后能做到什么（可检验）' },
+			{ en: 'TODO: a second goal', zh: 'TODO：第二个目标' }
+		],
+		prequestion: {
+			id: '{%slug%}-pre',
+			question: { en: 'TODO: a question the learner answers before the lesson', zh: 'TODO：学习者在课前回答的问题' },
+			options: [
+				{ en: 'TODO: option A', zh: 'TODO：选项 A' },
+				{ en: 'TODO: option B', zh: 'TODO：选项 B' }
+			],
+			answer: 0,
+			explain: { en: 'TODO: why', zh: 'TODO：原因' }
+		},
+		// the checkpoint section: questions with an explanation (answerFact reads a measured number from facts.json)
+		quiz: [],
+		// the first pitfall of the page (concept.ts adds more); step: the lesson step that shows it
+		misconception: { claim: { en: 'TODO: a common mix-up', zh: 'TODO：一个常见误解' }, truth: { en: 'TODO: what is true instead', zh: 'TODO：真实情况' } },
+		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
+	},
+	// Every dataset, ported code or idea-with-code (AK704). promote appends these to static/licenses.json.
+	credits: []
+};
+
+export default manifest;

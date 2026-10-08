@@ -1,0 +1,25 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "alphazero-ttt",
+ "checked": "2026-10-06",
+ "sources": {
+  "search": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.31e-15,
+   "frames": 326,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  },
+  "game": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  }
+ }
+}

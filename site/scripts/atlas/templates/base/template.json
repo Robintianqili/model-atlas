@@ -1,0 +1,17 @@
+{
+	"name": "base",
+	"description": "The default scaffold for any mix of kinds: a manifest, a lesson, and per kind a working toy (trace: an MLP exported with export_model; train: an XOR trainer and its fp64 twin; process: a coin-flip process and its Python reference). Named templates (W1-E2) overlay files on top of it.",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "package/process.ts.tmpl", "to": "package/process.ts", "when": "process" },
+		{ "from": "package/trainer.ts.tmpl", "to": "package/trainer.ts", "when": "train" },
+		{ "from": "package/worker.ts.tmpl", "to": "package/worker.ts", "when": "worker" },
+		{ "from": "pipeline/README.md.tmpl", "to": "pipeline/README.md" },
+		{ "from": "pipeline/model.py.tmpl", "to": "pipeline/model.py", "when": "trace" },
+		{ "from": "pipeline/export.py.tmpl", "to": "pipeline/export.py", "when": "trace" },
+		{ "from": "pipeline/twin.py.tmpl", "to": "pipeline/twin.py", "when": "train" },
+		{ "from": "pipeline/reference.py.tmpl", "to": "pipeline/reference.py", "when": "process" },
+		{ "from": "notes.md.tmpl", "to": "notes" }
+	]
+}

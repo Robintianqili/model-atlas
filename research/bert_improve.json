@@ -1,0 +1,68 @@
+{
+ "_about": "Slide 5 (r-improve). Intermediate-task training: fine-tune BERT-base on MNLI first, then on RTE (STILTs, Phang et al., 2018). 5-seed numbers from results/runs.jsonl (tags repro vs mnli_inter, lr 2e-5, 3 epochs, same seeds, paired). The example pair comes from our seed-1 viz models.",
+ "rte": {
+  "question": "does sentence A entail sentence B? (2 classes: entailed / not entailed)",
+  "train_pairs": 2490,
+  "dev_pairs": 277,
+  "updates_3_epochs": 234
+ },
+ "mnli": {
+  "question": "does A entail B, contradict it, or neither? (3 classes)",
+  "train_pairs": 392702,
+  "ratio_vs_rte": "158x",
+  "steps": 36816,
+  "fine_tune_minutes": 36,
+  "source_model_dev_acc": "83.9 matched / 84.2 mismatched"
+ },
+ "recipe": "1) fine-tune pre-trained BERT-base on MNLI (3 epochs) and save it; 2) replace its 3-way head with a new 2-way head; 3) fine-tune on RTE exactly as before (lr 2e-5, 3 epochs, batch 32)",
+ "seeds": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "direct_per_seed": [
+  59.6,
+  60.6,
+  64.6,
+  65.0,
+  65.3
+ ],
+ "mnli_first_per_seed": [
+  78.0,
+  78.0,
+  76.2,
+  78.0,
+  76.5
+ ],
+ "direct_mean": "63.0 ± 2.7",
+ "mnli_first_mean": "77.3 ± 0.9",
+ "gain": "+14.3 points",
+ "higher_on": "5 of 5 seeds",
+ "per_epoch_mean_dev_acc": {
+  "direct": [
+   57.8,
+   63.0,
+   63.0
+  ],
+  "mnli_first": [
+   75.5,
+   77.0,
+   77.3
+  ]
+ },
+ "paper_support": "BERT paper, footnote 14: they 'did observe substantial improvements on RTE from multitask training with MNLI' but report no numbers",
+ "phang_2018": "STILTs (Phang et al., 2018) report RTE 68.6 -> 79.1 for BERT-base with MNLI first (best of 20 restarts, not means)",
+ "example": {
+  "dev_index": 219,
+  "a": "Napkins, invitations and plain old paper cost more than they did a month ago.",
+  "b": "The cost of paper is rising.",
+  "gold": "entailed",
+  "direct_p_entailed": 0.33,
+  "direct_prediction": "not entailed (wrong)",
+  "mnli_first_p_entailed": 0.94,
+  "mnli_first_prediction": "entailed (right)",
+  "_note": "from our seed-1 models (direct: dev 60.6 in this re-run; MNLI-first: 78.0); across the 277 dev pairs MNLI-first fixes 68 pairs and breaks 20"
+ }
+}

@@ -1,0 +1,22 @@
+"""{%slug%}: the PyTorch model (kind A). Scaffolded by `atlas new model {%slug%} --template char-seq` on {%today%}.
+
+A character-level LSTM: each character id -> an embedding -> one LSTM layer -> a score per character of the alphabet.
+Submodule names become layer ids and tensor names (emb.weight, lstm.weight_ih, ...).
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+
+
+class CharLSTM(nn.Module):
+    def __init__(self, vocab: int, emb: int = 16, hidden: int = 48):
+        super().__init__()
+        self.emb = nn.Embedding(vocab, emb)
+        self.lstm = nn.LSTM(emb, hidden)          # one layer, batch_first=False (values carry no batch dim)
+        self.head = nn.Linear(hidden, vocab)
+
+    def forward(self, ids: torch.Tensor) -> torch.Tensor:
+        """ids [T] (int) -> logits [T, vocab]."""
+        h, _ = self.lstm(self.emb(ids))
+        return self.head(h)

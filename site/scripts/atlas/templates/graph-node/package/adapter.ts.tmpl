@@ -1,0 +1,34 @@
+// {%slug%}: local input adapter 'graph' (design §4.9; InputKind 'graph'). Scaffolded by `atlas new model {%slug%}
+// --template graph-node` on {%today%}. Pure TS; a Capture.svelte next to it (an edge editor) is the UI part to add.
+import type { InputAdapter, Preprocessed } from '../../../../atlas/types/index.ts';
+import { graphOf, normalizedAdjacency, type Graph } from '../../graph.ts';
+
+const adapter: InputAdapter<Graph> = {
+	id: 'graph',
+	kind: 'graph',
+	preprocess(raw): Preprocessed {
+		const g = graphOf(raw);
+		const ahat = normalizedAdjacency(g);
+		const ahat32 = { shape: ahat.shape, data: Float32Array.from(ahat.data) };
+		return {
+			tensors: { input: ahat32 },
+			steps: [{ id: 'ahat', label: { en: 'Who listens to whom (normalized adjacency)', zh: '谁听谁的（归一化邻接矩阵）' }, tensor: ahat32 }],
+			empty: g.edges.length === 0
+		};
+	},
+	edgeFixtures: () => [
+		{ id: 'isolated', label: { en: 'a node with no edges', zh: '一个没有边的节点' }, raw: { n: 3, edges: [[0, 1]], labels: [0, 0, 1], labelled: [0, 2] } },
+		{ id: 'line', label: { en: 'a line of four nodes', zh: '四个节点连成一条线' }, raw: { n: 4, edges: [[0, 1], [1, 2], [2, 3]], labels: [0, 0, 1, 1], labelled: [0, 3] } }
+	],
+	layer0: {
+		view: 'layer.tensor',
+		narration: {
+			what: {
+				en: 'The graph becomes a table of {n|int} numbers, shaped {shape}: row i says how much node i listens to each node, itself included.',
+				zh: '这张图变成一张有 {n|int} 个数的表，形状是 {shape}：第 i 行表示节点 i 听取每个节点（包括它自己）的程度。'
+			}
+		}
+	}
+};
+
+export default adapter;

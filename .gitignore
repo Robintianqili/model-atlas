@@ -1,0 +1,54 @@
+# dependencies and build output
+node_modules/
+site/build/
+site/.svelte-kit/
+site/package/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# DevKit: reports, parity tables, Python-twin fixtures and builds (ATLAS_BUILD_DIR=.atlas/build-*), lane copies,
+# the machine-local CLI config (your Python) and your computer's own strings for the /devkit/ guard
+site/.atlas/
+site/.work/
+site/scripts/atlas/atlas.config.local.json
+site/src/lib/devkit-site/machine.local.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# training data and training output (never committed; pipeline/<slug>/train.py re-creates them)
+pipeline/data/
+pipeline/*/runs/
+pipeline/*/logs/
+pipeline/*/out/
+pipeline/tinycnn/verify/out/
+pipeline/parity/verify_tinygpt/*.json
+pipeline/tokenizers/raw/
+pipeline/tokenizers/cache/
+
+# model checkpoints (the site ships its exported weights in site/static/models/)
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npy
+*.npz
+*.onnx
+
+# screenshots from page tests (atlas e2e, atlas review)
+notes/shots/
+test-results/
+playwright-report/
+
+# local tooling and secrets: only the project skills in .claude/skills/ are shared
+.claude/*
+!.claude/skills/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,62 @@
+// {%slug%}: process '{%processId%}' (kind C, design §4.4). Scaffolded by `atlas new model {%slug%} --template char-seq`
+// on {%today%}. Writing text one character at a time with the exported model: the kit's sampling process
+// (process/library/sampling.ts: temperature, top-k, top-p, TinyGPT semantics) on logits from the kind-A trace.
+// The source passes the learner's ids and the loaded GraphModel as input (run: 'main': a model cannot go to a worker).
+//   npm run atlas -- run {%slug%} sample --frames 0..20
+import type { GraphModel, ProcessDef } from '../../atlas/types/index.ts';
+import { samplingProcess, type SamplingOpt, type SamplingState } from '../../atlas/process/library/sampling.ts';
+
+export type SampleInput = { ids: number[]; model: GraphModel | null };
+const CONTEXT = 64;
+
+/** Scores for the next character after `ids`: the last row of the model's 'head' layer. */
+function nextLogits(model: GraphModel, ids: number[]): Float32Array {
+	const x = ids.length ? ids : [0];
+	const tr = model.forward({ input: { shape: [x.length], data: Int32Array.from(x), dtype: 'i32' } }, { record: 'layers' });
+	const z = tr.t.head;
+	const V = z.shape[z.shape.length - 1];
+	return Float32Array.from(z.data.subarray(z.data.length - V));
+}
+
+const shape = samplingProcess({ id: '{%processId%}', logits: () => [] });
+
+export const {%processIdent%}: ProcessDef<SampleInput, SamplingOpt, SamplingState> = {
+	...shape,
+	title: { en: 'TODO: Write text one character at a time', zh: 'TODO：一次写一个字符' },
+	defaults: { ...shape.defaults, maxNew: 40, temperature: 0.8 },
+	phases: {
+		prompt: {
+			...shape.phases.prompt,
+			narration: {
+				what: {
+					en: 'The model starts from your text, {frame.length|int} characters. It reads them one by one and carries a memory along.',
+					zh: '模型从你的文字出发，共 {frame.length|int} 个字符。它一个一个地读，并把记忆一路带下去。'
+				}
+			}
+		},
+		logits: {
+			...shape.phases.logits,
+			narration: {
+				what: { en: 'The model gives each of the {frame.V|int} characters it knows a score for coming next.', zh: '模型给它认识的 {frame.V|int} 个字符各打一个分，表示它接下来出现的可能。' }
+			}
+		},
+		distribution: {
+			...shape.phases.distribution,
+			narration: {
+				what: { en: 'Temperature {frame.temperature} turns the scores into chances that add up to one. Lower temperatures favour the top scores.', zh: '温度 {frame.temperature} 把分数变成加起来等于一的概率。温度越低，越偏向高分。' }
+			}
+		},
+		sample: {
+			...shape.phases.sample,
+			narration: {
+				what: { en: 'A random number {frame.u} picks one character; it had a chance of {frame.p|pct}. Then the new character becomes part of the input.', zh: '一个随机数 {frame.u} 选出一个字符，它的概率是 {frame.p|pct}。然后这个新字符成为输入的一部分。' }
+			}
+		}
+	},
+	run(input, ctx) {
+		const model = input.model;
+		if (!model) throw new Error('{%processId%}: the model is not loaded (export it first: npm run atlas -- export {%slug%})');
+		const p = samplingProcess({ id: '{%processId%}', context: CONTEXT, logits: (ids) => nextLogits(model, ids) });
+		return p.run({ ids: input.ids }, ctx);
+	}
+};

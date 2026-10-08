@@ -1,0 +1,15 @@
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+# DevKit (wave 0): reports, parity tables, Python-twin fixtures and builds (ATLAS_BUILD_DIR=.atlas/build-*);
+# the machine-local CLI config
+/.atlas
+/scripts/atlas/atlas.config.local.json
+# this computer's own strings and local-only block list for the /devkit/ guard (src/lib/devkit-site/machine.ts)
+/src/lib/devkit-site/machine.local.json

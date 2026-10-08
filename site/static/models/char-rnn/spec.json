@@ -1,0 +1,415 @@
+{
+ "slug": "char-rnn",
+ "name": {
+  "en": "Character LSTM",
+  "zh": "字符级 LSTM"
+ },
+ "version": "2026-10-06",
+ "params": 29626,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "emb.weight",
+   "shape": [
+    74,
+    24
+   ],
+   "offset": 0,
+   "length": 1776
+  },
+  {
+   "name": "lstm.weight_ih",
+   "shape": [
+    256,
+    24
+   ],
+   "offset": 1776,
+   "length": 6144
+  },
+  {
+   "name": "lstm.weight_hh",
+   "shape": [
+    256,
+    64
+   ],
+   "offset": 7920,
+   "length": 16384
+  },
+  {
+   "name": "lstm.bias_ih",
+   "shape": [
+    256
+   ],
+   "offset": 24304,
+   "length": 256
+  },
+  {
+   "name": "lstm.bias_hh",
+   "shape": [
+    256
+   ],
+   "offset": 24560,
+   "length": 256
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    74,
+    64
+   ],
+   "offset": 24816,
+   "length": 4736
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    74
+   ],
+   "offset": 29552,
+   "length": 74
+  }
+ ],
+ "layers": [
+  {
+   "id": "emb",
+   "op": "embedding",
+   "label": {
+    "en": "Character vectors",
+    "zh": "字符向量"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    24
+   ],
+   "desc": {
+    "en": "Each character id picks its own row of 24 learned numbers.",
+    "zh": "每个字符 id 取出自己那一行 24 个学来的数。"
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/char-rnn/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "lstm",
+   "op": "lstm",
+   "label": {
+    "en": "LSTM memory",
+    "zh": "LSTM 记忆"
+   },
+   "in": [
+    "emb"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "hidden": 64,
+    "inputSize": 24
+   },
+   "code": {
+    "file": "pipeline/char-rnn/model.py",
+    "line": 34
+   },
+   "sub": [
+    "i",
+    "f",
+    "g",
+    "o",
+    "c",
+    "h"
+   ]
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Next-character scores",
+    "zh": "下一个字符的分数"
+   },
+   "in": [
+    "lstm"
+   ],
+   "outShape": [
+    "T",
+    74
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 74
+   },
+   "axes": [
+    "t",
+    "vocab"
+   ],
+   "code": {
+    "file": "pipeline/char-rnn/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Next-character chances",
+    "zh": "下一个字符的概率"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    "T",
+    74
+   ],
+   "axes": [
+    "t",
+    "vocab"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "TinyStories (TinyStoriesV2-GPT4): 39,347,112 characters from the start of the train split",
+  "chars": 39347112,
+  "steps": 40000,
+  "metrics": {
+   "val_loss": 1.07475,
+   "val_bpc": 1.55054
+  },
+  "recipe": "AdamW (wd 0), warm-up 300, cosine to 0, clip 1.0, lr 0.004, batch 256 x 128 characters"
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000114,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 6,
+  "edgeCases": [
+   "one",
+   "max"
+  ],
+  "perLayer": {
+   "lstm": 0.0000021,
+   "lstm#i": 0.00000191,
+   "lstm#f": 0.00000167,
+   "lstm#g": 0.00000259,
+   "lstm#o": 0.00000167,
+   "lstm#c": 0.00000763,
+   "lstm#h": 0.0000021,
+   "head": 0.0000114,
+   "probs": 0.00000137
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/char-rnn/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "text-presets",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 128,
+   "label": {
+    "en": "characters",
+    "zh": "字符"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "alphabet": [
+  "�",
+  " ",
+  "\n",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  ".",
+  ",",
+  "\"",
+  "'",
+  "!",
+  "?",
+  "-",
+  ":",
+  ";",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+ ],
+ "unk": "�",
+ "context": 128,
+ "labels": [
+  "�",
+  "␣",
+  "↵",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  ".",
+  ",",
+  "\"",
+  "'",
+  "!",
+  "?",
+  "-",
+  ":",
+  ";",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+ ]
+}

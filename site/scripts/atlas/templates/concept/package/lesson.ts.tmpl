@@ -1,0 +1,37 @@
+// {%slug%}: the guided lesson of a concept page, its primary path (design §4.6). Scaffolded by
+// `atlas new concept {%slug%}` on {%today%}.
+// Start from the auto plan (`npm run atlas -- lesson {%slug%} draft` prints its step ids), then replace auto steps
+// with your own. Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task` and one step
+// with kindOf: 'limits' | 'breakIt'. Numbers in narration come from {placeholders}, never typed by hand (AK402).
+// The interaction the catalog promises: {%interactionEn%}
+// The page around the lesson (hook, toy, real model, comparison, pitfalls) is concept.ts.
+import type { LessonDef } from '../../atlas/types/index.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%titleEn%}, step by step', zh: 'TODO：{%titleZh%}，分步课程' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		// Every auto step of the plan. Narrow it with { autoAll: { until: 'op:<layer>' } } or replace steps one by one:
+		//   { auto: 'op:<layer>', override: { title: { en: '...', zh: '...' } } }
+		{ autoAll: {} },
+{%#process%}
+		{
+			// an author step: the honest limit of the example process (replace it with your own)
+			id: 'estimate-wobbles',
+			source: 'run',
+			at: 'last',
+			view: 'zoom.formula',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: a short run is not the truth', zh: 'TODO：短短一次运行不等于真相' },
+			narration: {
+				en: 'After {n|int} flips the estimate is {estimate}, but the coin was set to {p}. With few flips the estimate wobbles around the true value.',
+				zh: '抛了 {n|int} 次之后，估计值是 {estimate}，而硬币的真实偏向是 {p}。抛的次数少，估计值就会在真实值附近摇摆。',
+				vars: (_rt, at) => ({ n: at.frame!.metrics!.n, estimate: at.frame!.metrics!.estimate, p: (at.tape!.opt as { p: number }).p })
+			}
+		},
+{%/process%}
+	]
+};
+
+export default lesson;

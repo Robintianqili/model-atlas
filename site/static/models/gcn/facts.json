@@ -1,0 +1,47 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "steps": {
+   "value": 200,
+   "unit": "steps",
+   "source": "pipeline/gcn/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "lr": {
+   "value": 0.01,
+   "unit": "learning rate (Adam)",
+   "source": "pipeline/gcn/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "lossFinal": {
+   "value": 0.008982,
+   "unit": "cross-entropy",
+   "source": "pipeline/gcn/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "trainAcc": {
+   "value": 0.96875,
+   "unit": "share of the 32 unlabelled members",
+   "source": "pipeline/gcn/train.py (CPU float32, seed 0)",
+   "measured": "2026-10-06"
+  },
+  "shallowAcc": {
+   "value": 0.953125,
+   "unit": "share",
+   "source": "pipeline/gcn/train.py (the same recipe, seeds 0-9, mean share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  },
+  "deepAcc": {
+   "value": 0.959375,
+   "unit": "share",
+   "source": "pipeline/gcn/train.py (the same recipe, seeds 0-9, mean share of the 32 unlabelled members), 8 graph layers",
+   "measured": "2026-10-06"
+  },
+  "seeds": {
+   "value": 10,
+   "unit": "random starts",
+   "source": "pipeline/gcn/train.py (the same recipe, seeds 0-9, mean share of the 32 unlabelled members)",
+   "measured": "2026-10-06"
+  }
+ }
+}

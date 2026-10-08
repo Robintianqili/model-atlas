@@ -1,0 +1,1252 @@
+{
+ "slug": "ddpm-unet",
+ "name": {
+  "en": "Tiny DDPM with a U-Net",
+  "zh": "带 U-Net 的小型 DDPM"
+ },
+ "version": "2026-10-07",
+ "params": 60001,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "tmlp.conv.weight",
+   "shape": [
+    32,
+    16,
+    1,
+    1
+   ],
+   "offset": 0,
+   "length": 512
+  },
+  {
+   "name": "tmlp.conv.bias",
+   "shape": [
+    32
+   ],
+   "offset": 512,
+   "length": 32
+  },
+  {
+   "name": "in.conv.weight",
+   "shape": [
+    16,
+    1,
+    3,
+    3
+   ],
+   "offset": 544,
+   "length": 144
+  },
+  {
+   "name": "in.conv.bias",
+   "shape": [
+    16
+   ],
+   "offset": 688,
+   "length": 16
+  },
+  {
+   "name": "down.conv.weight",
+   "shape": [
+    32,
+    16,
+    3,
+    3
+   ],
+   "offset": 704,
+   "length": 4608
+  },
+  {
+   "name": "down.conv.bias",
+   "shape": [
+    32
+   ],
+   "offset": 5312,
+   "length": 32
+  },
+  {
+   "name": "down.time.weight",
+   "shape": [
+    32,
+    32,
+    1,
+    1
+   ],
+   "offset": 5344,
+   "length": 1024
+  },
+  {
+   "name": "down.time.bias",
+   "shape": [
+    32
+   ],
+   "offset": 6368,
+   "length": 32
+  },
+  {
+   "name": "mid.conv1.weight",
+   "shape": [
+    64,
+    32,
+    3,
+    3
+   ],
+   "offset": 6400,
+   "length": 18432
+  },
+  {
+   "name": "mid.conv1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 24832,
+   "length": 64
+  },
+  {
+   "name": "mid.time.weight",
+   "shape": [
+    64,
+    32,
+    1,
+    1
+   ],
+   "offset": 24896,
+   "length": 2048
+  },
+  {
+   "name": "mid.time.bias",
+   "shape": [
+    64
+   ],
+   "offset": 26944,
+   "length": 64
+  },
+  {
+   "name": "mid.conv2.weight",
+   "shape": [
+    32,
+    64,
+    3,
+    3
+   ],
+   "offset": 27008,
+   "length": 18432
+  },
+  {
+   "name": "mid.conv2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 45440,
+   "length": 32
+  },
+  {
+   "name": "up.conv.weight",
+   "shape": [
+    16,
+    64,
+    3,
+    3
+   ],
+   "offset": 45472,
+   "length": 9216
+  },
+  {
+   "name": "up.conv.bias",
+   "shape": [
+    16
+   ],
+   "offset": 54688,
+   "length": 16
+  },
+  {
+   "name": "up.time.weight",
+   "shape": [
+    16,
+    32,
+    1,
+    1
+   ],
+   "offset": 54704,
+   "length": 512
+  },
+  {
+   "name": "up.time.bias",
+   "shape": [
+    16
+   ],
+   "offset": 55216,
+   "length": 16
+  },
+  {
+   "name": "top.conv.weight",
+   "shape": [
+    16,
+    32,
+    3,
+    3
+   ],
+   "offset": 55232,
+   "length": 4608
+  },
+  {
+   "name": "top.conv.bias",
+   "shape": [
+    16
+   ],
+   "offset": 59840,
+   "length": 16
+  },
+  {
+   "name": "out.weight",
+   "shape": [
+    1,
+    16,
+    3,
+    3
+   ],
+   "offset": 59856,
+   "length": 144
+  },
+  {
+   "name": "out.bias",
+   "shape": [
+    1
+   ],
+   "offset": 60000,
+   "length": 1
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your drawing x₀",
+    "zh": "你的画 x₀"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28x28 numbers: 0 is paper, 1 is full ink.",
+    "zh": "28x28 个数：0 是纸，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "eps",
+   "op": "input",
+   "label": {
+    "en": "Noise ε",
+    "zh": "噪声 ε"
+   },
+   "in": [
+    "eps"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "784 numbers from a standard bell curve N(0, 1).",
+    "zh": "从标准钟形曲线 N(0, 1) 中抽出的 784 个数。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "t",
+   "op": "input",
+   "label": {
+    "en": "Step t",
+    "zh": "步数 t"
+   },
+   "in": [
+    "t"
+   ],
+   "outShape": [
+    1
+   ],
+   "desc": {
+    "en": "Which of the 100 noise steps (1 to 100).",
+    "zh": "100 个加噪步中的第几步（1 到 100）。"
+   },
+   "axes": [
+    "k"
+   ]
+  },
+  {
+   "id": "xt",
+   "op": "q_sample",
+   "label": {
+    "en": "Noisy drawing x_t",
+    "zh": "加噪的画 x_t"
+   },
+   "in": [
+    "input",
+    "eps",
+    "t"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "params": {
+    "abar": [
+     0.9990000128746033,
+     0.99599289894104,
+     0.9909928441047668,
+     0.9840258359909058,
+     0.9751298427581787,
+     0.9643541574478149,
+     0.9517590999603271,
+     0.9374154210090637,
+     0.9214036464691162,
+     0.9038131833076477,
+     0.8847418427467346,
+     0.8642944693565369,
+     0.8425823450088501,
+     0.8197219967842102,
+     0.7958341240882874,
+     0.7710426449775696,
+     0.7454736232757568,
+     0.7192540764808655,
+     0.6925109028816223,
+     0.6653700470924377,
+     0.6379554867744446,
+     0.6103880405426025,
+     0.5827849507331848,
+     0.5552586913108826,
+     0.5279163718223572,
+     0.5008593201637268,
+     0.47418224811553955,
+     0.4479728937149048,
+     0.4223117530345917,
+     0.39727166295051575,
+     0.37291768193244934,
+     0.349307119846344,
+     0.32648923993110657,
+     0.3045056164264679,
+     0.2833901643753052,
+     0.2631692588329315,
+     0.24386221170425415,
+     0.22548140585422516,
+     0.20803280174732208,
+     0.19151625037193298,
+     0.1759260594844818,
+     0.16125133633613586,
+     0.14747655391693115,
+     0.1345820426940918,
+     0.12254443019628525,
+     0.11133718490600586,
+     0.1009310930967331,
+     0.09129472076892853,
+     0.08239486813545227,
+     0.07419699430465698,
+     0.06666562706232071,
+     0.05976472422480583,
+     0.05345803499221802,
+     0.04770940914750099,
+     0.04248305782675743,
+     0.037743836641311646,
+     0.0334574356675148,
+     0.029590565711259842,
+     0.02611113339662552,
+     0.022988347336649895,
+     0.02019282430410385,
+     0.017696665599942207,
+     0.015473499894142151,
+     0.013498518615961075,
+     0.011748483404517174,
+     0.010201718658208847,
+     0.008838088251650333,
+     0.007638965267688036,
+     0.006587180308997631,
+     0.005666971206665039,
+     0.004863921087235212,
+     0.004164892248809338,
+     0.0035579537507146597,
+     0.003032311098650098,
+     0.002578230109065771,
+     0.002186964266002178,
+     0.001850679749622941,
+     0.0015623850049450994,
+     0.0013158596120774746,
+     0.0011055879294872284,
+     0.0009266948327422142,
+     0.00077488535316661,
+     0.0006463874597102404,
+     0.0005378987989388406,
+     0.0004465375386644155,
+     0.00036979620927013457,
+     0.00030550023075193167,
+     0.00025176923372782767,
+     0.0002069822803605348,
+     0.00016974637401290238,
+     0.0001388679665978998,
+     0.00011332747817505151,
+     0.00009225658141076565,
+     0.00007491793803637847,
+     0.000060687310906359926,
+     0.00004903780063614249,
+     0.00003952595216105692,
+     0.00003177966573275626,
+     0.00002548761221987661,
+     0.000020390089048305526
+    ]
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 99
+   }
+  },
+  {
+   "id": "temb",
+   "op": "time_embed",
+   "label": {
+    "en": "t as waves",
+    "zh": "t 变成波"
+   },
+   "in": [
+    "t"
+   ],
+   "outShape": [
+    16,
+    1,
+    1
+   ],
+   "params": {
+    "dim": 16
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 77
+   }
+  },
+  {
+   "id": "tmlp.conv",
+   "op": "conv2d",
+   "label": {
+    "en": "Time vector",
+    "zh": "时间向量"
+   },
+   "in": [
+    "temb"
+   ],
+   "outShape": [
+    32,
+    1,
+    1
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 16,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "tmlp.silu",
+   "op": "silu",
+   "label": {
+    "en": "Time vector, SiLU",
+    "zh": "时间向量，SiLU"
+   },
+   "in": [
+    "tmlp.conv"
+   ],
+   "outShape": [
+    32,
+    1,
+    1
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 77
+   }
+  },
+  {
+   "id": "in.conv",
+   "op": "conv2d",
+   "label": {
+    "en": "In (28×28) · convolution",
+    "zh": "输入（28×28） · 卷积"
+   },
+   "in": [
+    "xt"
+   ],
+   "outShape": [
+    16,
+    28,
+    28
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 1,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 65
+   }
+  },
+  {
+   "id": "in.silu",
+   "op": "silu",
+   "label": {
+    "en": "In (28×28) · SiLU",
+    "zh": "输入（28×28） · SiLU"
+   },
+   "in": [
+    "in.conv"
+   ],
+   "outShape": [
+    16,
+    28,
+    28
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 78
+   }
+  },
+  {
+   "id": "down.pool",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Down (14×14) · max pool",
+    "zh": "下行（14×14） · 最大池化"
+   },
+   "in": [
+    "in.silu"
+   ],
+   "outShape": [
+    16,
+    14,
+    14
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 79
+   }
+  },
+  {
+   "id": "down.conv",
+   "op": "conv2d",
+   "label": {
+    "en": "Down (14×14) · convolution",
+    "zh": "下行（14×14） · 卷积"
+   },
+   "in": [
+    "down.pool"
+   ],
+   "outShape": [
+    32,
+    14,
+    14
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 79
+   }
+  },
+  {
+   "id": "down.time",
+   "op": "conv2d",
+   "label": {
+    "en": "Down (14×14) · time bias",
+    "zh": "下行（14×14） · 时间偏置"
+   },
+   "in": [
+    "tmlp.silu"
+   ],
+   "outShape": [
+    32,
+    1,
+    1
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 32,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 67
+   }
+  },
+  {
+   "id": "down.add",
+   "op": "add",
+   "label": {
+    "en": "Down (14×14) · + time bias",
+    "zh": "下行（14×14） · 加上时间偏置"
+   },
+   "in": [
+    "down.conv",
+    "down.time"
+   ],
+   "outShape": [
+    32,
+    14,
+    14
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 79
+   }
+  },
+  {
+   "id": "down.silu",
+   "op": "silu",
+   "label": {
+    "en": "Down (14×14) · SiLU",
+    "zh": "下行（14×14） · SiLU"
+   },
+   "in": [
+    "down.add"
+   ],
+   "outShape": [
+    32,
+    14,
+    14
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 79
+   }
+  },
+  {
+   "id": "mid.pool",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Middle (7×7) · max pool",
+    "zh": "中间（7×7） · 最大池化"
+   },
+   "in": [
+    "down.silu"
+   ],
+   "outShape": [
+    32,
+    7,
+    7
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 80
+   }
+  },
+  {
+   "id": "mid.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Middle (7×7) · convolution",
+    "zh": "中间（7×7） · 卷积"
+   },
+   "in": [
+    "mid.pool"
+   ],
+   "outShape": [
+    64,
+    7,
+    7
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 32,
+    "outChannels": 64
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 80
+   }
+  },
+  {
+   "id": "mid.time",
+   "op": "conv2d",
+   "label": {
+    "en": "Middle (7×7) · time bias",
+    "zh": "中间（7×7） · 时间偏置"
+   },
+   "in": [
+    "tmlp.silu"
+   ],
+   "outShape": [
+    64,
+    1,
+    1
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 32,
+    "outChannels": 64
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 69
+   }
+  },
+  {
+   "id": "mid.add",
+   "op": "add",
+   "label": {
+    "en": "Middle (7×7) · + time bias",
+    "zh": "中间（7×7） · 加上时间偏置"
+   },
+   "in": [
+    "mid.conv1",
+    "mid.time"
+   ],
+   "outShape": [
+    64,
+    7,
+    7
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 80
+   }
+  },
+  {
+   "id": "mid.silu1",
+   "op": "silu",
+   "label": {
+    "en": "Middle (7×7) · SiLU",
+    "zh": "中间（7×7） · SiLU"
+   },
+   "in": [
+    "mid.add"
+   ],
+   "outShape": [
+    64,
+    7,
+    7
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 80
+   }
+  },
+  {
+   "id": "mid.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Middle (7×7) · convolution",
+    "zh": "中间（7×7） · 卷积"
+   },
+   "in": [
+    "mid.silu1"
+   ],
+   "outShape": [
+    32,
+    7,
+    7
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 64,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 81
+   }
+  },
+  {
+   "id": "mid.silu2",
+   "op": "silu",
+   "label": {
+    "en": "Middle (7×7) · SiLU",
+    "zh": "中间（7×7） · SiLU"
+   },
+   "in": [
+    "mid.conv2"
+   ],
+   "outShape": [
+    32,
+    7,
+    7
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 81
+   }
+  },
+  {
+   "id": "up.up",
+   "op": "upsample",
+   "label": {
+    "en": "Up (14×14) · upsample",
+    "zh": "上行（14×14） · 上采样"
+   },
+   "in": [
+    "mid.silu2"
+   ],
+   "outShape": [
+    32,
+    14,
+    14
+   ],
+   "params": {
+    "scale": 2
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 82
+   }
+  },
+  {
+   "id": "up.cat",
+   "op": "concat",
+   "label": {
+    "en": "Up (14×14) · skip: + the down maps",
+    "zh": "上行（14×14） · 跳跃连接：接上下行的图"
+   },
+   "in": [
+    "up.up",
+    "down.silu"
+   ],
+   "outShape": [
+    64,
+    14,
+    14
+   ],
+   "params": {
+    "axis": 0
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 82
+   }
+  },
+  {
+   "id": "up.conv",
+   "op": "conv2d",
+   "label": {
+    "en": "Up (14×14) · convolution",
+    "zh": "上行（14×14） · 卷积"
+   },
+   "in": [
+    "up.cat"
+   ],
+   "outShape": [
+    16,
+    14,
+    14
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 64,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 83
+   }
+  },
+  {
+   "id": "up.time",
+   "op": "conv2d",
+   "label": {
+    "en": "Up (14×14) · time bias",
+    "zh": "上行（14×14） · 时间偏置"
+   },
+   "in": [
+    "tmlp.silu"
+   ],
+   "outShape": [
+    16,
+    1,
+    1
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 32,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 72
+   }
+  },
+  {
+   "id": "up.add",
+   "op": "add",
+   "label": {
+    "en": "Up (14×14) · + time bias",
+    "zh": "上行（14×14） · 加上时间偏置"
+   },
+   "in": [
+    "up.conv",
+    "up.time"
+   ],
+   "outShape": [
+    16,
+    14,
+    14
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 83
+   }
+  },
+  {
+   "id": "up.silu",
+   "op": "silu",
+   "label": {
+    "en": "Up (14×14) · SiLU",
+    "zh": "上行（14×14） · SiLU"
+   },
+   "in": [
+    "up.add"
+   ],
+   "outShape": [
+    16,
+    14,
+    14
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 83
+   }
+  },
+  {
+   "id": "top.up",
+   "op": "upsample",
+   "label": {
+    "en": "Up (28×28) · upsample",
+    "zh": "上行（28×28） · 上采样"
+   },
+   "in": [
+    "up.silu"
+   ],
+   "outShape": [
+    16,
+    28,
+    28
+   ],
+   "params": {
+    "scale": 2
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 84
+   }
+  },
+  {
+   "id": "top.cat",
+   "op": "concat",
+   "label": {
+    "en": "Up (28×28) · skip: + the input maps",
+    "zh": "上行（28×28） · 跳跃连接：接上输入层的图"
+   },
+   "in": [
+    "top.up",
+    "in.silu"
+   ],
+   "outShape": [
+    32,
+    28,
+    28
+   ],
+   "params": {
+    "axis": 0
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 84
+   }
+  },
+  {
+   "id": "top.conv",
+   "op": "conv2d",
+   "label": {
+    "en": "Up (28×28) · convolution",
+    "zh": "上行（28×28） · 卷积"
+   },
+   "in": [
+    "top.cat"
+   ],
+   "outShape": [
+    16,
+    28,
+    28
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 32,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 85
+   }
+  },
+  {
+   "id": "top.silu",
+   "op": "silu",
+   "label": {
+    "en": "Up (28×28) · SiLU",
+    "zh": "上行（28×28） · SiLU"
+   },
+   "in": [
+    "top.conv"
+   ],
+   "outShape": [
+    16,
+    28,
+    28
+   ],
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 85
+   }
+  },
+  {
+   "id": "out",
+   "op": "conv2d",
+   "label": {
+    "en": "Predicted noise ε̂",
+    "zh": "预测的噪声 ε̂"
+   },
+   "in": [
+    "top.silu"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 1
+   },
+   "code": {
+    "file": "pipeline/ddpm-unet/model.py",
+    "line": 86
+   }
+  }
+ ],
+ "training": {
+  "dataset": "Quick, Draw! numpy bitmaps, 3 classes (star, umbrella, house), TinyCNN's split",
+  "steps": 84600,
+  "batchSize": 256,
+  "epochs": 600,
+  "optimizer": "Adam lr 0.001, cosine decay to 0; EMA 0.999 of the weights; loss = mean squared error between the predicted and the real noise (t uniform in 1..100)",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)",
+  "metrics": {
+   "val_noise_mse": 0.0395,
+   "val_n": 4500
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.000042,
+  "checked": "2026-10-07",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 5,
+  "edgeCases": [
+   "blank-t100",
+   "dot-t1"
+  ],
+  "perLayer": {
+   "xt": 2.38e-7,
+   "tmlp.conv": 2.38e-7,
+   "tmlp.silu": 3.58e-7,
+   "in.conv": 7.15e-7,
+   "in.silu": 9.54e-7,
+   "down.pool": 9.54e-7,
+   "down.conv": 0.00000429,
+   "down.time": 9.54e-7,
+   "down.add": 0.00000429,
+   "down.silu": 0.00000143,
+   "mid.pool": 0.00000143,
+   "mid.conv1": 0.00000381,
+   "mid.time": 4.77e-7,
+   "mid.add": 0.00000381,
+   "mid.silu1": 0.00000215,
+   "mid.conv2": 0.00000381,
+   "mid.silu2": 0.00000119,
+   "up.up": 0.00000119,
+   "up.cat": 0.00000143,
+   "up.conv": 0.00000381,
+   "up.time": 4.77e-7,
+   "up.add": 0.00000381,
+   "up.silu": 0.00000334,
+   "top.up": 0.00000334,
+   "top.cat": 0.00000334,
+   "top.conv": 0.000042,
+   "top.silu": 0.0000153,
+   "out": 0.0000137
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/ddpm-unet/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "drawing28",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "name": "eps",
+   "adapter": "drawing28",
+   "kind": "noise",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "name": "t",
+   "adapter": "drawing28",
+   "kind": "timestep",
+   "shape": [
+    1
+   ],
+   "dtype": "f32",
+   "axes": [
+    "k"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "kinds": [
+  {
+   "id": "star",
+   "en": "star",
+   "zh": "星星"
+  },
+  {
+   "id": "umbrella",
+   "en": "umbrella",
+   "zh": "雨伞"
+  },
+  {
+   "id": "house",
+   "en": "house",
+   "zh": "房子"
+  }
+ ],
+ "T": 100
+}

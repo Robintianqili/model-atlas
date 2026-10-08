@@ -1,0 +1,101 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "valLoss": {
+   "value": 1.07475,
+   "unit": "nats per character",
+   "source": "train.py: cross-entropy on 1,966,956 held-out characters (TinyStoriesV2-GPT4-valid.txt), windows of 128, CPU fp32",
+   "measured": "2026-10-06"
+  },
+  "valBpc": {
+   "value": 1.55054,
+   "unit": "bits per character",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "trainChars": {
+   "value": 39347112,
+   "unit": "characters",
+   "source": "train.py: ak.data.tinystories_chars(n_chars=40,000,000) on the TinyStories train head (story markers become blank lines), normalized",
+   "measured": "2026-10-06"
+  },
+  "trainSteps": {
+   "value": 40000,
+   "unit": "steps of 256 windows of 128 characters",
+   "source": "train.py",
+   "measured": "2026-10-06"
+  },
+  "params": {
+   "value": 29626,
+   "unit": "parameters",
+   "source": "model.py",
+   "measured": "2026-10-06"
+  },
+  "vocab": {
+   "value": 74,
+   "unit": "characters in the alphabet",
+   "source": "model.py",
+   "measured": "2026-10-06"
+  },
+  "evalChars": {
+   "value": 393088,
+   "unit": "characters",
+   "source": "units.py: first 400,000 characters of TinyStoriesV2-GPT4-valid.txt, windows of 128",
+   "measured": "2026-10-06"
+  },
+  "counterUnit": {
+   "value": 51,
+   "unit": "unit index (from 0)",
+   "source": "units.py: largest correlation of c with the letters so far in the word",
+   "measured": "2026-10-06"
+  },
+  "counterR": {
+   "value": 0.6336,
+   "unit": "Pearson r",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "counterResetF": {
+   "value": 0.0144,
+   "unit": "median forget gate at a space after a letter",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "counterLetterF": {
+   "value": 0.9948,
+   "unit": "median forget gate at a letter after a letter",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "counterRise": {
+   "value": 0.891,
+   "unit": "median change of c per letter inside a word",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "quoteR": {
+   "value": 0.06,
+   "unit": "largest |Pearson r| of any unit's c or h with 'a quote is open'",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "quoteChars": {
+   "value": 2212,
+   "unit": "quote marks in the held-out text",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "medianF": {
+   "value": 0.8552,
+   "unit": "median forget gate, all units and characters",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  },
+  "meanF": {
+   "value": 0.6074,
+   "unit": "mean forget gate, all units and characters",
+   "source": "units.py",
+   "measured": "2026-10-06"
+  }
+ }
+}

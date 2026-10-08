@@ -1,0 +1,39 @@
+# {%slug%}
+
+Working notes for the `{%slug%}` concept package (kinds: {%kindsCsv%}{%#dev%}, dev-only{%/dev%}). Scaffolded by
+`atlas new concept {%slug%}` on {%today%}. `atlas check` reads the five sections below (paperwork gate).
+
+- Package: `site/src/lib/explainers/{%slug%}/`
+- Pipeline: `pipeline/{%slug%}/`
+- Dev server: `npm run dev -- --port {%port%}`, then {%^dev%}`/train/{%slug%}/` (the concept page) and {%/dev%}`/dev/atlas/lab/{%slug%}/`
+
+## What
+
+TODO: what the page teaches and which parts are live, precomputed or illustrative.
+Catalog interaction: {%interactionEn%}
+
+## Decisions
+
+TODO: choices and why (architecture, data, lesson shape).
+
+## Final numbers
+
+TODO: measured numbers only (accuracy, parity max |diff| and bar, sizes, lines of page code).
+
+## How to re-run
+
+```
+cd site
+npm run atlas -- doctor
+{%#trace%}npm run atlas -- export {%slug%}
+{%/trace%}{%#train%}npm run atlas -- run {%slug%} train --frames 0..20
+{%/train%}{%#process%}npm run atlas -- run {%slug%} run --frames 0..20
+{%/process%}npm run atlas -- lesson {%slug%} lint
+node --test src/lib/explainers/{%slug%}/concept.test.ts
+npm run atlas -- check {%slug%}
+npm run atlas -- e2e {%slug%} --url /train/{%slug%}/
+```
+
+## Kit issues
+
+TODO: anything in the kit that blocked or slowed you, and the workaround used inside this package.

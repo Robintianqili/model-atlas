@@ -1,0 +1,372 @@
+{
+ "slug": "snake-dqn",
+ "name": {
+  "en": "Snake DQN: the target network",
+  "zh": "贪吃蛇 DQN：目标网络"
+ },
+ "version": "2026-10-07",
+ "params": 171235,
+ "precision": "fp32",
+ "input": {
+  "kind": "game",
+  "shape": [
+   3,
+   9,
+   9
+  ]
+ },
+ "tensors": [
+  {
+   "name": "conv1.weight",
+   "shape": [
+    16,
+    3,
+    3,
+    3
+   ],
+   "offset": 0,
+   "length": 432
+  },
+  {
+   "name": "conv1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 432,
+   "length": 16
+  },
+  {
+   "name": "conv2.weight",
+   "shape": [
+    32,
+    16,
+    3,
+    3
+   ],
+   "offset": 448,
+   "length": 4608
+  },
+  {
+   "name": "conv2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 5056,
+   "length": 32
+  },
+  {
+   "name": "fc1.weight",
+   "shape": [
+    64,
+    2592
+   ],
+   "offset": 5088,
+   "length": 165888
+  },
+  {
+   "name": "fc1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 170976,
+   "length": 64
+  },
+  {
+   "name": "out.weight",
+   "shape": [
+    3,
+    64
+   ],
+   "offset": 171040,
+   "length": 192
+  },
+  {
+   "name": "out.bias",
+   "shape": [
+    3
+   ],
+   "offset": 171232,
+   "length": 3
+  }
+ ],
+ "layers": [
+  {
+   "id": "board",
+   "op": "input",
+   "label": {
+    "en": "The board as three planes: head, body, food",
+    "zh": "棋盘的三层：蛇头、身体、食物"
+   },
+   "in": [
+    "board"
+   ],
+   "outShape": [
+    3,
+    9,
+    9
+   ],
+   "desc": {
+    "en": "1 on the head; on the body (L − i) / L for the i-th cell behind the head; 1 on the food.",
+    "zh": "蛇头处为 1；身体上从蛇头往后第 i 节为 (L − i) / L；食物处为 1。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Convolution 1 (16 kernels)",
+    "zh": "卷积 1（16 个卷积核）"
+   },
+   "in": [
+    "board"
+   ],
+   "outShape": [
+    16,
+    9,
+    9
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 3,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 27
+   }
+  },
+  {
+   "id": "act1",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 1",
+    "zh": "ReLU 1"
+   },
+   "in": [
+    "conv1"
+   ],
+   "outShape": [
+    16,
+    9,
+    9
+   ],
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 27
+   }
+  },
+  {
+   "id": "conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Convolution 2 (32 kernels)",
+    "zh": "卷积 2（32 个卷积核）"
+   },
+   "in": [
+    "act1"
+   ],
+   "outShape": [
+    32,
+    9,
+    9
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 16,
+    "outChannels": 32
+   },
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 28
+   }
+  },
+  {
+   "id": "act2",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 2",
+    "zh": "ReLU 2"
+   },
+   "in": [
+    "conv2"
+   ],
+   "outShape": [
+    32,
+    9,
+    9
+   ],
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 28
+   }
+  },
+  {
+   "id": "flat",
+   "op": "flatten",
+   "label": {
+    "en": "Flatten",
+    "zh": "展平"
+   },
+   "in": [
+    "act2"
+   ],
+   "outShape": [
+    2592
+   ],
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "fc1",
+   "op": "linear",
+   "label": {
+    "en": "Hidden layer (64)",
+    "zh": "隐藏层（64）"
+   },
+   "in": [
+    "flat"
+   ],
+   "outShape": [
+    64
+   ],
+   "params": {
+    "inFeatures": 2592,
+    "outFeatures": 64
+   },
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "act3",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 3",
+    "zh": "ReLU 3"
+   },
+   "in": [
+    "fc1"
+   ],
+   "outShape": [
+    64
+   ],
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "out",
+   "op": "linear",
+   "label": {
+    "en": "Q-values: straight on, left, right",
+    "zh": "Q 值：直走、左转、右转"
+   },
+   "in": [
+    "act3"
+   ],
+   "outShape": [
+    3
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 3
+   },
+   "axes": [
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/snake-dqn/model.py",
+    "line": 30
+   }
+  }
+ ],
+ "training": {
+  "dataset": "its own games (no dataset)",
+  "steps": 44500
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 4.77e-7,
+  "checked": "2026-10-07",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 7,
+  "edgeCases": [
+   "new-game",
+   "wall-ahead"
+  ],
+  "perLayer": {
+   "conv1": 1.19e-7,
+   "act1": 1.19e-7,
+   "conv2": 4.77e-7,
+   "act2": 1.79e-7,
+   "flat": 1.79e-7,
+   "fc1": 4.77e-7,
+   "act3": 4.77e-7,
+   "out": 4.77e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/snake-dqn/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "board",
+   "adapter": "snake-board",
+   "kind": "game",
+   "shape": [
+    3,
+    9,
+    9
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json"
+ },
+ "labels": [
+  {
+   "en": "straight on",
+   "zh": "直走"
+  },
+  {
+   "en": "turn left",
+   "zh": "左转"
+  },
+  {
+   "en": "turn right",
+   "zh": "右转"
+  }
+ ],
+ "copiedAtUpdate": 44500
+}

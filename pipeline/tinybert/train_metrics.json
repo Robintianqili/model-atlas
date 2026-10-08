@@ -1,0 +1,26 @@
+{
+ "run": "v1",
+ "steps": 40000,
+ "batch": 512,
+ "lr": 0.005,
+ "warmup": 500,
+ "weight_decay": 0.1,
+ "seed": 7,
+ "optimizer": "AdamW betas (0.9, 0.98), cosine to 10%, clip 1.0",
+ "params": 364420,
+ "val": {
+  "loss": 1.1484368265131955,
+  "acc": 0.7236062226691655,
+  "top5": 0.8901129039630662,
+  "n": 65631
+ },
+ "train_loss_ema": 1.1479608868354494,
+ "examples_seen": 20480000,
+ "masking": {
+  "rate": 0.15,
+  "mask": 0.8,
+  "random": 0.1,
+  "keep": 0.09999999999999995,
+  "atLeastOne": true
+ }
+}

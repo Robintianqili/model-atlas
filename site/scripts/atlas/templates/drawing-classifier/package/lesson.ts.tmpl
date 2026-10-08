@@ -1,0 +1,55 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template drawing-classifier` on {%today%}.
+// After `npm run atlas -- export {%slug%}`, `npm run atlas -- lesson {%slug%} draft` prints the auto plan from the
+// spec (input, op:conv1, op:relu1, op:pool1, op:conv2, ..., output). Keep it with autoAll, then add your own steps.
+// Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`, one kindOf 'limits' | 'breakIt'.
+import type { LessonDef } from '../../atlas/types/index.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{ autoAll: { until: 'output' } },
+		{
+			id: 'answer',
+			source: 'fwd',
+			at: { layer: 'softmax' },
+			select: () => ({ layer: 'softmax' }),
+			view: 'kit.probbars',
+			provenance: 'live',
+			title: { en: 'TODO: the answer', zh: 'TODO：答案' },
+			predict: {
+				id: '{%slug%}-answer',
+				question: { en: 'TODO: which class will win for your drawing?', zh: 'TODO：你的画会被认成哪一类？' },
+				options: [
+					{ en: 'TODO: the one I drew', zh: 'TODO：我画的那一类' },
+					{ en: 'TODO: another one', zh: 'TODO：别的类' }
+				],
+				answer: 0,
+				explain: { en: 'TODO: why', zh: 'TODO：原因' }
+			},
+			narration: {
+				en: 'The model gives {top.label} a share of {top.p|pct}; the runner-up is {runnerUp.label}.',
+				zh: '模型给 {top.label} 的份额是 {top.p|pct}；第二名是 {runnerUp.label}。'
+			},
+			task: {
+				prompt: { en: 'TODO: draw something the model gets wrong.', zh: 'TODO：画一个模型会认错的东西。' },
+				done: (rt) => rt.num('top.p') < 0.5
+			}
+		},
+		{
+			id: 'limits',
+			source: 'fwd',
+			at: { layer: 'softmax' },
+			view: 'kit.probbars',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: a share, not certainty', zh: 'TODO：份额，而不是确定' },
+			narration: {
+				en: 'TODO: the shares always add up to one over the classes it knows, even for a drawing of something else. Here the top share is {top.p|pct}.',
+				zh: 'TODO：这些份额在它认识的类别上总是加起来等于一，即使画的是别的东西。这里最高的份额是 {top.p|pct}。'
+			}
+		}
+	]
+};
+
+export default lesson;

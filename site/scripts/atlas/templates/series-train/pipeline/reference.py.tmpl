@@ -1,0 +1,71 @@
+"""{%slug%}: Python reference for process '{%processId%}' (kind C parity, design §4.11).
+
+An independent run of the TS 'windows' process: the same series (the learner's input as passed by --input, or the same
+sine wave as data.ts), cut into the same windows. `npm run atlas -- parity {%slug%}` compares the tapes frame by frame.
+
+CLI contract (every reference.py): --process <id> --seed <n> --opt <json> --draws <draws.json> --input <json> --out <stem>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import sys
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:  # run without PYTHONPATH: use the repo's pipeline/ folder
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import numpy as np
+
+SCHEMA = {
+    "series": {"kind": "tensor", "label": ("The series", "序列"), "role": "data", "tol": 1e-12},
+    "window": {"kind": "tensor", "label": ("The window (model input)", "窗口（模型输入）"), "role": "data", "tol": 1e-12},
+    "target": {"kind": "scalar", "label": ("The next value (target)", "下一个值（目标）"), "role": "target", "tol": 1e-12},
+    "start": {"kind": "int", "label": ("Where the window starts", "窗口的起点"), "tol": "exact"},
+}
+PHASES = {
+    "series": {"label": ("The whole series", "整条序列"), "kind": "input"},
+    "window": {"label": ("One window and its target", "一个窗口和它的目标"), "kind": "observe",
+               "tex": "(y_{ {{start}} }, \\dots, y_{ {{end}} }) \\;\\to\\; y_{ {{next}} } = {{target}}"},
+}
+
+
+def series_of(raw) -> np.ndarray:
+    """data.ts seriesOf(): the learner's numbers (>= 12 finite values), else sine(64, period 16)."""
+    a = raw.get("y") if isinstance(raw, dict) else raw
+    if isinstance(a, list) and len(a) >= 12 and all(isinstance(v, (int, float)) and math.isfinite(v) for v in a):
+        return np.array(a, dtype=np.float64)
+    return np.array([math.sin(2 * math.pi * i / 16) for i in range(64)], dtype=np.float64)
+
+
+def run(raw=None, seed: int = 1, L: int = 8, stride: int = 4) -> "ak.TapeWriter":
+    w = ak.TapeWriter("{%processId%}", SCHEMA, seed=seed, opt={"L": L, "stride": stride}, phases=PHASES, provenance="live")
+    y = series_of(raw)
+    w.frame("series", {"series": y.copy()}, metrics={"n": len(y)})
+    k, s = 0, 0
+    while s + L < len(y):
+        target = float(y[s + L])
+        w.frame("window", {"window": y[s:s + L].copy(), "target": target, "start": s}, step=k,
+                metrics={"k": k + 1, "L": L, "start": s, "end": s + L - 1, "target": target})
+        k += 1
+        s += stride
+    return w
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--process", default="{%processId%}")
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--opt", default="{}")
+    ap.add_argument("--draws", default=None)
+    ap.add_argument("--input", default="null", help="JSON input of the TS run, or @<file> (ak.json_arg)")
+    ap.add_argument("--out", default=None)
+    a = ap.parse_args()
+    opt = {"L": 8, "stride": 4, **json.loads(a.opt)}
+    tape = run(ak.json_arg(a.input), seed=a.seed, L=int(opt["L"]), stride=int(opt["stride"]))
+    jpath, _ = tape.write(a.out or ak.site_path(".atlas", "{%slug%}", "{%processId%}.ref"))
+    print(f"wrote {jpath} ({len(tape.frames)} frames)")

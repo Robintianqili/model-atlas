@@ -1,0 +1,64 @@
+// {%slug%}: process '{%processId%}' (kind C, design §4.4). Scaffolded by `atlas new model {%slug%} --template series-train`
+// on {%today%}. How a series becomes training examples: a window of the last L values is the input, the value right
+// after it is the target. One frame per window, so the lesson can step through them.
+//   npm run atlas -- run {%slug%} windows --frames 0..10
+// Python reference: pipeline/{%slug%}/reference.py (npm run atlas -- parity {%slug%}).
+import type { Control, Frame, ProcessDef, Tensor } from '../../atlas/types/index.ts';
+import { seriesOf } from './data.ts';
+
+export type WinOpt = { L: number; stride: number };
+export type WinState = { series: Tensor; window: Tensor; target: number; start: number };
+type Run = Generator<Frame<WinState>, void, Control<WinOpt> | undefined>;
+
+export const {%processIdent%}: ProcessDef<unknown, WinOpt, WinState> = {
+	id: '{%processId%}',
+	kind: 'algorithm',
+	title: { en: 'TODO: Cut the series into examples', zh: 'TODO：把序列切成样例' },
+	phases: {
+		series: {
+			label: { en: 'The whole series', zh: '整条序列' },
+			kind: 'input',
+			narration: {
+				what: {
+					en: 'The series has {frame.n|int} values. A forecaster never sees it all at once: it learns from short windows.',
+					zh: '这条序列有 {frame.n|int} 个值。预测模型不会一次看到全部：它从一个个短窗口中学习。'
+				}
+			}
+		},
+		window: {
+			label: { en: 'One window and its target', zh: '一个窗口和它的目标' },
+			kind: 'observe',
+			formula: {
+				tex: '(y_{ {{start}} }, \\dots, y_{ {{end}} }) \\;\\to\\; y_{ {{next}} } = {{target}}',
+				values: (f) => ({ start: f.metrics!.start, end: f.metrics!.end, next: f.metrics!.end + 1, target: f.metrics!.target })
+			},
+			narration: {
+				what: {
+					en: 'Window {frame.k|int} holds the {frame.L|int} values from position {frame.start|int} to {frame.end|int}. The value right after it, {frame.target}, is what the model must predict.',
+					zh: '第 {frame.k|int} 个窗口包含从第 {frame.start|int} 到第 {frame.end|int} 个位置的 {frame.L|int} 个值。紧跟其后的值 {frame.target} 就是模型要预测的。'
+				}
+			}
+		}
+	},
+	schema: {
+		series: { kind: 'tensor', label: { en: 'The series', zh: '序列' }, role: 'data', tol: 1e-12 },
+		window: { kind: 'tensor', label: { en: 'The window (model input)', zh: '窗口（模型输入）' }, role: 'data', tol: 1e-12 },
+		target: { kind: 'scalar', label: { en: 'The next value (target)', zh: '下一个值（目标）' }, role: 'target', tol: 1e-12 },
+		start: { kind: 'int', label: { en: 'Where the window starts', zh: '窗口的起点' }, tol: 'exact' }
+	},
+	defaults: { L: 8, stride: 4 },
+	*run(input, ctx): Run {
+		const y = seriesOf(input);
+		const { L, stride } = ctx.opt;
+		yield { phase: 'series', state: { series: { shape: [y.length], data: y.slice() } }, metrics: { n: y.length } };
+		for (let k = 0, s = 0; s + L < y.length && !ctx.signal.cancelled; k++, s += stride) {
+			const target = y[s + L];
+			yield {
+				phase: 'window',
+				step: k,
+				state: { window: { shape: [L], data: y.slice(s, s + L) }, target, start: s },
+				metrics: { k: k + 1, L, start: s, end: s + L - 1, target }
+			};
+		}
+	}
+};

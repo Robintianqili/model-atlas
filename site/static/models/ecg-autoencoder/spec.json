@@ -1,0 +1,307 @@
+{
+ "slug": "ecg-autoencoder",
+ "name": {
+  "en": "ECG anomaly autoencoder",
+  "zh": "心电图异常检测自编码器"
+ },
+ "version": "2026-10-08",
+ "params": 9424,
+ "precision": "fp32",
+ "input": {
+  "kind": "series",
+  "shape": [
+   140
+  ]
+ },
+ "tensors": [
+  {
+   "name": "enc1.weight",
+   "shape": [
+    32,
+    140
+   ],
+   "offset": 0,
+   "length": 4480
+  },
+  {
+   "name": "enc1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 4480,
+   "length": 32
+  },
+  {
+   "name": "code.weight",
+   "shape": [
+    4,
+    32
+   ],
+   "offset": 4512,
+   "length": 128
+  },
+  {
+   "name": "code.bias",
+   "shape": [
+    4
+   ],
+   "offset": 4640,
+   "length": 4
+  },
+  {
+   "name": "dec1.weight",
+   "shape": [
+    32,
+    4
+   ],
+   "offset": 4644,
+   "length": 128
+  },
+  {
+   "name": "dec1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 4772,
+   "length": 32
+  },
+  {
+   "name": "out.weight",
+   "shape": [
+    140,
+    32
+   ],
+   "offset": 4804,
+   "length": 4480
+  },
+  {
+   "name": "out.bias",
+   "shape": [
+    140
+   ],
+   "offset": 9284,
+   "length": 140
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your beat: 140 heights",
+    "zh": "你的心跳：140 个高度"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    140
+   ],
+   "desc": {
+    "en": "The height of the trace at 140 moments of one heartbeat.",
+    "zh": "一次心跳中 140 个时刻的曲线高度。"
+   },
+   "axes": [
+    "t"
+   ]
+  },
+  {
+   "id": "enc1",
+   "op": "linear",
+   "label": {
+    "en": "Encoder layer (32)",
+    "zh": "编码器层（32）"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    32
+   ],
+   "params": {
+    "inFeatures": 140,
+    "outFeatures": 32
+   },
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 24
+   }
+  },
+  {
+   "id": "enc1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Encoder ReLU",
+    "zh": "编码器 ReLU"
+   },
+   "in": [
+    "enc1"
+   ],
+   "outShape": [
+    32
+   ],
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 30
+   }
+  },
+  {
+   "id": "code",
+   "op": "linear",
+   "label": {
+    "en": "The code (4 numbers)",
+    "zh": "编码（4 个数）"
+   },
+   "in": [
+    "enc1.relu"
+   ],
+   "outShape": [
+    4
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 4
+   },
+   "desc": {
+    "en": "The bottleneck: all the decoder gets to know about the beat.",
+    "zh": "瓶颈：解码器能知道的关于这次心跳的全部信息。"
+   },
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 25
+   }
+  },
+  {
+   "id": "dec1",
+   "op": "linear",
+   "label": {
+    "en": "Decoder layer (32)",
+    "zh": "解码器层（32）"
+   },
+   "in": [
+    "code"
+   ],
+   "outShape": [
+    32
+   ],
+   "params": {
+    "inFeatures": 4,
+    "outFeatures": 32
+   },
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 26
+   }
+  },
+  {
+   "id": "dec1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder ReLU",
+    "zh": "解码器 ReLU"
+   },
+   "in": [
+    "dec1"
+   ],
+   "outShape": [
+    32
+   ],
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 33
+   }
+  },
+  {
+   "id": "out",
+   "op": "linear",
+   "label": {
+    "en": "The rebuilt beat: 140 heights",
+    "zh": "重建的心跳：140 个高度"
+   },
+   "in": [
+    "dec1.relu"
+   ],
+   "outShape": [
+    140
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 140
+   },
+   "axes": [
+    "t"
+   ],
+   "code": {
+    "file": "pipeline/ecg-autoencoder/model.py",
+    "line": 27
+   }
+  }
+ ],
+ "training": {
+  "dataset": "synthetic beats made in TS (beats.ts): 4,000 normal training beats",
+  "steps": 4800,
+  "batchSize": 128,
+  "epochs": 150,
+  "bestEpoch": 139,
+  "optimizer": "Adam lr 0.002, cosine decay to 0; loss = mean squared error over the 140 points",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)",
+  "metrics": {
+   "train_mse": 0.0005069,
+   "val_mse": 0.0005256,
+   "test_auc": 0.9391
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 7.15e-7,
+  "checked": "2026-10-08",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 8,
+  "edgeCases": [
+   "flat",
+   "top"
+  ],
+  "perLayer": {
+   "enc1": 4.77e-7,
+   "enc1.relu": 4.77e-7,
+   "code": 4.77e-7,
+   "dec1": 7.15e-7,
+   "dec1.relu": 5.36e-7,
+   "out": 5.96e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/ecg-autoencoder/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "series",
+   "kind": "series",
+   "shape": [
+    140
+   ],
+   "dtype": "f32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ }
+}

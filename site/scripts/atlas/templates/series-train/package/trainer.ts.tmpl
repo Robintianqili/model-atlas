@@ -1,0 +1,46 @@
+// {%slug%}: trainer '{%trainerId%}' (kind B, design §4.5). Scaffolded by `atlas new model {%slug%} --template series-train`
+// on {%today%}. A small MLP forecaster: the last L values in, the next value out, trained live on the windows of the
+// learner's series (a sine wave until there is one). Registered as process 'train:{%trainerId%}'.
+//   npm run atlas -- run {%slug%} train --frames 0..20
+// Python twin: pipeline/{%slug%}/twin.py. Randomness: draw batches from the rng you are given (one 'batch' stream).
+import type { Tensor, TrainOpt, TrainerDef } from '../../atlas/types/index.ts';
+import { MLP } from '../../atlas/autograd/nn.ts';
+import { mse } from '../../atlas/autograd/loss.ts';
+import { input, noGrad } from '../../atlas/autograd/var.ts';
+import { windows } from '../../atlas/data/series.ts';
+import { seriesOf } from './data.ts';
+
+export type Opt = TrainOpt & { L: number; hidden: number };
+
+function examples(raw: unknown, L: number) {
+	const w = windows(seriesOf(raw), L, 1);
+	return { x: w.x, y: w.y, count: w.count };
+}
+
+export const {%trainerIdent%}: TrainerDef<unknown, MLP, { x: Tensor; y: Tensor }, Opt> = {
+	id: '{%trainerId%}',
+	title: { en: 'TODO: Train a forecaster on the windows', zh: 'TODO：在窗口上训练一个预测模型' },
+	defaults: { seed: 1, lr: 0.01, batch: 16, steps: 300, snapshotEvery: 10, optimizer: 'adam', L: 8, hidden: 16 },
+	model: (rng, opt) => new MLP('net', [opt.L, opt.hidden, 1], 'tanh', rng),
+	batch(data, _step, rng, opt) {
+		const e = examples(data, opt.L);
+		const x = new Float64Array(opt.batch * opt.L);
+		const y = new Float64Array(opt.batch);
+		for (let i = 0; i < opt.batch; i++) {
+			const j = rng.int(e.count);
+			x.set(e.x.subarray(j * opt.L, (j + 1) * opt.L), i * opt.L);
+			y[i] = e.y[j];
+		}
+		return { x: { shape: [opt.batch, opt.L], data: x }, y: { shape: [opt.batch, 1], data: y } };
+	},
+	loss: (m, b, rec) => ({ loss: mse(m.forward(input(b.x), rec), input(b.y)) }),
+	metrics(m, data) {
+		// mean absolute error of the one-step forecast over every window
+		const L = m.layers[0].inFeatures;
+		const e = examples(data, L);
+		const p = noGrad(() => m.forward(input({ shape: [e.count, L], data: e.x }))).value.data;
+		let s = 0;
+		for (let i = 0; i < e.count; i++) s += Math.abs(p[i] - e.y[i]);
+		return { mae: s / Math.max(1, e.count) };
+	}
+};

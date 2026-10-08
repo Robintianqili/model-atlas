@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "adversarial-tinycnn",
+ "checked": "2026-10-07",
+ "sources": {
+  "attack": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 3.44e-15,
+   "frames": 15,
+   "fixtures": 16,
+   "checked": "2026-10-07"
+  }
+ }
+}

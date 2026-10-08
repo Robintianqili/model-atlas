@@ -1,0 +1,15 @@
+// Tests for op '{%op%}' (node --test). Scaffolded by `atlas new op {%op%} --like {%like%}` on {%today%}.
+// The op started as a copy of '{%like%}': these checks only say that the copy loads under its new name. Replace them with
+// tests of what {%op%} computes (forward on a small input, explain() equals the trace for every unit; the generic op
+// template, `atlas new op x`, shows both), and add torch goldens when the op is real.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { {%opIdent%} } from './{%opFile%}';
+
+test('{%op%}: the copy loads under its own name', () => {
+	assert.equal({%opIdent%}.op, '{%op%}');
+	assert.equal(typeof {%opIdent%}.forward, 'function');
+	assert.equal(typeof {%opIdent%}.inferShape, 'function');
+});
+
+test.todo('{%op%}: forward on a small input, and explain() equals the trace for every unit');

@@ -1,0 +1,26 @@
+{
+ "classes": [
+  "star",
+  "ladder",
+  "umbrella",
+  "eyeglasses",
+  "t-shirt"
+ ],
+ "zdim": 2,
+ "params": 435988,
+ "best_epoch": 77,
+ "epochs": 80,
+ "seconds": 167.4,
+ "steps": 37520,
+ "batch": 128,
+ "lr": 0.001,
+ "seed": 0,
+ "test": {
+  "rec_mu": 207.04166666666666,
+  "kl": 6.558856510416667,
+  "rec_sampled": 207.96881666666667,
+  "loss": 214.52767317708333
+ },
+ "test_n": 7500,
+ "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)"
+}

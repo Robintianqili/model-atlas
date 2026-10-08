@@ -1,0 +1,143 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 60001,
+   "unit": "numbers",
+   "source": "pipeline/ddpm-unet/model.py",
+   "measured": "2026-10-07"
+  },
+  "macs": {
+   "value": 8354304,
+   "unit": "multiply-adds per run",
+   "source": "pipeline/ddpm-unet/model.py macs()",
+   "measured": "2026-10-07"
+  },
+  "trainN": {
+   "value": 36000,
+   "unit": "drawings",
+   "source": "ak.data.quickdraw (TinyCNN split)",
+   "measured": "2026-10-07"
+  },
+  "classesN": {
+   "value": 3,
+   "unit": "kinds",
+   "source": "pipeline/ddpm-unet/model.py",
+   "measured": "2026-10-07"
+  },
+  "epochs": {
+   "value": 600,
+   "unit": "epochs",
+   "source": "pipeline/ddpm-unet/train.py",
+   "measured": "2026-10-07"
+  },
+  "trainSteps": {
+   "value": 84600,
+   "unit": "steps",
+   "source": "pipeline/ddpm-unet/train.py",
+   "measured": "2026-10-07"
+  },
+  "valLoss": {
+   "value": 0.0395,
+   "unit": "mean squared error",
+   "source": "pipeline/ddpm-unet/train.py (validation split, fixed t and eps)",
+   "measured": "2026-10-07"
+  },
+  "beta1": {
+   "value": 0.001,
+   "unit": "",
+   "source": "model.py schedule()",
+   "measured": "2026-10-07"
+  },
+  "betaT": {
+   "value": 0.2,
+   "unit": "",
+   "source": "model.py schedule()",
+   "measured": "2026-10-07"
+  },
+  "abarT": {
+   "value": 2.039008975564078e-05,
+   "unit": "",
+   "source": "model.py schedule()",
+   "measured": "2026-10-07"
+  },
+  "judgedN": {
+   "value": 1000,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judgedIn": {
+   "value": 0.71,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judgedInFew": {
+   "value": 0.538,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judgedReal": {
+   "value": 0.9733,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "greyFull": {
+   "value": 0.4366,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "greyFew": {
+   "value": 0.4485,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "greyReal": {
+   "value": 0.4366,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "inkFull": {
+   "value": 0.1585,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "inkFew": {
+   "value": 0.1709,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "inkReal": {
+   "value": 0.1643,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judged_star": {
+   "value": 0.197,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judged_umbrella": {
+   "value": 0.242,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "judged_house": {
+   "value": 0.271,
+   "unit": "",
+   "source": "pipeline/ddpm-unet/stats.py (1,000 samples, PyTorch, CPU float32)",
+   "measured": "2026-10-07"
+  }
+ }
+}

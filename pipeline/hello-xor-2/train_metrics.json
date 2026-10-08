@@ -1,0 +1,15 @@
+{
+ "seed": 0,
+ "steps": 1500,
+ "lr": 0.05,
+ "optimizer": "Adam",
+ "loss": "binary cross-entropy",
+ "final_loss": 0.00031885935459285975,
+ "outputs": [
+  0.000229,
+  0.999614,
+  0.999532,
+  0.000193
+ ],
+ "correct": 4
+}

@@ -1,0 +1,2697 @@
+{
+ "slug": "tinyvit",
+ "name": {
+  "en": "TinyViT",
+  "zh": "TinyViT"
+ },
+ "version": "2026-10-06",
+ "params": 116938,
+ "precision": "fp32",
+ "input": {
+  "kind": "drawing",
+  "shape": [
+   1,
+   28,
+   28
+  ]
+ },
+ "tensors": [
+  {
+   "name": "patch.weight",
+   "shape": [
+    48,
+    1,
+    7,
+    7
+   ],
+   "offset": 0,
+   "length": 2352
+  },
+  {
+   "name": "patch.bias",
+   "shape": [
+    48
+   ],
+   "offset": 2352,
+   "length": 48
+  },
+  {
+   "name": "cls.weight",
+   "shape": [
+    48
+   ],
+   "offset": 2400,
+   "length": 48
+  },
+  {
+   "name": "pos.weight",
+   "shape": [
+    17,
+    48
+   ],
+   "offset": 2448,
+   "length": 816
+  },
+  {
+   "name": "B1.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 3264,
+   "length": 48
+  },
+  {
+   "name": "B1.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 3312,
+   "length": 48
+  },
+  {
+   "name": "B1.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 3360,
+   "length": 2304
+  },
+  {
+   "name": "B1.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 5664,
+   "length": 48
+  },
+  {
+   "name": "B1.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 5712,
+   "length": 2304
+  },
+  {
+   "name": "B1.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 8016,
+   "length": 48
+  },
+  {
+   "name": "B1.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 8064,
+   "length": 2304
+  },
+  {
+   "name": "B1.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 10368,
+   "length": 48
+  },
+  {
+   "name": "B1.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 10416,
+   "length": 2304
+  },
+  {
+   "name": "B1.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 12720,
+   "length": 48
+  },
+  {
+   "name": "B1.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 12768,
+   "length": 48
+  },
+  {
+   "name": "B1.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 12816,
+   "length": 48
+  },
+  {
+   "name": "B1.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 12864,
+   "length": 9216
+  },
+  {
+   "name": "B1.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 22080,
+   "length": 192
+  },
+  {
+   "name": "B1.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 22272,
+   "length": 9216
+  },
+  {
+   "name": "B1.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 31488,
+   "length": 48
+  },
+  {
+   "name": "B2.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 31536,
+   "length": 48
+  },
+  {
+   "name": "B2.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 31584,
+   "length": 48
+  },
+  {
+   "name": "B2.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 31632,
+   "length": 2304
+  },
+  {
+   "name": "B2.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 33936,
+   "length": 48
+  },
+  {
+   "name": "B2.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 33984,
+   "length": 2304
+  },
+  {
+   "name": "B2.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 36288,
+   "length": 48
+  },
+  {
+   "name": "B2.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 36336,
+   "length": 2304
+  },
+  {
+   "name": "B2.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 38640,
+   "length": 48
+  },
+  {
+   "name": "B2.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 38688,
+   "length": 2304
+  },
+  {
+   "name": "B2.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 40992,
+   "length": 48
+  },
+  {
+   "name": "B2.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 41040,
+   "length": 48
+  },
+  {
+   "name": "B2.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 41088,
+   "length": 48
+  },
+  {
+   "name": "B2.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 41136,
+   "length": 9216
+  },
+  {
+   "name": "B2.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 50352,
+   "length": 192
+  },
+  {
+   "name": "B2.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 50544,
+   "length": 9216
+  },
+  {
+   "name": "B2.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 59760,
+   "length": 48
+  },
+  {
+   "name": "B3.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 59808,
+   "length": 48
+  },
+  {
+   "name": "B3.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 59856,
+   "length": 48
+  },
+  {
+   "name": "B3.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 59904,
+   "length": 2304
+  },
+  {
+   "name": "B3.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 62208,
+   "length": 48
+  },
+  {
+   "name": "B3.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 62256,
+   "length": 2304
+  },
+  {
+   "name": "B3.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 64560,
+   "length": 48
+  },
+  {
+   "name": "B3.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 64608,
+   "length": 2304
+  },
+  {
+   "name": "B3.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 66912,
+   "length": 48
+  },
+  {
+   "name": "B3.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 66960,
+   "length": 2304
+  },
+  {
+   "name": "B3.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 69264,
+   "length": 48
+  },
+  {
+   "name": "B3.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 69312,
+   "length": 48
+  },
+  {
+   "name": "B3.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 69360,
+   "length": 48
+  },
+  {
+   "name": "B3.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 69408,
+   "length": 9216
+  },
+  {
+   "name": "B3.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 78624,
+   "length": 192
+  },
+  {
+   "name": "B3.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 78816,
+   "length": 9216
+  },
+  {
+   "name": "B3.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 88032,
+   "length": 48
+  },
+  {
+   "name": "B4.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 88080,
+   "length": 48
+  },
+  {
+   "name": "B4.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 88128,
+   "length": 48
+  },
+  {
+   "name": "B4.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 88176,
+   "length": 2304
+  },
+  {
+   "name": "B4.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 90480,
+   "length": 48
+  },
+  {
+   "name": "B4.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 90528,
+   "length": 2304
+  },
+  {
+   "name": "B4.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 92832,
+   "length": 48
+  },
+  {
+   "name": "B4.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 92880,
+   "length": 2304
+  },
+  {
+   "name": "B4.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 95184,
+   "length": 48
+  },
+  {
+   "name": "B4.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 95232,
+   "length": 2304
+  },
+  {
+   "name": "B4.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 97536,
+   "length": 48
+  },
+  {
+   "name": "B4.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 97584,
+   "length": 48
+  },
+  {
+   "name": "B4.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 97632,
+   "length": 48
+  },
+  {
+   "name": "B4.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 97680,
+   "length": 9216
+  },
+  {
+   "name": "B4.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 106896,
+   "length": 192
+  },
+  {
+   "name": "B4.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 107088,
+   "length": 9216
+  },
+  {
+   "name": "B4.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 116304,
+   "length": 48
+  },
+  {
+   "name": "ln.weight",
+   "shape": [
+    48
+   ],
+   "offset": 116352,
+   "length": 48
+  },
+  {
+   "name": "ln.bias",
+   "shape": [
+    48
+   ],
+   "offset": 116400,
+   "length": 48
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    10,
+    48
+   ],
+   "offset": 116448,
+   "length": 480
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    10
+   ],
+   "offset": 116928,
+   "length": 10
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your drawing",
+    "zh": "你的画"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28x28 numbers: 0 is empty, 1 is full ink.",
+    "zh": "28x28 个数：0 是空白，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "patch",
+   "op": "conv2d",
+   "label": {
+    "en": "Patch embedding",
+    "zh": "图块嵌入"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    48,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 7,
+    "stride": 7,
+    "padding": 0,
+    "inChannels": 1,
+    "outChannels": 48
+   },
+   "desc": {
+    "en": "Each 7x7 patch (49 pixels) becomes 48 numbers.",
+    "zh": "每个 7x7 图块（49 个像素）变成 48 个数。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 66
+   }
+  },
+  {
+   "id": "tokens",
+   "op": "to_tokens",
+   "label": {
+    "en": "Patches become rows",
+    "zh": "图块变成行"
+   },
+   "in": [
+    "patch"
+   ],
+   "outShape": [
+    16,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 84
+   }
+  },
+  {
+   "id": "cls",
+   "op": "cls_token",
+   "label": {
+    "en": "[CLS] row in front",
+    "zh": "前面加上 [CLS] 行"
+   },
+   "in": [
+    "tokens"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 67
+   }
+  },
+  {
+   "id": "pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "Position rows",
+    "zh": "位置行"
+   },
+   "in": [
+    "cls"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 68
+   }
+  },
+  {
+   "id": "embed",
+   "op": "add",
+   "label": {
+    "en": "Rows + positions",
+    "zh": "行 + 位置"
+   },
+   "in": [
+    "cls",
+    "pos"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 86
+   },
+   "teach": {
+    "narration": {
+     "what": {
+      "en": "Each row gets the learned position row of its place added, so the same stroke in another patch gives other numbers. The position rows are the same for every drawing; only their count follows the rows. The result has shape {outShape}.",
+      "zh": "每一行都加上它所在位置的那一行学来的位置数，所以同样的笔画放在别的图块里会得到不同的数。位置行对每幅画都一样，只有它们的行数跟着输入走。结果的形状是 {outShape}。"
+     }
+    }
+   }
+  },
+  {
+   "id": "B1.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 1",
+    "zh": "第 1 块 · 层归一化 1"
+   },
+   "in": [
+    "embed"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "B1.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Queries Q",
+    "zh": "第 1 块 · 查询 Q"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "B1.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Keys K",
+    "zh": "第 1 块 · 键 K"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "B1.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Values V",
+    "zh": "第 1 块 · 值 V"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "B1.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 1 · Attention scores",
+    "zh": "第 1 块 · 注意力分数"
+   },
+   "in": [
+    "B1.q",
+    "B1.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "B1.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 1 · Attention weights",
+    "zh": "第 1 块 · 注意力权重"
+   },
+   "in": [
+    "B1.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "B1.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 1 · Mix of values",
+    "zh": "第 1 块 · 值的混合"
+   },
+   "in": [
+    "B1.attn",
+    "B1.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "B1.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Attention output",
+    "zh": "第 1 块 · 注意力输出"
+   },
+   "in": [
+    "B1.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B1.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Add attention",
+    "zh": "第 1 块 · 加上注意力"
+   },
+   "in": [
+    "embed",
+    "B1.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B1.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 2",
+    "zh": "第 1 块 · 层归一化 2"
+   },
+   "in": [
+    "B1.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B1.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · MLP up (192)",
+    "zh": "第 1 块 · MLP 放大（192）"
+   },
+   "in": [
+    "B1.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "B1.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "Block 1 · GELU",
+    "zh": "第 1 块 · GELU"
+   },
+   "in": [
+    "B1.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B1.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · MLP down (48)",
+    "zh": "第 1 块 · MLP 缩回（48）"
+   },
+   "in": [
+    "B1.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "B1.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Add MLP",
+    "zh": "第 1 块 · 加上 MLP"
+   },
+   "in": [
+    "B1.add1",
+    "B1.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B2.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 1",
+    "zh": "第 2 块 · 层归一化 1"
+   },
+   "in": [
+    "B1.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "B2.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Queries Q",
+    "zh": "第 2 块 · 查询 Q"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "B2.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Keys K",
+    "zh": "第 2 块 · 键 K"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "B2.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Values V",
+    "zh": "第 2 块 · 值 V"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "B2.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 2 · Attention scores",
+    "zh": "第 2 块 · 注意力分数"
+   },
+   "in": [
+    "B2.q",
+    "B2.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "B2.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 2 · Attention weights",
+    "zh": "第 2 块 · 注意力权重"
+   },
+   "in": [
+    "B2.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "B2.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 2 · Mix of values",
+    "zh": "第 2 块 · 值的混合"
+   },
+   "in": [
+    "B2.attn",
+    "B2.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "B2.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Attention output",
+    "zh": "第 2 块 · 注意力输出"
+   },
+   "in": [
+    "B2.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B2.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Add attention",
+    "zh": "第 2 块 · 加上注意力"
+   },
+   "in": [
+    "B1.add2",
+    "B2.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B2.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 2",
+    "zh": "第 2 块 · 层归一化 2"
+   },
+   "in": [
+    "B2.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B2.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · MLP up (192)",
+    "zh": "第 2 块 · MLP 放大（192）"
+   },
+   "in": [
+    "B2.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "B2.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "Block 2 · GELU",
+    "zh": "第 2 块 · GELU"
+   },
+   "in": [
+    "B2.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B2.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · MLP down (48)",
+    "zh": "第 2 块 · MLP 缩回（48）"
+   },
+   "in": [
+    "B2.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "B2.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Add MLP",
+    "zh": "第 2 块 · 加上 MLP"
+   },
+   "in": [
+    "B2.add1",
+    "B2.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B3.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 3 · LayerNorm 1",
+    "zh": "第 3 块 · 层归一化 1"
+   },
+   "in": [
+    "B2.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "B3.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Queries Q",
+    "zh": "第 3 块 · 查询 Q"
+   },
+   "in": [
+    "B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "B3.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Keys K",
+    "zh": "第 3 块 · 键 K"
+   },
+   "in": [
+    "B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "B3.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Values V",
+    "zh": "第 3 块 · 值 V"
+   },
+   "in": [
+    "B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "B3.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 3 · Attention scores",
+    "zh": "第 3 块 · 注意力分数"
+   },
+   "in": [
+    "B3.q",
+    "B3.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "B3.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 3 · Attention weights",
+    "zh": "第 3 块 · 注意力权重"
+   },
+   "in": [
+    "B3.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "B3.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 3 · Mix of values",
+    "zh": "第 3 块 · 值的混合"
+   },
+   "in": [
+    "B3.attn",
+    "B3.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "B3.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · Attention output",
+    "zh": "第 3 块 · 注意力输出"
+   },
+   "in": [
+    "B3.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B3.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 3 · Add attention",
+    "zh": "第 3 块 · 加上注意力"
+   },
+   "in": [
+    "B2.add2",
+    "B3.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B3.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 3 · LayerNorm 2",
+    "zh": "第 3 块 · 层归一化 2"
+   },
+   "in": [
+    "B3.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B3.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · MLP up (192)",
+    "zh": "第 3 块 · MLP 放大（192）"
+   },
+   "in": [
+    "B3.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "B3.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "Block 3 · GELU",
+    "zh": "第 3 块 · GELU"
+   },
+   "in": [
+    "B3.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B3.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Block 3 · MLP down (48)",
+    "zh": "第 3 块 · MLP 缩回（48）"
+   },
+   "in": [
+    "B3.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "B3.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 3 · Add MLP",
+    "zh": "第 3 块 · 加上 MLP"
+   },
+   "in": [
+    "B3.add1",
+    "B3.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B4.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 4 · LayerNorm 1",
+    "zh": "第 4 块 · 层归一化 1"
+   },
+   "in": [
+    "B3.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "B4.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Queries Q",
+    "zh": "第 4 块 · 查询 Q"
+   },
+   "in": [
+    "B4.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "B4.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Keys K",
+    "zh": "第 4 块 · 键 K"
+   },
+   "in": [
+    "B4.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "B4.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Values V",
+    "zh": "第 4 块 · 值 V"
+   },
+   "in": [
+    "B4.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "B4.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 4 · Attention scores",
+    "zh": "第 4 块 · 注意力分数"
+   },
+   "in": [
+    "B4.q",
+    "B4.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "B4.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 4 · Attention weights",
+    "zh": "第 4 块 · 注意力权重"
+   },
+   "in": [
+    "B4.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "B4.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 4 · Mix of values",
+    "zh": "第 4 块 · 值的混合"
+   },
+   "in": [
+    "B4.attn",
+    "B4.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "B4.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · Attention output",
+    "zh": "第 4 块 · 注意力输出"
+   },
+   "in": [
+    "B4.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B4.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 4 · Add attention",
+    "zh": "第 4 块 · 加上注意力"
+   },
+   "in": [
+    "B3.add2",
+    "B4.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "B4.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 4 · LayerNorm 2",
+    "zh": "第 4 块 · 层归一化 2"
+   },
+   "in": [
+    "B4.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B4.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · MLP up (192)",
+    "zh": "第 4 块 · MLP 放大（192）"
+   },
+   "in": [
+    "B4.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "B4.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "Block 4 · GELU",
+    "zh": "第 4 块 · GELU"
+   },
+   "in": [
+    "B4.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "B4.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Block 4 · MLP down (48)",
+    "zh": "第 4 块 · MLP 缩回（48）"
+   },
+   "in": [
+    "B4.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "B4.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 4 · Add MLP",
+    "zh": "第 4 块 · 加上 MLP"
+   },
+   "in": [
+    "B4.add1",
+    "B4.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "ln",
+   "op": "layernorm",
+   "label": {
+    "en": "Final LayerNorm",
+    "zh": "最后的层归一化"
+   },
+   "in": [
+    "B4.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 70
+   }
+  },
+  {
+   "id": "clsout",
+   "op": "select_token",
+   "label": {
+    "en": "The [CLS] row",
+    "zh": "[CLS] 行"
+   },
+   "in": [
+    "ln"
+   ],
+   "outShape": [
+    48
+   ],
+   "params": {
+    "index": 0
+   },
+   "axes": [
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 92
+   }
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Class scores",
+    "zh": "类别分数"
+   },
+   "in": [
+    "clsout"
+   ],
+   "outShape": [
+    10
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 10
+   },
+   "axes": [
+    "class"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 71
+   }
+  },
+  {
+   "id": "softmax",
+   "op": "softmax",
+   "label": {
+    "en": "Probabilities",
+    "zh": "概率"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    10
+   ],
+   "axes": [
+    "class"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "Quick, Draw! numpy bitmaps (TinyCNN's 10 classes and split)",
+  "steps": 23500,
+  "batchSize": 512,
+  "epochs": 100,
+  "bestEpoch": 90,
+  "optimizer": "AdamW lr 0.002 (5 warm-up epochs, cosine), weight decay 0.05 on matrices, label smoothing 0.1",
+  "augmentation": "TinyCNN's augment(): shift, scale 0.8-1.1, rotation +-12 deg, stroke thickness jitter",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32 (evaluation, export)",
+  "metrics": {
+   "test_acc": 0.9715,
+   "val_acc": 0.9702,
+   "test_n": 15000,
+   "per_class_test_acc": {
+    "apple": 0.9667,
+    "bicycle": 0.9813,
+    "car": 0.9673,
+    "clock": 0.9747,
+    "fish": 0.9633,
+    "house": 0.9887,
+    "star": 0.9727,
+    "sun": 0.9693,
+    "tree": 0.968,
+    "umbrella": 0.9633
+   },
+   "confusion": [
+    [
+     1450,
+     7,
+     5,
+     7,
+     10,
+     7,
+     6,
+     4,
+     1,
+     3
+    ],
+    [
+     5,
+     1472,
+     10,
+     0,
+     3,
+     3,
+     4,
+     1,
+     2,
+     0
+    ],
+    [
+     6,
+     15,
+     1451,
+     2,
+     11,
+     2,
+     4,
+     1,
+     2,
+     6
+    ],
+    [
+     15,
+     0,
+     1,
+     1462,
+     7,
+     6,
+     4,
+     3,
+     1,
+     1
+    ],
+    [
+     6,
+     11,
+     15,
+     1,
+     1445,
+     3,
+     12,
+     3,
+     4,
+     0
+    ],
+    [
+     2,
+     1,
+     3,
+     2,
+     2,
+     1483,
+     3,
+     0,
+     2,
+     2
+    ],
+    [
+     1,
+     0,
+     9,
+     0,
+     12,
+     4,
+     1459,
+     7,
+     6,
+     2
+    ],
+    [
+     4,
+     4,
+     3,
+     1,
+     7,
+     1,
+     21,
+     1454,
+     3,
+     2
+    ],
+    [
+     4,
+     0,
+     5,
+     0,
+     2,
+     6,
+     11,
+     2,
+     1452,
+     18
+    ],
+    [
+     1,
+     2,
+     4,
+     0,
+     4,
+     3,
+     8,
+     2,
+     31,
+     1445
+    ]
+   ]
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000405,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 7,
+  "edgeCases": [
+   "blank",
+   "dot"
+  ],
+  "perLayer": {
+   "patch": 3.58e-7,
+   "tokens": 3.58e-7,
+   "cls": 3.58e-7,
+   "embed": 3.58e-7,
+   "B1.ln1": 5.96e-7,
+   "B1.q": 7.15e-7,
+   "B1.k": 7.15e-7,
+   "B1.v": 7.15e-7,
+   "B1.scores": 0.00000191,
+   "B1.attn": 3.58e-7,
+   "B1.mix": 0.00000107,
+   "B1.proj": 3.92e-7,
+   "B1.add1": 3.87e-7,
+   "B1.ln2": 0.00000143,
+   "B1.fc1": 0.00000101,
+   "B1.gelu": 9.54e-7,
+   "B1.fc2": 4.77e-7,
+   "B1.add2": 8.49e-7,
+   "B2.ln1": 0.00000211,
+   "B2.q": 0.00000113,
+   "B2.k": 0.00000121,
+   "B2.v": 0.00000113,
+   "B2.scores": 0.00000143,
+   "B2.attn": 2.09e-7,
+   "B2.mix": 4.17e-7,
+   "B2.proj": 2.98e-7,
+   "B2.add1": 8.79e-7,
+   "B2.ln2": 0.00000301,
+   "B2.fc1": 0.00000185,
+   "B2.gelu": 0.00000191,
+   "B2.fc2": 8.34e-7,
+   "B2.add2": 0.0000011,
+   "B3.ln1": 0.00000179,
+   "B3.q": 0.00000125,
+   "B3.k": 9.54e-7,
+   "B3.v": 0.00000106,
+   "B3.scores": 0.00000191,
+   "B3.attn": 3.87e-7,
+   "B3.mix": 4.17e-7,
+   "B3.proj": 2.83e-7,
+   "B3.add1": 0.0000011,
+   "B3.ln2": 0.00000215,
+   "B3.fc1": 0.00000167,
+   "B3.gelu": 0.00000143,
+   "B3.fc2": 8.34e-7,
+   "B3.add2": 0.0000013,
+   "B4.ln1": 0.00000191,
+   "B4.q": 0.00000107,
+   "B4.k": 0.00000121,
+   "B4.v": 0.00000167,
+   "B4.scores": 0.00000119,
+   "B4.attn": 1.49e-7,
+   "B4.mix": 5.66e-7,
+   "B4.proj": 5.36e-7,
+   "B4.add1": 0.00000149,
+   "B4.ln2": 0.00000286,
+   "B4.fc1": 0.00000298,
+   "B4.gelu": 0.00000218,
+   "B4.fc2": 0.00000405,
+   "B4.add2": 0.00000405,
+   "ln": 0.0000037,
+   "clsout": 0.00000161,
+   "head": 0.00000179,
+   "softmax": 2.38e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tinyvit/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "drawing28",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  }
+ ],
+ "outputs": [
+  "softmax"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "classes": [
+  {
+   "id": "apple",
+   "en": "apple",
+   "zh": "苹果"
+  },
+  {
+   "id": "bicycle",
+   "en": "bicycle",
+   "zh": "自行车"
+  },
+  {
+   "id": "car",
+   "en": "car",
+   "zh": "汽车"
+  },
+  {
+   "id": "clock",
+   "en": "clock",
+   "zh": "时钟"
+  },
+  {
+   "id": "fish",
+   "en": "fish",
+   "zh": "鱼"
+  },
+  {
+   "id": "house",
+   "en": "house",
+   "zh": "房子"
+  },
+  {
+   "id": "star",
+   "en": "star",
+   "zh": "星星"
+  },
+  {
+   "id": "sun",
+   "en": "sun",
+   "zh": "太阳"
+  },
+  {
+   "id": "tree",
+   "en": "tree",
+   "zh": "树"
+  },
+  {
+   "id": "umbrella",
+   "en": "umbrella",
+   "zh": "雨伞"
+  }
+ ],
+ "heldOutClasses": [
+  "ladder",
+  "envelope"
+ ]
+}

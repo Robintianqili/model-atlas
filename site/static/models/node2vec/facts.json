@@ -1,0 +1,11 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "gcnRight": {
+   "value": 31,
+   "unit": "of the 32 unlabelled members, sorted right by the GCN trained on the labels of members 0 and 33",
+   "source": "static/models/gcn/facts.json trainAcc 0.96875 x 32 (pipeline/gcn/train.py (CPU float32, seed 0))",
+   "measured": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,12 @@
+// {%slug%}: the series the package learns from. Scaffolded by `atlas new model {%slug%} --template series-train` on {%today%}.
+// TS is the source of truth for synthetic data: the Python twin reads the windows the TS trainer wrote.
+import { sine } from '../../atlas/data/series.ts';
+import { seriesOf as learnerSeries } from '../../atlas/adapters/series/adapter.ts';
+
+/** The learner's series. A trainer or process receives the RAW input (rt.input: the series adapter's { preset }, a drawn
+ *  { y: [...] } or a plain array), so the adapter's seriesOf() reads it. Fewer than 12 values: a sine wave. */
+export function seriesOf(raw: unknown): Float64Array {
+	const y = Array.isArray(raw) ? Float64Array.from(raw as number[]) : learnerSeries(raw).y;
+	if (y.length >= 12 && y.every((v) => Number.isFinite(v))) return Float64Array.from(y);
+	return Float64Array.from(sine(64, { period: 16, amplitude: 1 }).y);
+}

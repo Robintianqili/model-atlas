@@ -1,0 +1,76 @@
+// {%slug%}: process '{%processId%}' (kind C, design §4.4). Scaffolded by `atlas new model {%slug%}` on {%today%}.
+// A working example to replace: estimate a coin's bias by flipping it. It shows every part a process needs:
+//   - randomness only from ctx.rng (Math.random is banned, AK503); the Python reference replays the same draws
+//   - a field tracked by `changes` (counts: every edit is reported), a snapshot field (flip) and metrics
+//   - a narration per phase, with {frame.<metric>} placeholders (the auto lesson's proc:event steps read them)
+//   - a phase formula with {{name}} slots filled from the frame
+//   - controls: { type: 'set', opt: { n } } arrives through gen.next(control)
+// Pure: the same input, opt and seed give the same frames. Check it in Node before any UI:
+//   npm run atlas -- run {%slug%} run --frames 0..12
+// The Python reference twin is pipeline/{%slug%}/reference.py (same rng, same frames): npm run atlas -- parity {%slug%}
+import type { Control, Frame, ProcessDef, Tensor } from '../../atlas/types/index.ts';
+
+export type CoinOpt = { n: number; p: number };
+export type CoinState = { counts: Tensor; flip: number; estimate: number };
+/** Spell out run()'s return type: then every yielded frame is checked against Frame<CoinState> on its own (without it,
+ *  TypeScript infers one union of the yielded literals, and frames with different metrics fail to type-check). */
+type Run = Generator<Frame<CoinState>, void, Control<CoinOpt> | undefined>;
+
+export const {%processIdent%}: ProcessDef<unknown, CoinOpt, CoinState> = {
+	id: '{%processId%}',
+	kind: 'algorithm',
+	title: { en: "TODO: Estimate a coin's bias", zh: 'TODO：估计一枚硬币的偏向' },
+	phases: {
+		flip: {
+			label: { en: 'Flip the coin', zh: '抛硬币' },
+			kind: 'act',
+			narration: {
+				what: {
+					en: 'Flip number {frame.n|int} draws the random number {frame.u}. The flip is heads when that number is below the coin\'s bias {frame.p}, and tails otherwise.',
+					zh: '第 {frame.n|int} 次抛硬币，抽到随机数 {frame.u}。这个数小于硬币的偏向 {frame.p} 就算正面，否则算反面。'
+				}
+			}
+		},
+		update: {
+			label: { en: 'Update the estimate', zh: '更新估计' },
+			kind: 'update',
+			formula: {
+				tex: '\\hat p = \\frac{ {{heads}} }{ {{n}} } = {{estimate}}',
+				values: (f) => ({ heads: f.metrics!.heads, n: f.metrics!.n, estimate: f.metrics!.estimate })
+			},
+			narration: {
+				what: {
+					en: 'After {frame.n|int} flips, {frame.heads|int} came up heads. The estimate is heads divided by flips: {frame.estimate}.',
+					zh: '抛了 {frame.n|int} 次，其中 {frame.heads|int} 次是正面。估计值就是正面次数除以总次数：{frame.estimate}。'
+				}
+			}
+		}
+	},
+	schema: {
+		counts: { kind: 'tensor', label: { en: 'Tails and heads so far', zh: '目前反面和正面的次数' }, shape: [2], track: 'changes', tol: 'exact' },
+		flip: { kind: 'int', label: { en: 'This flip (1 = heads)', zh: '这一次（1 = 正面）' }, tol: 'exact' },
+		estimate: { kind: 'scalar', label: { en: 'Estimated chance of heads', zh: '正面概率的估计' }, tol: 1e-12 }
+	},
+	defaults: { n: 20, p: 0.7 },
+	*run(_input, ctx): Run {
+		const counts: Tensor = { shape: [2], data: new Float64Array(2) };
+		let n = ctx.opt.n;
+		for (let i = 0; i < n && !ctx.signal.cancelled; i++) {
+			const u = ctx.rng.next();
+			const flip = u < ctx.opt.p ? 1 : 0;
+			yield { phase: 'flip', step: i, state: { counts, flip }, metrics: { u, n: i + 1, p: ctx.opt.p } };
+			const from = counts.data[flip];
+			counts.data[flip] = from + 1;
+			const heads = counts.data[1];
+			const estimate = heads / (i + 1);
+			const control = yield {
+				phase: 'update',
+				step: i,
+				state: { counts, estimate },
+				changes: [{ field: 'counts', index: [flip], from, to: from + 1 }],
+				metrics: { heads, n: i + 1, estimate }
+			};
+			if (control?.type === 'set' && typeof control.opt.n === 'number') n = control.opt.n;
+		}
+	}
+};

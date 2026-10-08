@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "ecg-autoencoder",
+ "checked": "2026-10-08",
+ "sources": {
+  "sweep": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 402,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  }
+ }
+}

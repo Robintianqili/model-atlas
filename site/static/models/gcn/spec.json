@@ -1,0 +1,409 @@
+{
+ "slug": "gcn",
+ "name": {
+  "en": "Graph convolutional network (GCN)",
+  "zh": "图卷积网络（GCN）"
+ },
+ "version": "2026-10-06",
+ "params": 156,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "gc1.weight",
+   "shape": [
+    4,
+    34
+   ],
+   "offset": 0,
+   "length": 136
+  },
+  {
+   "name": "gc1.bias",
+   "shape": [
+    4
+   ],
+   "offset": 136,
+   "length": 4
+  },
+  {
+   "name": "gc2.weight",
+   "shape": [
+    2,
+    4
+   ],
+   "offset": 140,
+   "length": 8
+  },
+  {
+   "name": "gc2.bias",
+   "shape": [
+    2
+   ],
+   "offset": 148,
+   "length": 2
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    2,
+    2
+   ],
+   "offset": 150,
+   "length": 4
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    2
+   ],
+   "offset": 154,
+   "length": 2
+  }
+ ],
+ "layers": [
+  {
+   "id": "adj",
+   "op": "input",
+   "label": {
+    "en": "Friendships (adjacency A)",
+    "zh": "朋友关系（邻接矩阵 A）"
+   },
+   "in": [
+    "adj"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "desc": {
+    "en": "Row i has a 1 in column j when members i and j are friends.",
+    "zh": "成员 i 和 j 是朋友时，第 i 行第 j 列是 1。"
+   },
+   "axes": [
+    "n",
+    "k"
+   ]
+  },
+  {
+   "id": "x",
+   "op": "input",
+   "label": {
+    "en": "One-hot features X",
+    "zh": "独热特征 X"
+   },
+   "in": [
+    "x"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "desc": {
+    "en": "Row i is all 0 except a 1 in column i: member i knows only who it is.",
+    "zh": "第 i 行除了第 i 列是 1 以外全是 0：成员 i 只知道自己是谁。"
+   },
+   "axes": [
+    "n",
+    "f"
+   ]
+  },
+  {
+   "id": "norm",
+   "op": "gcn_norm",
+   "label": {
+    "en": "Normalized adjacency Â",
+    "zh": "归一化邻接矩阵 Â"
+   },
+   "in": [
+    "adj"
+   ],
+   "outShape": [
+    34,
+    34
+   ],
+   "axes": [
+    "n",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 21
+   },
+   "sub": [
+    "loops",
+    "deg"
+   ]
+  },
+  {
+   "id": "gc1",
+   "op": "gcn_conv",
+   "label": {
+    "en": "Graph layer 1",
+    "zh": "图卷积层 1"
+   },
+   "in": [
+    "x",
+    "norm"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 47
+   },
+   "sub": [
+    "xw"
+   ]
+  },
+  {
+   "id": "act1",
+   "op": "tanh",
+   "label": {
+    "en": "Tanh 1",
+    "zh": "Tanh 1"
+   },
+   "in": [
+    "gc1"
+   ],
+   "outShape": [
+    34,
+    4
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "gc2",
+   "op": "gcn_conv",
+   "label": {
+    "en": "Graph layer 2",
+    "zh": "图卷积层 2"
+   },
+   "in": [
+    "act1",
+    "norm"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 48
+   },
+   "sub": [
+    "xw"
+   ]
+  },
+  {
+   "id": "act2",
+   "op": "tanh",
+   "label": {
+    "en": "2-D embedding",
+    "zh": "二维嵌入"
+   },
+   "in": [
+    "gc2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 54
+   }
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Faction scores",
+    "zh": "派别分数"
+   },
+   "in": [
+    "act2"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 2
+   },
+   "axes": [
+    "n",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/gcn/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Faction shares",
+    "zh": "派别份额"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    34,
+    2
+   ],
+   "axes": [
+    "n",
+    "d"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "Zachary's karate club (networkx, unweighted), labels of members 0 and 33 only",
+  "steps": 200,
+  "optimizer": "Adam lr 0.01, full graph every step, seed 0",
+  "hardware": "CPU float32",
+  "metrics": {
+   "unlabelled_acc": 0.96875,
+   "wrong": [
+    8
+   ],
+   "loss_final": 0.008981735445559025
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 2.38e-7,
+  "checked": "2026-10-06",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 4,
+  "edgeCases": [
+   "isolated",
+   "none"
+  ],
+  "perLayer": {
+   "norm": 2.98e-8,
+   "gc1": 1.19e-7,
+   "act1": 8.94e-8,
+   "gc2": 2.38e-7,
+   "gc2#xw": 2.38e-7,
+   "act2": 8.94e-8,
+   "head": 2.38e-7,
+   "probs": 1.19e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "train",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/gcn/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "adj",
+   "adapter": "graph",
+   "kind": "graph",
+   "shape": [
+    34,
+    34
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "k"
+   ]
+  },
+  {
+   "name": "x",
+   "adapter": "graph",
+   "kind": "graph",
+   "shape": [
+    34,
+    34
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "rowNames": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31",
+  "32",
+  "33"
+ ],
+ "factions": [
+  "Mr. Hi",
+  "Officer"
+ ]
+}

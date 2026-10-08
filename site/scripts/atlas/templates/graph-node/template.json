@@ -1,0 +1,14 @@
+{
+	"name": "graph-node",
+	"description": "Kind B on a graph (the GCN shape): a local 'graph' input adapter (nodes, edges, a few labelled nodes), a two-layer graph convolution trained live with only the labelled nodes in the loss, and the PyTorch twin. Add the kind-A trace later with a local op: atlas new op gcn_conv --local <slug> --like linear.",
+	"kinds": ["train"],
+	"input": "graph",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/graph.ts.tmpl", "to": "package/graph.ts" },
+		{ "from": "package/adapter.ts.tmpl", "to": "package/adapters/graph/adapter.ts" },
+		{ "from": "package/trainer.ts.tmpl", "to": "package/trainer.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "pipeline/twin.py.tmpl", "to": "pipeline/twin.py" }
+	]
+}

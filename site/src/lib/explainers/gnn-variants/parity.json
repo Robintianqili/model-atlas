@@ -1,0 +1,25 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "gnn-variants",
+ "checked": "2026-10-06",
+ "sources": {
+  "gat": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 5.55e-17,
+   "frames": 14,
+   "fixtures": 6,
+   "checked": "2026-10-06"
+  },
+  "drop": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 8.88e-16,
+   "frames": 7,
+   "fixtures": 6,
+   "checked": "2026-10-06"
+  }
+ }
+}

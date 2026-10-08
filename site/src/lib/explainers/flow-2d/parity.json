@@ -1,0 +1,46 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "flow-2d",
+ "checked": "2026-10-06",
+ "sources": {
+  "flow": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.89e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 20,
+   "checked": "2026-10-06"
+  },
+  "sgd1": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.89e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 20,
+   "checked": "2026-10-06"
+  },
+  "t0": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.89e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 20,
+   "checked": "2026-10-06"
+  },
+  "eulerCheck": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.58e-15,
+   "frames": 78,
+   "fixtures": 0,
+   "checked": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,15 @@
+{
+	"name": "char-seq",
+	"description": "Kinds A + C on text (the char-rnn shape): a character-level LSTM trained on TinyStories (already downloaded), exported with embedding / lstm (gate sub-steps) / linear / softmax builder calls and a symbolic length T (cases at T = 1 and T = max), plus a sampling process that writes text one character at a time on the exported model.",
+	"kinds": ["trace", "process"],
+	"input": "text-char",
+	"files": [
+		{ "from": "package/explainer.ts.tmpl", "to": "package/explainer.ts" },
+		{ "from": "package/process.ts.tmpl", "to": "package/process.ts" },
+		{ "from": "package/lesson.ts.tmpl", "to": "package/lesson.ts" },
+		{ "from": "pipeline/model.py.tmpl", "to": "pipeline/model.py" },
+		{ "from": "pipeline/train.py.tmpl", "to": "pipeline/train.py" },
+		{ "from": "pipeline/export.py.tmpl", "to": "pipeline/export.py" },
+		{ "to": "pipeline/reference.py", "skip": true }
+	]
+}

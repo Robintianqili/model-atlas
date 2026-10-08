@@ -1,0 +1,73 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template points2d-train` on {%today%}.
+// The auto plan has the train motifs (train:data@train, train:loss@sgd1, train:grad@sgd1, train:update@sgd1, train:watch@...);
+// `npm run atlas -- lesson {%slug%} draft` lists them. Below: a few of them plus author steps to grow from.
+// Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`, one kindOf 'limits' | 'breakIt'.
+import type { LessonDef } from '../../atlas/types/index.ts';
+import { updateOf } from '../../atlas/train/helpers.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{ auto: 'train:data@train' },
+		{ auto: 'train:loss@sgd1' },
+		{
+			// the slowed-down update, with the numbers that ran (updateOf throws for Adam, so this only works on sgd1)
+			id: 'one-update',
+			source: 'sgd1',
+			at: { phase: 'update', step: 0 },
+			view: 'train-step',
+			provenance: 'live',
+			title: { en: 'Nudge one weight a little', zh: '把一个权重推动一点点' },
+			focus: () => [{ field: 'params', key: 'net.0.weight', index: [0, 0], role: 'param' }],
+			narration: {
+				en: 'This weight was {old}. Its gradient is {g}, so with learning rate {lr} it becomes {old} − {lr} × {g} = {new}.',
+				zh: '这个权重原来是 {old}。它的梯度是 {g}，学习率是 {lr}，所以它变成 {old} − {lr} × {g} = {new}。',
+				vars: (_rt, at) => updateOf(at, 'net.0.weight', [0, 0])
+			}
+		},
+		{
+			id: 'watch',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			title: { en: 'TODO: watch it learn', zh: 'TODO：看它学习' },
+			predict: {
+				id: '{%slug%}-watch',
+				question: { en: 'TODO: will the loss go down smoothly or in jumps?', zh: 'TODO：损失会平稳下降还是跳着下降？' },
+				options: [
+					{ en: 'Smoothly', zh: '平稳下降' },
+					{ en: 'In jumps', zh: '跳着下降' }
+				],
+				answer: 1,
+				explain: { en: 'TODO: each step sees a different random batch, so the loss wiggles.', zh: 'TODO：每一步看到的随机批次不同，所以损失会抖动。' }
+			},
+			narration: {
+				en: 'After {step|int} steps the loss is {loss} and the network gets {acc|pct} of the points right.',
+				zh: '训练 {step|int} 步之后，损失是 {loss}，网络答对了 {acc|pct} 的点。',
+				vars: (_rt, at) => ({ step: at.frame!.step ?? 0, loss: at.frame!.metrics!.loss, acc: at.frame!.metrics!.accuracy })
+			}
+		},
+		{
+			id: 'too-small',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: where it fails', zh: 'TODO：它会在哪里失败' },
+			narration: {
+				en: 'TODO: show a setting where training fails, with live numbers: the loss stays at {loss}.',
+				zh: 'TODO：展示一个训练失败的设置，用实时数字：损失停在 {loss}。',
+				vars: (_rt, at) => ({ loss: at.frame!.metrics!.loss })
+			},
+			task: {
+				prompt: { en: 'TODO: change one setting until the loss drops below a target.', zh: 'TODO：改一个设置，直到损失低于目标。' },
+				done: (_rt, at) => (at.frame?.metrics?.loss ?? Infinity) < 0.1
+			}
+		}
+	]
+};
+
+export default lesson;

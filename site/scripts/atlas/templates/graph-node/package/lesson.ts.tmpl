@@ -1,0 +1,73 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template graph-node` on {%today%}.
+// `npm run atlas -- lesson {%slug%} draft` lists the auto steps (train:data@train, train:watch@train).
+// Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`, one kindOf 'limits' | 'breakIt'.
+import type { LessonDef } from '../../atlas/types/index.ts';
+import { graphOf } from './graph.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{
+			id: 'graph',
+			source: 'train',
+			at: 'first',
+			view: 'layer.tensor',
+			provenance: 'live',
+			title: { en: 'TODO: the graph and its few labels', zh: 'TODO：这张图和它少量的标签' },
+			narration: {
+				en: 'The graph has {n|int} nodes, and the network is told the class of only {k|int} of them. It must find the rest from the edges.',
+				zh: '这张图有 {n|int} 个节点，网络只知道其中 {k|int} 个的类别。其余的要靠边来推断。',
+				vars: (rt) => {
+					const g = graphOf(rt.input);
+					return { n: g.n, k: g.labelled.length };
+				}
+			}
+		},
+		{ auto: 'train:data@train' },
+		{ auto: 'train:watch@train' },
+		{
+			id: 'accuracy',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			title: { en: 'TODO: classes for every node', zh: 'TODO：每个节点的类别' },
+			predict: {
+				id: '{%slug%}-acc',
+				question: { en: 'TODO: will the unlabelled nodes next to a labelled one be right?', zh: 'TODO：挨着已标注节点的未标注节点会分对吗？' },
+				options: [
+					{ en: 'Mostly yes', zh: '大多会' },
+					{ en: 'Mostly no', zh: '大多不会' }
+				],
+				answer: 0,
+				explain: { en: 'TODO: each layer mixes a node with its neighbours.', zh: 'TODO：每一层都把节点和它的邻居混合起来。' }
+			},
+			narration: {
+				en: 'After {step|int} steps the network puts {acc|pct} of all nodes in the right class, although the loss only saw the labelled ones.',
+				zh: '训练 {step|int} 步之后，网络把 {acc|pct} 的节点分到了正确的类别，尽管损失只看了已标注的节点。',
+				vars: (_rt, at) => ({ step: at.frame!.step ?? 0, acc: at.frame!.metrics!.accuracy })
+			},
+			task: {
+				prompt: { en: 'TODO: move one edge so that a node changes class.', zh: 'TODO：移动一条边，让某个节点换个类别。' },
+				done: () => true
+			}
+		},
+		{
+			id: 'far-away',
+			source: 'train',
+			at: 'last',
+			view: 'loss-curve',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: what two layers cannot reach', zh: 'TODO：两层够不到的地方' },
+			narration: {
+				en: 'TODO: two layers only mix nodes up to two edges apart, so a node far from every label gets no signal. Here the accuracy is {acc|pct}.',
+				zh: 'TODO：两层只能混合两条边以内的节点，所以离所有标签都很远的节点得不到信号。这里的准确率是 {acc|pct}。',
+				vars: (_rt, at) => ({ acc: at.frame!.metrics!.accuracy })
+			}
+		}
+	]
+};
+
+export default lesson;

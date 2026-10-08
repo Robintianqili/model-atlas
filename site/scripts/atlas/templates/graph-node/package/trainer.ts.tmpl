@@ -1,0 +1,71 @@
+// {%slug%}: trainer '{%trainerId%}' (kind B, design §4.5). Scaffolded by `atlas new model {%slug%} --template graph-node`
+// on {%today%}. A two-layer graph convolution (GCN):  H = tanh(Â X W1ᵀ),  logits = Â H W2ᵀ,  trained with the
+// cross-entropy of the LABELLED nodes only; the other nodes get their class from their neighbours.
+//   npm run atlas -- run {%slug%} train --frames 0..20
+// Python twin: pipeline/{%slug%}/twin.py (same state_dict names: gc1.weight, gc2.weight).
+// A custom Module needs params() and named() (PyTorch state_dict names, [out, in] layouts).
+import type { Module, Rec, Rng, Tensor, TrainOpt, TrainerDef } from '../../atlas/types/index.ts';
+import { Linear } from '../../atlas/autograd/nn.ts';
+import { op } from '../../atlas/autograd/ops.ts';
+import { crossEntropy } from '../../atlas/autograd/loss.ts';
+import { input, noGrad, type Var } from '../../atlas/autograd/var.ts';
+import { graphOf, identity, normalizedAdjacency } from './graph.ts';
+
+export class Gcn implements Module {
+	readonly gc1: Linear;
+	readonly gc2: Linear;
+	constructor(features: number, hidden: number, classes: number, rng: Rng) {
+		this.gc1 = new Linear('gc1', features, hidden, rng, { bias: false });
+		this.gc2 = new Linear('gc2', hidden, classes, rng, { bias: false });
+	}
+	forward(ahat: Var, x: Var, rec?: Rec): Var {
+		const h = op.tanh(op.matmul(ahat, this.gc1.forward(x)));
+		rec?.('h', h);
+		return op.matmul(ahat, this.gc2.forward(h));
+	}
+	named(): Record<string, Var> {
+		return { ...this.gc1.named(), ...this.gc2.named() };
+	}
+	params(): Var[] {
+		return Object.values(this.named());
+	}
+}
+
+/** nodes: the size of the one-hot features (the largest graph the model takes); hidden and classes: layer sizes */
+export type Opt = TrainOpt & { hidden: number; classes: number; nodes: number };
+export type Batch = { ahat: Tensor; x: Tensor; y: Int32Array; labelled: Int32Array };
+
+function batchOf(raw: unknown, features: number): Batch {
+	const g = graphOf(raw);
+	return { ahat: normalizedAdjacency(g), x: identity(g.n, features), y: Int32Array.from(g.labels), labelled: Int32Array.from(g.labelled) };
+}
+
+/** Share of ALL nodes (labelled or not) whose predicted class is right. */
+export function nodeAccuracy(m: Gcn, b: Batch): number {
+	const z = noGrad(() => m.forward(input(b.ahat), input(b.x))).value.data;
+	const n = b.y.length;
+	const C = z.length / n;
+	let ok = 0;
+	for (let i = 0; i < n; i++) {
+		let best = 0;
+		for (let c = 1; c < C; c++) if (z[i * C + c] > z[i * C + best]) best = c;
+		if (best === b.y[i]) ok++;
+	}
+	return ok / n;
+}
+
+export const {%trainerIdent%}: TrainerDef<unknown, Gcn, Batch, Opt> = {
+	id: '{%trainerId%}',
+	title: { en: 'TODO: Train a graph network from a few labels', zh: 'TODO：用少量标签训练图网络' },
+	defaults: { seed: 1, lr: 0.05, batch: 1, steps: 200, snapshotEvery: 5, optimizer: 'adam', hidden: 4, classes: 2, nodes: 16 },
+	model: (rng, opt) => new Gcn(opt.nodes, opt.hidden, opt.classes, rng),
+	// the whole graph is one batch (full-batch training); the data is the learner's graph
+	batch: (data, _step, _rng, opt) => batchOf(data, opt.nodes),
+	loss(m, b, rec) {
+		const logits = m.forward(input(b.ahat), input(b.x), rec);
+		const picked = op.gather(logits, 0, b.labelled);
+		const targets = Array.from(b.labelled, (i) => b.y[i]);
+		return { loss: crossEntropy(picked, targets) };
+	},
+	metrics: (m, data) => ({ accuracy: nodeAccuracy(m, batchOf(data, m.gc1.inFeatures)) })
+};

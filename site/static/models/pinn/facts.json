@@ -1,0 +1,23 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "derivParity": {
+   "value": 2.2e-14,
+   "unit": "relative",
+   "source": "pipeline/pinn/export.py",
+   "measured": "2026-10-06, torch 2.11.0+cu128 float64 CPU, 3 weight sets x 200 times"
+  },
+  "derivParityD2": {
+   "value": 6.36e-16,
+   "unit": "relative",
+   "source": "pipeline/pinn/export.py",
+   "measured": "2026-10-06, torch 2.11.0+cu128 float64 CPU, 3 weight sets x 200 times"
+  },
+  "twinParity": {
+   "value": 7.06e-13,
+   "unit": "relative",
+   "source": "pipeline/pinn/export.py",
+   "measured": "2026-10-06, torch 2.11.0+cu128 float64 CPU, every train source, Adam, 50 steps"
+  }
+ }
+}

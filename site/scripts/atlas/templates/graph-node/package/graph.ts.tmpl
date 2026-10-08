@@ -1,0 +1,56 @@
+// {%slug%}: the graph data (pure TS). Scaffolded by `atlas new model {%slug%} --template graph-node` on {%today%}.
+// A graph is { n, edges, labels, labelled }: n nodes, undirected edges [a, b], a class per node, and the nodes whose
+// class the model is told (the rest it must infer). TS is the source of truth: the twin reads the tensors TS wrote.
+import type { Tensor } from '../../atlas/types/index.ts';
+
+export interface Graph {
+	n: number;
+	edges: [number, number][];
+	labels: number[];
+	labelled: number[];
+}
+
+/** Two triangles joined by one bridge edge; one labelled node in each (replace with your graph, e.g. the karate club). */
+export const TWO_TRIANGLES: Graph = {
+	n: 6,
+	edges: [
+		[0, 1],
+		[1, 2],
+		[0, 2],
+		[3, 4],
+		[4, 5],
+		[3, 5],
+		[2, 3]
+	],
+	labels: [0, 0, 0, 1, 1, 1],
+	labelled: [0, 5]
+};
+
+/** A valid graph from any raw input, else the default. */
+export function graphOf(raw: unknown): Graph {
+	const g = raw as Graph | null;
+	const ok = !!g && Number.isInteger(g.n) && g.n > 0 && Array.isArray(g.edges) && Array.isArray(g.labels) && g.labels.length === g.n && Array.isArray(g.labelled);
+	return ok && g.edges.every(([a, b]) => a >= 0 && b >= 0 && a < g.n && b < g.n) ? g : TWO_TRIANGLES;
+}
+
+/** Â = D^-1/2 (A + I) D^-1/2: each node averages itself and its neighbours, scaled by both degrees. */
+export function normalizedAdjacency(g: Graph): Tensor {
+	const n = g.n;
+	const a = new Float64Array(n * n);
+	for (let i = 0; i < n; i++) a[i * n + i] = 1;
+	for (const [i, j] of g.edges) {
+		a[i * n + j] = 1;
+		a[j * n + i] = 1;
+	}
+	const d = new Float64Array(n);
+	for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) d[i] += a[i * n + j];
+	for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) a[i * n + j] = a[i * n + j] / Math.sqrt(d[i] * d[j]);
+	return { shape: [n, n], data: a };
+}
+
+/** One-hot node features [n, f]: node i knows only "I am node i" (nodes past f get zeros: keep f >= n). */
+export function identity(n: number, f: number = n): Tensor {
+	const x = new Float64Array(n * f);
+	for (let i = 0; i < Math.min(n, f); i++) x[i * f + i] = 1;
+	return { shape: [n, f], data: x };
+}

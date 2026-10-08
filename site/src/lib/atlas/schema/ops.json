@@ -1,0 +1,554 @@
+[
+  {
+    "op": "input",
+    "version": 1,
+    "attrs": {
+      "name": {
+        "type": "string",
+        "doc": "the declared input to read when the layer's `in` is empty (default: the first declared input)"
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "io",
+    "zoom": "none",
+    "label": {
+      "en": "Input",
+      "zh": "输入"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "conv2d",
+    "version": 1,
+    "attrs": {
+      "kernel": {
+        "type": "int",
+        "required": true,
+        "doc": "kernel height and width (square)"
+      },
+      "stride": {
+        "type": "int",
+        "default": 1
+      },
+      "padding": {
+        "type": "int",
+        "default": 0,
+        "doc": "zeros added on every side"
+      },
+      "inChannels": {
+        "type": "int",
+        "doc": "informational; must equal weight.shape[1]"
+      },
+      "outChannels": {
+        "type": "int",
+        "doc": "informational; must equal weight.shape[0]"
+      },
+      "accumulate": {
+        "type": "string",
+        "default": "bias-last",
+        "doc": "'bias-last' (tinycnn.ts) or 'bias-first'"
+      }
+    },
+    "aliases": {},
+    "weights": [
+      {
+        "slot": "weight"
+      },
+      {
+        "slot": "bias",
+        "optional": true
+      }
+    ],
+    "subs": [],
+    "category": "conv",
+    "zoom": "weighted-sum",
+    "label": {
+      "en": "Convolution",
+      "zh": "卷积"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "linear",
+    "version": 1,
+    "attrs": {
+      "accumulate": {
+        "type": "string",
+        "default": "bias-last",
+        "doc": "'bias-last' (sum from 0, add the bias last; tinycnn.ts) or 'bias-first' (tinygpt.ts)"
+      },
+      "inFeatures": {
+        "type": "int",
+        "doc": "informational; must equal weight.shape[1]"
+      },
+      "outFeatures": {
+        "type": "int",
+        "doc": "informational; must equal weight.shape[0]"
+      },
+      "nHead": {
+        "type": "int",
+        "doc": "display hint: the output columns are nHead heads of dHead numbers (q/k/v projections)"
+      },
+      "dHead": {
+        "type": "int",
+        "doc": "display hint, with nHead"
+      }
+    },
+    "aliases": {
+      "dense": {},
+      "linear_tied": {}
+    },
+    "weights": [
+      {
+        "slot": "weight"
+      },
+      {
+        "slot": "bias",
+        "optional": true
+      }
+    ],
+    "subs": [],
+    "category": "linear",
+    "zoom": "weighted-sum",
+    "label": {
+      "en": "Linear (fully connected)",
+      "zh": "线性层（全连接）"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "relu",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "activation",
+    "zoom": "elementwise",
+    "label": {
+      "en": "ReLU",
+      "zh": "ReLU"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "tanh",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "activation",
+    "zoom": "elementwise",
+    "label": {
+      "en": "Tanh",
+      "zh": "Tanh"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "sigmoid",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "activation",
+    "zoom": "elementwise",
+    "label": {
+      "en": "Sigmoid",
+      "zh": "Sigmoid"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "silu",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "activation",
+    "zoom": "elementwise",
+    "label": {
+      "en": "SiLU",
+      "zh": "SiLU"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "gelu",
+    "version": 1,
+    "attrs": {
+      "approx": {
+        "type": "string",
+        "default": "none",
+        "doc": "'none' (exact, with erf) or 'tanh' (the GPT-2 approximation)"
+      }
+    },
+    "aliases": {
+      "gelu_tanh": {
+        "approx": "tanh"
+      }
+    },
+    "weights": [],
+    "subs": [],
+    "category": "activation",
+    "zoom": "elementwise",
+    "label": {
+      "en": "GELU",
+      "zh": "GELU"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "maxpool2d",
+    "version": 1,
+    "attrs": {
+      "kernel": {
+        "type": "int",
+        "default": 2
+      },
+      "stride": {
+        "type": "int",
+        "doc": "defaults to kernel"
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "pool",
+    "zoom": "reduce",
+    "label": {
+      "en": "Max pooling",
+      "zh": "最大池化"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "flatten",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "shape",
+    "zoom": "index-map",
+    "label": {
+      "en": "Flatten",
+      "zh": "展平"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "concat",
+    "version": 1,
+    "attrs": {
+      "axis": {
+        "type": "int",
+        "default": 0,
+        "doc": "the axis to join along (negative counts from the end), as torch.cat(dim=…)"
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "merge",
+    "zoom": "index-map",
+    "label": {
+      "en": "Concatenate",
+      "zh": "拼接"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "add",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "merge",
+    "zoom": "elementwise",
+    "label": {
+      "en": "Add",
+      "zh": "相加"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "embedding",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [
+      {
+        "slot": "weight"
+      }
+    ],
+    "subs": [],
+    "category": "embedding",
+    "zoom": "lookup",
+    "label": {
+      "en": "Embedding",
+      "zh": "嵌入"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "position_embedding",
+    "version": 1,
+    "attrs": {},
+    "aliases": {},
+    "weights": [
+      {
+        "slot": "weight"
+      }
+    ],
+    "subs": [],
+    "category": "embedding",
+    "zoom": "lookup",
+    "label": {
+      "en": "Position embedding",
+      "zh": "位置嵌入"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "layernorm",
+    "version": 1,
+    "attrs": {
+      "eps": {
+        "type": "float",
+        "default": 0.00001,
+        "doc": "added to the variance before the square root"
+      }
+    },
+    "aliases": {},
+    "weights": [
+      {
+        "slot": "weight",
+        "optional": true
+      },
+      {
+        "slot": "bias",
+        "optional": true
+      }
+    ],
+    "subs": [],
+    "category": "norm",
+    "zoom": "normalize",
+    "label": {
+      "en": "Layer normalization",
+      "zh": "层归一化"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "attention_scores",
+    "version": 1,
+    "attrs": {
+      "nHead": {
+        "type": "int",
+        "required": true
+      },
+      "dHead": {
+        "type": "int",
+        "required": true
+      },
+      "scale": {
+        "type": "float",
+        "doc": "defaults to 1/√dHead"
+      },
+      "causal": {
+        "type": "bool",
+        "default": false,
+        "doc": "write −∞ above the diagonal (fused causal mask)"
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "attention",
+    "zoom": "weighted-sum",
+    "label": {
+      "en": "Attention scores",
+      "zh": "注意力分数"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "causal_mask",
+    "version": 1,
+    "attrs": {
+      "fill": {
+        "type": "string",
+        "default": "-Infinity",
+        "doc": "documentation only: the masked entries are always −∞"
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "attention",
+    "zoom": "index-map",
+    "label": {
+      "en": "Causal mask",
+      "zh": "因果掩码"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "softmax",
+    "version": 1,
+    "attrs": {
+      "axis": {
+        "type": "int",
+        "default": -1
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "output",
+    "zoom": "softmax",
+    "label": {
+      "en": "Softmax",
+      "zh": "Softmax"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "attention_mix",
+    "version": 1,
+    "attrs": {
+      "nHead": {
+        "type": "int",
+        "required": true
+      },
+      "dHead": {
+        "type": "int",
+        "required": true
+      }
+    },
+    "aliases": {},
+    "weights": [],
+    "subs": [],
+    "category": "attention",
+    "zoom": "weighted-sum",
+    "label": {
+      "en": "Weighted sum of values",
+      "zh": "值的加权和"
+    },
+    "parityBar": 0.0001
+  },
+  {
+    "op": "lstm",
+    "version": 1,
+    "attrs": {
+      "hidden": {
+        "type": "int",
+        "required": true,
+        "doc": "H: size of the hidden and cell state"
+      },
+      "inputSize": {
+        "type": "int",
+        "doc": "informational; must equal weight_ih.shape[1]"
+      }
+    },
+    "aliases": {},
+    "weights": [
+      {
+        "slot": "weight_ih"
+      },
+      {
+        "slot": "weight_hh"
+      },
+      {
+        "slot": "bias_ih",
+        "optional": true
+      },
+      {
+        "slot": "bias_hh",
+        "optional": true
+      }
+    ],
+    "subs": [
+      {
+        "name": "i",
+        "label": {
+          "en": "input gate i",
+          "zh": "输入门 i"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      },
+      {
+        "name": "f",
+        "label": {
+          "en": "forget gate f",
+          "zh": "遗忘门 f"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      },
+      {
+        "name": "g",
+        "label": {
+          "en": "candidate g",
+          "zh": "候选值 g"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      },
+      {
+        "name": "o",
+        "label": {
+          "en": "output gate o",
+          "zh": "输出门 o"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      },
+      {
+        "name": "c",
+        "label": {
+          "en": "cell state c",
+          "zh": "细胞状态 c"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      },
+      {
+        "name": "h",
+        "label": {
+          "en": "hidden state h",
+          "zh": "隐藏状态 h"
+        },
+        "axes": [
+          "t",
+          "d"
+        ]
+      }
+    ],
+    "category": "recurrent",
+    "zoom": "gate",
+    "label": {
+      "en": "LSTM",
+      "zh": "LSTM（长短期记忆）"
+    },
+    "parityBar": 0.0001
+  }
+]

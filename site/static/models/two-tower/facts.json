@@ -1,0 +1,107 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 672,
+   "unit": "count",
+   "source": "spec",
+   "measured": "2026-10-07"
+  },
+  "trainViewers": {
+   "value": 5000,
+   "unit": "viewers",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "trainPairs": {
+   "value": 22498,
+   "unit": "pairs",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "testViewers": {
+   "value": 500,
+   "unit": "viewers",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "valViewers": {
+   "value": 500,
+   "unit": "viewers",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "epochs": {
+   "value": 40,
+   "unit": "epochs",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "bestEpoch": {
+   "value": 17,
+   "unit": "epoch",
+   "source": "pipeline/two-tower/train.py (CPU float32), best validation recall@8",
+   "measured": "2026-10-07"
+  },
+  "batch": {
+   "value": 64,
+   "unit": "pairs",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "uniqueCols": {
+   "value": 28.367521367521366,
+   "unit": "movies per batch",
+   "source": "pipeline/two-tower/train.py (CPU float32), first epoch",
+   "measured": "2026-10-07"
+  },
+  "recall8": {
+   "value": 0.6116666666666666,
+   "unit": "share",
+   "source": "pipeline/two-tower/train.py (CPU float32), test viewers",
+   "measured": "2026-10-07"
+  },
+  "recall8Pop": {
+   "value": 0.39375,
+   "unit": "share",
+   "source": "pipeline/two-tower/train.py (CPU float32), test viewers",
+   "measured": "2026-10-07"
+  },
+  "recall8Random": {
+   "value": 0.23979526848862712,
+   "unit": "share",
+   "source": "pipeline/two-tower/train.py (CPU float32), test viewers",
+   "measured": "2026-10-07"
+  },
+  "hits3Before": {
+   "value": 1.344,
+   "unit": "movies",
+   "source": "pipeline/two-tower/train.py (CPU float32), test viewers",
+   "measured": "2026-10-07"
+  },
+  "hits3After": {
+   "value": 1.348,
+   "unit": "movies",
+   "source": "pipeline/two-tower/train.py (CPU float32), test viewers",
+   "measured": "2026-10-07"
+  },
+  "rankFitRows": {
+   "value": 4000,
+   "unit": "rows",
+   "source": "pipeline/two-tower/train.py (CPU float32), validation viewers",
+   "measured": "2026-10-07"
+  },
+  "twinLikesA": {
+   "value": 2141,
+   "unit": "likes",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  },
+  "twinLikesB": {
+   "value": 283,
+   "unit": "likes",
+   "source": "pipeline/two-tower/train.py (CPU float32)",
+   "measured": "2026-10-07"
+  }
+ }
+}

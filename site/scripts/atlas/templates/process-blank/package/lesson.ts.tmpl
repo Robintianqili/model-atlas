@@ -1,0 +1,59 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template process-blank` on {%today%}.
+// The auto plan gives one step per narrated phase (proc:event.<phase>@run) and a run-through (proc:run@run):
+//   npm run atlas -- lesson {%slug%} draft
+// Then add your own steps. Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`
+// and one step with kindOf: 'limits' | 'breakIt'. Numbers come from {placeholders} (AK402 warns on typed numbers).
+import type { LessonDef } from '../../atlas/types/index.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{ auto: 'proc:event.start@run' },
+		{
+			id: 'guess-first',
+			source: 'run',
+			at: { phase: 'move', step: 1 },
+			view: 'zoom.formula',
+			provenance: 'live',
+			title: { en: 'TODO: one random step', zh: 'TODO：随机走一步' },
+			predict: {
+				id: '{%slug%}-guess',
+				question: { en: 'TODO: where will the walker be after its first step?', zh: 'TODO：走完第一步后，游走者会在哪里？' },
+				options: [
+					{ en: 'One cell to the left or right', zh: '左边或右边一格' },
+					{ en: 'Anywhere on the line', zh: '这一排的任何地方' }
+				],
+				answer: 0,
+				explain: { en: 'Each step moves one cell left or right, unless a wall is in the way; the walker starts in the middle.', zh: '每一步向左或向右移动一格，除非撞到墙；游走者从中间出发。' }
+			},
+			narration: {
+				en: 'The first step goes from cell {from|int} to cell {to|int}. Each step adds {s} to the position.',
+				zh: '第一步从第 {from|int} 格走到第 {to|int} 格。每一步都给位置加上 {s}。',
+				vars: (_rt, at) => ({ from: at.frame!.metrics!.from, to: at.frame!.metrics!.to, s: at.frame!.metrics!.s })
+			}
+		},
+		{ auto: 'proc:event.move@run' },
+		{ auto: 'proc:run@run' },
+		{
+			id: 'visits',
+			source: 'run',
+			at: 'last',
+			view: 'tape.table',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: what one run can and cannot tell', zh: 'TODO：一次运行能说明什么、不能说明什么' },
+			narration: {
+				en: 'After {t|int} steps the walker is in cell {pos|int}. One run is one story: another seed gives another path.',
+				zh: '走了 {t|int} 步之后，游走者在第 {pos|int} 格。一次运行只是一个故事：换一个种子就是另一条路。',
+				vars: (_rt, at) => ({ t: at.frame!.metrics!.t ?? 0, pos: at.frame!.metrics!.to ?? at.frame!.metrics!.pos })
+			},
+			task: {
+				prompt: { en: 'TODO: replay the run and find the step where the walker first hits a wall.', zh: 'TODO：重放这次运行，找出游走者第一次碰到墙的那一步。' },
+				done: () => true
+			}
+		}
+	]
+};
+
+export default lesson;

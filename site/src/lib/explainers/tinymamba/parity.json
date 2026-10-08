@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tinymamba",
+ "checked": "2026-10-06",
+ "sources": {
+  "scan": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 2.22e-16,
+   "frames": 16,
+   "fixtures": 11,
+   "checked": "2026-10-06"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+// {%slug%}: the guided lesson (design §4.6). Scaffolded by `atlas new model {%slug%} --template char-seq` on {%today%}.
+// After `npm run atlas -- export {%slug%}`, `npm run atlas -- lesson {%slug%} draft` prints the auto plan (input,
+// op:emb, op:lstm with the gate view, op:head, output; proc:event.*@sample, proc:run@sample).
+// Shape rules (AK407): 5-12 steps, 2-4 sentences each, at least one `predict`, one `task`, one kindOf 'limits' | 'breakIt'.
+import type { LessonDef } from '../../atlas/types/index.ts';
+
+const lesson: LessonDef = {
+	title: { en: 'TODO: {%nameEn%}, step by step', zh: 'TODO：一步步看{%nameZh%}' },
+	summary: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' },
+	steps: [
+		{ autoAll: { until: 'output' } },
+		{
+			id: 'next-char',
+			source: 'fwd',
+			at: { layer: 'probs' },
+			select: () => ({ layer: 'probs' }),
+			view: 'layer.tensor',
+			provenance: 'live',
+			title: { en: 'TODO: what comes next', zh: 'TODO：接下来是什么' },
+			predict: {
+				id: '{%slug%}-next',
+				question: { en: 'TODO: which character will get the highest chance?', zh: 'TODO：哪个字符的概率最高？' },
+				options: [
+					{ en: 'TODO: a space', zh: 'TODO：空格' },
+					{ en: 'TODO: a letter', zh: 'TODO：一个字母' }
+				],
+				answer: 0,
+				explain: { en: 'TODO: why', zh: 'TODO：原因' }
+			},
+			narration: {
+				en: 'After your text the model gives the most likely next character a chance of {top.p|pct}. The runner-up is close behind, with a margin of {margin|pct}.',
+				zh: '在你的文字之后，模型给最可能的下一个字符 {top.p|pct} 的概率。第二名紧随其后，差距是 {margin|pct}。'
+			}
+		},
+		{ auto: 'proc:event.sample@sample' },
+		{
+			id: 'written',
+			source: 'sample',
+			at: 'last',
+			view: 'tape.table',
+			provenance: 'live',
+			kindOf: 'limits',
+			title: { en: 'TODO: fluent, not meaningful', zh: 'TODO：通顺，但没有意义' },
+			narration: {
+				en: 'TODO: after {n|int} characters the text looks like words, but the model only ever predicts the next character.',
+				zh: 'TODO：写了 {n|int} 个字符之后，文字看起来像单词，但模型始终只是在预测下一个字符。',
+				vars: (_rt, at) => ({ n: at.frame?.step !== undefined ? at.frame.step + 1 : 0 })
+			},
+			task: {
+				prompt: { en: 'TODO: change the temperature and compare two texts.', zh: 'TODO：改变温度，比较两段文字。' },
+				done: () => true
+			}
+		}
+	]
+};
+
+export default lesson;

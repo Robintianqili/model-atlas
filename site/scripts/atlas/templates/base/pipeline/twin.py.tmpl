@@ -1,0 +1,34 @@
+"""{%slug%}: the PyTorch fp64 twin of trainer '{%trainerId%}' (kind B parity, design §4.11). Optional: it gives the
+stronger badge ("matches PyTorch fp64 to 7 significant digits over 50 steps").
+
+`atlas run {%slug%} train --save` writes .atlas/{%slug%}/train_fixture.json (the TS init params and batches: TS is the
+source of truth for init and synthetic data); python -m atlas_kit.train_reference (W1-E2) loads them into build(cfg),
+runs K float64 steps with loss() and compares losses, step-1 grads and final params.
+The state_dict names must equal the TS Module.named() names ('net.0.weight', ...).
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+
+
+class Net(nn.Module):
+    """TS MLP('net', [2, hidden, 1], 'tanh'): state_dict names net.0.weight, net.0.bias, net.2.weight, net.2.bias."""
+
+    def __init__(self, hidden: int):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(2, hidden), nn.Tanh(), nn.Linear(hidden, 1))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+def build(cfg: dict) -> nn.Module:
+    """Same architecture and state_dict names as the TS trainer (MLP 2 -> hidden -> 1, tanh)."""
+    return Net(int(cfg.get("hidden", 4))).double()
+
+
+def loss(model: nn.Module, batch: dict, cfg: dict) -> tuple[torch.Tensor, dict]:
+    """batch: {'x': [N, 2], 'y': [N, 1]} as float64 tensors. Returns (loss, parts)."""
+    yhat = model(batch["x"])
+    return torch.mean((yhat - batch["y"]) ** 2), {}

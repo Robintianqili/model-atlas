@@ -1,0 +1,107 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testN": {
+   "value": 15000,
+   "unit": "drawings",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "cleanAcc": {
+   "value": 0.9681,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "attackedN": {
+   "value": 14521,
+   "unit": "drawings",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "fgsm05": {
+   "value": 0.2067,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "pgd05": {
+   "value": 0.5778,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "fgsm10": {
+   "value": 0.4532,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "pgd10": {
+   "value": 0.9781,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "fgsm20": {
+   "value": 0.7177,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "pgd20": {
+   "value": 1.0,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "minFgsmMedian": {
+   "value": 0.115,
+   "unit": "eps",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "fgsmNever": {
+   "value": 0.1372,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "minPgdMedian": {
+   "value": 0.05,
+   "unit": "eps",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "vitN": {
+   "value": 14035,
+   "unit": "drawings",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "transferVit": {
+   "value": 0.0297,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "vitPgd10": {
+   "value": 0.9659,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "gradF32Max": {
+   "value": 4.33e-06,
+   "unit": "abs",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  },
+  "signF32": {
+   "value": 0.0046,
+   "unit": "share",
+   "source": "pipeline/adversarial-tinycnn/stats.py",
+   "measured": "2026-10-07"
+  }
+ }
+}

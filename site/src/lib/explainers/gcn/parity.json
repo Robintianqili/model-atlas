@@ -1,0 +1,35 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "gcn",
+ "checked": "2026-10-06",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 4.42e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-06"
+  },
+  "mp": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 11,
+   "fixtures": 6,
+   "checked": "2026-10-06"
+  },
+  "smooth": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 9,
+   "fixtures": 6,
+   "checked": "2026-10-06"
+  }
+ }
+}

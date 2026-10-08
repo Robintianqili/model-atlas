@@ -1,0 +1,54 @@
+// Op '{%op%}' (design §4.3). Scaffolded by `atlas new op {%op%}` on {%today%}.
+// {%#local%}A local op of package {%slug%}: list it in the package's ops.ts ([...CORE_OPS, {%opIdent%}]). It moves into CORE_OPS
+// when a second model needs it (rule of two); the spec does not change.{%/local%}{%^local%}A core op: add it to CORE_OPS in ops/index.ts and regenerate schema/ops.json (node src/lib/atlas/ops/manifest.ts --write).{%/local%}
+// Python mirror: {%mirrorPath%} (same attrs; checked against ops.json).
+// The example is y = alpha * x, elementwise: replace forward, explain, formula and narration.
+import type { OpDef } from '{%typesPath%}';
+
+type P = { alpha: number };
+
+export const {%opIdent%}: OpDef<P> = {
+	op: '{%op%}',
+	version: 1,
+	attrs: { alpha: { type: 'float', default: 1, doc: 'TODO: what the attribute means' } },
+	category: 'activation',
+	label: { en: 'TODO: {%op%}', zh: 'TODO：{%op%}' },
+	inferShape: (ins) => ins[0],
+	axes: (ins) => ins[0],
+	// f64 accumulation, f32 storage (as tinycnn.ts and tinygpt.ts do)
+	forward(xs, p) {
+		const x = xs[0];
+		const out = new Float32Array(x.data.length);
+		for (let i = 0; i < out.length; i++) out[i] = p.alpha * x.data[i];
+		return { shape: [...x.shape], data: out };
+	},
+	unit: { axes: (out) => out, scan: 'none', pick: 'argmaxAbs' },
+	// The arithmetic behind one output number; `result` is recomputed here, `traced` read from the trace (gate: <= 1e-5).
+	explain(q) {
+		let k = 0;
+		for (let d = 0; d < q.unit.length; d++) k = k * q.out.shape[d] + q.unit[d];
+		const x = q.ins[0].data[k];
+		const result = Math.fround(q.p.alpha * x);
+		return {
+			kind: 'elementwise',
+			layer: q.layer.id,
+			unit: q.unit,
+			reads: [{ tensor: q.layer.in[0], cells: [k] }],
+			curve: { fn: '{%op%}', x, y: result },
+			values: { x, alpha: q.p.alpha, y: result },
+			result,
+			traced: q.out.data[k]
+		};
+	},
+	formula: 'y = \\alpha \\cdot x = {{alpha}} \\times {{x}} = {{y}}',
+	narration: {
+		what: { en: 'TODO: what the op does, in one or two sentences.', zh: 'TODO：用一两句话说明这个算子做什么。' },
+		unit: { en: 'This number is {alpha} × {x} = {y}.', zh: '这个数是 {alpha} × {x} = {y}。' }
+	},
+	zoom: 'elementwise',
+	color: 'diverging',
+	parity: { bar: 1e-6 },
+	pytorch: (layer) => `y = ${(layer.params?.alpha as number | undefined) ?? 1} * x`
+};
+
+export default {%opIdent%};

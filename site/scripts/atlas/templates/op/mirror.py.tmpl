@@ -1,0 +1,21 @@
+"""Python mirror of op '{%op%}' ({%tsPath%}). Scaffolded by `atlas new op {%op%}` on {%today%}.
+
+Same metadata as the TS OpDef (checked against site/src/lib/atlas/schema/ops.json for core ops) and the PyTorch
+reference for one layer. Use it from describe():
+{%#local%}    from ops_{%op%} import reference as {%opIdent%}_ref
+    y = b.op("{%op%}", "my_layer", [x], params={"alpha": 2.0}, ref={%opIdent%}_ref){%/local%}{%^local%}    y = b.op("{%op%}", "my_layer", [x], params={"alpha": 2.0})   # core ops use this mirror automatically
+    (register it in pipeline/atlas_kit/ops/__init__.py MIRRORS){%/local%}
+"""
+
+OP = "{%op%}"
+VERSION = 1
+CATEGORY = "activation"
+LABEL = ("TODO: {%op%}", "TODO：{%op%}")
+ATTRS = {"alpha": {"type": "float", "default": 1}}
+ALIASES: dict = {}
+WEIGHTS: list = []
+SUBS: list = []
+
+
+def reference(xs, params, weights):
+    return params.get("alpha", 1.0) * xs[0]

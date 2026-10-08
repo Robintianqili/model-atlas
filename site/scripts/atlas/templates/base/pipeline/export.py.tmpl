@@ -1,0 +1,60 @@
+"""{%slug%}: export the model to site/static/models/{%slug%}/ (kind A, design §4.11).
+
+    npm run atlas -- export {%slug%}         # runs this file, then parity and the lesson draft
+    npm run atlas -- py pipeline/{%slug%}/export.py   # also works (the configured Python; or PYTHONPATH=pipeline)
+
+describe() is the graph, written once: every builder call computes the PyTorch value for the current case and records
+the layer. export_model() calls it once per case, checks it against module(x) (AK103), writes spec.json (parity null
+until `atlas parity` runs), weights.bin, reference.json (atlas-ref-1) and facts.json, CPU only (AK102).
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+try:
+    import atlas_kit as ak
+except ImportError:  # run without PYTHONPATH: use the repo's pipeline/ folder
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import atlas_kit as ak
+
+import torch
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from model import Model  # noqa: E402
+
+HERE = Path(__file__).resolve().parent
+CKPT = HERE / "runs" / "TODO" / "best.pt"   # TODO: your trained checkpoint
+
+torch.manual_seed(0)
+model = Model()
+if CKPT.is_file():
+    model.load_state_dict(torch.load(CKPT, map_location="cpu"))
+else:
+    print(f"note: {CKPT} not found, exporting untrained weights (fine for a smoke test, not for a page)")
+model = model.cpu().eval()
+
+
+def describe(b: ak.SpecBuilder, case: ak.Case) -> None:
+    x = b.input("input", case.input, adapter="{%adapter%}", kind="{%inputKind%}", axes="f",
+                label=("Your input", "你的输入"), desc=("The two numbers the model reads.", "模型读入的两个数。"))
+    h = b.linear("fc1", x, model.fc1, label=("Hidden layer", "隐藏层"), code=("pipeline/{%slug%}/model.py", 17))
+    h = b.tanh("act1", h, label=("Tanh", "Tanh"))
+    b.output(b.linear("fc2", h, model.fc2, label=("Class scores", "类别分数")))
+
+
+# Reference cases: typical inputs plus edge cases (blank, extreme, T = 1 / T = max for sequences): edge=True.
+CASES = [
+    ak.Case("origin", "(0, 0)", torch.tensor([0.0, 0.0]), edge=True),
+    ak.Case("a", "(1, -1)", torch.tensor([1.0, -1.0])),
+    ak.Case("far", "(5, 5)", torch.tensor([5.0, 5.0]), edge=True),
+]
+
+if __name__ == "__main__":
+    report = ak.export_model(
+        describe, CASES, slug="{%slug%}", name=("{%nameEn%}", "{%nameZh%}"), kinds=({%kindsPy%}),
+        module=model, module_input=lambda c: c.input.unsqueeze(0),
+        facts={},   # measured numbers for narration: {"testAcc": {"value": 0.97, "unit": "share", "source": "..."}}
+        training={"dataset": "TODO", "steps": 0, "metrics": {}},
+    )
+    print(report)

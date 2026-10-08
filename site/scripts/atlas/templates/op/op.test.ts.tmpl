@@ -1,0 +1,28 @@
+// Tests for op '{%op%}' (node --test). Scaffolded by `atlas new op {%op%}` on {%today%}.
+// Add the torch goldens when the op is real (pipeline/atlas_fixtures/ops/make.py writes site/tests/atlas/ops/).
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import type { AtlasLayer, AtlasSpec, Trace } from '{%typesPath%}';
+import { {%opIdent%} } from './{%opFile%}';
+
+const layer: AtlasLayer = { id: 'demo', op: '{%op%}', label: { en: 'Demo', zh: '演示' }, in: ['input'], outShape: [2, 3], params: { alpha: 2 } };
+const x = { shape: [2, 3], data: Float32Array.from([-1, 0, 1, 2, 3, 0.5]) };
+const p = { alpha: 2 };
+const ctx = { layer, dims: {}, w: () => { throw new Error('no weights'); }, emit: () => {} };
+
+test('{%op%}: forward', () => {
+	const y = {%opIdent%}.forward([x], p, ctx);
+	assert.deepEqual(y.shape, [2, 3]);
+	assert.deepEqual(Array.from(y.data), [-2, 0, 2, 4, 6, 1]);
+	assert.deepEqual({%opIdent%}.inferShape([[2, 'T']], p, {}), [2, 'T']);
+});
+
+test('{%op%}: explain() equals the trace for every unit', () => {
+	const out = {%opIdent%}.forward([x], p, ctx);
+	const trace: Trace = { order: ['input', 'demo'], t: { input: x, demo: out } };
+	for (let i = 0; i < 2; i++)
+		for (let j = 0; j < 3; j++) {
+			const e = {%opIdent%}.explain!({ layer, unit: [i, j], ins: [x], out, w: ctx.w, p, trace, spec: {} as AtlasSpec });
+			assert.ok(Math.abs(e.result - e.traced) <= 1e-5, `unit [${i}, ${j}]`);
+		}
+});

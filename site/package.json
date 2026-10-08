@@ -1,0 +1,36 @@
+{
+  "name": "model-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Model Atlas / 模型图鉴 — playable, layer-by-layer explanations of neural network models (static site).",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "check:catalog": "node scripts/check-catalog.ts",
+    "check:build": "node scripts/check-build.ts",
+    "check:atlas": "node --test \"src/lib/atlas/**/*.test.ts\" \"src/lib/explainers/**/*.test.ts\" \"scripts/atlas/tests/*.test.ts\" \"src/lib/devkit-site/*.test.ts\"",
+    "atlas": "node scripts/atlas/cli.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.3",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@types/node": "^24.19.1",
+    "playwright-core": "^1.63.0",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6"
+  },
+  "dependencies": {
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "katex": "^0.19.0"
+  }
+}

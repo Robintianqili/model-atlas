@@ -1,0 +1,239 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testAcc": {
+   "value": 0.9715,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "testN": {
+   "value": 15000,
+   "unit": "drawings",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "params": {
+   "value": 116938,
+   "unit": "count",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "cnnTestAcc": {
+   "value": 0.9681,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "cnnParams": {
+   "value": 6722,
+   "unit": "count",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "agree": {
+   "value": 0.9656,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "bothWrong": {
+   "value": 0.0173,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "maxTopP": {
+   "value": 0.9361,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "inkThreshold": {
+   "value": 0.5,
+   "unit": "pixel value",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "inkedShare": {
+   "value": 0.7268,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1InkShare": {
+   "value": 0.7311,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1SelfShare": {
+   "value": 0.0662,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1h0InkShare": {
+   "value": 0.7108,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1h1InkShare": {
+   "value": 0.8475,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1h2InkShare": {
+   "value": 0.6401,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b1h3InkShare": {
+   "value": 0.726,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2InkShare": {
+   "value": 0.631,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2SelfShare": {
+   "value": 0.0587,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2h0InkShare": {
+   "value": 0.7592,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2h1InkShare": {
+   "value": 0.7082,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2h2InkShare": {
+   "value": 0.4665,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b2h3InkShare": {
+   "value": 0.5902,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3InkShare": {
+   "value": 0.7689,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3SelfShare": {
+   "value": 0.0352,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3h0InkShare": {
+   "value": 0.8067,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3h1InkShare": {
+   "value": 0.7225,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3h2InkShare": {
+   "value": 0.8221,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b3h3InkShare": {
+   "value": 0.7244,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4InkShare": {
+   "value": 0.8314,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4SelfShare": {
+   "value": 0.0459,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4h0InkShare": {
+   "value": 0.8829,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4h1InkShare": {
+   "value": 0.8264,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4h2InkShare": {
+   "value": 0.7879,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "b4h3InkShare": {
+   "value": 0.8283,
+   "unit": "share",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "head": {
+   "value": 1,
+   "unit": "head index (from 0)",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "headLean": {
+   "value": 3.261,
+   "unit": "ratio",
+   "source": "pipeline/tinyvit/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-06"
+  },
+  "smoothTarget": {
+   "value": 0.91,
+   "unit": "share",
+   "source": "pipeline/tinyvit/train.py (label smoothing: the training target of the right class)",
+   "measured": "2026-10-06"
+  },
+  "bestEpoch": {
+   "value": 90,
+   "unit": "epoch",
+   "source": "pipeline/tinyvit/train.py",
+   "measured": "2026-10-06"
+  },
+  "epochs": {
+   "value": 100,
+   "unit": "epoch",
+   "source": "pipeline/tinyvit/train.py",
+   "measured": "2026-10-06"
+  }
+ }
+}

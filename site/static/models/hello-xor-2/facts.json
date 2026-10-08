@@ -1,0 +1,23 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "trainLoss": {
+   "value": 0.00031885935459285975,
+   "unit": "bce",
+   "source": "pipeline/hello-xor-2/export.py (model_final.pt on the 4 XOR points)",
+   "measured": "2026-10-06"
+  },
+  "correct": {
+   "value": 4,
+   "unit": "points of 4",
+   "source": "pipeline/hello-xor-2/export.py",
+   "measured": "2026-10-06"
+  },
+  "trainSteps": {
+   "value": 1500,
+   "unit": "steps",
+   "source": "pipeline/hello-xor-2/train.py",
+   "measured": "2026-10-06"
+  }
+ }
+}

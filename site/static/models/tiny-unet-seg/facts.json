@@ -1,0 +1,137 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "trainN": {
+   "value": 16000,
+   "unit": "scenes",
+   "source": "pipeline/tiny-unet-seg/make_data.ts",
+   "measured": "2026-10-07"
+  },
+  "testN": {
+   "value": 2000,
+   "unit": "scenes",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "epochs": {
+   "value": 40,
+   "unit": "epochs",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "params": {
+   "value": 29644,
+   "unit": "numbers",
+   "source": "pipeline/tiny-unet-seg/model.py",
+   "measured": "2026-10-07"
+  },
+  "paramsNoskip": {
+   "value": 26764,
+   "unit": "numbers",
+   "source": "pipeline/tiny-unet-seg/model.py",
+   "measured": "2026-10-07"
+  },
+  "bgShare": {
+   "value": 0.8632891235351563,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/make_data.ts (training pixels)",
+   "measured": "2026-10-07"
+  },
+  "testMiou": {
+   "value": 0.9738236018499365,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testAcc": {
+   "value": 0.9971582293510437,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testEdgeAcc": {
+   "value": 0.982511579990387,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testEdgeShare": {
+   "value": 0.10121093690395355,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "noskipMiou": {
+   "value": 0.9370090603312659,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py --noskip (train_metrics_noskip.json)",
+   "measured": "2026-10-07"
+  },
+  "noskipEdgeAcc": {
+   "value": 0.9297906160354614,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py --noskip (train_metrics_noskip.json)",
+   "measured": "2026-10-07"
+  },
+  "noskipAcc": {
+   "value": 0.9913012981414795,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py --noskip (train_metrics_noskip.json)",
+   "measured": "2026-10-07"
+  },
+  "testIouBackground": {
+   "value": 0.9990389233232372,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testIouCircle": {
+   "value": 0.9693002257336343,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testIouSquare": {
+   "value": 0.9497684935931948,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "testIouTriangle": {
+   "value": 0.9771867647496798,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "bigMiou": {
+   "value": 0.6890554492414289,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "hollowMiou": {
+   "value": 0.29924774314248836,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "darkMiou": {
+   "value": 0.05001858764195503,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "hollowShapeIou": {
+   "value": 0.06774481573310416,
+   "unit": "share",
+   "source": "pipeline/tiny-unet-seg/train.py (train_metrics.json)",
+   "measured": "2026-10-07"
+  },
+  "oodN": {
+   "value": 500,
+   "unit": "scenes",
+   "source": "pipeline/tiny-unet-seg/make_data.ts (big, hollow and dark sets)",
+   "measured": "2026-10-07"
+  }
+ }
+}

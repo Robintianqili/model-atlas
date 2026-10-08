@@ -1,0 +1,37 @@
+// {%slug%}: trainer '{%trainerId%}' (kind B, design §4.5). Scaffolded by `atlas new model {%slug%}` on {%today%}.
+// The loaders wrap every TrainerDef export with trainingProcess() and register it as process 'train:{%trainerId%}'.
+// Check it in Node before any UI:  npm run atlas -- run {%slug%} train --frames 0..20
+// Python twin (optional, stronger badge): pipeline/{%slug%}/twin.py with the same state_dict names.
+//
+// Randomness: trainingProcess hands model() the run's rng.fork('init') and batch() one rng.fork('batch') stream for the
+// whole run. Draw from the rng you are given; do not fork it again per step (that would repeat the same batch).
+import type { Tensor, TrainOpt, TrainerDef } from '../../atlas/types/index.ts';
+import { MLP } from '../../atlas/autograd/nn.ts';
+import { mse } from '../../atlas/autograd/loss.ts';
+import { input } from '../../atlas/autograd/var.ts';
+
+/** A toy data set (replace it): XOR on four points. TS is the source of truth for synthetic data. */
+export type Data = { x: Tensor; y: Tensor };
+/** The learner's input when it is a data set like XOR ({ x, y } tensors); anything else (a point, a drawing) is not. */
+const isData = (d: unknown): d is Data => !!d && typeof d === 'object' && 'x' in d && 'y' in d;
+export const XOR: Data = {
+	x: { shape: [4, 2], data: Float64Array.from([0, 0, 0, 1, 1, 0, 1, 1]) },
+	y: { shape: [4, 1], data: Float64Array.from([0, 1, 1, 0]) }
+};
+
+export type Opt = TrainOpt & { hidden: number };
+
+export const {%trainerIdent%}: TrainerDef<unknown, MLP, { x: Tensor; y: Tensor }, Opt> = {
+	id: '{%trainerId%}',
+	title: { en: 'TODO: Train a tiny network', zh: 'TODO：训练一个小网络' },
+	defaults: { seed: 1, lr: 0.1, batch: 4, steps: 300, snapshotEvery: 10, optimizer: 'adam', hidden: 4 },
+	// rng is already the run's fork('init'), so sources with different optimizers start from the same weights
+	model: (rng, opt) => new MLP('net', [2, opt.hidden, 1], 'tanh', rng),
+	// The data is the learner's input (rt.input, from the manifest's input adapter); XOR until the package has one.
+	// Full batch here; to sample, draw from the rng argument (the run's 'batch' stream).
+	batch: (data) => (isData(data) ? data : XOR),
+	loss: (m, b, rec) => {
+		const yhat = m.forward(input(b.x), rec);
+		return { loss: mse(yhat, input(b.y)) };
+	}
+};
