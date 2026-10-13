@@ -233,6 +233,8 @@ export class LessonState {
 	/** the default is ladder test drawing 3, the hook's typical ladder (its top guess, house, is the most common one) */
 	source = $state<Source>({ kind: 'test', cls: 0, i: 2 });
 	drawnInput = $state.raw<Float32Array | null>(null);
+	/** the lesson pad's strokes (kept here, so the input sheet can close and reopen with the drawing) */
+	strokes = $state.raw<Stroke[]>([]);
 	trail = $state.raw<TrailItem[]>([]);
 	#trailN = 0;
 

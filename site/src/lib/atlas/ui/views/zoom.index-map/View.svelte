@@ -8,13 +8,13 @@
 <script lang="ts">
 	import Num from '../kit.parts/Num.svelte';
 	import { fmt3 } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import TensorPanel from '../kit.parts/TensorPanel.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, layerLabel, outLabels, resolveUnit, tensorOf, tokenIds, tokenTexts, unflat, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, layerLabel, outLabels, resolveUnit, tensorOf, tokenIds, tokenTexts, unflat, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -29,8 +29,8 @@
 	const out = $derived(R.trace && id ? R.trace.t[id] : null);
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
 	const T = $derived(out ? (axes[0] === 't' ? out.shape[0] : axes[1] === 'tq' ? out.shape[1] : 0) : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model)) : []);
-	const where = $derived(e ? unitWhere(e.unit, axes, tokens, outLabels(P, R.model)) : null);
+	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model), i18n.lang) : []);
+	const where = $derived(e ? unitWhere(e.unit, axes, tokens, outLabels(P, R.model), axisNames(P)) : null);
 	const srcId = $derived(e?.reads[0]?.tensor ?? '');
 	const src = $derived(R.trace && srcId ? tensorOf(R.trace, srcId) : null);
 	const srcCell = $derived(src && e?.reads[0]?.cells.length ? unflat(src.shape, e.reads[0].cells[0]) : null);
@@ -93,7 +93,7 @@
 				{t({ en: `The number ${fmt3(e.result)} is copied unchanged.`, zh: `数值 ${fmt3(e.result)} 原样复制。` })}
 			{/if}
 		</p>
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 
@@ -120,7 +120,7 @@
 		justify-items: center;
 		color: var(--muted);
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	@media (max-width: 560px) {
 		.arrow {

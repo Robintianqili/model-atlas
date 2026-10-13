@@ -752,6 +752,60 @@ export function layerNorm(x: Var, w?: Var | null, b?: Var | null, eps = 1e-5): V
 }
 
 /** The op namespace of design §4.5: op.add, op.matmul, … */
+// ------------------------------------------------------------------ K4: clamp, minimum, maximum (PPO's clipped ratio)
+
+/** clamp(x, lo, hi) as torch.clamp: min(max(x, lo), hi); null leaves that side open. The gradient passes where
+ *  lo ≤ x ≤ hi (the closed range, as PyTorch) and is 0 outside it. */
+export function clamp(x: Var, lo: number | null, hi: number | null): Var {
+	const a = x.data;
+	const L = lo ?? -Infinity;
+	const H = hi ?? Infinity;
+	const y = new Float64Array(a.length);
+	for (let i = 0; i < a.length; i++) y[i] = Math.min(Math.max(a[i], L), H);
+	return unary(
+		'clamp',
+		x,
+		y,
+		(g, r) => {
+			for (let i = 0; i < r.length; i++) r[i] = a[i] >= L && a[i] <= H ? g[i] : 0;
+		},
+		(g) => {
+			const m = new Float64Array(a.length);
+			for (let i = 0; i < a.length; i++) m[i] = a[i] >= L && a[i] <= H ? 1 : 0;
+			return mul(g, raw(m, x.shape.slice()));
+		}
+	);
+}
+
+/** minimum or maximum, broadcasting; the gradient goes to the chosen side, and is split evenly on a tie (as PyTorch). */
+function pick(op: 'minimum' | 'maximum', a: VarLike, b: VarLike): Var {
+	const A = asVar(a);
+	const B = asVar(b);
+	const shape = K.broadcastShape(A.shape, B.shape);
+	const x = K.expand(A.data, A.shape, shape);
+	const z = K.expand(B.data, B.shape, shape);
+	const y = new Float64Array(x.length);
+	const wa = new Float64Array(x.length);
+	for (let i = 0; i < x.length; i++) {
+		const takeA = op === 'minimum' ? x[i] < z[i] : x[i] > z[i];
+		const tie = x[i] === z[i];
+		y[i] = Number.isNaN(x[i]) || Number.isNaN(z[i]) ? NaN : takeA || tie ? x[i] : z[i];
+		wa[i] = tie ? 0.5 : takeA ? 1 : 0;
+	}
+	const wb = wa.map((w) => 1 - w);
+	return result(op, y, shape, [A, B], (g, need) => [need[0] ? sumTo(mul(g, raw(wa, shape.slice())), A.shape) : null, need[1] ? sumTo(mul(g, raw(wb, shape.slice())), B.shape) : null]);
+}
+
+/** Elementwise minimum of a and b (torch.minimum): PPO's min(r·A, clip(r)·A). */
+export function minimum(a: VarLike, b: VarLike): Var {
+	return pick('minimum', a, b);
+}
+
+/** Elementwise maximum of a and b (torch.maximum). */
+export function maximum(a: VarLike, b: VarLike): Var {
+	return pick('maximum', a, b);
+}
+
 export const op = {
 	add,
 	sub,
@@ -790,5 +844,8 @@ export const op = {
 	softmax,
 	logSoftmax,
 	conv1d,
-	layerNorm
+	layerNorm,
+	clamp,
+	minimum,
+	maximum
 };

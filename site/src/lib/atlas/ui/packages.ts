@@ -18,6 +18,7 @@ import type { OpDef } from '../types/op.ts';
 import type { ProcessDef } from '../types/process.ts';
 import type { TrainerDef } from '../types/train.ts';
 import type { PackageModules, SourceRunner } from '../types/runtime.ts';
+import { prepareViews } from './registry.ts';
 
 type Mod = Record<string, unknown>;
 type Loader<T = Mod> = () => Promise<T>;
@@ -90,7 +91,8 @@ export interface LoadedPackage {
 	notes: string[];
 }
 
-/** The package for `slug`, or null when there is none. Throws when a package file fails to load. */
+/** The package for `slug`, or null when there is none. Throws when a package file fails to load. Its view metas are in the
+ *  registry when it resolves (prepareViews: hasView / viewMeta / loadView stay synchronous for every caller). */
 export async function loadPackage(slug: string): Promise<LoadedPackage | null> {
 	const em = explainers[pkgPath(slug, 'explainer.ts')];
 	if (!em) return null;
@@ -103,7 +105,7 @@ export async function loadPackage(slug: string): Promise<LoadedPackage | null> {
 		const l = globbed[pkgPath(slug, file)];
 		return l ? l() : null;
 	};
-	const [lm, om, pm, tm] = await Promise.all([get(lessons, 'lesson.ts'), get(opsMods, 'ops.ts'), get(processMods, 'process.ts'), get(trainerMods, 'trainer.ts')]);
+	const [lm, om, pm, tm] = await Promise.all([get(lessons, 'lesson.ts'), get(opsMods, 'ops.ts'), get(processMods, 'process.ts'), get(trainerMods, 'trainer.ts'), prepareViews(slug)]);
 	const lesson = lm ? (((lm.default ?? lm.lesson) as LessonDef<any> | undefined) ?? null) : null;
 	if (lm && !lesson) notes.push('lesson.ts has no default export');
 	let ops: OpDef[];

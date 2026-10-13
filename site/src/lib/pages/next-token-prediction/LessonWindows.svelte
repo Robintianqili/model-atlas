@@ -164,8 +164,6 @@
 		margin: 0;
 		font-size: var(--fs-xs);
 		color: var(--muted);
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
 	}
 	.sent {
 		display: flex;

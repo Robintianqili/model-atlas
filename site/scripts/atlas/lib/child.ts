@@ -9,6 +9,8 @@ export interface RunResult {
 	stdout: string;
 	stderr: string;
 	ms: number;
+	/** K4: the command was stopped because it ran past timeoutMs */
+	timedOut?: boolean;
 }
 
 /** Run a command; with `echo`, its output is also streamed to this process (line by line, prefixed). */
@@ -36,14 +38,19 @@ export function runCmd(cmd: string, args: string[], o: { cwd?: string; env?: Nod
 			relay(c, process.stderr);
 		});
 		let timer: NodeJS.Timeout | undefined;
-		if (o.timeoutMs) timer = setTimeout(() => p.kill(), o.timeoutMs);
+		let timedOut = false;
+		if (o.timeoutMs)
+			timer = setTimeout(() => {
+				timedOut = true;
+				p.kill();
+			}, o.timeoutMs);
 		p.on('error', (e) => {
 			if (timer) clearTimeout(timer);
 			reject(e);
 		});
 		p.on('close', (code) => {
 			if (timer) clearTimeout(timer);
-			resolve({ code: code ?? 1, stdout: out, stderr: err, ms: performance.now() - t0 });
+			resolve({ code: code ?? 1, stdout: out, stderr: err, ms: performance.now() - t0, ...(timedOut ? { timedOut } : {}) });
 		});
 	});
 }

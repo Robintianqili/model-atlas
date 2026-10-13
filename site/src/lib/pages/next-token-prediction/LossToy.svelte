@@ -382,7 +382,7 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.axis {
@@ -402,7 +402,7 @@
 	}
 	.meanlbl,
 	.reflbl {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 		paint-order: stroke;
 		stroke: var(--surface);

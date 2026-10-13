@@ -3,6 +3,9 @@
   the row (classes, tokens, or the keys of an attention row) with its score x, e^(x − m) and its share, largest first,
   the unit's own entry outlined; masked entries (−∞) get exactly 0. Then the op's steps (largest score m, the
   exponential, the row sum, the share), the formula and the stored-value check. Click a row to pick that entry.
+  K4: the entries are named by the classes or the vocabulary only when the softmax runs over a class, vocab or feature
+  axis (a softmax over 4 experts, axis k, no longer took the characters of ids 0-3); props.labels names them otherwise
+  (strings or { en, zh }), and props.axisWords / axisItems name an axis such as k.
 -->
 <script lang="ts">
 	import Num from '../kit.parts/Num.svelte';
@@ -11,12 +14,12 @@
 	import { makeScale } from '$lib/kit/color';
 	import { themeState } from '$lib/kit/theme.svelte';
 	import { fmt3, fmtPct } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, layerLabel, outLabels, resolveUnit, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, keyTexts, layerLabel, nameText, outLabels, resolveUnit, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -33,21 +36,30 @@
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
 	const ids = $derived(tokenIds(R.trace, R.model));
 	const T = $derived(out ? (axes[0] === 't' ? out.shape[0] : axes[1] === 'tq' ? out.shape[1] : 0) : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, ids) : []);
+	const tokens = $derived(T ? tokenTexts(P, T, ids, i18n.lang) : []);
 	const labels = $derived(outLabels(P, R.model));
-	const where = $derived(e ? unitWhere(e.unit, axes, tokens, labels) : null);
+	const where = $derived(e ? unitWhere(e.unit, axes, tokens, labels, axisNames(P)) : null);
 	const ax = $derived(axes.length - 1);
 	const kAt = $derived(e ? (e.values.k ?? e.unit[ax]) : 0);
 	const lastAxis = $derived(axes[ax]);
+	const own = $derived(Array.isArray(P.props.labels) ? (P.props.labels as unknown[]) : null);
+	const names = $derived(axisNames(P));
 	function itemName(j: number): string {
-		if (lastAxis === 'tk') return `${t({ en: 'key', zh: '键' })} ${j}${tokens[j] ? ` “${tokens[j]}”` : ''}`;
-		if (labels) {
+		if (own) return nameText(own[j], i18n.lang) ?? `#${j}`;
+		if (lastAxis === 'tk') return `${t({ en: 'key', zh: '键' })} ${j}${keyNames[j] ? ` “${keyNames[j]}”` : ''}`;
+		const item = names.items?.[lastAxis]?.[j];
+		if (item !== undefined) return nameText(item, i18n.lang) ?? `#${j}`;
+		const word = names.words?.[lastAxis];
+		if (word) return `${t(word)} ${j}`;
+		if (labels && (lastAxis === undefined || lastAxis === 'class' || lastAxis === 'vocab' || lastAxis === 'd' || lastAxis === 'f')) {
 			const l = labels(j);
 			return typeof l === 'string' ? l : t(l);
 		}
 		return `#${j}`;
 	}
 	const terms = $derived(e?.terms ?? []);
+	// K4: the keys of an attention row by their own names (props.keys for cross-attention), not the queries' tokens
+	const keyNames = $derived(lastAxis === 'tk' ? keyTexts(P, terms.length, ids, i18n.lang).map((x, j) => (x === String(j) ? '' : x)) : []);
 	const order = $derived.by(() => {
 		const ix = Array.from({ length: terms.length }, (_, i) => i).sort((a, b) => terms[b].p - terms[a].p || a - b);
 		if (all || ix.length <= 12) return ix;
@@ -144,7 +156,7 @@
 				{/each}
 			</ol>
 		{/if}
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 

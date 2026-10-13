@@ -15,7 +15,9 @@
 //            server, one browser).
 //   --all    every package's fast gates, kit honesty, docs, the atlas tests, legacy parity, ONE full build (npm run check
 //            over the whole site, every page) and, for the packages given (positional or --e2e a,b|all), ONE e2e sequence
-//            with --passes all by default.
+//            on the default 2 passes (lean gates, 2026-10-13; it ran --passes all before). The integrator runs it
+//            without packages (each lane's full check ran its e2e); a kit or layout change names about 6 packages of
+//            different kinds.
 //
 // Gates for one package, each blocking unless marked:
 //   schema       manifest (slug, catalog AK701 unless devOnly, TODO markers AK501, credits AK704), spec 1.1 + weights,
@@ -37,24 +39,32 @@
 //                (a warning for devOnly packages); credits complete
 //   ownership    inside a lane: nothing outside the owned paths changed (AK702; merge --dry-run rules, parallel I/O)
 // The report also counts page-specific lines of code (files under explainers/<slug>/ except tests; comments and CSS not
-// counted; target <= 1,000).
+// counted; K4: nor the manifest's `catalog` block, data only promote reads; target <= 1,000).
+// K4: the op tests gate also runs the kit's view contract (types/contract.test.ts, part 5) on the package's own views
+// (meta.ts default export, key = folder, demo() resolves, describe(demo) in en and zh, provenance 'illustrative'), which
+// only check:atlas ran before (tinymoe's route demo passed every package gate and failed check --all). A test file may
+// raise its time limit (default 540 s) with a line `// atlas-timeout: <seconds>`, and a run that hits it says so
+// (AK408 "timed out after N s", not "0 passed, 0 failed"). --only keeps the gates it does not run from the previous
+// check.json (marked with their date), so a partial re-run no longer loses the full report; check.json records the mode.
 // --all: every package's non-build gates, docs (node scripts/atlas/docs.ts --check: DEVKIT.md's generated tables match
 // the code), all atlas Node tests (npm run check:atlas, which also runs the docs check), both legacy parity scripts
 // (--no-write), then one full build into .atlas/build-all/ with npm run check and check:build (unless --fast), then one
-// e2e sequence over the given packages.
+// e2e sequence over the given packages, on the default passes unless --passes says otherwise (allE2ePlan).
 // Writes .atlas/<slug>/check.json (or .atlas/check-all.json).
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { ProcessDef } from '../../../src/lib/atlas/types/index.ts';
+import type { ProcessDef, ViewMeta } from '../../../src/lib/atlas/types/index.ts';
 import { pythonChoice } from '../config.ts';
 import { AtlasError, formatIssue, type AkCode } from '../errors.ts';
 import { siteSteps } from '../lib/build.ts';
+import { closing } from '../lib/catalogpatch.ts';
 import { runNode, runNpm } from '../lib/child.ts';
 import { readRecord, stopKept } from '../lib/devserver.ts';
 import { inputsKey, readCached, writeCached } from '../lib/gatecache.ts';
 import { posix, writeJson } from '../lib/io.ts';
 import { KNOWN_LANES, modelOwns, scanLane } from '../lib/lanes.ts';
+import { metaImportProblems } from '../lib/metalint.ts';
 import { resolvePasses } from '../lib/passes.ts';
 import { Issues, LEGACY, openPackage, sig, walk, type Opened } from '../lib/pkg.ts';
 import { checkPackages, firstProblems } from '../lib/typecheck.ts';
@@ -79,7 +89,7 @@ export interface CheckOpts {
 	echo?: boolean;
 	/** the e2e gate's dev-server port (else e2e picks one: the package's port when free, else a free one from 5210) */
 	port?: number;
-	/** e2e passes (lib/passes.ts); default 'default' for packages, 'all' for --all */
+	/** e2e passes (lib/passes.ts); default 'default', for --all too (lean gates, 2026-10-13) */
 	passes?: string;
 	/** keep the dev server e2e starts (default true) */
 	keepServer?: boolean;
@@ -166,11 +176,64 @@ async function schemaGate(o: Opened, is: Issues): Promise<string> {
 }
 
 // ------------------------------------------------------------------ op tests and claims (node --test)
-async function nodeTests(files: string[], echo: boolean): Promise<{ code: number; pass: number; fail: number; out: string }> {
+/** K4: the time limit of a node --test run: 540 s, or the largest `// atlas-timeout: <seconds>` line of its files (at most
+ *  3,600 s; a package whose claims train every fixture at full length on a loaded machine). */
+export function testTimeoutMs(files: string[]): number {
+	let s = 540;
+	for (const f of files) {
+		const m = existsSync(f) ? /^\s*\/\/\s*atlas-timeout:\s*(\d+)/m.exec(readFileSync(f, 'utf8')) : null;
+		if (m) s = Math.max(s, Math.min(3600, Number(m[1])));
+	}
+	return s * 1000;
+}
+
+/** The views/<key>/meta.ts files of a package folder. */
+export function viewMetaFiles(dir: string): string[] {
+	const views = join(dir, 'views');
+	if (!existsSync(views)) return [];
+	return readdirSync(views)
+		.map((k) => join(views, k, 'meta.ts'))
+		.filter((f) => existsSync(f));
+}
+
+/** K4: the view contract of types/contract.test.ts (part 5) on one package's views/<key>/meta.ts. */
+export async function viewContract(dir: string, slug: string): Promise<{ views: number; problems: string[] }> {
+	const views = join(dir, 'views');
+	const problems: string[] = [];
+	let n = 0;
+	if (!existsSync(views)) return { views: 0, problems };
+	for (const key of readdirSync(views)) {
+		const file = join(views, key, 'meta.ts');
+		if (!existsSync(file)) continue;
+		n++;
+		const k = `${slug}/${key}`;
+		try {
+			const mod = (await import(pathToFileURL(file).href)) as { default?: ViewMeta; meta?: ViewMeta };
+			const meta = mod.default ?? mod.meta;
+			if (!meta) {
+				problems.push(`${k}: meta.ts must default-export its ViewMeta`);
+				continue;
+			}
+			if (meta.key !== k) problems.push(`${k}: meta.key is '${meta.key}', must be '${k}'`);
+			if (!(meta.title?.en && meta.title?.zh)) problems.push(`${k}: title needs en and zh`);
+			if (!Array.isArray(meta.kinds) || !meta.kinds.length) problems.push(`${k}: kinds is empty`);
+			const demo = await meta.demo();
+			if (demo.provenance !== 'illustrative') problems.push(`${k}: demo provenance must be 'illustrative' (got '${demo.provenance}')`);
+			const d = meta.describe(demo);
+			if (!d.en?.trim() || !d.zh?.trim()) problems.push(`${k}: describe(demo) is empty in ${!d.en?.trim() ? 'en' : 'zh'} (AK504)`);
+		} catch (e) {
+			problems.push(`${k}: ${(e as Error).message.split('\n')[0]}`);
+		}
+	}
+	return { views: n, problems };
+}
+
+async function nodeTests(files: string[], echo: boolean): Promise<{ code: number; pass: number; fail: number; out: string; timedOut?: number }> {
 	if (!files.length) return { code: 0, pass: 0, fail: 0, out: '' };
-	const r = await runNode(['--test', ...files], { echo: echo ? '    ' : false, timeoutMs: 540_000 });
+	const limit = testTimeoutMs(files);
+	const r = await runNode(['--test', ...files], { echo: echo ? '    ' : false, timeoutMs: limit });
 	const num = (k: string) => Number(new RegExp(`^ℹ ${k} (\\d+)`, 'm').exec(r.stdout)?.[1] ?? 0);
-	return { code: r.code, pass: num('pass'), fail: num('fail'), out: r.stdout + r.stderr };
+	return { code: r.code, pass: num('pass'), fail: num('fail'), out: r.stdout + r.stderr, ...(r.timedOut ? { timedOut: limit / 1000 } : {}) };
 }
 
 // ------------------------------------------------------------------ determinism
@@ -412,6 +475,20 @@ export function codeLines(text: string, svelte = false): number {
 	return n;
 }
 
+/** K4: explainer.ts without its manifest's `catalog: { … }` block (data only promote reads: hook, shows, sizes). */
+export function withoutCatalog(src: string): string {
+	const m = /^[ \t]*catalog\s*:\s*\{/m.exec(src);
+	if (!m) return src;
+	const open = m.index + m[0].length - 1;
+	try {
+		let end = closing(src, open) + 1;
+		if (src[end] === ',') end++;
+		return src.slice(0, m.index) + src.slice(end);
+	} catch {
+		return src;
+	}
+}
+
 export function pageLines(dir: string): { files: number; lines: number; all: number } {
 	let lines = 0;
 	let all = 0;
@@ -419,7 +496,8 @@ export function pageLines(dir: string): { files: number; lines: number; all: num
 	for (const f of walk(dir)) {
 		if (/\.test\.ts$/.test(f) || !/\.(ts|svelte|js)$/.test(f)) continue;
 		files++;
-		const text = readFileSync(join(dir, f), 'utf8');
+		const raw = readFileSync(join(dir, f), 'utf8');
+		const text = f === 'explainer.ts' ? withoutCatalog(raw) : raw;
 		all += text.split('\n').filter((l) => l.trim()).length;
 		lines += codeLines(text, f.endsWith('.svelte'));
 	}
@@ -509,8 +587,17 @@ async function packageGates(op: Opened, o: CheckOpts): Promise<Gate[]> {
 	gates.push(
 		await cachedGate(op, o, 'op tests', gateInputs(op, importClosure(op.l.dir, tests)), async (is) => {
 			const t = await nodeTests(tests, echo);
-			if (t.code !== 0) is.error('AK301', `package tests failed (${t.fail} of ${t.pass + t.fail})`, { where: tests.map((f) => posix(relative(r.site, f))).join(', ') });
-			return tests.length ? `${t.pass} passed, ${t.fail} failed (${tests.length} file(s))` : 'no package tests (local ops and views bring their own)';
+			if (t.timedOut) is.error('AK301', `package tests timed out after ${t.timedOut} s (${t.pass} passed before)`, { where: tests.map((f) => posix(relative(r.site, f))).join(', '), fix: 'make the tests cheaper, or raise the limit with a line // atlas-timeout: <seconds> in the test file' });
+			else if (t.code !== 0) is.error('AK301', `package tests failed (${t.fail} of ${t.pass + t.fail})`, { where: tests.map((f) => posix(relative(r.site, f))).join(', ') });
+			// K4: the kit's view contract on this package's views (check:atlas runs it over every package)
+			const vc = await viewContract(op.l.dir, slug);
+			for (const p of vc.problems) is.error('AK504', `view contract: ${p}`, { fix: "meta.ts default-exports { key: '<slug>/<folder>', title, kinds, describe, demo }, and demo() works in Node (src/lib/atlas/types/contract.test.ts part 5)" });
+			// redesign F (AK507): a package's view metas load with the package (prepareViews), so they import no Svelte module
+			// and no other package
+			const metaProblems = viewMetaFiles(op.l.dir).flatMap((f) => metaImportProblems(f, slug));
+			for (const p of metaProblems) is.error('AK507', p, { fix: 'a meta.ts imports types, the kit and its own package only; the component stays in View.svelte' });
+			const vcText = vc.views ? `; view contract ${vc.problems.length || metaProblems.length ? 'FAILED' : 'ok'} on ${vc.views} view(s)` : '';
+			return (tests.length ? `${t.pass} passed, ${t.fail} failed (${tests.length} file(s))` : 'no package tests (local ops and views bring their own)') + vcText;
 		})
 	);
 	gates.push(
@@ -522,8 +609,9 @@ async function packageGates(op: Opened, o: CheckOpts): Promise<Gate[]> {
 			let claimText = 'no claims.test.ts';
 			if (existsSync(claims)) {
 				const t = await nodeTests([claims], echo);
-				claimText = `claims ${t.pass} passed, ${t.fail} failed`;
-				if (t.code !== 0) is.error('AK408', `claim tests failed (${t.fail})`, { where: posix(relative(r.site, claims)), likely: t.out.split('\n').filter((l) => /✖|AssertionError|Error:/.test(l)).slice(0, 4).join(' | ') });
+				claimText = `claims ${t.pass} passed, ${t.fail} failed${t.timedOut ? `, timed out after ${t.timedOut} s` : ''}`;
+				if (t.timedOut) is.error('AK408', `claim tests timed out after ${t.timedOut} s (${t.pass} passed before the limit)`, { where: posix(relative(r.site, claims)), likely: 'a loaded machine, or claims that train every fixture at full length', fix: 'share runs between fixtures (withFixtures does), use a shorter run where the claim allows, or raise the limit: // atlas-timeout: <seconds> in claims.test.ts' });
+				else if (t.code !== 0) is.error('AK408', `claim tests failed (${t.fail})`, { where: posix(relative(r.site, claims)), likely: t.out.split('\n').filter((l) => /✖|AssertionError|Error:/.test(l)).slice(0, 4).join(' | ') });
 			} else if (op.l.pkg.manifest.quality !== 'draft') is.error('AK408', 'a reviewed lesson needs claims.test.ts for its factual sentences');
 			const errs = res.issues.filter((i) => i.level === 'error').length;
 			return `${res.steps} steps x ${res.fixtures.length} fixtures x en/zh: ${errs} error(s), ${res.issues.length - errs} warning(s)${res.viewsChecked ? '' : ' (view keys not checked: no view metas)'}; ${claimText}`;
@@ -542,16 +630,39 @@ async function ownershipGate(o: CheckOpts): Promise<Gate> {
 	if (!r.lane) return skipGate('ownership', 'main tree (no lane)');
 	return gate('ownership', o, async (is) => {
 		const name = r.lane!;
-		const laneDir = join(r.site, '..');
-		const main = join(laneDir, '..', '..');
+		// lane.json sits next to the lane's site/; the main site is the one lane.json records (a lane may live outside the repo)
+		const laneDir = r.laneDir ?? join(r.site, '..');
+		const main = r.main;
 		const plan = await scanLane(main, r.site, join(laneDir, 'lane.json'), KNOWN_LANES[name] ?? modelOwns(name));
 		if (plan.outside.length) is.error('AK702', `the lane changed ${plan.outside.length} file(s) outside its owned paths`, { where: plan.outside.slice(0, 8).join(', '), fix: `npm run atlas -- merge ${name} --dry-run lists them` });
 		return `lane ${name}: ${plan.copy.length} owned file(s) to merge, ${plan.outside.length} outside`;
 	});
 }
 
-function writeReport(res: Result): void {
-	writeJson(join(roots().site, '.atlas', res.slug, 'check.json'), { ...res, checked: new Date().toISOString() }, 1);
+/** K4: the mode a check ran in, as check.json records it (review says which gates a packet's numbers come from). */
+export function checkMode(o: CheckOpts): string {
+	return o.quick ? 'quick' : o.fast ? 'fast' : 'full';
+}
+
+function writeReport(res: Result, o: CheckOpts = {}): void {
+	const file = join(roots().site, '.atlas', res.slug, 'check.json');
+	let gates = res.gates;
+	// K4: --only re-runs some gates; the others keep their result from the previous report (with its date), so a partial
+	// run no longer overwrites the full gate summary
+	if (o.only && existsSync(file)) {
+		try {
+			const prev = JSON.parse(readFileSync(file, 'utf8')) as { gates?: Gate[]; checked?: string; mode?: string };
+			const when = `${prev.mode ? `${prev.mode} ` : ''}check of ${(prev.checked ?? '').slice(0, 16).replace('T', ' ')}`;
+			gates = res.gates.map((g) => {
+				if (g.status !== 'skip' || !/--only/.test(g.summary)) return g;
+				const old = prev.gates?.find((x) => x.name === g.name);
+				return old && old.status !== 'skip' ? { ...old, summary: `${old.summary.replace(/ \(from the .* check of [^)]*\)$/, '')} (from the ${when})` } : g;
+			});
+		} catch {
+			/* an unreadable old report: write this run alone */
+		}
+	}
+	writeJson(file, { ...res, gates, pass: gates.every((g) => g.status !== 'fail'), mode: o.only ? `${checkMode(o)}, --only ${o.only.join(',')}` : checkMode(o), checked: new Date().toISOString() }, 1);
 }
 
 const e2eGateFrom = (x: Pick<E2eResult, 'issues' | 'summary' | 'ms'>): Gate => {
@@ -594,7 +705,7 @@ export async function checkPackages_(slugs: string[], o: CheckOpts = {}): Promis
 		gates.push(await gate('paperwork', o, async (is) => paperworkGate(op, is)));
 		gates.push(own);
 		const res: Result = { slug: op.slug, gates, pass: gates.every((g) => g.status !== 'fail'), lines: pageLines(op.l.dir) };
-		writeReport(res);
+		writeReport(res, o);
 		results.push(res);
 	}
 	return { results };
@@ -605,6 +716,13 @@ export async function checkPackage(slug: string, o: CheckOpts = {}): Promise<Res
 }
 
 // ------------------------------------------------------------------ --all
+/** The one e2e sequence of --all: the packages given (every package for --e2e all), on the default 2 passes unless
+ *  --passes says otherwise. Lean gates (2026-10-13): it ran the five `all` passes before; the integrator gives no
+ *  packages (the lanes' full checks ran their e2e), a kit or layout change about 6 packages of different kinds. */
+export function allE2ePlan(o: Pick<CheckOpts, 'e2e' | 'passes'>, all: readonly string[]): { slugs: string[]; passes: string } {
+	return { slugs: o.e2e === 'all' ? [...all] : [...(o.e2e ?? [])], passes: o.passes ?? 'default' };
+}
+
 async function checkAll(o: CheckOpts): Promise<{ results: { slug: string; pass: boolean; gates: Gate[] }[]; extra: Gate[]; pass: boolean }> {
 	const r = roots();
 	const results: { slug: string; pass: boolean; gates: Gate[] }[] = [];
@@ -646,13 +764,13 @@ async function checkAll(o: CheckOpts): Promise<{ results: { slug: string; pass: 
 		);
 	if (!o.fast) extra.push(await gate('site (one build)', o, async (is) => (await siteSteps(is, { site: r.site, name: 'build-all', slugs: null, echo: o.echo })).summary));
 	else extra.push(skipGate('site (one build)', '--fast'));
-	// K2: one e2e sequence over the given packages (one dev server, one browser), --passes all by default
-	const e2eSlugs = o.e2e === 'all' ? all : (o.e2e ?? []);
-	if (e2eSlugs.length && !o.fast) {
+	// K2: one e2e sequence over the given packages (one dev server, one browser); lean gates: the default 2 passes
+	const plan = allE2ePlan(o, all);
+	if (plan.slugs.length && !o.fast) {
 		const { e2eMany } = await import('./e2e.ts');
-		const res = await e2eMany(e2eSlugs, { port: o.port, passes: o.passes ?? 'all', keepServer: o.keepServer, echo: o.echo });
+		const res = await e2eMany(plan.slugs, { port: o.port, passes: plan.passes, keepServer: o.keepServer, echo: o.echo });
 		for (const x of res) extra.push({ ...e2eGateFrom(x), name: `e2e ${x.slug}` });
-	} else extra.push(skipGate('e2e (one sequence)', o.fast ? '--fast' : 'no packages given (atlas check --all <slug> ... or --e2e all)'));
+	} else extra.push(skipGate('e2e (one sequence)', o.fast ? '--fast' : "no packages given (the lanes' checks ran their e2e; a kit or layout change: check --all <about 6 slugs>)"));
 	const pass = results.every((x) => x.pass) && extra.every((g) => g.status !== 'fail');
 	writeJson(join(r.site, '.atlas', 'check-all.json'), { results, extra, pass, checked: new Date().toISOString() }, 1);
 	return { results, extra, pass };
@@ -673,8 +791,9 @@ function printIssues(gates: Gate[]): void {
 
 export const USAGE = 'atlas check <slug> [<slug>...] [--quick|--fast] [--passes <list>] [--json] [--only gate,gate] [--port n] [--keep-server|--no-keep-server] [--stop-server] | check --all [<slug>...] [--e2e <slugs|all>] [--passes <list>] [--fast] [--json]';
 
-export async function main(args: string[]): Promise<number> {
-	const t0 = performance.now();
+/** The arguments of `atlas check` (AK301 for an unknown flag, gate or pass, before anything runs). With --all, the
+ *  positional slugs join --e2e: the packages of its one e2e sequence (allE2ePlan). */
+export function parseCheckArgs(args: string[]): { o: CheckOpts & { json?: boolean; all?: boolean; stop?: boolean }; pos: string[] } {
 	const o: CheckOpts & { json?: boolean; all?: boolean; stop?: boolean } = { echo: false };
 	const pos: string[] = [];
 	for (let i = 0; i < args.length; i++) {
@@ -701,6 +820,16 @@ export async function main(args: string[]): Promise<number> {
 	if (o.only) for (const g of o.only) if (!(GATES as readonly string[]).includes(g)) throw new AtlasError('AK301', `unknown gate '${g}'`, { fix: `gates: ${GATES.join(', ')}` });
 	if (o.quick && o.fast) throw new AtlasError('AK301', '--quick and --fast: pick one (--quick adds the package type check and the parity cache)');
 	if (o.passes !== undefined) resolvePasses(o.passes);
+	if (o.all) {
+		if (o.quick) throw new AtlasError('AK301', 'check --all has no --quick (it runs every package\'s fast gates; --fast skips the build and e2e)');
+		if (pos.length) o.e2e = o.e2e === 'all' ? 'all' : [...new Set([...(o.e2e ?? []), ...pos])];
+	}
+	return { o, pos };
+}
+
+export async function main(args: string[]): Promise<number> {
+	const t0 = performance.now();
+	const { o, pos } = parseCheckArgs(args);
 	const done = async () => {
 		// --json: stdout is the report alone; the notes go to stderr
 		const say = o.json ? console.error : console.log;
@@ -712,8 +841,6 @@ export async function main(args: string[]): Promise<number> {
 		say(`  took ${((performance.now() - t0) / 1000).toFixed(1)} s`);
 	};
 	if (o.all) {
-		if (o.quick) throw new AtlasError('AK301', 'check --all has no --quick (it runs every package\'s fast gates; --fast skips the build and e2e)');
-		if (pos.length) o.e2e = o.e2e === 'all' ? 'all' : [...new Set([...(o.e2e ?? []), ...pos])];
 		const res = await checkAll(o);
 		if (o.json) console.log(JSON.stringify(res));
 		else {

@@ -1,6 +1,7 @@
 <!--
-  A numbered page section with an anchor, a title and an optional provenance badge.
-  <Section id="output" n={7} title={{ en: 'Output', zh: '输出' }} provenance="live">…</Section>
+  A page section with an anchor, a title and an optional provenance label (redesign: sentence-case titles in the sans;
+  a section number, when given, is a quiet prefix, never mono).
+  <Section id="output" title={{ en: 'Output', zh: '输出' }} provenance="live">…</Section>
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -16,7 +17,7 @@
 		provenance?: Provenance;
 		precision?: string;
 		tolerance?: number;
-		/** full-bleed background band */
+		/** a background band */
 		band?: boolean;
 		children: Snippet;
 	}
@@ -26,7 +27,7 @@
 <section {id} class="sec" class:band aria-labelledby="{id}-title">
 	<header class="sh">
 		<h2 id="{id}-title">
-			{#if n !== undefined}<span class="n num" aria-hidden="true">{String(n).padStart(2, '0')}</span>{/if}
+			{#if n !== undefined}<span class="n" aria-hidden="true">{n}</span>{/if}
 			<span>{t(title)}</span>
 		</h2>
 		{#if provenance}<ProvenanceBadge mode={provenance} {precision} {tolerance} />{/if}
@@ -39,12 +40,12 @@
 	.sec {
 		padding: var(--s6) 0 var(--s4);
 		border-top: 1px solid var(--rule);
-		scroll-margin-top: calc(var(--header-h) + 12px);
+		scroll-margin-top: calc(var(--ltop-h) + 12px);
 	}
 	.band {
-		background: var(--surface-2);
-		border-radius: var(--r3);
 		padding-inline: var(--s4);
+		border-radius: var(--r4);
+		background: var(--well);
 	}
 	.sh {
 		display: flex;
@@ -55,21 +56,21 @@
 		margin-bottom: var(--s3);
 	}
 	h2 {
-		margin: 0;
 		display: flex;
 		align-items: baseline;
-		gap: 12px;
-		font-size: var(--fs-xl);
+		gap: 10px;
+		margin: 0;
+		font-size: var(--t-xl);
+		line-height: var(--lh-xl);
 	}
 	.n {
-		font-size: var(--fs-sm);
-		color: var(--accent);
-		font-weight: 600;
-		letter-spacing: 0.04em;
+		color: var(--muted);
+		font-size: var(--t-md);
+		font-weight: var(--w-ui);
 	}
 	.intro {
-		color: var(--ink-2);
 		max-width: var(--measure);
+		color: var(--ink-2);
 	}
 	.body {
 		min-width: 0;

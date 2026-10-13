@@ -1,0 +1,119 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "bigTokens": {
+   "value": 64000,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "next tokens scored (1,000 windows of the validation split)",
+   "measured": "2026-10-13"
+  },
+  "pretrainSteps": {
+   "value": 30000,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "TinyGPT's pretraining steps (spec.json training.steps)",
+   "measured": "2026-10-13"
+  },
+  "upSteps": {
+   "value": 1500,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "uptraining steps (5% of TinyGPT's 30,000 pretraining steps)",
+   "measured": "2026-10-13"
+  },
+  "upTokens": {
+   "value": 49152000,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "training tokens seen while uptraining",
+   "measured": "2026-10-13"
+  },
+  "pplMha0": {
+   "value": 6.8786,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 4 key/value head(s) per block after 0 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMha50": {
+   "value": 6.8351,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 4 key/value head(s) per block after 50 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMha150": {
+   "value": 6.8654,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 4 key/value head(s) per block after 150 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMha500": {
+   "value": 6.8259,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 4 key/value head(s) per block after 500 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMha1500": {
+   "value": 6.6658,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 4 key/value head(s) per block after 1500 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplGqa0": {
+   "value": 35.4538,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 2 key/value head(s) per block after 0 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplGqa50": {
+   "value": 9.4751,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 2 key/value head(s) per block after 50 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplGqa150": {
+   "value": 7.7988,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 2 key/value head(s) per block after 150 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplGqa500": {
+   "value": 7.3038,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 2 key/value head(s) per block after 500 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplGqa1500": {
+   "value": 7.0036,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 2 key/value head(s) per block after 1500 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMqa0": {
+   "value": 62.3488,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 1 key/value head(s) per block after 0 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMqa50": {
+   "value": 15.8861,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 1 key/value head(s) per block after 50 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMqa150": {
+   "value": 9.2371,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 1 key/value head(s) per block after 150 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMqa500": {
+   "value": 7.943,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 1 key/value head(s) per block after 500 uptraining steps",
+   "measured": "2026-10-13"
+  },
+  "pplMqa1500": {
+   "value": 7.4404,
+   "source": "pipeline/attention-variants/prepare.py",
+   "unit": "validation perplexity with 1 key/value head(s) per block after 1500 uptraining steps",
+   "measured": "2026-10-13"
+  }
+ }
+}

@@ -66,9 +66,13 @@ judge meaning: read the print as a learner would.
 | `check <slug>` | the same without the cache, + site (`check:catalog`, a package-only build into `.atlas/build-<slug>/`, `check:build`) + e2e (default passes) | once, at the end |
 | `check <slug> --fast` | the quick gates without types and without the cache | to distrust the cache cheaply |
 | `check a b` | the packages' gates, one package-only build, one e2e sequence | a builder with two packages |
-| `check --all [<slugs>] [--e2e a,b\|all]` | every package's fast gates, the kit gates (honesty, docs, all Node tests, legacy parity), `npm run check`, one full build, one e2e sequence (`--passes all`) | integration, once |
+| `check --all [<slugs>] [--e2e a,b\|all]` | every package's fast gates, the kit gates (honesty, docs, all Node tests, legacy parity), `npm run check`, one full build, one e2e sequence over the slugs given (default passes) | integration, once, without slugs; after a kit or layout change, with about 6 slugs of different kinds |
 | `build <slug>[,<slug>]` | the package-only build alone (`ATLAS_ONLY`) | to look at built pages |
 
+- **Lean gates.** Builder: `--quick` while iterating, the one full check (one e2e, default passes) at the end.
+  Reviewer: no e2e (the packet; the full check only when it is missing or stale). Integrator: `check --all` without
+  slugs. A kit or layout change: `check --all` with about 6 slugs. A full-site sweep (one screenshot per page): before a
+  public release only. Never re-run a gate that passed; AK603 never blocks.
 - The cache does not count `lesson.ts`, `claims.test.ts`, `.svelte` or `.md` files (unless a package test imports
   them). A lesson fixture you add is tested by parity and the op tests only in the full check.
 - `--only gate,gate` picks gates; `--json` prints the report (also `.atlas/<slug>/check.json`). A failed site step
@@ -80,10 +84,12 @@ judge meaning: read the print as a learner would.
 
 ## 5. The browser test (e2e)
 
+The full check runs e2e once. Run it by hand only to re-run a browser gate that failed (or `check <slug> --only e2e`).
+
 ```
 npm run atlas -- e2e <slug>                     # default passes: desktop-en-light, phone-zh-dark (+ a 360 px scroll probe)
-npm run atlas -- e2e <slug> --axe warn          # while iterating: axe reports without failing
-npm run atlas -- e2e <slug> --passes all        # 5 passes: + narrow-en-dark, desktop-zh-light, desktop-en-light-reduced
+npm run atlas -- e2e <slug> --axe warn          # re-running a failed axe gate: the list without failing
+npm run atlas -- e2e <slug> --passes all        # 5 passes, on request (no gate needs them)
 npm run atlas -- e2e a,b                        # several packages in one sequence
 npm run atlas -- e2e --stop-server              # stop the kept dev server
 ```
@@ -91,19 +97,25 @@ npm run atlas -- e2e --stop-server              # stop the kept dev server
 - Pass names: `<desktop|phone|narrow|px>-<en|zh>-<light|dark>[-reduced]`; presets `default`, `all`, `full`.
 - It opens the Lesson Lab (dev packages), `/m/<slug>/`, or `/train/<slug>/` (concept packages); `--url <path>` opens
   another page.
-- Gates: AK601 (console error), AK602 (horizontal scroll at 360 px), AK603 (a long task: over 100 ms fails, over 50 ms
-  warns), AK604 (axe serious or critical), AK502 (a stage without a badge).
+- Gates: AK601 (console error), AK602 (horizontal scroll at 360 px), AK604 (axe serious or critical), AK605 (the lesson
+  app's layout mode), AK502 (a stage without a badge). AK603 (a long task over 50 ms) and AK606 (loaded JS) only warn.
 - Output, replaced on each run: `notes/shots/<slug>/e2e-<pass>-<nn>.png` and `notes/shots/<slug>/contact/`:
-  `<pass>.png` (every step on one labelled sheet), `lesson-print.txt`, `axe.txt`, `axe-<pass>.json`.
+  `<pass>.png` (every step on one labelled sheet), `lesson-print.txt`, `axe.txt`, `axe-<pass>.json`. A lane outside the
+  repo (on D:) writes them into its own folder instead: `<lanes>/<name>/shots/<slug>/` (the command prints the path).
+- In the shots the lesson's control bar is not sticky, so it no longer covers step 1. A Vite error overlay on the page
+  fails the pass (AK601): fix the error, or `e2e --stop-server` when the kept server shows a stale one.
+- `--as-live` (a lane) shows the package as its promoted catalog entry for the run: no "(Planned)" in the title, the
+  live default provenance. The lane's catalog files are put back afterwards.
 - Training is capped at 200 steps (`?atlas-e2e=1`), so a `live-model` step can show other numbers than your browser;
   `--cap off` runs the full length.
-- AK603 is load-sensitive: the same page shows 2-3 times longer tasks while other processes keep the CPU busy. Re-run on
-  a quieter machine before you chase a 50-100 ms warning; move real work to the worker.
+- AK603 never blocks and is never re-run: it is load-sensitive (the same page shows 2-3 times longer tasks while other
+  processes keep the CPU busy). Move real work to the worker when a large warning comes back on a quiet machine.
 
 ## 6. The dev server
 
 - `e2e` and `check` reuse a dev server of this site: the one they kept (`.atlas/dev-server.json`), or one on the
-  package's port that answers the identity probe (`.svelte-kit/atlas-dev-probe.txt`). Else they start one and keep it.
+  package's port that answers the identity probe (`.svelte-kit/atlas-dev-probe.txt`). Else they start one and keep it;
+  a server they start must answer the probe too, else they try the next free port (another lane took it meanwhile).
 - A kept server stops itself after 20 idle minutes; `e2e --stop-server` stops it now; `--no-keep-server` stops it when
   the command ends. A server that is not kept exits when the atlas process dies.
 - Builds may run beside it. On a locked file the site gate stops a server it kept and retries once.
@@ -113,18 +125,32 @@ npm run atlas -- e2e --stop-server              # stop the kept dev server
 ## 7. Lanes and merging
 
 ```
-npm run atlas -- worktree <name> --from-git HEAD   # a lane in site/.work/<name>/site from the last commit
+npm run atlas -- worktree <name> --from-git HEAD   # a lane in <lanes>/<name>/site from the last commit
 npm run atlas -- worktree <name> --sync [--from-git <rev>]   # refresh the non-owned files (AK703 if you edited one)
 npm run atlas -- merge <name> --dry-run            # AK702 for any change outside the owned paths
 npm run atlas -- merge <name>                      # main session only
+npm run atlas -- lanes [--json]                    # the lanes folder, the shared packages, every lane and its size
+npm run atlas -- lanes --rm <name>                 # main session: delete a merged lane and its shots (AK702 while it holds unmerged work)
+npm run atlas -- lanes --clean <name|main>         # delete a kept lane's builds and caches (build, .svelte-kit, .atlas/build*, node_modules/.vite)
+npm run atlas -- promote <slug> --verify           # the catalog patch from manifest.catalog, applied to a copy and checked
 ```
 
 - A model lane owns `pipeline/<slug>/**`, `site/src/lib/explainers/<slug>/**`, `site/static/models/<slug>/**`,
-  `notes/<slug>.md`, `notes/shots/<slug>/**` (`--owns a,b` for anything else).
+  `notes/<slug>.md`, `notes/review-<slug>.md`, `notes/shots/<slug>/**` (`--owns a,b` for anything else).
+- The catalog entry comes from the package: put `name`, `family`, `inputs`, `mode`, `hook`, `shows`, `runtime`,
+  `params` and `size` into `manifest.catalog` (not counted as page code) and run `promote <slug> --verify`: it applies
+  the patch to a copy of the catalog, runs check:catalog and lists the checks by hand (measured weights size in
+  1,024-byte KB, the page's input kinds, mode, similar tech-zh rows). Never edit a catalog file in a lane.
 - `--from-git` takes the files from a commit, so another workflow editing the main tree cannot leak half-done work into
   the lane. The local CLI config (`scripts/atlas/atlas.config.local.json`) is copied, never synced or merged.
 - Python writes `pipeline/<slug>/` in the main tree directly; its assets go to the lane's `static/` (`ATLAS_SITE`).
-- Delete a lane right after it is merged (each costs 1-4 GB with its builds).
+- The lanes folder `<lanes>` is `site/.work` unless `ATLAS_LANES_DIR` or `"lanesDir"` in
+  `scripts/atlas/atlas.config.local.json` moves it (another drive). Lanes outside the main site share
+  `<lanes>/node_modules`: `npm run atlas -- lanes --deps` from the main site installs it (again after
+  `package-lock.json` changes; `doctor` warns). `lane.json` records the repo root and the main site, so every command
+  works from such a lane; git always runs on the main repo. Older lanes in `site/.work` are still found.
+- Delete a lane right after it is merged: `npm run atlas -- lanes --rm <name>` (a lane with its builds costs 1-4 GB on
+  a drive with 1 MiB clusters, about 190 MB on NTFS).
 
 ## 8. AK quick fixes
 
@@ -141,6 +167,6 @@ npm run atlas -- merge <name>                      # main session only
 | AK412 | a predict step gives the answer away | move the answer to `predict.explain` |
 | AK503 | a `$lib` import, a missing `.ts` extension, an `enum`, `Math.random` in a pure file | relative `.ts` imports from `src/lib/atlas/**`, erasable TypeScript, the kit's `rng` |
 | AK602 | a wide element at 360 px | `grid-template-columns: minmax(0, 1fr)`; let the wide view scroll in its own box with `use:keyScroll` |
-| AK603 | heavy work on the main thread | leave `run` unset (the worker); yield every ≤ 8 ms; re-run on a quiet machine first |
+| AK603 | heavy work on the main thread (a warning only) | leave `run` unset (the worker); yield every ≤ 8 ms; never re-run e2e for it |
 | AK604 | contrast, an unreachable scroll box, an svg with buttons, an ARIA table, a `<dl>` | [charts-and-a11y.md](charts-and-a11y.md) |
 | AK702 | a change outside the owned paths | undo it; a kit bug goes under "Kit issues" |

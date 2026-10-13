@@ -27,6 +27,9 @@ export interface StageProps {
   /** K1 (additive): one object per lesson step, shared by the views of that step (the two panels of a step's compare
    *  render the view twice: a toggle kept here changes both). Reactive in the browser; {} in Node. */
   shared?: Record<string, unknown>;
+  /** R1 (redesign W2, additive): the stage pane's density (spec §5.4): compact below 600 px wide or 480 px tall (always on
+   *  phones), roomy from 760 x 700, regular otherwise. A view may tighten or grow; it never scales text below 12 px. */
+  density?: 'roomy' | 'regular' | 'compact';
 }
 // W1-D1: ui/registry.ts — metas via import.meta.glob (inside AutoModelPage's lazy chunk only), components lazy;
 //        package views from '$lib/explainers/*/views/*/meta.ts' registered as '<slug>/<key>'.

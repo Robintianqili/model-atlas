@@ -6,9 +6,9 @@ Read this before building a model page or a concept page. Every component is ren
 
 - Stack: SvelteKit 2.70 + Svelte 5.57 (runes) + TypeScript 5.9 + Vite 7, `@sveltejs/adapter-static`, every page
   prerendered, `trailingSlash: 'always'`, `paths.base` from `BASE_PATH` (default `''`), `paths.relative: true`.
-- No runtime third-party requests. Fonts (Fraunces, Atkinson Hyperlegible Next, JetBrains Mono) and KaTeX are
-  bundled from npm. CJK text uses the system stack (`PingFang SC`, `Hiragino Sans GB`, `Microsoft YaHei`,
-  `Noto Sans CJK SC`).
+- No runtime third-party requests. Fonts (Atkinson Hyperlegible Next for words, JetBrains Mono for numbers and code)
+  and KaTeX are bundled from npm (@fontsource only; Fraunces was removed in the 2026-10 redesign). CJK text uses the
+  system stack (`PingFang SC`, `Hiragino Sans GB`, `Microsoft YaHei`, `Noto Sans CJK SC`).
 
 ## Contents
 
@@ -36,9 +36,17 @@ Run from `site/` (from the repo root: `cd site`).
 | `npm run check` | `svelte-kit sync` + `svelte-check` (must stay at 0 errors, 0 warnings) |
 | `npm run build` | prerenders every page into `build/` |
 | `npm run preview` | serves `build/` on http://localhost:4173 |
-| `npm run check:catalog` | validates the catalog (unique slugs, links, prerequisites, bilingual labels) |
-| `npm run check:build` | after a build: expected pages exist, no third-party runtime URLs, JS sizes per page |
+| `npm run check:catalog` | validates the catalog (unique slugs, links, prerequisites, bilingual labels, `glossary-names.ts` up to date); warns on hooks over 100/50 characters and short names over 24 |
+| `npm run check:build` | after a build: expected pages exist, no third-party runtime URLs, JS sizes per page (300 KB gate, a warning over 250 KB on the flagships), no glossary definitions in any shell but `/glossary/` |
+| `node scripts/gen-glossary-names.ts` | regenerates `src/lib/catalog/glossary-names.ts` from `glossary.ts` (`promote --apply` does it) |
+| `npm run atlas -- thumbs [--build <dir>]` | the catalog thumbnails: 4 webp sprites and `index.json` in `static/thumbs/` (DEVKIT.md section 12) |
 | `BASE_PATH=/model-atlas npm run build` | build for a GitHub Pages project site |
+
+**Gates for a kit or layout change** (DEVKIT.md section 10, "Who runs what"): `npm run check`, `npm run check:atlas`,
+one build with `check:build` (the 300 KB shells), and ONE browser test on the default 2 passes over about 6 packages of
+different kinds, e.g. `npm run atlas -- check --all char-rnn gcn cart-pole kalman-filter masked-lm adversarial-tinycnn`
+(a text input, a graph, live training, a process, a concept, a drawing). Not every package and not `--passes all`. A
+long-task warning (AK603) never blocks. One screenshot of every page (a full-site sweep) only before a public release.
 
 ## 2. Folder map
 
@@ -135,20 +143,57 @@ themeState.pref       // 'system' | 'light' | 'dark'
 motion.reduced        // prefers-reduced-motion
 ```
 
+**The redesign's three UI signals** (2026-10, wave F). Besides the data ramps there are only three colours of meaning:
+**act** is ink (the one primary button per screen: Next, Start, Continue), **look** is the highlighter yellow (the stage
+ring, the Look line and the current rail segment; at most 3 marks per screen), and **here** is an ink bar on a pale row
+(the current step, tab, index row). The teal accent is gone: links, focus, the current layer and the trainable outline
+are ink.
+
 | Token group | Tokens |
 |---|---|
-| Type | `--font-display` (Fraunces), `--font-body` (Atkinson Hyperlegible Next), `--font-mono` (JetBrains Mono), `--font-cjk`, `--fs-xs … --fs-3xl`, `--measure` |
-| Space / shape | `--s1 … --s8` (4–72 px), `--r1 --r2 --r3 --r-pill`, `--page-max`, `--gutter`, `--header-h` |
-| Surfaces / ink | `--bg --surface --surface-2 --surface-3 --ink --ink-2 --muted --rule --rule-strong --shadow-1 --shadow-2` |
-| UI accent (not data) | `--accent --accent-strong --accent-soft --accent-ink` (links, focus, current layer, trainable outline) |
-| Provenance / status | `--live(-soft) --pre(-soft) --illus(-soft) --planned(-soft)` |
-| Data grammar | `--div-neg --div-mid --div-pos`, `--seq-lo --seq-mid --seq-hi`, `--q --k --v` (attention frames), `--real --generated`, `--param --grad`, `--mask-hatch`, `--highlight --highlight-halo`, `--cat-0 … --cat-9` |
-| Data colors as text | `--div-neg-text --div-pos-text --q-text --k-text --v-text --real-text --generated-text`: the same hues, 4.5:1 or more on `--bg`, `--surface` and `--surface-2` (use them for `color:`; the plain tokens are for fills and lines) |
+| Type | `--font-sans` (Atkinson Hyperlegible Next), `--font-mono` (JetBrains Mono, numbers and code only), `--font-cjk`; 7 sizes with a 12 px floor `--t-xs` 12/16 · `--t-sm` 14/20 · `--t-md` 16/24 · `--t-lg` 18/28 (narration) · `--t-xl` 22/28 (step titles) · `--t-2xl` 28/34 (page titles) · `--t-3xl` 44/48 (home headline only; below 760 px `--t-lg` 17/26, `--t-xl` 20/26, `--t-3xl` 32/38) with `--lh-*`; weights `--w-body` 400, `--w-ui` 600, `--w-title` 700, `--w-display` 750; `--mono-adjust` (font-size-adjust ex-height 0.5: mono matches the words' x-height), `--measure` |
+| Space / shape | `--s1 … --s8` (4–72 px, unchanged), `--r1` 4 · `--r2` 8 · `--r3` 12 (buttons, inputs) · `--r4` 16 (cards, panels) · `--r5` 20 (sheets) · `--r-pill`; `--page-max` 1240, `--gutter` 24 (16 on phones), `--header-h` 64 (56), `--ltop-h`, `--abar-h`, `--narr-w` (the lesson app's bars and narration column) |
+| Surfaces | `--paper` (page), `--panel` (cards, narration), `--stage` (the lesson stage), `--well` (troughs, code), `--sunken`, `--raised`; `--shadow-1` (chips, hover), `--shadow-2` (sheets, popovers) |
+| Ink | `--ink`, `--ink-2`, `--muted` (≥ 5.2:1 on every surface), `--faint` (decoration), `--rule` and `--rule-strong` (decoration only), `--line-control` (a control's outline, ≥ 3:1) |
+| Roles | act `--act --act-ink --act-hover --act-lip`; look `--mark --mark-soft --mark-ink --mark-line --ring-halo`, the home headline band `--mark-band --mark-band-ink`; here `--here --here-bg`; feedback `--ok(-soft) --no(-soft)`; motion `--ease --dur-1 --dur-2 --dur-3`; `--focus-ring` |
+| Provenance | `--live(-soft) --pre(-soft) --illus(-soft)` (the dot of the one label per stage, and the footer legend) |
+| Data grammar (unchanged) | `--div-neg --div-mid --div-pos`, `--seq-lo --seq-mid --seq-hi`, `--q --k --v` (attention frames), `--real --generated`, `--param --grad`, `--mask-hatch`, `--cat-0 … --cat-9` |
+| Data colors as text | `--div-neg-text --div-pos-text --q-text --k-text --v-text --real-text --generated-text`: the same hues, 4.5:1 or more on `--paper`, `--panel`, `--well` and `--stage` (use them for `color:`; the plain tokens are for fills and lines) |
+| Legacy aliases | `--bg` = `--paper`, `--surface` = `--panel`, `--surface-2` = `--well`, `--surface-3` = `--sunken`, `--accent`/`--accent-strong`/`--highlight` = `--ink`, `--accent-soft` = `--here-bg`, `--accent-ink`/`--highlight-halo` = `--panel`, `--font-body`/`--font-display` = `--font-sans`, `--fs-*` = `--t-*`, `--lh-body` 1.6, `--planned` = `--muted`, `--planned-soft` = `--well`. They follow the theme; new code uses the canonical names |
 
-Utilities in `base.css`: `.container`, `.num` (mono, tabular, slashed zero), `.eyebrow`, `.muted`, `.lede`,
-`.prose`, `.btn` (+ `.primary`, `.ghost`, `.icon`, `[aria-pressed=true]`), `.chip`, `.segmented`, `.panel`,
-`.visually-hidden`, `.cluster`, `.stack`. Focus rings are global (`:focus-visible`). Reduced motion disables CSS
-animations globally.
+Utilities in `base.css`:
+
+- Buttons: `.btn` (panel fill, a `--line-control` outline, 44 px), `.btn-act` (alias `.btn.primary`: ink fill with a
+  3 px lip, the one primary per screen), `.btn-quiet` (alias `.btn.ghost`), `.btn.icon`, `.icon-btn` (44 × 44 tool),
+  `.btn[aria-pressed=true]` (here style).
+- Choice: `.seg` (alias `.segmented`; ≤ 5 options, `aria-pressed`; a `<span class="seg">` is left alone), `.chip` (a
+  static pill; a `button.chip`/`a.chip` is a 32 px pill button, 40 px on touch; pressed = here style, `.chip.fill`
+  pressed = ink fill for catalog filters), `button.opt` (full-width answer options with a `.kbd.hint`; `.ok`, `.no`,
+  `.dim` after the answer).
+- Numbers: `.num` (mono, tabular, x-height matched; it also marks containers, so it wraps), `.nc` (a number chip in
+  prose: weight 600, never broken, `.pos`/`.neg` take the data text colours, `[data-ref]` gets a dotted underline);
+  `sub` (indices at 12 px: W<sub>0</sub>); `kbd`/`.kbd` (`.hint` hidden on touch devices).
+- Text: `.eyebrow` (sentence case, 14 px, muted; never uppercase or letter-spaced), `.muted`, `.lede`, `.prose`
+  (article column, 18/30, zh 18/32).
+- Layout: `.container`, `.panel`, `.cluster`, `.stack`, `.visually-hidden`.
+- Focus is global and two-tone (an ink outline with a 2 px offset); reduced motion disables CSS animations globally.
+
+**Chrome components** (wave F): `SiteHeader` (brand, nav Lessons · Paths · Glossary · About, the search field, EN/中文,
+theme; the nav moves into a menu sheet below 1100 px), `SiteFooter` (privacy sentence, provenance legend, Learn / Build /
+About), `Mark` (the brand mark), `Icon` + `icons.ts` (`<Icon d={search} />`, `<Icon d={glyphVision} glyph />`; named
+exports, so a page bundles only the icons it imports; `glyphFor(areaSlug)` for data-driven code), `Sheet` (a modal
+`<dialog>`: a bottom sheet on phones, a centred or end panel above; focus trapped, Esc closes, focus returns),
+`Popover` (a modal `<dialog>` anchored to its opener; a bottom sheet on phones), `LangToggle` (`variant` seg / flip /
+auto), `ThemeToggle`, `catalog/SearchPalette` (wave F: a search form to `/atlas/?q=`; `/` and Ctrl+K focus it).
+The root layout renders a page without the site chrome when its load returns `{ chrome: 'lesson' }` (the lesson app
+brings its own top bar, `<main id="main">` and controls).
+
+**Strings**: `ui(key)` reads `UI` (every page carries it); the lesson app's strings are `lui(key)` (`LESSON_UI`) and the
+catalog's `cui(key)` (`CATALOG_UI`), separate exports of `strings.ts`, so a page bundles them only when it uses them.
+
+**Glossary terms**: `<Term id>` shows the name from `src/lib/catalog/glossary-names.ts` (generated; 7.7 KB gzip) and
+loads the definitions (`glossary.ts`, about 40 KB gzip) on the first hover, focus or tap. Only `/glossary/`, scripts
+and tests import `glossary.ts` (`check:build` fails otherwise).
 
 ## 5. Color-scale API
 
@@ -545,7 +590,8 @@ kept in memory + sessionStorage and shown again at the checkpoint. Labels use `c
    </ModelPageShell>
    ```
 5. **Checks.** `npm run check`, `npm run build`, `npm run check:build` (the live route should now say "built"),
-   then look at the page at 360 px and in both themes and languages.
+   then look at the page once at 360 px and at 1280 px, in both themes and languages. `atlas e2e` covers package
+   lessons only; a hand-built page gets its next browser look in the full-site sweep before a public release.
 
 ## 9. Adding a concept page
 
@@ -603,4 +649,6 @@ import { AREAS, AREA_BY_SLUG, MODELS, MODEL_BY_SLUG, CONCEPTS, CONCEPT_BY_SLUG, 
   `<noscript>` message from `app.html` shows instead (only on pages whose body is empty, i.e. the fallback).
 - The `/m/[slug]/` and `/train/[slug]/` routes 404 for live slugs until their static folders exist (build warns).
 - KaTeX ships all its font formats (woff2, woff, ttf) in `build/`; browsers download only woff2.
-- No automated Playwright tests yet; checks are `check`, `check:catalog`, `check:build` and manual review at 360 px.
+- Browser tests: `atlas e2e` (DEVKIT.md section 12) steps through package lessons only. Hand-built and catalog pages
+  are checked by `check`, `check:catalog`, `check:build`, one look when they change and the full-site sweep (one
+  screenshot per page) before a public release.

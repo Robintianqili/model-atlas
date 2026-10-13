@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tinymoe",
+ "checked": "2026-10-12",
+ "sources": {
+  "dispatch": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 55,
+   "fixtures": 7,
+   "checked": "2026-10-12"
+  }
+ }
+}

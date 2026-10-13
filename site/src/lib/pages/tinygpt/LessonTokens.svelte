@@ -93,6 +93,10 @@
 </div>
 
 <style>
+	/* the kit chips print their ids at 10 px: keep them at the 12 px floor here */
+	.lt :global(.id) {
+		font-size: var(--t-xs);
+	}
 	.lt {
 		display: grid;
 		gap: 6px;

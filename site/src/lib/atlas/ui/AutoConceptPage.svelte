@@ -1,6 +1,6 @@
 <!--
   AutoConceptPage (K2): a whole /train/<slug>/ concept page generated from a concept package (explainers/<slug>/ with
-  type: 'concept' and a concept.ts). It fills the kit ConceptPageShell, in its order:
+  type: 'concept' and a concept.ts). It fills the kit ConceptPageShell (redesign W2: the lesson app; Explore, Pitfalls and Sources one tab away):
      goals + predict-first   manifest.page.goals, manifest.page.prequestion
      hook                    concept.ts hook: a text, or a stage (a StepDef)
      lesson                  lesson.ts through LessonPlayer (the primary path; the side panel holds the input widget)
@@ -10,7 +10,8 @@
      checkpoint              back to the prediction (the shell) + manifest.page.quiz
      links                   the catalog's models for the concept (the shell), concept.ts further reading, credits
   A package replaces any of these with sections/<Hook|Lesson|Toy|Real|Compare|Pitfalls|Checkpoint|Links>.svelte
-  (props { store, pkg, def }). The page's plain text comes with the page data (concept/discover.server.ts), so the
+  (props { store, pkg, def }). Redesign W2: the lesson's cover shows the hook panel's stage (else the first step's), the
+  stage header holds the input widget (compact; the input sheet has the full one), and the views render only when opened. The page's plain text comes with the page data (concept/discover.server.ts), so the
   prerendered HTML shows it; the runtime and the stages start after mount (KIT rule 4). This component and the view
   registry live in the lazy chunk behind concept/entry.ts: planned concept pages never load them.
   KaTeX: this page does not import the KaTeX stylesheet itself (a second static importer next to AutoModelPage moved it
@@ -21,7 +22,8 @@
 <script lang="ts">
 	import { onMount, type Component } from 'svelte';
 	import { base } from '$app/paths';
-	import ConceptPageShell from '$lib/kit/ConceptPageShell.svelte';
+	import { page as appPage } from '$app/state';
+	import ConceptHost, { type ConceptPageData } from '$lib/kit/lesson/ConceptHost.svelte';
 	import { t, ui } from '$lib/i18n/i18n.svelte';
 	import type { WalkContext } from '$lib/kit/types';
 	import type { PackageModules } from '../types/runtime.ts';
@@ -185,29 +187,27 @@
 	{/if}
 {/snippet}
 
-{#snippet lessonAside(_ctx: WalkContext)}
+<!-- the stage header's control (spec §4.4: the concept's own control, e.g. LoRA's rank): the compact input widget -->
+{#snippet inputChip(_open: () => void)}
 	{#if manifest?.input}
-		<div class="you">
-			<h4>{csay('dials')}</h4>
-			{@render captureBox(true)}
-			<p class="hint muted">{say('inputUpdates')}</p>
-		</div>
+		<div class="cctl" role="group" aria-label={csay('dials')}>{@render captureBox(true)}</div>
 	{/if}
 {/snippet}
 
-{#snippet lessonEnd()}
-	<div class="fin">
-		<p><strong>{say('lessonEnd')}</strong> {csay('lessonEndConcept')}</p>
-		<a class="btn primary" href="#explore">{say('exploreFreely')} ↓</a>
-	</div>
+{#snippet inputSheet()}
+	<div class="capture">{@render captureBox(false)}</div>
+	<p class="hint muted">{say('inputUpdates')}</p>
+{/snippet}
+
+{#snippet coverStage(_ctx: WalkContext)}
+	{#if store && panels.hook}<ConceptPanel {store} step={panels.hook} {lab} />{/if}
 {/snippet}
 
 {#snippet lessonSec()}
 	{#if overrides.Lesson && store && pkg}
 		{@const C = overrides.Lesson}<C {store} {pkg} {def} />
 	{:else if store && lesson && lesson.steps.length}
-		<LessonPlayer {store} {lesson} label={lesson.title} bind:index={lessonIndex} {lab} aside={lessonAside} end={lessonEnd} />
-		<p class="foot muted">{manifest?.input ? csay('lessonFoot') : say('lessonFoot')}</p>
+		<LessonPlayer {store} {lesson} label={lesson.title} bind:index={lessonIndex} {lab} cover={panels.hook ? coverStage : undefined} />
 	{:else}
 		{@render loading()}
 	{/if}
@@ -286,17 +286,21 @@
 			<h3>{say('creditsTitle')}</h3>
 			<ul class="credits">
 				{#each credits as c (c.name)}
-					<li><a href={c.url} rel="noopener">{c.name}</a> · {c.license} · {c.usedFor}. <span class="muted">{c.attribution}</span></li>
+					<li><a href={c.url} rel="noopener">{c.name}</a> · {c.license} · {c.usedFor}{'.!?…'.includes(c.usedFor.trim().slice(-1)) ? '' : '.'} <span class="muted">{c.attribution}</span></li>
 				{/each}
 			</ul>
 		{/if}
 	{/if}
 {/snippet}
 
-<ConceptPageShell
-	{slug}
+<ConceptHost
+	concept={(appPage.data as { conceptCatalog?: ConceptPageData }).conceptCatalog ?? null}
 	goals={page?.goals ?? []}
 	prequestion={page?.prequestion}
+	summary={lesson?.summary?.en ? lesson.summary : undefined}
+	minutes={manifest?.catalog?.lesson?.minutes}
+	inputChip={hasInput ? inputChip : undefined}
+	inputSheet={hasInput ? inputSheet : undefined}
 	{lessonNote}
 	exploreIntro={CSTR.exploreIntro}
 	hook={hasHook ? hookSec : undefined}
@@ -313,7 +317,7 @@
 
 <style>
 	.hook {
-		font-size: var(--fs-lg);
+		font-size: var(--t-lg);
 		max-width: var(--measure);
 		margin: 0 0 12px;
 	}
@@ -322,40 +326,20 @@
 		max-width: 100%;
 		min-width: 0;
 	}
-	.you {
-		display: grid;
-		gap: 8px;
-		padding: 10px 12px;
+	.cctl {
+		max-width: 100%;
+		padding: 6px 10px;
 		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
-	}
-	.you h4 {
-		margin: 0;
-		font-size: var(--fs-md);
+		border-radius: 14px;
+		background: var(--panel);
+		box-shadow: var(--shadow-1);
 	}
 	.hint {
 		margin: 0;
-		font-size: var(--fs-xs);
-	}
-	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
-		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 	}
 	.small {
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 	}
 	.row {
 		display: flex;
@@ -377,7 +361,7 @@
 		padding: 12px 14px;
 		border: 1px solid var(--rule);
 		border-radius: var(--r3);
-		background: var(--surface);
+		background: var(--panel);
 	}
 	.quiz {
 		margin-bottom: 10px;
@@ -387,16 +371,14 @@
 		margin: 0;
 	}
 	.tag {
-		font-size: var(--fs-xs);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--accent-strong);
 		margin-right: 4px;
+		color: var(--muted);
+		font-size: var(--t-sm);
+		font-weight: var(--w-title);
 	}
 	.credits {
 		margin: 0;
 		padding-left: 18px;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 	}
 </style>

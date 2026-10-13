@@ -258,13 +258,13 @@
 	}
 	.hv,
 	.hl {
-		font-size: 9.5px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 	}
 	.hl {
 		color: var(--muted);
 		white-space: nowrap;
-		font-size: 8.5px;
+		font-size: var(--t-xs);
 	}
 	.bycls {
 		list-style: none;

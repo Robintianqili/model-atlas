@@ -11,12 +11,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fromParts } from './executor.ts';
 import { checkExplain, pickUnit } from './explain.ts';
 import { readReference } from './refs.ts';
 import { CORE_OPS } from '../ops/index.ts';
+import { findRepoRoot } from '../process/fixtures/paths.ts';
 import { bitEqual, maxDiff } from '../core/compare.ts';
 import { f32FromB64, fsFetch } from '../core/io.ts';
 import { intTensor } from '../core/tensor.ts';
@@ -30,16 +31,10 @@ const MODELS = join(SITE, 'static', 'models');
 const ab = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
 const json = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
 
-/** ATLAS_ROOT: $ATLAS_ROOT, else the nearest ancestor of the site folder with CONTRACTS.md and pipeline/ (works in lanes). */
+/** ATLAS_ROOT: $ATLAS_ROOT, else a lane's lane.json root (K4: a lane outside the repo), else the nearest ancestor of the
+ *  site folder with CONTRACTS.md and pipeline/. */
 function atlasRoot(): string | null {
-	if (process.env.ATLAS_ROOT) return process.env.ATLAS_ROOT;
-	let d = SITE;
-	for (;;) {
-		if (existsSync(join(d, 'CONTRACTS.md')) && existsSync(join(d, 'pipeline'))) return d;
-		const up = dirname(d);
-		if (up === d) return null;
-		d = up;
-	}
+	return findRepoRoot(SITE);
 }
 
 // ------------------------------------------------------------------ TinyCNN

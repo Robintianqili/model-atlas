@@ -1,14 +1,19 @@
-// atlas worktree <name> [--owns <glob,...>] [--from <main site>] [--from-git <rev>]   make site/.work/<name>/site
+// atlas worktree <name> [--owns <glob,...>] [--from <main site>] [--from-git <rev>]   make <lanes>/<name>/site
 // atlas worktree <name> --sync [--from-git <rev>]                                   refresh every non-owned file (AK703)
 // atlas merge <name> [--dry-run]                                                    copy the lane's owned files back (AK702)
 // (design §4.12, §6.4; lanes and lane.json: lib/lanes.ts)
 //
+// The lanes folder <lanes> is site/.work by default; ATLAS_LANES_DIR or "lanesDir" in the main site's
+//   atlas.config(.local).json moves it, for example to another drive (config.ts lanesChoice). A lane already in
+//   site/.work stays there and is still found by --sync, merge and `lanes --rm`. git always runs on the main repo.
 // worktree: copies the main site without node_modules, .svelte-kit, build, .work, .atlas and package-lock.json (no
-//   symlinks: exFAT), patches the copy's vite.config.ts (server.fs.allow, and no .work pattern in server.watch.ignored, so the
-//   lane's own dev server sees edits; lane setup, never merged back), and records the
-//   owned paths and a sha256 snapshot in site/.work/<name>/lane.json. Owned paths: --owns, else the design's table for
-//   kit lanes (w1-*, k0), else the model ownership of §8.3 (pipeline/<name>/**, site/src/lib/explainers/<name>/**,
-//   site/static/models/<name>/**, notes/<name>.md, notes/shots/<name>/**).
+//   symlinks), patches the copy's vite.config.ts (server.fs.allow: the main site for a lane inside it, the shared
+//   <lanes>/node_modules for a lane outside it; and no .work pattern in server.watch.ignored, so the lane's own dev server
+//   sees edits; lane setup, never merged back), and records the owned paths, a sha256 snapshot, the repo root and the main
+//   site in <lanes>/<name>/lane.json (a lane outside the repo finds the repo through them: root.ts). Owned paths: --owns,
+//   else the design's table for kit lanes (w1-*, k0), else the model ownership of §8.3 (pipeline/<name>/**,
+//   site/src/lib/explainers/<name>/**, site/static/models/<name>/**, notes/<name>.md, notes/review-<name>.md (K4),
+//   notes/shots/<name>/**). --sync adds notes/review-<name>.md to an older lane.json that owns notes/<name>.md.
 // --from-git <rev> (K2): the lane's files come from a committed revision (HEAD, a branch, a commit) instead of the main
 //   working tree, which another workflow may be editing: `git archive <rev> site` read in memory (no tar program), the
 //   same skips, the snapshot holds the revision's hashes and lane.json records the commit (`rev`). The machine's
@@ -22,11 +27,12 @@
 //   changed since the snapshot ("changed in both": sync first). vite.config.ts and the local CLI config are never merged.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative } from 'node:path';
+import { isInside, lanesChoice, type LanesChoice } from '../config.ts';
 import { AtlasError } from '../errors.ts';
 import { posix, readJson, writeJson, writeText } from '../lib/io.ts';
-import { KNOWN_LANES, LANE_FORMAT, LANE_LOCAL, LANE_SETUP, SKIP_DIRS, SKIP_FILES, matcher, modelOwns, patchViteConfig, sha256, siteFiles, type LaneFile } from '../lib/lanes.ts';
+import { ALLOW_OUTSIDE, KNOWN_LANES, LANE_FORMAT, LANE_LOCAL, LANE_SETUP, SKIP_DIRS, SKIP_FILES, depsState, matcher, modelOwns, patchViteConfig, sha256, siteFiles, withReview, type LaneFile } from '../lib/lanes.ts';
 import { suggestPort } from '../ports.ts';
 import { roots } from '../root.ts';
 
@@ -45,13 +51,40 @@ export interface LanePaths {
 	laneDir: string;
 	lane: string;
 	laneJson: string;
+	/** where lanes live (config.ts lanesChoice) */
+	lanes: LanesChoice;
+	/** the lane is outside the main site: it resolves the shared <lanes>/node_modules (atlas lanes --deps) */
+	outside: boolean;
+	/** the lane's server.fs.allow (vite.config.ts, lane setup) */
+	allow: string[];
 }
 
-export function lanePaths(name: string, root = roots().root, main?: string): LanePaths {
+/** The lane's folders. A lane is made in the configured lanes folder; an existing lane is looked up there and then in
+ *  the default site/.work (lanes made before a lanesDir was set). */
+export function lanePaths(name: string, root = roots().root, main?: string, o: { create?: boolean } = {}): LanePaths {
 	if (!NAME.test(name)) throw new AtlasError('AK301', `lane name '${name}' must be lowercase letters, digits, '-' or '_'`);
 	const m = main ?? join(root, 'site');
-	const laneDir = join(m, '.work', name);
-	return { root, main: m, laneDir, lane: join(laneDir, 'site'), laneJson: join(laneDir, 'lane.json') };
+	const lanes = lanesChoice(m);
+	const inFallback = !o.create && !existsSync(join(lanes.dir, name, 'site')) && existsSync(join(lanes.fallback, name, 'site'));
+	const laneDir = join(inFallback ? lanes.fallback : lanes.dir, name);
+	const lane = join(laneDir, 'site');
+	const outside = !isInside(laneDir, m);
+	const allow = outside ? ALLOW_OUTSIDE : ['.', posix(relative(lane, m))];
+	return { root, main: m, laneDir, lane, laneJson: join(laneDir, 'lane.json'), lanes, outside, allow };
+}
+
+/** The lanes this main site has: <lanes>/<name>/site in the configured folder and in the default site/.work. */
+export function listLanes(main = roots().main): { name: string; paths: LanePaths }[] {
+	const lanes = lanesChoice(main);
+	const out = new Map<string, LanePaths>();
+	for (const dir of [lanes.dir, lanes.fallback]) {
+		if (!existsSync(dir)) continue;
+		for (const d of readdirSync(dir, { withFileTypes: true })) {
+			if (!d.isDirectory() || d.name === 'node_modules' || !NAME.test(d.name) || out.has(d.name) || !existsSync(join(dir, d.name, 'site'))) continue;
+			out.set(d.name, lanePaths(d.name, roots().root, main));
+		}
+	}
+	return [...out].sort(([a], [b]) => (a < b ? -1 : 1)).map(([name, paths]) => ({ name, paths }));
 }
 
 export function defaultOwns(name: string): { owns: string[]; from: string } {
@@ -211,10 +244,12 @@ export function gitTree(root: string, main: string, rev: string): SiteTree {
 export function createLane(
 	name: string,
 	o: { owns?: string[]; root?: string; main?: string; fromGit?: string } = {}
-): { paths: LanePaths; files: number; bytes: number; owns: string[]; ownsFrom: string; vitePatched: boolean; rev?: string; local: string[] } {
-	const p = lanePaths(name, o.root, o.main);
-	if (existsSync(p.lane)) throw new AtlasError('AK301', `lane '${name}' already exists: ${posix(p.lane)}`, { fix: `refresh it with: npm run atlas -- worktree ${name} --sync` });
+): { paths: LanePaths; files: number; bytes: number; owns: string[]; ownsFrom: string; vitePatched: boolean; rev?: string; local: string[]; warnings: string[] } {
+	const p = lanePaths(name, o.root, o.main, { create: true });
+	for (const existing of [p.lane, join(p.lanes.fallback, name, 'site')])
+		if (existsSync(existing)) throw new AtlasError('AK301', `lane '${name}' already exists: ${posix(existing)}`, { fix: `refresh it with: npm run atlas -- worktree ${name} --sync` });
 	if (!existsSync(join(p.main, 'package.json'))) throw new AtlasError('AK301', `no main site at ${posix(p.main)}`);
+	if (p.outside && isInside(p.laneDir, p.lanes.deps)) throw new AtlasError('AK301', `lane name '${name}' is the shared node_modules folder`);
 	const d = o.owns?.length ? { owns: o.owns, from: '--owns' } : defaultOwns(name);
 	const tree = o.fromGit !== undefined ? gitTree(p.root, p.main, o.fromGit) : dirTree(p.main);
 	const snapshot: Record<string, string> = {};
@@ -236,13 +271,28 @@ export function createLane(
 	let vitePatched = false;
 	const vite = join(p.lane, 'vite.config.ts');
 	if (existsSync(vite)) {
-		const r = patchViteConfig(readFileSync(vite, 'utf8'));
+		const r = patchViteConfig(readFileSync(vite, 'utf8'), p.allow);
 		if (r.patched) writeText(vite, r.text);
 		vitePatched = r.patched;
 	}
-	const lane: Lane = { format: LANE_FORMAT, name, created: now(), owns: d.owns, snapshot, ...(tree.rev ? { rev: tree.rev } : {}) };
+	const lane: Lane = { format: LANE_FORMAT, name, created: now(), root: posix(p.root), main: posix(p.main), ...(tree.rev ? { rev: tree.rev } : {}), owns: d.owns, snapshot };
 	writeJson(p.laneJson, lane, 1);
-	return { paths: p, files: tree.files.length, bytes, owns: d.owns, ownsFrom: d.from, vitePatched, local, ...(tree.rev ? { rev: tree.rev } : {}) };
+	return { paths: p, files: tree.files.length, bytes, owns: d.owns, ownsFrom: d.from, vitePatched, local, warnings: outsideWarnings(name, p), ...(tree.rev ? { rev: tree.rev } : {}) };
+}
+
+/** What a lane outside the main site still needs: a CLI that reads lane.json (a revision older than lanes outside the
+ *  repo has none) and the shared node_modules. */
+function outsideWarnings(name: string, p: LanePaths): string[] {
+	if (!p.outside) return [];
+	const out: string[] = [];
+	const rootTs = fileOf(p.lane, 'scripts/atlas/root.ts');
+	if (existsSync(rootTs) && !readFileSync(rootTs, 'utf8').includes('lane.json'))
+		out.push(
+			`the lane's CLI predates lanes outside the repo: inside the lane it cannot find the repo by itself. Take main's CLI with npm run atlas -- worktree ${name} --sync, or set ATLAS_ROOT=${posix(p.root)} for commands in the lane`
+		);
+	const deps = depsState(p.lanes, p.main);
+	if (!deps.ok) out.push(`the shared node_modules (${posix(p.lanes.deps)}) is ${deps.why}: run npm run atlas -- lanes --deps in the main site before building or testing in the lane`);
+	return out;
 }
 
 export interface SyncPlan {
@@ -309,7 +359,7 @@ export function applySync(name: string, o: { root?: string; main?: string; fromG
 	const lv = join(p.lane, 'vite.config.ts');
 	const tmp = join(p.laneDir, 'vite.config.ts.source.tmp');
 	if (tree.copyTo('vite.config.ts', tmp)) {
-		const want = patchViteConfig(readFileSync(tmp, 'utf8')).text;
+		const want = patchViteConfig(readFileSync(tmp, 'utf8'), p.allow).text;
 		if (!existsSync(lv) || readFileSync(lv, 'utf8') !== want) {
 			writeText(lv, want);
 			plan.update.push('vite.config.ts (lane setup, re-patched)');
@@ -318,7 +368,8 @@ export function applySync(name: string, o: { root?: string; main?: string; fromG
 		rmSync(tmp, { force: true });
 	}
 	const base: Lane = lane ?? { format: LANE_FORMAT, name, created: now(), owns: defaultOwns(name).owns, snapshot };
-	const next: Lane = { ...base, synced: now(), snapshot };
+	// an older lane learns where the repo and the main site are (root.ts reads them)
+	const next: Lane = { ...base, root: base.root ?? posix(p.root), main: base.main ?? posix(p.main), owns: withReview(base.owns, name), synced: now(), snapshot };
 	// K2: a lane synced from a revision records it; a later sync from main drops it (main is newer than any revision)
 	if (tree.rev) next.rev = tree.rev;
 	else delete next.rev;
@@ -341,7 +392,7 @@ export function planMerge(name: string, o: { root?: string; main?: string; owns?
 	const p = lanePaths(name, o.root, o.main);
 	if (!existsSync(p.lane)) throw new AtlasError('AK301', `no lane '${name}' (${posix(p.lane)})`);
 	const lane = readLane(p);
-	const d = o.owns?.length ? { owns: o.owns, from: '--owns' } : lane ? { owns: lane.owns, from: 'lane.json' } : defaultOwns(name);
+	const d = o.owns?.length ? { owns: o.owns, from: '--owns' } : lane ? { owns: withReview(lane.owns, name), from: 'lane.json' } : defaultOwns(name);
 	const owns = matcher(d.owns);
 	const plan: MergePlan = { copy: [], remove: [], outside: [], both: [], inPlace: [], owns: d.owns, ownsFrom: d.from, noSnapshot: !lane };
 	const all = new Set([...siteFiles(p.main), ...siteFiles(p.lane)]);
@@ -440,12 +491,16 @@ export async function main(args: string[]): Promise<number> {
 	}
 	const owns = typeof flags.owns === 'string' && flags.owns ? flags.owns.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
 	const r = createLane(name, { owns, main, fromGit });
-	console.log(`atlas worktree ${name}: ${r.files} files (${(r.bytes / 1e6).toFixed(1)} MB) -> ${posix(r.paths.lane)}${r.rev ? ` from commit ${r.rev.slice(0, 7)} (${fromGit})` : ''}`);
+	const p = r.paths;
+	console.log(`atlas worktree ${name}: ${r.files} files (${(r.bytes / 1e6).toFixed(1)} MB) -> ${posix(p.lane)}${r.rev ? ` from commit ${r.rev.slice(0, 7)} (${fromGit})` : ''}`);
+	console.log(`  lanes folder    ${posix(p.lanes.dir)} (${p.lanes.from})${p.outside ? `; outside the main site: packages from ${posix(p.lanes.deps)} (atlas lanes --deps)` : "; packages from the main site's node_modules"}`);
 	if (r.local.length) console.log(`  local config    ${r.local.join(', ')} copied from main (git-ignored; never synced or merged)`);
-	console.log(`  vite.config.ts  ${r.vitePatched ? "server.fs.allow: ['.', '../../..'] added and the .work watch pattern dropped, so edits reload (lane setup; never merged)" : 'NOT patched (no server.fs block found): add allow by hand'}`);
+	const allow = '[' + p.allow.map((a) => `'${a}'`).join(', ') + ']';
+	console.log(`  vite.config.ts  ${r.vitePatched ? `server.fs.allow: ${allow} added and the .work watch pattern dropped, so edits reload (lane setup; never merged)` : 'NOT patched (no server.fs block found): add allow by hand'}`);
 	console.log(`  owned paths     (${r.ownsFrom})\n${list(r.owns)}`);
-	console.log(`  snapshot        ${posix(r.paths.laneJson)}`);
-	console.log(`\nWork inside the lane: cd "${posix(r.paths.lane)}"; npm run dev -- --port ${suggestPort(name, roots().root)}`);
+	console.log(`  snapshot        ${posix(p.laneJson)} (also records the repo root and the main site)`);
+	for (const w of r.warnings) console.log(`  WARN            ${w}`);
+	console.log(`\nWork inside the lane: cd "${posix(p.lane)}"; npm run dev -- --port ${suggestPort(name, roots().root)}`);
 	console.log(`Root-level owned paths (pipeline/, notes/) are edited in place in the main tree. Merge with: npm run atlas -- merge ${name}`);
 	return 0;
 }

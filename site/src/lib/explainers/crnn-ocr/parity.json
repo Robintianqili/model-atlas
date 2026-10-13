@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "crnn-ocr",
+ "checked": "2026-10-12",
+ "sources": {
+  "decode": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 33,
+   "fixtures": 0,
+   "checked": "2026-10-12"
+  }
+ }
+}

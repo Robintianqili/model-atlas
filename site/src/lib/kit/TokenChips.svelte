@@ -177,7 +177,7 @@
 		outline-offset: 2px;
 	}
 	.id {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		line-height: 1.3;
 	}

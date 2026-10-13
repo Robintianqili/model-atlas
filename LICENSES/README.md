@@ -12,7 +12,6 @@ below in its `licenseText` field; the licence table on the site's About page lin
 | [MIT-GPT-2.txt](MIT-GPT-2.txt) | MIT | the GPT-2 byte-level BPE vocabulary (`site/static/pages/tokenization/tok/gpt2.tokb`) | Copyright (c) 2019 OpenAI |
 | [MIT-tiktoken.txt](MIT-tiktoken.txt) | MIT | the tiktoken cl100k_base encoding (`site/static/pages/tokenization/tok/cl100k_base.tokb`) and tiktoken's byte-pair merge, re-implemented in TypeScript | Copyright (c) 2022 OpenAI, Shantanu Jain |
 | [MIT-KaTeX.txt](MIT-KaTeX.txt) | MIT | KaTeX: its JavaScript, CSS and fonts, bundled with the site | Copyright (c) 2013-2020 Khan Academy and other contributors |
-| [OFL-1.1-Fraunces.txt](OFL-1.1-Fraunces.txt) | SIL Open Font License 1.1 | Fraunces (headings), self-hosted woff2 files | Copyright 2020 The Fraunces Project Authors |
 | [OFL-1.1-Atkinson-Hyperlegible-Next.txt](OFL-1.1-Atkinson-Hyperlegible-Next.txt) | SIL Open Font License 1.1 | Atkinson Hyperlegible Next (body text), self-hosted woff2 files | Copyright 2020-2024 The Atkinson Hyperlegible Next Project Authors |
 | [OFL-1.1-JetBrains-Mono.txt](OFL-1.1-JetBrains-Mono.txt) | SIL Open Font License 1.1 | JetBrains Mono (numbers and code), self-hosted woff2 files | Copyright 2020 The JetBrains Mono Project Authors |
 
@@ -25,8 +24,8 @@ Where the texts come from:
 - `MIT-GPT-2.txt`: OpenAI's copyright line for GPT-2 with the MIT permission notice (the vocabulary's source,
   https://github.com/openai/gpt-2; its copy at https://huggingface.co/openai-community/gpt2 declares the MIT licence).
 - `MIT-KaTeX.txt`: the LICENSE of the `katex` package (0.19.0), unchanged.
-- `OFL-1.1-*.txt`: the LICENSE files of the `@fontsource-variable/fraunces`, `@fontsource-variable/atkinson-hyperlegible-next`
-  and `@fontsource-variable/jetbrains-mono` packages (5.3.0), unchanged.
+- `OFL-1.1-*.txt`: the LICENSE files of the `@fontsource-variable/atkinson-hyperlegible-next` and
+  `@fontsource-variable/jetbrains-mono` packages (5.3.0), unchanged.
 
 Model Atlas's own work is under the MIT licence (code) and CC BY 4.0 (lesson text, articles and figures); see
 `LICENSING.md` at the repository root.

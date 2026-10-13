@@ -3,11 +3,12 @@
 // --node-only: Python problems are warnings (kinds B and C need no Python).
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { pythonChoice, pythonCommand, type PythonChoice } from '../config.ts';
+import { isInside, lanesChoice, pythonChoice, pythonCommand, type LanesChoice, type PythonChoice } from '../config.ts';
 import { formatIssue, type AkCode, type AtlasErrorInfo } from '../errors.ts';
 import { posix } from '../lib/io.ts';
+import { depsState } from '../lib/lanes.ts';
 import { DEFAULT_DEV_PORT, PORTS, portFree } from '../ports.ts';
 import { pythonEnv, roots, type Roots } from '../root.ts';
 
@@ -189,12 +190,18 @@ export function checkNode(r: Roots): Check[] {
 	const missing = found.filter(([, f]) => !f).map(([p]) => p);
 	if (missing.length) {
 		const m = `site packages not installed: ${missing.join(', ')}`;
+		const shared = r.laneDir !== null && !isInside(r.laneDir, r.main); // a lane outside the main site
 		checks.push({
 			name: 'packages',
 			status: 'fail',
 			detail: m,
 			code: 'AK001',
-			issue: { message: m, fix: `cd "${posix(r.lane ? join(r.root, 'site') : r.site)}" && npm ci   (lanes resolve the main site's node_modules)` }
+			issue: {
+				message: m,
+				fix: shared
+					? `cd "${posix(r.main)}" && npm run atlas -- lanes --deps   (lanes outside the main site share the node_modules of their lanes folder)`
+					: `cd "${posix(r.main)}" && npm ci   (lanes resolve the main site's node_modules)`
+			}
 		});
 	} else {
 		const dirs = [...new Set(found.map(([, f]) => posix(f!.dir)))];
@@ -207,6 +214,32 @@ export function checkNode(r: Roots): Check[] {
 			: { name: 'atlas types', status: 'fail', detail: `missing ${posix(types)}`, code: 'AK001', issue: { message: 'the frozen atlas types are missing', fix: 'sync the lane from main' } }
 	);
 	return checks;
+}
+
+/** Where lanes live and whether their packages are there: lanes outside the main site share <lanes>/node_modules
+ *  (atlas lanes --deps). A warning, never a failure: the main tree works without lanes. */
+export function checkLanes(r: Roots, env: NodeJS.ProcessEnv = process.env): Check[] {
+	let lanes: LanesChoice;
+	try {
+		lanes = lanesChoice(r.main, env);
+	} catch (e) {
+		const m = (e as Error).message;
+		return [{ name: 'lanes', status: 'warn', detail: m, code: 'AK002', issue: { message: m, fix: 'fix "lanesDir" in site/scripts/atlas/atlas.config.local.json' } }];
+	}
+	// inside a lane, the folder that lane is in is the one that matters (it may differ from the configured one)
+	let env1 = '';
+	if (r.laneDir && resolve(dirname(r.laneDir)) !== resolve(lanes.dir)) {
+		const dir = dirname(r.laneDir);
+		const outside = !isInside(dir, r.main);
+		lanes = { ...lanes, dir, from: 'lane' as const, outside, deps: outside ? join(dir, 'node_modules') : join(r.main, 'node_modules') };
+		env1 = `ATLAS_LANES_DIR="${posix(dir)}" `;
+	}
+	const where = `${posix(lanes.dir)} (${lanes.from === 'lane' ? 'the folder of this lane' : lanes.from})`;
+	const st = depsState(lanes, r.main);
+	if (!lanes.outside) return [{ name: 'lanes', status: 'ok', detail: `${where}; lanes use ${st.why}` }];
+	if (st.ok) return [{ name: 'lanes', status: 'ok', detail: `${where}, outside the main site; shared packages ${posix(st.dir)} ${st.why}` }];
+	const m = `the packages lanes in ${posix(lanes.dir)} share (${posix(st.dir)}) are ${st.why}`;
+	return [{ name: 'lanes', status: 'warn', detail: m, code: 'AK001', issue: { message: m, fix: `cd "${posix(r.main)}" && ${env1}npm run atlas -- lanes --deps   (npm ci into ${posix(st.dir)}; stop the lanes' dev servers first)` } }];
 }
 
 export async function checkPorts(r: Roots): Promise<Check[]> {
@@ -286,6 +319,7 @@ export async function doctor(args: string[], env: NodeJS.ProcessEnv = process.en
 		detail: `ATLAS_SITE ${posix(r.site)} (${r.siteFrom}${r.lane ? `, lane ${r.lane}` : ', main tree'}); ATLAS_ROOT ${posix(r.root)} (${r.rootFrom})`
 	});
 	checks.push(...checkNode(r));
+	checks.push(...checkLanes(r, env));
 	const py = checkPython(r, env);
 	checks.push(...(nodeOnly ? py.map((c) => (c.status === 'fail' ? { ...c, status: 'warn' as Status } : c)) : py));
 	checks.push(...(await checkPlaywright(r)));

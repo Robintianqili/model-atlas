@@ -179,12 +179,12 @@
 		max-width: 520px;
 	}
 	.lbl {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 		font-family: var(--font-body);
 	}
 	.v {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 		fill: var(--ink);
 	}

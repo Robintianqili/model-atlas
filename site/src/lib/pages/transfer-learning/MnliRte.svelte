@@ -70,7 +70,7 @@
 	<figure class="fig">
 		<figcaption>
 			<span>{t({ en: 'RTE dev accuracy (%), BERT-base, 5 seeds: fine-tuned on RTE directly vs on MNLI first, then RTE', zh: 'RTE 验证集正确率（%），BERT-base，5 个种子：直接在 RTE 上微调 vs 先 MNLI、再 RTE' })}</span>
-			<ProvenanceBadge mode="precomputed" compact note={SRC} />
+			{#if !compact}<ProvenanceBadge mode="precomputed" compact note={SRC} />{/if}
 		</figcaption>
 		<div class="slope" bind:clientWidth={w}>
 			<svg
@@ -293,7 +293,7 @@
 		stroke: var(--rule);
 	}
 	.tick {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		font-family: var(--font-mono);
 	}
@@ -327,7 +327,7 @@
 		stroke-width: 3;
 	}
 	.val {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 		font-family: var(--font-mono);
 	}

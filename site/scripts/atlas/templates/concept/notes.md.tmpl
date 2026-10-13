@@ -34,6 +34,12 @@ npm run atlas -- check {%slug%}
 npm run atlas -- e2e {%slug%} --url /train/{%slug%}/
 ```
 
+## Catalog patch
+
+What the catalog entry should say once the page is live goes into `manifest.catalog` in explainer.ts (title, interaction, engine, mode, links),
+so `npm run atlas -- promote {%slug%} --dry-run` prints the whole patch and `--verify` checks it on a copy of the catalog.
+Note here only what the manifest cannot carry (a shared glossary or tech-zh row to fix, a licences row to extend).
+
 ## Kit issues
 
 TODO: anything in the kit that blocked or slowed you, and the workaround used inside this package.

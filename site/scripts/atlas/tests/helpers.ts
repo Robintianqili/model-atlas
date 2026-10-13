@@ -2,13 +2,14 @@
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pythonChoice, pythonCommand } from '../config.ts';
 import { cliSite, findRoot } from '../root.ts';
 
 export const SITE = cliSite(); // the site these tests run in (main tree or lane)
-export const ROOT = findRoot(SITE)!;
+/** K4: $ATLAS_ROOT first, as the CLI does (root.ts), then the lane's lane.json root or the walk up */
+export const ROOT = process.env.ATLAS_ROOT?.trim() ? resolve(process.env.ATLAS_ROOT.trim()) : findRoot(SITE)!;
 export const CLI = join(SITE, 'scripts', 'atlas', 'cli.ts');
 export const HERE = dirname(fileURLToPath(import.meta.url));
 

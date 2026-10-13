@@ -135,7 +135,7 @@
 		gap: 1px;
 	}
 	.cl {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.arrow {

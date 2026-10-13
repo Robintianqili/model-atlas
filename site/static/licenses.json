@@ -10,7 +10,7 @@
     "name": "nanoGPT / minGPT (ideas)",
     "url": "https://github.com/karpathy/nanoGPT",
     "license": "MIT",
-    "usedFor": "Ideas for TinyGPT's model and training loop (pre-LN GPT-2 block, tied head, init scaling, AdamW + warm-up + cosine). Code written fresh for this project.",
+    "usedFor": "Ideas for TinyGPT's model and training loop (pre-LN GPT-2 block, tied head, init scaling, AdamW + warm-up + cosine) and the small GPTs of the positional-encodings extrapolation sweep. Code written fresh for this project.",
     "attribution": "Andrej Karpathy, nanoGPT and minGPT (MIT License)"
   },
   {
@@ -40,14 +40,6 @@
     "license": "MIT",
     "usedFor": "Idea for the TinyCNN layout (TinyVGG: two blocks of conv-ReLU-conv-ReLU-maxpool, then a dense softmax layer) and for showing per-cell convolution arithmetic. No code copied.",
     "attribution": "Wang et al., Georgia Tech Polo Club, CNN Explainer (MIT License)"
-  },
-  {
-    "name": "Fraunces (font)",
-    "url": "https://github.com/undercasetype/Fraunces",
-    "license": "OFL-1.1",
-    "usedFor": "Display face for headings (self-hosted woff2 via @fontsource-variable/fraunces).",
-    "attribution": "Copyright 2020 The Fraunces Project Authors (Undercase Type)",
-    "licenseText": "LICENSES/OFL-1.1-Fraunces.txt"
   },
   {
     "name": "Atkinson Hyperlegible Next (font)",
@@ -165,7 +157,7 @@
     "name": "Quick, Draw! dataset",
     "url": "https://github.com/googlecreativelab/quickdraw-dataset",
     "license": "CC BY 4.0",
-    "usedFor": "TinyViT training and test drawings (TinyCNN’s 10 classes and split) and the preset drawings",
+    "usedFor": "TinyViT and llava-toy training and test drawings (TinyCNN’s 10 classes and split) and the preset drawings",
     "attribution": "Quick, Draw! dataset by Google Creative Lab"
   },
   {
@@ -489,5 +481,502 @@
     "license": "Apache-2.0; idea only, reimplemented (no code or weights copied)",
     "usedFor": "The idea of the page: snake on a small board read as planes by a convolutional Q-network, with three moves relative to the heading",
     "attribution": "The TensorFlow.js authors (Google)"
+  },
+  {
+    "name": "micrograd (ideas)",
+    "url": "https://github.com/karpathy/micrograd",
+    "license": "MIT",
+    "usedFor": "Ideas for the backpropagation page: a graph of scalar operations whose backward pass adds each edge's share into the parent's gradient (grad +=), and the numerical gradient check. Code written fresh for this project; every number comes from the site's own autograd",
+    "attribution": "Andrej Karpathy, micrograd (MIT License)"
+  },
+  {
+    "name": "Adam: A Method for Stochastic Optimization (Kingma and Ba, 2014)",
+    "url": "https://arxiv.org/abs/1412.6980",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The Adam update and its bias correction, as the kit implements it (the PyTorch form)",
+    "attribution": "Diederik P. Kingma and Jimmy Ba"
+  },
+  {
+    "name": "Decoupled Weight Decay Regularization (Loshchilov and Hutter, 2017)",
+    "url": "https://arxiv.org/abs/1711.05101",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "AdamW: weight decay applied to the weights directly, outside the Adam step",
+    "attribution": "Ilya Loshchilov and Frank Hutter"
+  },
+  {
+    "name": "Cyclical Learning Rates for Training Neural Networks (Smith, 2015)",
+    "url": "https://arxiv.org/abs/1506.01186",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The learning-rate range test: raise the rate every step and read the loss curve",
+    "attribution": "Leslie N. Smith"
+  },
+  {
+    "name": "On the difficulty of training recurrent neural networks (Pascanu, Mikolov and Bengio, 2013)",
+    "url": "https://arxiv.org/abs/1211.5063",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The exploding-gradient cliff of a one-unit recurrence and gradient clipping by norm",
+    "attribution": "Razvan Pascanu, Tomas Mikolov and Yoshua Bengio"
+  },
+  {
+    "name": "Why Momentum Really Works (Goh, Distill 2017)",
+    "url": "https://distill.pub/2017/momentum/",
+    "license": "CC-BY-4.0; ideas only (no text, figures or code used)",
+    "usedFor": "The idea of showing momentum on a long, narrow valley next to plain gradient descent",
+    "attribution": "Gabriel Goh"
+  },
+  {
+    "name": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (T5; ideas)",
+    "url": "https://arxiv.org/abs/1910.10683",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "span corruption: 15% of tokens in spans of mean length 3, sentinels (the random-span mask is written fresh)",
+    "attribution": "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li and Peter J. Liu (2020)"
+  },
+  {
+    "name": "BART: Denoising Sequence-to-Sequence Pre-training (ideas)",
+    "url": "https://arxiv.org/abs/1910.13461",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "text infilling: 30% of tokens masked in spans with Poisson(3) lengths, one [MASK] per span, the whole text as the target",
+    "attribution": "Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Ves Stoyanov and Luke Zettlemoyer (2020)"
+  },
+  {
+    "name": "Masked Autoencoders Are Scalable Vision Learners (MAE; ideas)",
+    "url": "https://arxiv.org/abs/2111.06377",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "masked autoencoding: 75% of the patches hidden, the hidden pixels as the target",
+    "attribution": "Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár and Ross Girshick (2022)"
+  },
+  {
+    "name": "A Simple Framework for Contrastive Learning of Visual Representations (SimCLR; ideas)",
+    "url": "https://arxiv.org/abs/2002.05709",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "contrastive learning with two altered views of one image",
+    "attribution": "Ting Chen, Simon Kornblith, Mohammad Norouzi and Geoffrey Hinton (2020)"
+  },
+  {
+    "name": "Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture (I-JEPA; ideas)",
+    "url": "https://arxiv.org/abs/2301.08243",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "predicting hidden patches as another network’s numbers instead of pixels",
+    "attribution": "Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, Yann LeCun and Nicolas Ballas (2023)"
+  },
+  {
+    "name": "RoBERTa: A Robustly Optimized BERT Pretraining Approach (ideas)",
+    "url": "https://arxiv.org/abs/1907.11692",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the pitfall on next-sentence prediction: removing it matched or slightly improved results on later tasks",
+    "attribution": "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer and Veselin Stoyanov (2019)"
+  },
+  {
+    "name": "Efficient Training of Language Models to Fill in the Middle (ideas)",
+    "url": "https://arxiv.org/abs/2207.14255",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "fill in the middle: prefix and suffix moved in front of the middle",
+    "attribution": "Mohammad Bavarian, Heewoo Jun, Nikolas Tezak, John Schulman, Christine McLeavey, Jerry Tworek and Mark Chen (2022)"
+  },
+  {
+    "name": "CPC: van den Oord et al., Representation Learning with Contrastive Predictive Coding (2018)",
+    "url": "https://arxiv.org/abs/1807.03748",
+    "license": "Paper (arXiv); ideas only (no code, weights or data used)",
+    "usedFor": "the InfoNCE loss: a softmax over one positive and the negatives, and its bound of log N",
+    "attribution": "Aaron van den Oord, Yazhe Li, Oriol Vinyals (DeepMind)"
+  },
+  {
+    "name": "McCloskey and Cohen, Catastrophic Interference in Connectionist Networks (1989)",
+    "url": "https://doi.org/10.1016/S0079-7421(08)60536-8",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "the phenomenon the page shows: training on a new task interferes with an old one",
+    "attribution": "Michael McCloskey, Neal J. Cohen"
+  },
+  {
+    "name": "Kirkpatrick et al., Overcoming catastrophic forgetting in neural networks (PNAS 2017)",
+    "url": "https://arxiv.org/abs/1612.00796",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "the pull toward the old weights (here with the same weight for every parameter, a simplified EWC)",
+    "attribution": "James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, et al."
+  },
+  {
+    "name": "Robins, Catastrophic Forgetting, Rehearsal and Pseudorehearsal (Connection Science, 1995)",
+    "url": "https://doi.org/10.1080/09540099550039318",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "replay (rehearsal): training on stored old examples together with the new task",
+    "attribution": "Anthony Robins"
+  },
+  {
+    "name": "Hu et al., LoRA: Low-Rank Adaptation of Large Language Models (ICLR 2022)",
+    "url": "https://arxiv.org/abs/2106.09685",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The update W0 + (α/r)·B·A with W0 frozen, B starting at zero and a fixed α, and the idea that the change a task needs has a low intrinsic rank",
+    "attribution": "Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang and Weizhu Chen"
+  },
+  {
+    "name": "microsoft/LoRA (loralib)",
+    "url": "https://github.com/microsoft/LoRA",
+    "license": "MIT; idea only (no code copied)",
+    "usedFor": "The initialization convention: A drawn like a PyTorch linear layer's weights (uniform in ±1/√d_in), B all zeros",
+    "attribution": "Microsoft Corporation"
+  },
+  {
+    "name": "Dettmers et al., QLoRA: Efficient Finetuning of Quantized LLMs (NeurIPS 2023)",
+    "url": "https://arxiv.org/abs/2305.14314",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The QLoRA bar of the memory step: the frozen weights stored with 4 bits each, the adapter trained as in LoRA",
+    "attribution": "Tim Dettmers, Artidoro Pagnoni, Ari Holtzman and Luke Zettlemoyer"
+  },
+  {
+    "name": "Radford et al., Language Models are Unsupervised Multitask Learners (GPT-2, 2019)",
+    "url": "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf",
+    "license": "Paper; published model configuration only",
+    "usedFor": "The sizes of GPT-2 small (12 blocks, width 768, MLP width 3,072, 50,257 tokens, 1,024 positions) for the parameter counter and the memory bars",
+    "attribution": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei and Ilya Sutskever"
+  },
+  {
+    "name": "Quantization from the ground up (ideas)",
+    "url": "https://ngrok.com/blog/quantization",
+    "license": "ideas only (no code or text used; no licence stated)",
+    "usedFor": "the bit-level format widgets, an outlier that breaks the scale, and judging a quantized model by perplexity and KL divergence; code written fresh",
+    "attribution": "Sam Rose, ngrok blog (2026)"
+  },
+  {
+    "name": "llama.cpp block quantization (ideas)",
+    "url": "https://github.com/ggml-org/llama.cpp",
+    "license": "MIT (ideas only; no code used)",
+    "usedFor": "blocks of 32 weights that each get their own scale; code written fresh",
+    "attribution": "Georgi Gerganov and the ggml contributors"
+  },
+  {
+    "name": "van den Oord, Vinyals and Kavukcuoglu, Neural Discrete Representation Learning (NeurIPS 2017)",
+    "url": "https://arxiv.org/abs/1711.00937",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "the VQ-VAE: nearest-code quantization, the straight-through gradient, the commitment loss and the moving-average codebook update",
+    "attribution": "Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu"
+  },
+  {
+    "name": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer (ideas)",
+    "url": "https://arxiv.org/abs/1701.06538",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the mixture-of-experts layer with a learned top-k router; code written fresh",
+    "attribution": "Noam Shazeer et al. (2017)"
+  },
+  {
+    "name": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding (ideas)",
+    "url": "https://arxiv.org/abs/2006.16668",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "top-2 routing in a Transformer and expert capacity (slots dropped when an expert is full); code written fresh",
+    "attribution": "Dmitry Lepikhin et al. (2020)"
+  },
+  {
+    "name": "Switch Transformers (ideas)",
+    "url": "https://arxiv.org/abs/2101.03961",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the load-balancing loss E · Σ f·P with weight 0.01 and the capacity factor; code written fresh",
+    "attribution": "William Fedus, Barret Zoph and Noam Shazeer (2021)"
+  },
+  {
+    "name": "Mixtral of Experts (ideas)",
+    "url": "https://arxiv.org/abs/2401.04088",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "top-2 of the experts with a softmax over the kept scores (the gates), and training without dropping tokens; code written fresh",
+    "attribution": "Albert Q. Jiang et al. (2024)"
+  },
+  {
+    "name": "PointNet (Qi, Su, Mo and Guibas, CVPR 2017)",
+    "url": "https://arxiv.org/abs/1612.00593",
+    "license": "idea only (no code or data used)",
+    "usedFor": "the architecture (shared per-point MLP, max pooling, classifier) and the idea of critical points",
+    "attribution": "C. R. Qi, H. Su, K. Mo, L. J. Guibas, “PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation”"
+  },
+  {
+    "name": "C. E. Rasmussen and C. K. I. Williams, “Gaussian Processes for Machine Learning” (MIT Press, 2006), chapters 2 and 5",
+    "url": "https://gaussianprocess.org/gpml/",
+    "license": "Book; ideas only (no text, figures, code or data used)",
+    "usedFor": "the posterior equations, the Cholesky-based prediction (algorithm 2.1) and the log marginal likelihood",
+    "attribution": "Carl Edward Rasmussen and Christopher K. I. Williams"
+  },
+  {
+    "name": "Schulman, Wolski, Dhariwal, Radford & Klimov (2017), Proximal Policy Optimization Algorithms",
+    "url": "https://arxiv.org/abs/1707.06347",
+    "license": "Paper; ideas only",
+    "usedFor": "The clipped objective min(r·A, clip(r, 1 − ε, 1 + ε)·A), several epochs of minibatch updates per batch",
+    "attribution": "John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford and Oleg Klimov"
+  },
+  {
+    "name": "Schulman, Moritz, Levine, Jordan & Abbeel (2016), High-Dimensional Continuous Control Using Generalized Advantage Estimation",
+    "url": "https://arxiv.org/abs/1506.02438",
+    "license": "Paper; ideas only",
+    "usedFor": "GAE: δ = r + γ·V(s′) − V(s), A_t = δ_t + γλ·A_(t+1)",
+    "attribution": "John Schulman, Philipp Moritz, Sergey Levine, Michael Jordan and Pieter Abbeel"
+  },
+  {
+    "name": "CleanRL: ppo_continuous_action.py",
+    "url": "https://github.com/vwxyzjn/cleanrl",
+    "license": "MIT",
+    "usedFor": "The training recipe (separate actor and critic, a state-independent log-std, normalized advantages, shuffled minibatch epochs); reimplemented on the Model Atlas autograd core, no code copied",
+    "attribution": "Shengyi Huang and the CleanRL contributors"
+  },
+  {
+    "name": "Bordes et al., Translating Embeddings for Modeling Multi-relational Data (NeurIPS 2013)",
+    "url": "https://proceedings.neurips.cc/paper/2013/hash/1cecc7a77928ca8133fa24680a88d2f9-Abstract.html",
+    "license": "Paper; ideas only (no code, text or figures used)",
+    "usedFor": "TransE: entities as points and relations as translations (h + r ≈ t), the L2 distance, the margin ranking loss with one corrupted triple per fact, and link prediction by ranking (here without the paper’s step that rescales entities to length 1)",
+    "attribution": "Antoine Bordes, Nicolas Usunier, Alberto Garcia-Durán, Jason Weston and Oksana Yakhnenko"
+  },
+  {
+    "name": "Wang et al., Knowledge Graph Embedding by Translating on Hyperplanes (AAAI 2014)",
+    "url": "https://doi.org/10.1609/aaai.v28i1.8870",
+    "license": "Paper; ideas only (no code, text or figures used)",
+    "usedFor": "The analysis of why TransE struggles with one-to-many, many-to-one and many-to-many relations, which the limits step shows with live numbers",
+    "attribution": "Zhen Wang, Jianwen Zhang, Jianlin Feng and Zheng Chen (TransH)"
+  },
+  {
+    "name": "Fourier Neural Operator (Li et al., 2021)",
+    "url": "https://arxiv.org/abs/2010.08895",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "The architecture (lift, Fourier layers with a spectral and a pointwise path, projection) and the idea of keeping only the lowest modes; no code or data",
+    "attribution": "Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, A. Anandkumar. Fourier Neural Operator for Parametric Partial Differential Equations. ICLR 2021"
+  },
+  {
+    "name": "An Interactive Introduction to Fourier Transforms (Jez Swanson)",
+    "url": "https://github.com/Jezzamonn/fourier",
+    "license": "MIT; ideas only (no code copied)",
+    "usedFor": "Ideas only (no code): drawing a curve and watching it rebuilt from a few waves as the number of kept waves changes",
+    "attribution": "Jez Swanson (Jezzamonn), MIT License"
+  },
+  {
+    "name": "Kang & McAuley, “Self-Attentive Sequential Recommendation” (ICDM 2018)",
+    "url": "https://doi.org/10.1109/ICDM.2018.00035",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the SASRec model (item and position embeddings, causal self-attention blocks, scores against the shared item embeddings), at toy size",
+    "attribution": "Wang-Cheng Kang and Julian McAuley (UC San Diego)"
+  },
+  {
+    "name": "Attention Is All You Need (ideas)",
+    "url": "https://arxiv.org/abs/1706.03762",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the encoder-decoder Transformer: scaled dot-product attention, several heads, the causal mask in the decoder and cross-attention to the encoder; the sinusoidal positional encoding and the √d embedding scale (positional-encodings); code written fresh",
+    "attribution": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser and Illia Polosukhin (2017)"
+  },
+  {
+    "name": "CRNN (Shi, Bai and Yao, 2015)",
+    "url": "https://arxiv.org/abs/1507.05717",
+    "license": "Paper (arXiv); ideas only (no code, weights or data used)",
+    "usedFor": "the architecture: convolutional features cut into columns, a bidirectional LSTM over the columns and a CTC output, reimplemented at toy size",
+    "attribution": "Baoguang Shi, Xiang Bai and Cong Yao, “An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition”"
+  },
+  {
+    "name": "Connectionist temporal classification (Graves et al., ICML 2006)",
+    "url": "https://www.cs.toronto.edu/~graves/icml_2006.pdf",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "the blank symbol, the collapse rule, the forward algorithm over the label with blanks and the CTC loss (training uses PyTorch’s ctc_loss; the page’s own forward algorithm is checked against it)",
+    "attribution": "Alex Graves, Santiago Fernández, Faustino Gomez and Jürgen Schmidhuber, “Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks”"
+  },
+  {
+    "name": "Dinh, Sohl-Dickstein and Bengio, Density estimation using Real NVP (ICLR 2017)",
+    "url": "https://arxiv.org/abs/1605.08803",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "affine coupling layers y′ = y·e^s + t with alternating masks, the log-determinant Σs, the exact log-likelihood and sampling by inverting",
+    "attribution": "Laurent Dinh, Jascha Sohl-Dickstein, Samy Bengio"
+  },
+  {
+    "name": "Dinh, Krueger and Bengio, NICE: Non-linear Independent Components Estimation (ICLR 2015 workshop)",
+    "url": "https://arxiv.org/abs/1410.8516",
+    "license": "Paper; idea only (no text, figures or code used)",
+    "usedFor": "coupling layers that keep one part of the input and are inverted without inverting their network",
+    "attribution": "Laurent Dinh, David Krueger, Yoshua Bengio"
+  },
+  {
+    "name": "Ross, Gordon & Bagnell (2011), A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning",
+    "url": "https://arxiv.org/abs/1011.0686",
+    "license": "Paper; ideas only",
+    "usedFor": "DAgger: let the learner drive, label the visited states with the expert, aggregate the datasets and retrain",
+    "attribution": "Stéphane Ross, Geoffrey J. Gordon and J. Andrew Bagnell"
+  },
+  {
+    "name": "Ross & Bagnell (2010), Efficient Reductions for Imitation Learning",
+    "url": "https://proceedings.mlr.press/v9/ross10a.html",
+    "license": "Paper; ideas only",
+    "usedFor": "Compounding error of behavior cloning: mistakes take the learner to states the expert never showed",
+    "attribution": "Stéphane Ross and J. Andrew Bagnell"
+  },
+  {
+    "name": "Pomerleau (1988), ALVINN: An Autonomous Land Vehicle in a Neural Network",
+    "url": "https://proceedings.neurips.cc/paper/1988/hash/812b4ba287f5ee0bc9d43bbf5bbe87fb-Abstract.html",
+    "license": "Paper; ideas only",
+    "usedFor": "Behavior cloning: a neural network learns steering from a driver’s demonstrations",
+    "attribution": "Dean A. Pomerleau"
+  },
+  {
+    "name": "E(n) Equivariant Graph Neural Networks (Satorras, Hoogeboom and Welling, ICML 2021)",
+    "url": "https://arxiv.org/abs/2102.09844",
+    "license": "idea only (no code or data used)",
+    "usedFor": "the EGNN layer: messages from atom features and squared distances, coordinate updates along relative positions, the node update",
+    "attribution": "V. G. Satorras, E. Hoogeboom, M. Welling, “E(n) Equivariant Graph Neural Networks”"
+  },
+  {
+    "name": "Morse potential (P. M. Morse, Physical Review 1929)",
+    "url": "https://doi.org/10.1103/PhysRev.34.57",
+    "license": "idea only (a textbook formula)",
+    "usedFor": "the shape of the toy pair energy that scores the training molecules (made-up parameters, not real chemistry)",
+    "attribution": "P. M. Morse, “Diatomic Molecules According to the Wave Mechanics. II. Vibrational Levels”"
+  },
+  {
+    "name": "L. R. Rabiner, “A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition” (Proceedings of the IEEE, 1989)",
+    "url": "https://doi.org/10.1109/5.18626",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the forward and Viterbi recursions and their notation (α, δ, ψ)",
+    "attribution": "Lawrence R. Rabiner"
+  },
+  {
+    "name": "A. J. Viterbi, “Error bounds for convolutional codes and an asymptotically optimum decoding algorithm” (IEEE Transactions on Information Theory, 1967)",
+    "url": "https://doi.org/10.1109/TIT.1967.1054010",
+    "license": "Article; ideas only (no text, figures, code or data used)",
+    "usedFor": "the Viterbi algorithm",
+    "attribution": "Andrew J. Viterbi"
+  },
+  {
+    "name": "Wikipedia, “Hidden Markov model” (the example of a distant friend whose activities depend on the weather)",
+    "url": "https://en.wikipedia.org/wiki/Hidden_Markov_model",
+    "license": "CC BY-SA 4.0; the idea of the example only (no text, figures or numbers used: the tables here are our own)",
+    "usedFor": "the setting of the story: hidden weather behind walk, shop and clean",
+    "attribution": "Wikipedia contributors"
+  },
+  {
+    "name": "Bai, Kolter & Koltun, An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling (2018)",
+    "url": "https://arxiv.org/abs/1803.01271",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "the TCN: causal dilated convolutions in residual blocks",
+    "attribution": "Shaojie Bai, J. Zico Kolter and Vladlen Koltun"
+  },
+  {
+    "name": "van den Oord et al., WaveNet: A Generative Model for Raw Audio (2016)",
+    "url": "https://arxiv.org/abs/1609.03499",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "dilations that double layer by layer, and the receptive field they give",
+    "attribution": "Aäron van den Oord and co-authors"
+  },
+  {
+    "name": "Hannan & Rissanen, Recursive estimation of mixed autoregressive-moving average order (Biometrika, 1982)",
+    "url": "https://doi.org/10.1093/biomet/69.1.81",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "ARIMA-lite: the two-stage least-squares fit of the AR and MA coefficients",
+    "attribution": "E. J. Hannan and J. Rissanen"
+  },
+  {
+    "name": "LLaVA: Liu et al., Visual Instruction Tuning (2023) and Improved Baselines with Visual Instruction Tuning (2023)",
+    "url": "https://arxiv.org/abs/2304.08485",
+    "license": "Papers (arXiv); ideas only (no code, weights or data used)",
+    "usedFor": "a frozen vision encoder read at its second-to-last layer without the [CLS] row, the two-layer GELU projector, image tokens placed in the language model’s sequence and the loss on the answer only, at toy size",
+    "attribution": "Haotian Liu, Chunyuan Li, Qingyang Wu, Yuheng Li and Yong Jae Lee"
+  },
+  {
+    "name": "bitsandbytes NF4 data type (the 16 NF4 levels)",
+    "url": "https://github.com/bitsandbytes-foundation/bitsandbytes",
+    "license": "MIT",
+    "usedFor": "the table of the 16 NF4 levels (fmt.ts NF4), recomputed from normal quantiles in pipeline/number-formats/flib.py; the rounding code is written fresh",
+    "attribution": "QLoRA (Dettmers, Pagnoni, Holtzman and Zettlemoyer, 2023) and the bitsandbytes contributors"
+  },
+  {
+    "name": "FP8 formats for deep learning; OCP Microscaling (MX) formats (ideas)",
+    "url": "https://arxiv.org/abs/2209.05433",
+    "license": "ideas only (no code or text used)",
+    "usedFor": "the e4m3 and e5m2 encodings (e4m3 without infinity, one NaN code) and FP4 e2m1 with a scale per block of 32; code written fresh and checked against PyTorch’s float8 dtypes",
+    "attribution": "Micikevicius et al. (2022); Open Compute Project MX specification v1.0 (2023)"
+  },
+  {
+    "name": "Mixed precision training (ideas)",
+    "url": "https://arxiv.org/abs/1710.03740",
+    "license": "ideas only (no code or text used)",
+    "usedFor": "fp32 master weights and loss scaling, shown on one weight and on TinyGPT’s gradients; code written fresh",
+    "attribution": "Micikevicius et al. (2018)"
+  },
+  {
+    "name": "The Curious Case of Neural Text Degeneration (ideas)",
+    "url": "https://arxiv.org/abs/1904.09751",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "top-p (nucleus) sampling, and repetition under greedy decoding",
+    "attribution": "Ari Holtzman, Jan Buys, Li Du, Maxwell Forbes and Yejin Choi (2020)"
+  },
+  {
+    "name": "Hierarchical Neural Story Generation (ideas)",
+    "url": "https://arxiv.org/abs/1805.04833",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "top-k sampling",
+    "attribution": "Angela Fan, Mike Lewis and Yann Dauphin (2018)"
+  },
+  {
+    "name": "Prompt caching (ideas)",
+    "url": "https://ngrok.com/blog/prompt-caching/",
+    "license": "ideas only (no code or text used; no licence stated)",
+    "usedFor": "an attention grid that fills as tokens are generated, with the cached work shown as skipped; code written fresh",
+    "attribution": "Sam Rose, ngrok blog (2025)"
+  },
+  {
+    "name": "Su et al., RoFormer: Enhanced Transformer with Rotary Position Embedding (2021)",
+    "url": "https://arxiv.org/abs/2104.09864",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "RoPE: each 2-D pair of a query and a key turned by position × θ_i with θ_i = 10000^(−2i/d), so that their dot product depends on the distance only",
+    "attribution": "Jianlin Su, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen and Yunfeng Liu"
+  },
+  {
+    "name": "Press et al., Train Short, Test Long: Attention with Linear Biases (ALiBi, ICLR 2022)",
+    "url": "https://arxiv.org/abs/2108.12409",
+    "license": "Paper; ideas only (no text, figures or code used)",
+    "usedFor": "ALiBi’s bias −m × distance with the head slopes 2^(−8/H), 2^(−16/H), …, and the train-short, test-long comparison",
+    "attribution": "Ofir Press, Noah A. Smith and Mike Lewis"
+  },
+  {
+    "name": "Ainslie et al., GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (EMNLP 2023)",
+    "url": "https://arxiv.org/abs/2305.13245",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "Grouped-query attention, converting a multi-head checkpoint by mean pooling each group’s key and value heads, and uptraining with 5% of the pretraining steps; the page repeats both on TinyGPT",
+    "attribution": "Joshua Ainslie, James Lee-Thorp, Michiel de Jong, Yury Zemlyanskiy, Federico Lebrón and Sumit Sanghai"
+  },
+  {
+    "name": "Shazeer, Fast Transformer Decoding: One Write-Head is All You Need (2019)",
+    "url": "https://arxiv.org/abs/1911.02150",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "Multi-query attention: one key head and one value head shared by every query head",
+    "attribution": "Noam Shazeer"
+  },
+  {
+    "name": "DeepSeek-AI, DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model (2024)",
+    "url": "https://arxiv.org/abs/2405.04434",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "Multi-head latent attention and the DeepSeek-V2 preset: 60 layers, 128 heads of width 128, a cached latent of 512 plus a 64-wide RoPE key per token and layer",
+    "attribution": "DeepSeek-AI"
+  },
+  {
+    "name": "Touvron et al., Llama 2: Open Foundation and Fine-Tuned Chat Models (2023)",
+    "url": "https://arxiv.org/abs/2307.09288",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "The Llama 2 7B (32 layers, 32 heads, MHA) and Llama 2 70B (80 layers, 64 heads, 8 KV heads) presets, head width 128",
+    "attribution": "Hugo Touvron, Louis Martin, Kevin Stone and the Llama 2 team (Meta)"
+  },
+  {
+    "name": "Llama Team, AI @ Meta, The Llama 3 Herd of Models (2024)",
+    "url": "https://arxiv.org/abs/2407.21783",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "The Llama 3 8B preset: 32 layers, 32 heads, 8 KV heads, head width 128",
+    "attribution": "Aaron Grattafiori, Abhimanyu Dubey and the Llama 3 team (Meta)"
+  },
+  {
+    "name": "Almazrouei et al., The Falcon Series of Open Language Models (2023)",
+    "url": "https://arxiv.org/abs/2311.16867",
+    "license": "Paper; ideas and published numbers only (no text, figures or code used)",
+    "usedFor": "The Falcon-7B preset: 32 layers, 71 query heads of width 64, multi-query attention",
+    "attribution": "Ebtesam Almazrouei, Hamza Alobeidli, Abdulaziz Alshamsi and the Falcon team (TII)"
+  },
+  {
+    "name": "AI Notes: Initializing neural networks (ideas)",
+    "url": "https://www.deeplearning.ai/ai-notes/initialization/",
+    "license": "ideas only (no code or text used)",
+    "usedFor": "the idea of showing per-layer histograms of a deep network under zero, too small, Xavier and too large initialization; network, data and code written fresh",
+    "attribution": "Katanforoosh and Kunin, deeplearning.ai (2019)"
+  },
+  {
+    "name": "ELECTRA: Pre-training Text Encoders as Discriminators Rather Than Generators (ideas)",
+    "url": "https://arxiv.org/abs/2003.10555",
+    "license": "ideas only (paper; no code or text used)",
+    "usedFor": "the point that a masked model learns from only the chosen ~15% of positions per example, and the further-reading link",
+    "attribution": "Kevin Clark, Minh-Thang Luong, Quoc V. Le and Christopher D. Manning (2020)"
   }
 ]

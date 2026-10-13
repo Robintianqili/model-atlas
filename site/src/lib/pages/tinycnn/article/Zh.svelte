@@ -6,7 +6,7 @@
 	import { sym } from '$lib/kit/tex';
 	import type { CnnStore } from '../store.svelte';
 
-	let { S, onshow }: { S: CnnStore; onshow: () => void } = $props();
+	let { S }: { S: CnnStore } = $props();
 </script>
 
 <h3>1. 一幅画就是一格格数字</h3>
@@ -26,7 +26,7 @@
 <p>
 	然后把窗口挪一个像素，再算一次，每个位置都这样做。结果是一张新的网格，叫<Term id="feature-map" />：窗口里的内容越像卷积核，那里的值就越大。
 	TinyCNN 不使用<Term id="padding" />，所以 3 × 3 的卷积核在 28 个像素里只能放 26 个位置：每做一次<Term id="convolution" />，四边各少一个像素（28
-	→ 26 → 24）。<ShowMe {S} {onshow} layer="conv1_1" label="看卷积 1-1 滑动" />
+	→ 26 → 24）。<ShowMe {S} layer="conv1_1" label="看卷积 1-1 滑动" />
 </p>
 
 <h3>3. 卷积核、通道和特征图</h3>
@@ -35,20 +35,20 @@
 </p>
 <p>
 	下一层同时读取全部 8 张图。它的卷积核是 3 × 3 × 8：每个输入通道一块 3 × 3 的切片。一个输出格等于 8 个小和（每个通道一个）再加偏置，一共 72
-	次乘法。后面的层就是这样组合简单模式的：“这里有一条横边，<em>并且</em>那里有一条斜线”。<ShowMe {S} {onshow} layer="conv2_1" label="看 8 个通道如何相加" />
+	次乘法。后面的层就是这样组合简单模式的：“这里有一条横边，<em>并且</em>那里有一条斜线”。<ShowMe {S} layer="conv2_1" label="看 8 个通道如何相加" />
 </p>
 
 <h3>4. ReLU：只保留正面的证据</h3>
 <p>
 	每次卷积之后是 <Term id="relu" />：<Tex tex={'\\max(0, x)'} />。负数变成 0，正数原样通过。可以把每个格子看作在用它的数值投票：“我看到了我的模式”。ReLU
 	丢掉的是“我肯定没看到”的那些票。它在数学上也很关键：连续两次卷积只相当于一次更大的卷积；中间加上这个“折弯”，叠起来的层才能表达多得多的东西。
-	<ShowMe {S} {onshow} layer="relu1_1" label="比较之前与之后" />
+	<ShowMe {S} layer="relu1_1" label="比较之前与之后" />
 </p>
 
 <h3>5. 最大池化：缩小，并保留最强的</h3>
 <p>
 	<Term id="pooling">最大池化</Term>把每张图切成 2 × 2 的小块，每块只保留最大的那个值，宽和高都减半（24 → 12，8 → 4）。它没有权重。它记住的是“这个模式出现在这一块里”，忘掉具体在哪个位置，所以笔画往左挪一个像素，对后面的影响很小。
-	<ShowMe {S} {onshow} layer="pool1" label="看 2×2 窗口" />
+	<ShowMe {S} layer="pool1" label="看 2×2 窗口" />
 </p>
 
 <h3>6. 感受野：越深的格子看得越多</h3>
@@ -76,7 +76,7 @@
 </div>
 <p>
 	只有 logit 之间的差值才重要，而且概率永远是在这 10 个已知类别之间分配 100%。没有“都不是”这个选项，所以一幅梯子可能被判成 99.8% 的房子。
-	<ShowMe {S} {onshow} layer="dense" label="看什么把一个类别推高" />
+	<ShowMe {S} layer="dense" label="看什么把一个类别推高" />
 </p>
 
 <h3>8. 为什么参数这么少？</h3>

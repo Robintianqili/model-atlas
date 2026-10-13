@@ -169,7 +169,7 @@
 		vector-effect: non-scaling-stroke;
 	}
 	.ro {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 		min-height: 1.4em;
 	}

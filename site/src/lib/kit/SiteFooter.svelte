@@ -1,9 +1,11 @@
-<!-- Site footer: privacy promise, links, licences and credits. The counts come from the root layout's server load
-     (catalog/slices.ts), so no page loads the catalog modules for them. -->
+<!-- Site footer (redesign spec §4.5): the brand, the privacy sentence and the provenance legend (with About, the only place
+     the three kinds are explained in full) · Learn / Build / About columns · the licence line. The counts come from the
+     root layout's server load (catalog/slices.ts), so no page loads the catalog modules for them. -->
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
-	import { ui, t } from '$lib/i18n/i18n.svelte';
+	import Mark from './Mark.svelte';
+	import { ui } from '$lib/i18n/i18n.svelte';
 	import { REPO_URL } from '$lib/project';
 	import type { SiteCounts } from '$lib/catalog/types';
 
@@ -13,43 +15,42 @@
 </script>
 
 <footer class="ftr">
-	<div class="container inner">
-		<div class="col">
-			<p class="brand">Model Atlas · <span lang="zh-CN">模型图鉴</span></p>
-			<p class="privacy">
-				<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect x="2" y="5.2" width="8" height="5.6" rx="1.2" fill="currentColor" /><path d="M3.8 5.2V3.8a2.2 2.2 0 0 1 4.4 0v1.4" fill="none" stroke="currentColor" stroke-width="1.4" /></svg>
-				{ui('footerPrivacy')}
-			</p>
-			{#if counts}
-				<p class="muted small">
-					{ui('countModels', { n: counts.models })} · {ui('countConcepts', { n: counts.concepts })} ·
-					{ui('countLive', { n: counts.live })}
-				</p>
-			{/if}
+	<div class="inner">
+		<div class="about">
+			<a class="brand" href="{base}/"><Mark size={26} /><span>Model Atlas</span><span class="zh" lang="zh-CN">模型图鉴</span></a>
+			<p class="numbers">{ui('footerNumbers')}</p>
+			<h2 class="visually-hidden">{ui('provLegend')}</h2>
+			<ul class="provs">
+				<li><span class="prov live"><span class="dot" aria-hidden="true"></span><b>{ui('provLive')}</b></span><span>{ui('provLiveNote')}</span></li>
+				<li><span class="prov pre"><span class="dot" aria-hidden="true"></span><b>{ui('provPrecomputed')}</b></span><span>{ui('provPrecomputedNote')}</span></li>
+				<li><span class="prov illus"><span class="dot" aria-hidden="true"></span><b>{ui('provIllustrative')}</b></span><span>{ui('provIllustrativeNote')}</span></li>
+			</ul>
 		</div>
-		<nav class="col links" aria-label="Footer">
-			<a href="{base}/atlas/">{ui('navAtlas')}</a>
-			<a href="{base}/train/">{ui('navTrain')}</a>
+		<nav aria-labelledby="ftr-learn">
+			<h2 id="ftr-learn">{ui('footerLearn')}</h2>
+			<a href="{base}/atlas/">{ui('footerAllLessons')}</a>
+			<a href="{base}/#paths">{ui('footerPaths')}</a>
 			<a href="{base}/glossary/">{ui('navGlossary')}</a>
+		</nav>
+		<nav aria-labelledby="ftr-build">
+			<h2 id="ftr-build">{ui('footerBuild')}</h2>
+			<a href="{base}/devkit/">{ui('footerDevkit')}</a>
+			<a href="{base}/dev/kit/">{ui('navKit')}</a>
+			<a href={REPO_URL} rel="noopener">{ui('footerSource')}</a>
+		</nav>
+		<nav aria-labelledby="ftr-about">
+			<h2 id="ftr-about">{ui('navAbout')}</h2>
 			<a href="{base}/about/">{ui('footerHowNumbers')}</a>
 			<a href="{base}/about/#licenses">{ui('footerLicenses')}</a>
-			<a href="{base}/devkit/">{ui('navDevkit')}</a>
-			<a href="{base}/dev/kit/">{ui('navKit')}</a>
+			<a href="{base}/about/#privacy">{ui('footerPrivacyLink')}</a>
 		</nav>
-		<div class="col small muted legal">
-			<p>
-				{t({
-					en: 'Code: MIT licence. Lesson text, articles and figures: CC BY 4.0. Datasets, vocabularies and fonts keep their own licences.',
-					zh: '代码采用 MIT 许可证；课程文字、文章和插图采用 CC BY 4.0；数据集、词表和字体保留各自的许可证。'
-				})}
-				<a href={REPO_URL} rel="noopener">{t({ en: 'Source on GitHub', zh: 'GitHub 上的源代码' })}</a>
-			</p>
-			<p>
-				{t({
-					en: 'A static site: every model runs or is replayed in your browser. Fonts: Fraunces, Atkinson Hyperlegible Next, JetBrains Mono (SIL OFL). Math: KaTeX (MIT).',
-					zh: '纯静态网站：所有模型都在你的浏览器中运行或回放。字体：Fraunces、Atkinson Hyperlegible Next、JetBrains Mono（SIL OFL）。公式：KaTeX（MIT）。'
-				})}
-			</p>
+		<div class="legal">
+			<p>{ui('footerLegal')} {ui('footerTech')}</p>
+			{#if counts}
+				<p class="counts">
+					{ui('countModels', { n: counts.models })} · {ui('countConcepts', { n: counts.concepts })} · {ui('countLive', { n: counts.live })}
+				</p>
+			{/if}
 		</div>
 	</div>
 </footer>
@@ -58,41 +59,124 @@
 	.ftr {
 		margin-top: var(--s8);
 		border-top: 1px solid var(--rule);
-		background: var(--surface-2);
-		padding: var(--s6) 0 var(--s7);
-		font-size: var(--fs-sm);
+		background: var(--panel);
 	}
 	.inner {
+		max-width: var(--page-max);
+		margin: 0 auto;
+		padding: 40px var(--gutter) 32px;
 		display: grid;
-		grid-template-columns: 1.4fr 1fr 1.2fr;
-		gap: var(--s5);
-	}
-	@media (max-width: 760px) {
-		.inner {
-			grid-template-columns: 1fr;
-		}
+		grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+		gap: var(--s6);
 	}
 	.brand {
-		font-family: var(--font-display);
-		font-weight: 650;
-		font-size: 1.05rem;
-		margin-bottom: 6px;
-	}
-	.privacy {
 		display: flex;
-		gap: 6px;
-		align-items: baseline;
+		align-items: center;
+		gap: 10px;
+		color: var(--ink);
+		text-decoration: none;
+		font-weight: var(--w-title);
+	}
+	.brand .zh {
+		font-family: var(--font-cjk);
+		font-weight: var(--w-body);
+		color: var(--muted);
+	}
+	.numbers {
+		max-width: 44ch;
+		margin: 14px 0;
 		color: var(--ink-2);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
-	.links {
+	.provs {
 		display: grid;
-		gap: 4px;
-		align-content: start;
+		gap: 6px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		color: var(--muted);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
-	.small {
-		font-size: var(--fs-xs);
+	.provs li {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.prov {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-width: 126px;
+	}
+	.prov b {
+		color: var(--ink-2);
+		font-weight: var(--w-ui);
+	}
+	.dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--live);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 22%, transparent);
+	}
+	.pre .dot {
+		background: var(--pre);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--pre) 22%, transparent);
+	}
+	.illus .dot {
+		background: transparent;
+		border: 1.5px dashed var(--illus);
+		box-shadow: none;
+		width: 10px;
+		height: 10px;
+	}
+	nav {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+	nav h2 {
+		margin: 0 0 2px;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+	}
+	nav a {
+		color: var(--ink-2);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		text-decoration: none;
+		padding: 2px 0;
+	}
+	nav a:hover {
+		color: var(--ink);
+		text-decoration: underline;
+	}
+	.legal {
+		grid-column: 1 / -1;
+		border-top: 1px solid var(--rule);
+		padding-top: var(--s4);
+		color: var(--muted);
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
 	}
 	.legal p {
-		margin: 0 0 8px;
+		margin: 0 0 6px;
+		max-width: 110ch;
+	}
+	@media (max-width: 759px) {
+		.inner {
+			grid-template-columns: 1fr 1fr;
+			gap: var(--s5);
+			padding: 32px var(--gutter) 24px;
+		}
+		.about {
+			grid-column: 1 / -1;
+		}
+		nav a {
+			padding: 6px 0;
+		}
 	}
 </style>

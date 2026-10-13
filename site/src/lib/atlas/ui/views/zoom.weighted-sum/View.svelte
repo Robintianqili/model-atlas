@@ -19,7 +19,7 @@
 	import RoleFrame from '$lib/kit/RoleFrame.svelte';
 	import Num from '../kit.parts/Num.svelte';
 	import { fmt3 } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import { motion } from '$lib/kit/theme.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
@@ -28,7 +28,7 @@
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import SpatialMaps from '../kit.parts/SpatialMaps.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, domainOf, layerLabel, outLabels, resolveUnit, scanDriven, tensorOf, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, domainOf, keyTexts, layerLabel, nameText, outLabels, resolveUnit, scanDriven, tensorOf, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -51,8 +51,8 @@
 	const isConv = $derived(!!e?.layout && !!xT && xT.shape.length === 3 && outAxes.join() === 'c,y,x');
 	const ids = $derived(tokenIds(R.trace, R.model));
 	const T = $derived(out && (outAxes[0] === 't' || outAxes[1] === 'tq') ? (outAxes[0] === 't' ? out.shape[0] : out.shape[1]) : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, ids) : []);
-	const where = $derived(e ? unitWhere(e.unit, outAxes, tokens, outLabels(P, R.model)) : null);
+	const tokens = $derived(T ? tokenTexts(P, T, ids, i18n.lang) : []);
+	const where = $derived(e ? unitWhere(e.unit, outAxes, tokens, outLabels(P, R.model), axisNames(P)) : null);
 	const reduced = $derived(P.ctx?.reduced ?? motion.reduced);
 
 	// ------------------------------------------------ kernels (conv2d and any k×k layout)
@@ -108,18 +108,19 @@
 		kindOp === 'attention_scores' ? { x: 'q', w: 'k' } : kindOp === 'attention_mix' ? { x: 'v', w: 'prob' } : { x: 'in', w: 'param' }
 	);
 	// K1: props.names renames the columns ({ x: 'h', w: 'W', p: 'h·W' }): x and y clash with a lesson's own notation (flow
-	// matching's x0 and x1)
+	// matching's x0 and x1). K4: a name may be bilingual ({ x: { en: 'price', zh: '价格' } }).
 	const head = $derived({
 		...(kindOp === 'attention_scores'
 			? { i: 'c', x: 'q', w: 'k', p: 'q·k' }
 			: kindOp === 'attention_mix'
 				? { i: t({ en: 'key', zh: '键' }), x: 'v', w: 'a', p: 'a·v' }
 				: { i: 'i', x: 'x', w: 'w', p: 'x·w' }),
-		...((P.props.names ?? {}) as Record<string, string>)
+		...Object.fromEntries(Object.entries((P.props.names ?? {}) as Record<string, unknown>).map(([k, v]) => [k, nameText(v, i18n.lang) ?? String(v)]))
 	});
 	const keyTokens = $derived.by(() => {
 		if (kindOp !== 'attention_mix' || !e?.terms) return [];
-		return tokenTexts(P, e.terms.length, ids);
+		// K4: the keys of a cross-attention mix are another sequence (props.keys)
+		return keyTexts(P, e.terms.length, ids, i18n.lang);
 	});
 	const termIdx = $derived((i: number) => {
 		if (kindOp === 'attention_mix') return `${i}${keyTokens[i] ? ` ${keyTokens[i]}` : ''}`;
@@ -390,7 +391,7 @@
 			tex={R.op?.def.formula}
 			{e}
 			caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined}
-			provenance={P.provenance}
+			provenance={P.provenance} digits={P.props.digits as number | undefined}
 		/>
 	</div>
 {/if}
@@ -438,7 +439,7 @@
 		box-shadow: 0 0 0 2px var(--accent);
 	}
 	.cs {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.cs.neg {
@@ -469,7 +470,7 @@
 		gap: 3px;
 	}
 	.ng figcaption {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.op {

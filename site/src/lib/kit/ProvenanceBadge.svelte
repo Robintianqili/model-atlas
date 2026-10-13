@@ -1,10 +1,13 @@
 <!--
-  Provenance badge (required on every panel that shows model numbers; CONTRACTS.md rule 2).
+  Provenance label (required on every panel that shows model numbers; CONTRACTS.md rule 2). Redesign look (spec §4.4,
+  ProvenanceLabel): a dot and the word, with the precision in mono; the tooltip (hover, focus or tap) explains the kind
+  and gives the parity detail. Same API as before.
     live         computed in the browser right now
     precomputed  computed offline from the same model
-    illustrative made-up example values (always labeled)
+    illustrative made-up example values (always labeled; a dashed dot)
   <ProvenanceBadge mode="live" precision="fp32" tolerance={3.1e-6} against="PyTorch fp32" />
   <ProvenanceBadge mode="illustrative" />
+  The root keeps the class "badge": atlas e2e looks for `.stage .badge` on every step (AK502).
 -->
 <script lang="ts">
 	import Tooltip from './Tooltip.svelte';
@@ -24,7 +27,7 @@
 		approximate?: boolean;
 		/** extra sentence for the tooltip */
 		note?: Text;
-		/** smaller badge without the precision text */
+		/** the word only (no precision), for tight places */
 		compact?: boolean;
 	}
 	let { mode, precision, tolerance, against = 'PyTorch', approximate = false, note, compact = false }: Props =
@@ -51,15 +54,7 @@
 		{#if note}<br />{t(note)}{/if}
 	{/snippet}
 	<span class="badge {mode}" class:compact>
-		<span class="glyph" aria-hidden="true">
-			{#if mode === 'live'}
-				<svg viewBox="0 0 12 12" width="12" height="12"><circle cx="6" cy="6" r="3.2" fill="currentColor" /><circle class="ring" cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
-			{:else if mode === 'precomputed'}
-				<svg viewBox="0 0 12 12" width="12" height="12"><ellipse cx="6" cy="3.2" rx="4.4" ry="1.9" fill="none" stroke="currentColor" stroke-width="1.3" /><path d="M1.6 3.2v5.6c0 1 2 1.9 4.4 1.9s4.4-.9 4.4-1.9V3.2M1.6 6c0 1 2 1.9 4.4 1.9S10.4 7 10.4 6" fill="none" stroke="currentColor" stroke-width="1.3" /></svg>
-			{:else}
-				<svg viewBox="0 0 12 12" width="12" height="12"><path d="M2 10l1-3 5.5-5.5 2 2L5 9z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" /></svg>
-			{/if}
-		</span>
+		<span class="dot" aria-hidden="true"></span>
 		<span class="lbl">{label}</span>
 		{#if precision && !compact}<span class="prec num">{precision}{#if approximate}≈{/if}</span>{/if}
 		{#if tolerance !== undefined && !compact}<span class="prec num">Δ≤{fmt3(tolerance, 2)}</span>{/if}
@@ -70,57 +65,51 @@
 	.badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 5px;
-		padding: 2px 8px 2px 6px;
-		border-radius: var(--r-pill);
-		border: 1px solid currentColor;
-		font-size: var(--fs-xs);
-		font-weight: 650;
-		line-height: 1.5;
+		gap: 7px;
+		padding: 2px 0;
+		color: var(--muted);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 		white-space: nowrap;
 		vertical-align: middle;
 	}
 	.badge.compact {
-		padding: 1px 6px 1px 4px;
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
+		gap: 6px;
 	}
-	.live {
-		color: var(--live);
-		background: var(--live-soft);
+	.dot {
+		flex: none;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--live);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 22%, transparent);
 	}
-	.precomputed {
-		color: var(--pre);
-		background: var(--pre-soft);
+	.precomputed .dot {
+		background: var(--pre);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--pre) 22%, transparent);
 	}
-	.illustrative {
-		color: var(--illus);
-		background: repeating-linear-gradient(
-			-45deg,
-			var(--illus-soft) 0 5px,
-			color-mix(in srgb, var(--illus-soft) 55%, transparent) 5px 10px
-		);
-		border-style: dashed;
+	/* made-up values: a hollow, dashed dot (never colour alone: the word says it too) */
+	.illustrative .dot {
+		width: 10px;
+		height: 10px;
+		background: transparent;
+		border: 1.5px dashed var(--illus);
+		box-shadow: none;
 	}
-	.glyph {
-		display: inline-flex;
+	.lbl {
+		color: var(--ink-2);
+		font-weight: var(--w-ui);
 	}
-	.ring {
-		transform-origin: 6px 6px;
-		/* a few pulses, not forever: infinite SVG animations repaint every frame (costly on big pages) */
-		animation: pulse 2.4s var(--ease) 3;
-	}
-	@keyframes pulse {
-		0% {
-			opacity: 0.9;
-			transform: scale(0.6);
-		}
-		70%,
-		100% {
-			opacity: 0;
-			transform: scale(1.15);
-		}
-	}
-	/* full color, no opacity: the precision text keeps 4.5:1 on the badge (axe color-contrast) */
 	.prec {
-		font-weight: 500;
+		font-size: var(--t-xs);
+		color: var(--muted);
+	}
+	@media (forced-colors: active) {
+		.dot {
+			background: CanvasText;
+			forced-color-adjust: none;
+		}
 	}
 </style>

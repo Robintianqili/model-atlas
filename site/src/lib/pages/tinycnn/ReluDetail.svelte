@@ -145,7 +145,7 @@
 	}
 	.ax {
 		font-family: var(--font-mono);
-		font-size: 9px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.note {

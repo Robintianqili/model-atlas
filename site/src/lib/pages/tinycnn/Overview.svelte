@@ -573,7 +573,7 @@
 		color: var(--accent);
 	}
 	.shape {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		white-space: nowrap;
 	}
@@ -671,7 +671,7 @@
 		min-width: 42px;
 		height: 24px;
 		border-radius: 3px;
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 	}
 	.vertical .sq {
 		min-width: 0;
@@ -722,7 +722,7 @@
 	.pv {
 		flex: 0 0 34px;
 		text-align: right;
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.status {
 		min-height: 1.5em;

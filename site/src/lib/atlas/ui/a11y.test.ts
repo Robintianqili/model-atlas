@@ -28,17 +28,33 @@ test('kit color: inkOn on the class colors and on the worst mid grays', () => {
 		assert.ok(contrast(hexToRgb(hex), hexToRgb(inkOn(hexToRgb(hex)))) >= AA, hex);
 });
 
-/** The custom properties of one rule block of tokens.css (`:root {` or `:root[data-theme='dark'] {`). */
+/** The custom properties of one rule block of tokens.css (`:root {` or `:root[data-theme='dark'] {`): hex colors and
+ *  var() aliases (the redesign's legacy names, e.g. --bg: var(--paper)). */
 function block(css: string, head: string): Record<string, string> {
 	const at = css.indexOf(head);
 	assert.ok(at >= 0, `tokens.css has no ${head}`);
 	const body = css.slice(at + head.length, css.indexOf('}', at));
-	return Object.fromEntries([...body.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)].map((m) => [m[1], m[2]]));
+	return Object.fromEntries([...body.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6}|var\(--[\w-]+\))\s*;/g)].map((m) => [m[1], m[2]]));
+}
+
+/** Resolve var(--x) aliases to their hex value in the same theme. */
+function resolved(tk: Record<string, string>): Record<string, string> {
+	const out: Record<string, string> = {};
+	for (const k of Object.keys(tk)) {
+		let v = tk[k];
+		for (let i = 0; i < 4 && v?.startsWith('var('); i++) v = tk[v.slice(6, -1)];
+		if (v) out[k] = v;
+	}
+	return out;
 }
 
 test('tokens.css: text tokens keep 4.5:1 on the page surfaces, both themes', () => {
 	const css = readFileSync(join(fileURLToPath(new URL('.', import.meta.url)), '../../styles/tokens.css'), 'utf8');
-	const themes = { light: block(css, ':root {'), dark: block(css, ":root[data-theme='dark'] {") };
+	const light = block(css, ':root {');
+	const darkOwn = block(css, ":root[data-theme='dark'] {");
+	// the aliases live on :root once and follow the dark values
+	const aliases = Object.fromEntries(Object.entries(light).filter(([, v]) => v.startsWith('var(')));
+	const themes = { light: resolved(light), dark: resolved({ ...light, ...darkOwn, ...aliases }) };
 	const texts = ['ink', 'ink-2', 'muted', 'accent', 'div-neg-text', 'div-pos-text', 'q-text', 'k-text', 'v-text', 'real-text', 'generated-text'];
 	for (const [theme, tk] of Object.entries(themes)) {
 		for (const t of texts)
@@ -53,5 +69,5 @@ test('tokens.css: text tokens keep 4.5:1 on the page surfaces, both themes', () 
 	// the media-query copy of the dark theme says the same as [data-theme='dark']
 	const media = css.slice(css.indexOf('@media (prefers-color-scheme: dark)'));
 	const m = block(media, ":root:not([data-theme='light']) {");
-	for (const [k, v] of Object.entries(themes.dark)) assert.equal(m[k], v, `--${k}: the two dark blocks differ`);
+	for (const [k, v] of Object.entries(darkOwn)) assert.equal(m[k], v, `--${k}: the two dark blocks differ`);
 });

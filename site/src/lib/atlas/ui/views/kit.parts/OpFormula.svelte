@@ -19,14 +19,21 @@
 		/** extra values on top of e.values */
 		values?: Record<string, number>;
 		check?: boolean;
+		/** K4: significant digits of the numbers in the formula (default 3; a step's props.digits) */
+		digits?: number;
 	}
-	let { tex, e, caption, provenance, where = [], values = {}, check = true }: Props = $props();
+	let { tex, e, caption, provenance, where = [], values = {}, check = true, digits }: Props = $props();
+	// K4: a card narrower than 520 px breaks a long two-term line too (alignTex narrow)
+	let width = $state(0);
+	const nd = $derived(Number.isInteger(digits) && digits! >= 2 && digits! <= 6 ? digits! : 3);
 	const vals = $derived<Record<string, number>>({ ...e.values, ...values });
 	const same = $derived(e.result === e.traced || (Number.isNaN(e.result) && Number.isNaN(e.traced)));
 </script>
 
 {#if tex}
-	<FormulaCard tex={alignTex(tex)} values={texValues(vals)} {caption} {where} {provenance} />
+	<div class="opf" bind:clientWidth={width}>
+		<FormulaCard tex={alignTex(tex, 3, { narrow: width > 0 && width < 520 })} values={texValues(vals, nd)} digits={nd} {caption} {where} {provenance} />
+	</div>
 {/if}
 {#if check}
 	<p class="ck">
@@ -37,6 +44,9 @@
 {/if}
 
 <style>
+	.opf {
+		min-width: 0;
+	}
 	.ck {
 		margin: 0;
 		font-size: var(--fs-xs);

@@ -13,7 +13,7 @@
 	color: var(--ink-2);
 }
 .sym-out {
-	color: var(--accent);
+	color: var(--ink);
 }
 .sym-q {
 	color: var(--q-text);
@@ -34,10 +34,10 @@
 	color: var(--div-pos-text);
 }
 .sym-accent {
-	color: var(--accent);
+	color: var(--ink);
 }
 .num-live {
-	background: var(--accent-soft);
+	background: var(--here-bg);
 	border-radius: 3px;
 	padding: 0 0.12em;
 }

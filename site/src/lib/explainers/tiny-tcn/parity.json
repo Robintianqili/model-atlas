@@ -1,0 +1,46 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tiny-tcn",
+ "checked": "2026-10-12",
+ "sources": {
+  "init": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.78e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.78e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "long": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 5.55e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "arima": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 3,
+   "fixtures": 9,
+   "checked": "2026-10-12"
+  }
+ }
+}

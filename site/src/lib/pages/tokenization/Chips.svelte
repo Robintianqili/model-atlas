@@ -267,7 +267,7 @@
 		background: color-mix(in srgb, var(--cat-4) 18%, var(--surface));
 	}
 	.chip :global(.hex) {
-		font-size: 0.72em;
+		font-size: max(var(--t-xs), 0.72em);
 		letter-spacing: 0.02em;
 		color: var(--ink-2);
 	}
@@ -309,7 +309,7 @@
 		outline-offset: 2px;
 	}
 	.id {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		line-height: 1.3;
 	}

@@ -36,6 +36,8 @@
 		showBar?: boolean;
 		/** label of the big pad mark (default “your drawing”; the lesson says “this drawing” for a preset test drawing) */
 		padLabel?: Text;
+		/** the legend's own provenance label (the guided lesson's stage header carries one instead) */
+		badge?: boolean;
 	}
 	let {
 		pca,
@@ -52,7 +54,8 @@
 		onselect,
 		trail = [],
 		showBar = true,
-		padLabel = { en: 'your drawing', zh: '你的画' }
+		padLabel = { en: 'your drawing', zh: '你的画' },
+		badge = true
 	}: Props = $props();
 
 	let showLine = $state(true);
@@ -356,7 +359,7 @@
 			<span><svg width="14" height="14" aria-hidden="true"><path class="ex b" d={markerPath('square', 5)} transform="translate(7,7)" /></svg>{names[1]}</span>
 			<span><svg width="14" height="14" aria-hidden="true"><circle class="pt" cx="7" cy="7" r="3" /></svg>{t({ en: 'test drawings of other classes', zh: '其他类别的测试图' })}</span>
 			{#if !preset}<span class="muted">* {t({ en: 'held-out classes, not part of your pair', zh: '留出类别，不属于你这一对' })}</span>{/if}
-			<ProvenanceBadge mode="live" compact note={{ en: 'Your examples and pad drawing are projected live; the gray context points and the PCA axes are precomputed (pca.json).', zh: '你的样本和画板上的画是实时投影的；灰色的参照点和 PCA 坐标轴是预计算的（pca.json）。' }} />
+			{#if badge}<ProvenanceBadge mode="live" compact note={{ en: 'Your examples and pad drawing are projected live; the gray context points and the PCA axes are precomputed (pca.json).', zh: '你的样本和画板上的画是实时投影的；灰色的参照点和 PCA 坐标轴是预计算的（pca.json）。' }} />{/if}
 		</p>
 		<p class="muted small">
 			{t({
@@ -447,7 +450,7 @@
 		opacity: 0.55;
 	}
 	.cl {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		paint-order: stroke;
 		stroke: var(--surface);
@@ -490,7 +493,7 @@
 		stroke-linecap: round;
 	}
 	.trailmk text {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 		fill: var(--ink-2);
 		paint-order: stroke;

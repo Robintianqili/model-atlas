@@ -45,7 +45,7 @@
 		display: inline-grid;
 		gap: 2px;
 		width: min(var(--w), 100%);
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.title {
@@ -59,6 +59,6 @@
 	.ticks {
 		display: flex;
 		justify-content: space-between;
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 </style>

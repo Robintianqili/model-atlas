@@ -6,7 +6,7 @@
 	import { sym } from '$lib/kit/tex';
 	import type { CnnStore } from '../store.svelte';
 
-	let { S, onshow }: { S: CnnStore; onshow: () => void } = $props();
+	let { S }: { S: CnnStore } = $props();
 </script>
 
 <h3>1. A drawing is a grid of numbers</h3>
@@ -29,7 +29,7 @@
 	Then slide the window one pixel and do it again, at every position. The result is a new grid, a
 	<Term id="feature-map" />, which is large wherever the window looked like the kernel. TinyCNN uses no
 	<Term id="padding" />, so a 3 × 3 kernel fits 26 times across 28 pixels: each <Term id="convolution" /> trims one pixel
-	from every border (28 → 26 → 24). <ShowMe {S} {onshow} layer="conv1_1" label="Watch Conv 1-1 slide" />
+	from every border (28 → 26 → 24). <ShowMe {S} layer="conv1_1" label="Watch Conv 1-1 slide" />
 </p>
 
 <h3>3. Kernels, channels and feature maps</h3>
@@ -41,7 +41,7 @@
 <p>
 	The next layer reads all 8 maps at once. Its kernels are 3 × 3 × 8: one 3 × 3 slice per input channel. One output cell
 	is the sum of 8 small sums (one per channel) plus a bias, 72 products in total. That is how later layers combine
-	simple patterns: "a horizontal edge here <em>and</em> a diagonal there". <ShowMe {S} {onshow} layer="conv2_1" label="See 8 channels add up" />
+	simple patterns: "a horizontal edge here <em>and</em> a diagonal there". <ShowMe {S} layer="conv2_1" label="See 8 channels add up" />
 </p>
 
 <h3>4. ReLU: keep the positive evidence</h3>
@@ -49,7 +49,7 @@
 	After each convolution comes <Term id="relu" />: <Tex tex={'\\max(0, x)'} />. Negative values become 0; positive ones
 	pass unchanged. Think of a cell as voting "I saw my pattern" with its value: ReLU throws away the "I definitely did not"
 	votes. It also matters mathematically. Two convolutions in a row are just one bigger convolution; with a bend between
-	them, the stack can express much more. <ShowMe {S} {onshow} layer="relu1_1" label="Compare before and after" />
+	them, the stack can express much more. <ShowMe {S} layer="relu1_1" label="Compare before and after" />
 </p>
 
 <h3>5. Max pooling: shrink and keep the strongest</h3>
@@ -57,7 +57,7 @@
 	<Term id="pooling">Max pooling</Term> cuts each map into 2 × 2 blocks and keeps only the largest value of each block,
 	halving width and height (24 → 12, 8 → 4). It has no weights. It keeps "the pattern was somewhere in this block" and
 	forgets exactly where, so a stroke drawn one pixel further left changes little downstream.
-	<ShowMe {S} {onshow} layer="pool1" label="Watch the 2×2 window" />
+	<ShowMe {S} layer="pool1" label="Watch the 2×2 window" />
 </p>
 
 <h3>6. Receptive field: deeper cells see more</h3>
@@ -96,7 +96,7 @@
 <p>
 	Only differences between logits matter, and the probabilities always share 100% among the 10 known classes. There is no
 	"none of these" option, which is why a ladder can come out as 99.8% house.
-	<ShowMe {S} {onshow} layer="dense" label="See what pushes a class up" />
+	<ShowMe {S} layer="dense" label="See what pushes a class up" />
 </p>
 
 <h3>8. Why so few parameters?</h3>

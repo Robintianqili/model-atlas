@@ -16,6 +16,10 @@
       promote adds it to the site glossary;
     - ctx.done() once everything the step waits for has happened (Play then moves on after `linger`).
   The Walkthrough re-creates the stage on every step ({#key}), so all state here is per step.
+  Redesign W2: in the lesson app the provenance label sits in the Walkthrough's stage header and the predict question and
+  the task are beats in its narration: LessonPlayer passes badge={false} and beats={false}, the gate comes from
+  ctx.gated, and the task's state goes back through ontask. A free-standing panel (ConceptPanel) keeps all of it here.
+  StageProps.density (R1) passes the stage pane's density on to the view.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';
@@ -48,8 +52,14 @@
 		lab?: boolean;
 		/** K1: true once the predict is answered and the task done (LessonPlayer: Play stops saying "Waiting for your answer…") */
 		onlearner?: (done: boolean) => void;
+		/** W2: show the provenance badge in the stage (false: the Walkthrough's stage header shows it) */
+		badge?: boolean;
+		/** W2: ask the predict question and show the task here (false: the Walkthrough's narration does; the gate is ctx.gated) */
+		beats?: boolean;
+		/** W2: the task's state, read at the shown frame */
+		ontask?: (done: boolean) => void;
 	}
-	let { store, step, pos, ctx, lab = false, onlearner }: Props = $props();
+	let { store, step, pos, ctx, lab = false, onlearner, badge: showBadge = true, beats = true, ontask }: Props = $props();
 
 	const rt = $derived(store.r);
 	const src = $derived.by(() => {
@@ -135,8 +145,16 @@
 	});
 
 	// ------------------------------------------------------------------ gating: predict, task, play
+	// K4: the live parts of the question (StepDef.predictAt: options, answer and explanation from the learner's input),
+	// read at the step's own position, so they hold still while the step plays
+	const pq = $derived.by(() => {
+		if (!step.predict) return null;
+		const a = pos && !pos.error && !pos.skipped && pos.at.index >= 0 ? pos.at : at;
+		const live = a && step.predictAt ? safe(() => step.predictAt!(rt, a), undefined) : undefined;
+		return { ...step.predict, ...(live ?? {}) };
+	});
 	let answered = $state<number | null>(null);
-	const gate = $derived(!!step.predict && answered === null);
+	const gate = $derived(beats ? !!step.predict && answered === null : !!ctx.gated);
 	const taskDone = $derived(step.task && at ? safe(() => !!step.task!.done(rt, at), false) : false);
 	const needsPlay = $derived(!!(play || selfPlays) && !ctx.reduced);
 	function onPlayEnd() {
@@ -199,6 +217,7 @@
 			focus,
 			sel: rt.sel,
 			ctx: { shown: ctx.shown, reduced: ctx.reduced, playing: ctx.playing || playing, done: onPlayEnd },
+			density: ctx.density,
 			provenance: prov.mode,
 			autoplay: selfPlays && ctx.shown && !ctx.reduced && !gate,
 			onend: onPlayEnd,
@@ -208,8 +227,12 @@
 		};
 	});
 	$effect(() => {
-		const done = (!step.predict || answered !== null) && (!step.task || taskDone);
+		const done = (!step.predict || (beats ? answered !== null : ctx.answered != null)) && (!step.task || taskDone);
 		untrack(() => onlearner?.(done));
+	});
+	$effect(() => {
+		const d = !!taskDone;
+		untrack(() => ontask?.(d));
 	});
 	const compareProps = $derived.by((): [StageProps, StageProps] | null => {
 		const c = step.compare;
@@ -235,14 +258,18 @@
 </script>
 
 <div class="sh" data-step={step.id}>
-	<div class="top">
-		{#if computing}
-			<span class="busy" role="status"><span class="spin" aria-hidden="true"></span>{computing}</span>
-		{/if}
-		<span class="grow"></span>
-		<ProvenanceBadge mode={prov.mode} compact precision={badge.precision} tolerance={badge.tolerance} against={badge.against} note={prov.note ?? badge.note} />
-		{#if badge.short}<span class="chk small" title={badge.note ? t(badge.note) : undefined}>{t(badge.short)}</span>{/if}
-	</div>
+	{#if showBadge || computing}
+		<div class="top" class:bare={!showBadge}>
+			{#if computing}
+				<span class="busy" role="status"><span class="spin" aria-hidden="true"></span>{computing}</span>
+			{/if}
+			{#if showBadge}
+				<span class="grow"></span>
+				<ProvenanceBadge mode={prov.mode} compact precision={badge.precision} tolerance={badge.tolerance} against={badge.against} note={prov.note ?? badge.note} />
+				{#if badge.short}<span class="chk small" title={badge.note ? t(badge.note) : undefined}>{t(badge.short)}</span>{/if}
+			{/if}
+		</div>
+	{/if}
 
 	{#if pos?.error}
 		<div class="err" role="alert">
@@ -260,17 +287,17 @@
 			<div class="empty" role="note">{#each notes.length ? notes : [STR.emptyInput] as n, i (i)}<p>{t(n)}</p>{/each}</div>
 		{/if}
 
-		{#if step.predict}
+		{#if pq && beats}
 			<div class="predict" class:done={answered !== null}>
-				<p class="q"><span class="tag">{say('predictFirst')}</span> {t(step.predict.question)}</p>
-				<div class="opts" role="group" aria-label={t(step.predict.question)}>
-					{#each step.predict.options as o, i (i)}
+				<p class="q"><span class="tag">{say('predictFirst')}</span> {t(pq.question)}</p>
+				<div class="opts" role="group" aria-label={t(pq.question)}>
+					{#each pq.options as o, i (i)}
 						<button
 							type="button"
 							class="btn"
 							aria-pressed={answered === i}
-							class:right={answered !== null && i === step.predict.answer}
-							class:wrong={answered === i && i !== step.predict.answer}
+							class:right={answered !== null && i === pq.answer}
+							class:wrong={answered === i && i !== pq.answer}
 							onclick={() => (answered = i)}>{t(o)}</button
 						>
 					{/each}
@@ -278,12 +305,12 @@
 				{#if answered === null}
 					<p class="muted small">{say('predictHint')}</p>
 				{:else}
-					<p class="small" aria-live="polite"><strong>{answered === step.predict.answer ? say('right') : say('notQuite')}</strong> {t(step.predict.explain)}</p>
+					<p class="small" aria-live="polite"><strong>{answered === pq.answer ? say('right') : say('notQuite')}</strong> {t(pq.explain)}</p>
 				{/if}
 			</div>
 		{/if}
 
-		{#if step.task}
+		{#if step.task && beats}
 			<div class="task" class:done={taskDone} aria-live="polite">
 				<p><span class="tag">{say('yourTurn')}</span> {t(step.task.prompt)}</p>
 				<p class="small">{taskDone ? (step.task.doneText ? t(step.task.doneText) : say('taskDone')) : step.task.waiting ? t(step.task.waiting) : say('taskWaiting')}</p>
@@ -293,7 +320,7 @@
 			</div>
 		{/if}
 
-		<div class="view" class:dim={gate} inert={gate}>
+		<div class="view" class:dim={gate && beats} inert={(gate && beats) || undefined}>
 			{#if compareProps && step.compare}
 				<div class="cmp">
 					{#each compareProps as sp, i (i)}
@@ -346,10 +373,18 @@
 </div>
 
 <style>
+	/* K4 (rule of two: two-tower, sasrec): an element of the stage with class="atlas-answer" stays hidden while a predict
+	   question keeps the stage inert, so the view cannot show the answer before the learner commits */
+	.view[inert] :global(.atlas-answer) {
+		visibility: hidden;
+	}
 	.sh {
 		display: grid;
 		gap: 10px;
 		min-width: 0;
+	}
+	.top.bare {
+		min-height: 0;
 	}
 	.top {
 		display: flex;
@@ -369,7 +404,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 	}
 	.spin {
@@ -377,7 +412,7 @@
 		height: 10px;
 		border-radius: 50%;
 		border: 2px solid var(--rule-strong);
-		border-top-color: var(--accent);
+		border-top-color: var(--ink);
 		animation: spin 0.9s linear infinite;
 	}
 	@keyframes spin {
@@ -389,16 +424,16 @@
 	.empty {
 		padding: 10px 12px;
 		border-radius: var(--r2);
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 	}
 	.err {
 		border: 1px solid var(--div-neg);
-		background: var(--surface-2);
+		background: var(--well);
 	}
 	.err code {
 		display: block;
 		margin-top: 4px;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		white-space: pre-wrap;
 		word-break: break-word;
 	}
@@ -411,7 +446,7 @@
 	}
 	.clamped {
 		margin: 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 		border-left: 3px solid var(--pre);
 		padding-left: 8px;
@@ -420,7 +455,7 @@
 	.task {
 		padding: 10px 12px;
 		border-radius: var(--r2);
-		background: var(--surface-2);
+		background: var(--well);
 		border: 1px solid var(--rule);
 		display: grid;
 		gap: 6px;
@@ -434,11 +469,9 @@
 		background: var(--live-soft);
 	}
 	.tag {
-		font-size: var(--fs-xs);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--accent-strong);
+		font-size: var(--t-sm);
+		font-weight: var(--w-title);
+		color: var(--muted);
 		margin-right: 4px;
 	}
 	.opts {
@@ -448,7 +481,7 @@
 	}
 	.opts .btn {
 		min-height: 34px;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 	}
 	.opts .btn.right {
 		border-color: var(--live);
@@ -458,7 +491,7 @@
 		border-color: var(--div-neg);
 	}
 	.small {
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 	}
 	.view {
 		min-width: 0;
@@ -473,7 +506,7 @@
 	}
 	.term {
 		text-decoration: underline dotted;
-		text-decoration-color: var(--accent);
+		text-decoration-color: var(--ink);
 		text-underline-offset: 3px;
 		text-decoration-thickness: 1.5px;
 	}
@@ -484,7 +517,7 @@
 	}
 	.cmp-l {
 		margin: 0 0 4px;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		font-weight: 600;
 	}
 </style>

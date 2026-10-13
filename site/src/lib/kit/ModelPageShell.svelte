@@ -1,45 +1,46 @@
 <!--
-  ModelPageShell: the fixed per-model page template (brief §4.2). Every section is a snippet
-  prop; sections a page does not provide are omitted (and left out of the "On this page" list).
+  ModelPageShell (redesign spec §5, R1): a model page is its lesson. The shell is a view host: the Lesson (the
+  Walkthrough of the `lesson` snippet, which becomes the whole page: top bar, stage | narration, action bar, cover) and,
+  one tab away, Explore, How it works, Code and Training (hash views: #explore, #article, #code, #training; the old
+  #overview, #inspector, #unit, #output, #tryThis, #checkpoint and #credits open the matching view). A view is a lazy
+  panel (`views`, rendered only when it opens; `viewProps` is what it receives as `vp`) or, during the migration of the
+  hand-built pages, the old section snippets, which render inside the matching view:
+     Explore   overview, inspector, unit, output, tryThis, checkpoint (with PredictReveal), links, moreLinks
+     Article   article                     Code   code                     Training   training, credits
+  The facts strip and the credits move into the About sheet (ⓘ), the input into the input sheet (the stage header's
+  chip opens it; `inputChip` / `inputSheet`, else the old `input` snippet), the goals and the predict-first question onto
+  the lesson's cover. A tab exists only if its view has content.
 
-   1 goals + predict-first   (goals: Text[], prequestion: PredictQuestion)
-   2 facts                   (automatic from the catalog entry + spec.json; override with `facts`)
-   3 input                   3b lesson (guided Walkthrough; adds a hero "Start the lesson" button and an
-                                        "Explore freely" heading before the sections below)
-   4 overview                5 inspector       6 unit (arithmetic)
-   7 output                  8 tryThis         9 training       10 article
-  11 code                   12 links (automatic: concepts using this model, prerequisites, next;
-                                     override with `links`, or append with `moreLinks`)
-  13 checkpoint (PredictReveal + your `checkpoint` snippet) + credits
-
-  <ModelPageShell slug="tinycnn" {spec} goals={[…]} prequestion={q} provenance="live">
-    {#snippet input()}<DrawPad … />{/snippet}
-    {#snippet overview()}<ModelOverview … />{/snippet}
-    …
+  <ModelPageShell slug="tinycnn" {spec} goals={[…]} prequestion={q} views={{ explore: () => import('./ExplorePanel.svelte') }} viewProps={{ S }}>
+    {#snippet lesson()}<Walkthrough … />{/snippet}
   </ModelPageShell>
+
+  A page whose route returns { chrome: 'lesson' } is the lesson app (no site header; app mode at 960 x 600 and up);
+  without it (a hand-built page before its migration) the lesson is a card under the site header.
 -->
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onMount, type Component, type Snippet } from 'svelte';
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
-	import Section from './Section.svelte';
-	import FactStrip from './FactStrip.svelte';
-	import StatusBadge from './StatusBadge.svelte';
-	import PredictFirst from './PredictFirst.svelte';
+	import Sheet from './Sheet.svelte';
 	import PredictReveal from './PredictReveal.svelte';
 	import CatalogCard from './CatalogCard.svelte';
+	import Section from './Section.svelte';
+	import { book, chart, code as codeIcon, compass, lesson as lessonIcon } from './icons';
 	import type { ModelPageCatalog } from '$lib/catalog/types';
-	import { ui, t, colon, type Text } from '$lib/i18n/i18n.svelte';
+	import { lui, ui, t, type Text } from '$lib/i18n/i18n.svelte';
 	import type { UIKey } from '$lib/i18n/strings';
 	import { fmtBytes, fmtInt, fmtShape } from './format';
 	import type { ModelSpec } from './spec';
-	import type { PredictQuestion, Provenance } from './types';
+	import type { PredictQuestion, Provenance, WalkContext } from './types';
+	import { setLessonApp, type LessonApp, type ViewTab } from './lesson/app';
+	import { parseHash, type ViewId } from './lesson/views';
+	import ViewHost from './lesson/ViewHost.svelte';
 
+	type Loader = () => Promise<{ default: Component<any> }>;
 	interface Props {
 		slug: string;
-		/** the catalog entry and its cards (default: page.data.catalog, which the root layout's server load computes for every
-		 *  /m/<slug>/ route and the Lesson Lab; catalog/slices.ts). The shell imports no catalog module, so a model page's JS
-		 *  does not grow with the catalog. */
+		/** the catalog entry and its cards (default: page.data.catalog, computed at build time; catalog/slices.ts) */
 		catalog?: ModelPageCatalog | null;
 		spec?: ModelSpec | null;
 		/** measured download size of the files the page loads (defaults to the build-time measure) */
@@ -47,14 +48,25 @@
 		provenance?: Provenance;
 		goals?: Text[];
 		prequestion?: PredictQuestion;
-		/** sections */
+		/** the cover's promise (default: the catalog's lesson summary) */
+		summary?: Text;
+		/** reading time in minutes (default: the catalog's) */
+		minutes?: number;
+		/** R1: the views as lazy panels; each receives `vp` (viewProps) and `section` */
+		views?: Partial<Record<Exclude<ViewId, 'lesson'>, Loader>>;
+		viewProps?: Record<string, unknown>;
+		/** R1: the stage header's input chip (it calls `open` to open the input sheet) and the sheet's content */
+		inputChip?: Snippet<[() => void]>;
+		inputSheet?: Snippet;
+		/** R1: the cover's stage */
+		cover?: Snippet<[WalkContext]>;
+		/** the About sheet's body (default: the facts, the parity check and the credits) */
+		about?: Snippet;
+		/** sections (accepted during the migration; they render inside the matching view) */
 		facts?: Snippet;
 		input?: Snippet;
-		/** the guided lesson (kit Walkthrough), shown right after the input */
 		lesson?: Snippet;
-		/** one line under the hero's "Start the step-by-step lesson" button, e.g. "10 steps, with your drawing" */
 		lessonNote?: Text;
-		/** intro under the "Explore freely" heading (default: a generic sentence) */
 		exploreIntro?: Text;
 		overview?: Snippet;
 		inspector?: Snippet;
@@ -68,26 +80,11 @@
 		moreLinks?: Snippet;
 		checkpoint?: Snippet;
 		credits?: Snippet;
-		/** optional section titles/intros overriding the defaults */
 		titles?: Partial<Record<SectionKey, Text>>;
 		intros?: Partial<Record<SectionKey, Text>>;
-		/** per-section provenance badges */
 		badges?: Partial<Record<SectionKey, Provenance>>;
 	}
-	type SectionKey =
-		| 'goals'
-		| 'input'
-		| 'lesson'
-		| 'overview'
-		| 'inspector'
-		| 'unit'
-		| 'output'
-		| 'tryThis'
-		| 'training'
-		| 'article'
-		| 'code'
-		| 'links'
-		| 'checkpoint';
+	type SectionKey = 'goals' | 'input' | 'lesson' | 'overview' | 'inspector' | 'unit' | 'output' | 'tryThis' | 'training' | 'article' | 'code' | 'links' | 'checkpoint';
 
 	let {
 		slug,
@@ -97,10 +94,17 @@
 		provenance,
 		goals = [],
 		prequestion,
+		summary,
+		minutes,
+		views = {},
+		viewProps = {},
+		inputChip,
+		inputSheet,
+		cover,
+		about,
 		facts,
 		input,
 		lesson,
-		lessonNote,
 		exploreIntro,
 		overview,
 		inspector,
@@ -127,34 +131,12 @@
 	const area = $derived(cat?.area);
 	const mode = $derived<Provenance>(provenance ?? (model?.status === 'live' ? 'live' : 'precomputed'));
 	const measured = $derived(downloadBytes ?? (page.data as { liveSizes?: Record<string, number> })?.liveSizes?.[slug]);
-	// Facts: the fetched spec once it is loaded; before that (and in the prerendered HTML) the
-	// spec.json facts read at build time by the root +layout.server.ts.
 	type SpecFacts = Pick<ModelSpec, 'params' | 'precision' | 'parity'> & { input?: { shape: (number | string)[] }; inputs?: { kind: string; shape: (number | string)[] }[] };
-	const sf = $derived<SpecFacts | undefined>(
-		spec ?? (page.data as { liveSpecs?: Record<string, SpecFacts> })?.liveSpecs?.[slug]
-	);
-	const usedBy = $derived(cat?.usedBy ?? []);
-	const prereqs = $derived(cat?.prereqs ?? []);
-	const next = $derived(cat?.next ?? []);
+	const sf = $derived<SpecFacts | undefined>(spec ?? (page.data as { liveSpecs?: Record<string, SpecFacts> })?.liveSpecs?.[slug]);
+	const name = $derived<Text>(spec?.name ?? model?.name ?? slug);
+	/** the page is the lesson app (its route returned chrome: 'lesson') */
+	const embedded = $derived((page.data as { chrome?: string }).chrome !== 'lesson');
 
-	const defaultTitle: Record<SectionKey, UIKey> = {
-		goals: 'secGoals',
-		input: 'secInput',
-		lesson: 'secLesson',
-		overview: 'secOverview',
-		inspector: 'secInspector',
-		unit: 'secUnit',
-		output: 'secOutput',
-		tryThis: 'secTryThis',
-		training: 'secTraining',
-		article: 'secArticle',
-		code: 'secCode',
-		links: 'secLinks',
-		checkpoint: 'secCheckpoint'
-	};
-	const title = (k: SectionKey) => titles[k] ?? ui(defaultTitle[k]);
-
-	/** an input kind's name (a multi-input spec's kinds; DevKit K1) */
 	const inName = (k: string) => {
 		try {
 			return ui(`in_${k}` as UIKey) || k;
@@ -166,297 +148,274 @@
 		model
 			? sf?.inputs && sf.inputs.length > 1
 				? [...new Set(sf.inputs.map((x) => x.kind))].map((k) => `${inName(k)} → ${sf.inputs!.filter((x) => x.kind === k).map((x) => fmtShape(x.shape)).join(', ')}`).join('; ')
-				: model.inputs.map((k) => ui(`in_${k}` as UIKey)).join(', ') + (sf?.input?.shape ? ` → ${fmtShape(sf.input.shape)}` : '')
+				: model.inputs.map((k) => inName(k)).join(', ') + (sf?.input?.shape ? ` → ${fmtShape(sf.input.shape)}` : '')
 			: ''
 	);
 	const factList = $derived(
 		model
 			? [
-					{ label: ui('area'), value: area ?? model.area },
-					{ label: ui('family'), value: model.family },
-					{ label: ui('params'), value: sf?.params ? fmtInt(sf.params) : (cat?.tech.params ?? '—'), mono: true },
-					{ label: ui('download'), value: measured ? fmtBytes(measured) : (cat?.tech.size ?? '—'), mono: true },
-					{ label: ui('runtime'), value: cat?.tech.runtime ?? model.runtime },
+					{ label: ui('area'), value: area ? t(area) : model.area },
+					{ label: ui('family'), value: t(model.family) },
+					{ label: ui('params'), value: sf?.params ? fmtInt(sf.params) : cat?.tech.params ? t(cat.tech.params) : '—', mono: true },
+					{ label: ui('download'), value: measured ? fmtBytes(measured) : cat?.tech.size ? t(cat.tech.size) : '—', mono: true },
+					{ label: ui('runtime'), value: cat ? t(cat.tech.runtime) : t(model.runtime) },
 					{ label: ui('input'), value: inputLabel },
 					{ label: ui('precision'), value: sf?.precision ?? '—', mono: true }
 				]
 			: []
 	);
+	const parity = $derived(sf?.parity && typeof sf.parity.max_abs_diff === 'number' ? sf.parity : null);
 
-	// numbered sections in template order
-	const present = $derived(
-		(
-			[
-				['goals', goals.length > 0 || !!prequestion],
-				['input', !!input],
-				['lesson', !!lesson],
-				['overview', !!overview],
-				['inspector', !!inspector],
-				['unit', !!unit],
-				['output', !!output],
-				['tryThis', !!tryThis],
-				['training', !!training],
-				['article', !!article],
-				['code', !!code],
-				['links', true],
-				['checkpoint', !!prequestion || !!checkpoint || !!credits]
-			] as [SectionKey, boolean][]
-		)
-			.filter(([, ok]) => ok)
-			.map(([k]) => k)
+	// ------------------------------------------------------------------ views
+	const hasExplore = $derived(!!views.explore || !!(overview || inspector || unit || output || tryThis || checkpoint || links || moreLinks));
+	const tabs = $derived<ViewTab[]>(
+		[
+			{ id: 'lesson' as const, label: { en: 'Lesson', zh: '课程' }, icon: lessonIcon, note: { en: 'Step by step, on your input', zh: '一步一步，用你的输入' }, ok: true },
+			{ id: 'explore' as const, label: { en: 'Explore', zh: '探索' }, icon: compass, note: { en: 'Every layer and number, freely', zh: '自由查看每一层、每个数' }, ok: hasExplore },
+			{ id: 'article' as const, label: { en: 'How it works', zh: '原理' }, icon: book, note: { en: 'The idea in one article', zh: '一篇文章讲清原理' }, ok: !!views.article || !!article },
+			{ id: 'code' as const, label: { en: 'Code', zh: '代码' }, icon: codeIcon, note: { en: 'The code, and how it was checked', zh: '代码，以及如何核对' }, ok: !!views.code || !!code },
+			{ id: 'training' as const, label: { en: 'Training', zh: '训练' }, icon: chart, note: { en: 'How it learned, and from what', zh: '它怎么学的，用了什么数据' }, ok: !!views.training || !!training || !!credits }
+		]
+			.filter((v) => v.ok)
+			.map(({ ok: _ok, ...v }) => v)
 	);
-	const num = (k: SectionKey) => present.indexOf(k) + 1;
-	/** with a lesson, the free-exploration sections start here (after the lesson) */
-	const firstExplore = $derived(lesson ? present.find((k) => k !== 'goals' && k !== 'input' && k !== 'lesson') : undefined);
+	const upNext = $derived.by(() => {
+		const c = (cat?.next ?? []).find((x) => x.status === 'live') ?? (cat?.usedBy ?? []).find((x) => x.status === 'live');
+		return c ? { href: `${base}/${c.kind === 'concept' ? 'train' : 'm'}/${c.slug}/`, title: c.title, note: c.family ?? c.area } : undefined;
+	});
+	const inputOpen = $state({ open: false });
+	const nav = $state<{ view: ViewId; section?: string }>({ view: 'lesson' });
+	const pos = $state({ at: 0, n: 0, cover: false, id: 'lesson' } as LessonApp['pos']);
+	const app: LessonApp = {
+		get slug() {
+			return slug;
+		},
+		kind: 'model',
+		get name() {
+			return name;
+		},
+		get crumbs() {
+			return model ? [{ href: `${base}/atlas/`, label: { en: 'Atlas', zh: '图鉴' } }, { href: `${base}/atlas/${model.area}/`, label: area ?? model.area }] : [];
+		},
+		get tabs() {
+			return tabs;
+		},
+		get embedded() {
+			return embedded;
+		},
+		nav,
+		pos,
+		get goals() {
+			return goals;
+		},
+		get prequestion() {
+			return prequestion;
+		},
+		get summary() {
+			return summary ?? model?.lesson?.summary;
+		},
+		get minutes() {
+			return minutes ?? model?.lesson?.minutes;
+		},
+		get inputChip() {
+			return inputChip;
+		},
+		get inputSheet() {
+			return inputSheet ?? input;
+		},
+		get cover() {
+			return cover;
+		},
+		get about() {
+			return about ?? aboutBody;
+		},
+		aboutTitle: { en: 'About this model', zh: '关于这个模型' },
+		get upNext() {
+			return upNext;
+		},
+		input: inputOpen,
+		go: (v, s) => {
+			location.hash = v === 'lesson' ? 'lesson' : s ? `${v}-${s}` : v;
+		}
+	};
+	setLessonApp(app);
+
+	function sync() {
+		const was = nav.view;
+		const r = parseHash(location.hash, { kind: 'model', lessonId: pos.id, has: tabs.map((x) => x.id) });
+		if (!r) return;
+		nav.view = r.view;
+		nav.section = r.section;
+		if (r.input) inputOpen.open = true;
+		// back in the lesson from a scrolled view: the lesson starts at the top of the page (flow mode)
+		if (r.view === 'lesson' && was !== 'lesson' && !embedded) window.scrollTo({ top: 0 });
+	}
+	onMount(() => {
+		sync();
+		addEventListener('hashchange', sync);
+		return () => removeEventListener('hashchange', sync);
+	});
+	const current = $derived(tabs.find((x) => x.id === nav.view) ?? tabs[0]);
+	const sec = (k: SectionKey, fallback: Text) => titles[k] ?? fallback;
+	const linkGroups = $derived(
+		[
+			{ h: ui('seeAlsoConcepts'), cards: cat?.usedBy ?? [] },
+			{ h: ui('prerequisites'), cards: cat?.prereqs ?? [] },
+			{ h: t({ en: 'Next', zh: '下一步' }), cards: cat?.next ?? [] }
+		].filter((g) => g.cards.length)
+	);
 </script>
 
-{#snippet exploreHead()}
-	<div class="explore" id="explore">
-		<h2>{ui('exploreFreely')}</h2>
-		<p class="muted">{t(exploreIntro ?? ui('exploreFreelyIntro'))}</p>
-	</div>
+{#snippet aboutBody()}
+	<dl class="facts">
+		{#each factList as f (f.label)}<div><dt>{f.label}</dt><dd class:num={f.mono}>{f.value}</dd></div>{/each}
+	</dl>
+	<p class="ab-note">
+		<strong>{mode === 'live' ? ui('provLive') : ui('provPrecomputed')}.</strong>
+		{mode === 'live' ? ui('provLiveHelp') : ui('provPrecomputedHelp')}
+		{#if parity}{t({ en: `Checked against ${parity.against ?? 'PyTorch'}: every layer within ${(parity.max_abs_diff as number).toExponential(2)}.`, zh: `与 ${parity.against ?? 'PyTorch'} 对照：每一层的误差都在 ${(parity.max_abs_diff as number).toExponential(2)} 以内。` })}{/if}
+	</p>
+	{#if facts}<div class="ab-more">{@render facts()}</div>{/if}
+	{#if credits}<div class="ab-more"><h3>{ui('credits')}</h3>{@render credits()}</div>{/if}
+{/snippet}
+
+{#snippet exploreContent()}
+	{#if overview}<Section id="explore-overview" title={sec('overview', ui('secOverview'))} intro={intros.overview} provenance={badges.overview}>{@render overview()}</Section>{/if}
+	{#if inspector}<Section id="explore-inspector" title={sec('inspector', ui('secInspector'))} intro={intros.inspector} provenance={badges.inspector}>{@render inspector()}</Section>{/if}
+	{#if unit}<Section id="explore-unit" title={sec('unit', ui('secUnit'))} intro={intros.unit} provenance={badges.unit}>{@render unit()}</Section>{/if}
+	{#if output}<Section id="explore-output" title={sec('output', ui('secOutput'))} intro={intros.output} provenance={badges.output}>{@render output()}</Section>{/if}
+	{#if tryThis}<Section id="explore-tryThis" title={sec('tryThis', ui('secTryThis'))} intro={intros.tryThis} provenance={badges.tryThis}>{@render tryThis()}</Section>{/if}
+	{#if checkpoint || prequestion}
+		<Section id="explore-checkpoint" title={sec('checkpoint', ui('secCheckpoint'))} intro={intros.checkpoint}>
+			<div class="cp">
+				{#if prequestion}<PredictReveal q={prequestion} />{/if}
+				{#if checkpoint}{@render checkpoint()}{/if}
+			</div>
+		</Section>
+	{/if}
+	<Section id="explore-links" title={sec('links', ui('secLinks'))} intro={intros.links}>
+		{#if links}
+			{@render links()}
+		{:else}
+			<div class="links">
+				{#each linkGroups as g (g.h)}
+					<div>
+						<h3>{g.h}</h3>
+						<div class="cards">{#each g.cards as c (c.slug)}<CatalogCard card={c} compact />{/each}</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
+		{#if moreLinks}{@render moreLinks()}{/if}
+	</Section>
+{/snippet}
+{#snippet articleContent()}
+	{#if article}<div class="prose">{@render article()}</div>{/if}
+{/snippet}
+{#snippet codeContent()}
+	{#if code}{@render code()}{/if}
+{/snippet}
+{#snippet trainingContent()}
+	{#if training}<Section id="training-data" title={sec('training', ui('secTraining'))} intro={intros.training} provenance={badges.training}>{@render training()}</Section>{/if}
+	{#if credits}<Section id="training-credits" title={ui('credits')}>{@render credits()}</Section>{/if}
 {/snippet}
 
 <svelte:head>
 	{#if model}
-		<title>{t(spec?.name ?? model.name)}{model.status === 'live' ? '' : ` (${ui('statusPlanned')})`} · Model Atlas</title>
+		<title>{t(name)}{model.status === 'live' ? '' : ` (${ui('statusPlanned')})`} · Model Atlas</title>
 		<meta name="description" content={t(model.hook)} />
 	{/if}
 </svelte:head>
 
 {#if model}
-	<article class="mps container">
-		<header class="hero">
-			<p class="eyebrow">
-				<a href="{base}/atlas/{model.area}/">{area ? t(area) : model.area}</a> · {t(model.family)}
-			</p>
-			<div class="title-row">
-				<h1>{t(spec?.name ?? model.name)}</h1>
-				<StatusBadge status={model.status} tier={model.tier} tooltip />
-			</div>
-			<p class="lede">{t(model.hook)}</p>
-			{#if lesson}
-				<p class="start">
-					<a class="btn primary big" href="#lesson">
-						<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.5 2.8v10.4L13 8z" fill="currentColor" /></svg>
-						{ui('lessonStart')}
-					</a>
-					{#if lessonNote}<span class="muted">{t(lessonNote)}</span>{/if}
-				</p>
-			{/if}
-			{#if present.length > 2}
-				<nav class="toc" aria-label={ui('onThisPage')}>
-					<span class="muted">{ui('onThisPage')}{colon()}</span>
-					{#each present as k (k)}
-						{#if k === firstExplore}<span class="muted sep">· {ui('exploreFreely')}{colon()}</span>{/if}
-						<a href="#{k}" class:strong={k === 'lesson'}>{t(title(k))}</a>
-					{/each}
-				</nav>
-			{/if}
-		</header>
-
-		{#if facts}
-			{@render facts()}
-		{:else}
-			<FactStrip
-				facts={factList}
-				provenance={mode}
-				precision={sf?.precision}
-				tolerance={sf?.parity?.max_abs_diff}
-				against={sf?.parity?.against}
+	<div class="lapp" class:embedded data-view={nav.view}>
+		<div class="lv" hidden={nav.view !== 'lesson' || undefined}>
+			{#if lesson}{@render lesson()}{/if}
+		</div>
+		{#if nav.view !== 'lesson' && current}
+			<ViewHost
+				{app}
+				view={nav.view}
+				section={nav.section}
+				title={current.label}
+				intro={nav.view === 'explore' ? (exploreIntro ?? current.note) : current.note}
+				loader={views[nav.view as Exclude<ViewId, 'lesson'>]}
+				vp={viewProps}
+				content={nav.view === 'explore' ? exploreContent : nav.view === 'article' ? articleContent : nav.view === 'code' ? codeContent : trainingContent}
+				width={nav.view === 'article' ? 'article' : nav.view === 'training' ? 'narrow' : 'wide'}
 			/>
 		{/if}
-
-		{#if present.includes('goals')}
-			<Section id="goals" n={num('goals')} title={title('goals')} intro={intros.goals}>
-				<div class="goals">
-					{#if goals.length}
-						<ul class="goal-list">
-							{#each goals as g, i (i)}<li>{t(g)}</li>{/each}
-						</ul>
-					{/if}
-					{#if prequestion}<PredictFirst q={prequestion} />{/if}
-				</div>
-			</Section>
-		{/if}
-		{#if input}
-			<Section id="input" n={num('input')} title={title('input')} intro={intros.input} provenance={badges.input}>{@render input()}</Section>
-		{/if}
-		{#if lesson}
-			<Section id="lesson" n={num('lesson')} title={title('lesson')} intro={intros.lesson} provenance={badges.lesson}>{@render lesson()}</Section>
-			{#if firstExplore}{@render exploreHead()}{/if}
-		{/if}
-		{#if overview}
-			<Section id="overview" n={num('overview')} title={title('overview')} intro={intros.overview} provenance={badges.overview}>{@render overview()}</Section>
-		{/if}
-		{#if inspector}
-			<Section id="inspector" n={num('inspector')} title={title('inspector')} intro={intros.inspector} provenance={badges.inspector}>{@render inspector()}</Section>
-		{/if}
-		{#if unit}
-			<Section id="unit" n={num('unit')} title={title('unit')} intro={intros.unit} provenance={badges.unit}>{@render unit()}</Section>
-		{/if}
-		{#if output}
-			<Section id="output" n={num('output')} title={title('output')} intro={intros.output} provenance={badges.output}>{@render output()}</Section>
-		{/if}
-		{#if tryThis}
-			<Section id="tryThis" n={num('tryThis')} title={title('tryThis')} intro={intros.tryThis} provenance={badges.tryThis}>{@render tryThis()}</Section>
-		{/if}
-		{#if training}
-			<Section id="training" n={num('training')} title={title('training')} intro={intros.training} provenance={badges.training}>{@render training()}</Section>
-		{/if}
-		{#if article}
-			<Section id="article" n={num('article')} title={title('article')} intro={intros.article}>
-				<div class="prose">{@render article()}</div>
-			</Section>
-		{/if}
-		{#if code}
-			<Section id="code" n={num('code')} title={title('code')} intro={intros.code}>{@render code()}</Section>
-		{/if}
-		<Section id="links" n={num('links')} title={title('links')} intro={intros.links}>
-			{#if links}
-				{@render links()}
-			{:else}
-				<div class="links">
-					{#if usedBy.length}
-						<div>
-							<h3>{ui('seeAlsoConcepts')}</h3>
-							<div class="cards">
-								{#each usedBy as c (c.slug)}<CatalogCard card={c} compact />{/each}
-							</div>
-						</div>
-					{/if}
-					{#if prereqs.length}
-						<div>
-							<h3>{ui('prerequisites')}</h3>
-							<div class="cards">
-								{#each prereqs as m (m.slug)}<CatalogCard card={m} compact />{/each}
-							</div>
-						</div>
-					{/if}
-					{#if next.length}
-						<div>
-							<h3>{t({ en: 'Next', zh: '下一步' })}</h3>
-							<div class="cards">
-								{#each next as m (m.slug)}<CatalogCard card={m} compact />{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
-			{/if}
-			{#if moreLinks}{@render moreLinks()}{/if}
-		</Section>
-		{#if present.includes('checkpoint')}
-			<Section id="checkpoint" n={num('checkpoint')} title={title('checkpoint')} intro={intros.checkpoint}>
-				<div class="cp">
-					{#if prequestion}<PredictReveal q={prequestion} />{/if}
-					{#if checkpoint}{@render checkpoint()}{/if}
-					{#if credits}
-						<div class="credits">
-							<h3>{ui('credits')}</h3>
-							{@render credits()}
-						</div>
-					{/if}
-				</div>
-			</Section>
-		{/if}
-	</article>
+	</div>
+	{#if inputSheet || input}
+		<Sheet bind:open={inputOpen.open} title={lui('yourInput')} width={720}>
+			{#if inputSheet}{@render inputSheet()}{:else if input}{@render input()}{/if}
+		</Sheet>
+	{/if}
 {:else}
 	<p class="container">Unknown model slug: {slug}</p>
 {/if}
 
 <style>
-	.mps {
-		padding-top: var(--s6);
+	.lapp {
+		background: var(--panel);
+	}
+	.lapp.embedded {
+		max-width: var(--page-max);
+		margin: var(--s4) auto var(--s6);
+		padding: 0 var(--gutter);
+		background: none;
+	}
+	.lv[hidden] {
+		display: none;
+	}
+	.facts {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--s4);
-	}
-	.hero {
-		display: grid;
-		gap: 8px;
-	}
-	.eyebrow a {
-		color: inherit;
-	}
-	.title-row {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px 16px;
-	}
-	h1 {
+		grid-template-columns: 1fr 1fr;
+		gap: 10px 16px;
 		margin: 0;
 	}
-	.lede {
+	.facts dt {
+		color: var(--muted);
+		font-size: var(--t-xs);
+		font-weight: var(--w-ui);
+	}
+	.facts dd {
 		margin: 0;
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
+		overflow-wrap: anywhere;
 	}
-	.toc {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 4px 12px;
-		font-size: var(--fs-sm);
-		margin-top: 6px;
+	.ab-note {
+		margin: var(--s4) 0 0;
+		padding-top: var(--s3);
+		border-top: 1px solid var(--rule);
+		color: var(--ink-2);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
-	.toc .strong {
-		font-weight: 700;
+	.ab-more {
+		margin-top: var(--s4);
+		padding-top: var(--s3);
+		border-top: 1px solid var(--rule);
+		font-size: var(--t-sm);
 	}
-	.start {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 6px 14px;
-		margin: 6px 0 0;
-		font-size: var(--fs-sm);
+	.ab-more h3 {
+		font-size: var(--t-md);
 	}
-	.big {
-		gap: 8px;
-		min-height: 44px;
-		padding-inline: 18px;
-		font-size: var(--fs-md);
-	}
-	.explore {
-		margin-top: var(--s5);
-		padding: var(--s5) 0 0;
-		border-top: 3px double var(--rule-strong);
-	}
-	.explore h2 {
-		margin: 2px 0 4px;
-		font-size: var(--fs-2xl);
-	}
-	.explore p {
-		margin: 0;
-		max-width: var(--measure);
-	}
-	.goals {
+	.cp {
 		display: grid;
 		gap: var(--s4);
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-		align-items: start;
-	}
-	.goal-list {
-		margin: 0;
-		padding-left: 1.2em;
-	}
-	.goal-list li + li {
-		margin-top: 6px;
 	}
 	.links {
 		display: grid;
 		gap: var(--s5);
 	}
 	.links h3 {
-		font-size: var(--fs-md);
+		font-size: var(--t-md);
 	}
 	.cards {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
 		gap: 10px;
-	}
-	.cp {
-		display: grid;
-		gap: var(--s4);
-	}
-	.credits h3 {
-		font-size: var(--fs-md);
 	}
 </style>

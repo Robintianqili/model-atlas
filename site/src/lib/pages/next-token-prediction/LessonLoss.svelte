@@ -5,7 +5,6 @@
 -->
 <script lang="ts">
 	import FormulaCard from '$lib/kit/FormulaCard.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import Num from '$lib/kit/Num.svelte';
 	import { sym } from '$lib/kit/tex';
 	import { t, colon } from '$lib/i18n/i18n.svelte';
@@ -95,7 +94,6 @@
 <div class="ls">
 	<div class="top">
 		<LessonWindow {L} />
-		<ProvenanceBadge mode="live" compact precision="fp32" tolerance={FACTS.tolerance} against="PyTorch fp32" />
 	</div>
 	{#if L.pos < 1}
 		<p class="muted">{t({ en: 'Type at least two tokens.', zh: '至少输入两个词元。' })}</p>
@@ -143,7 +141,6 @@
 				tex={t({ en: tex, zh: texZh })}
 				values={{ p: d.p, L: loss }}
 				caption={{ en: 'The loss of this one window', zh: '这一个窗口的损失' }}
-				provenance="live"
 			/>
 			<div class="notes small">
 				<p>
@@ -204,11 +201,11 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.axis {
-		font-size: 11.5px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 	}
 	.curve {
@@ -238,7 +235,7 @@
 		stroke-width: 3;
 	}
 	.lbl {
-		font-size: 11.5px;
+		font-size: var(--t-xs);
 		paint-order: stroke;
 		stroke: var(--surface);
 		stroke-width: 3px;

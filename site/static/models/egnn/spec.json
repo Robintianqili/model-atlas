@@ -1,0 +1,1300 @@
+{
+ "slug": "egnn",
+ "name": {
+  "en": "Small EGNN",
+  "zh": "小型 EGNN"
+ },
+ "version": "2026-10-12",
+ "params": 3619,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "embed.weight",
+   "shape": [
+    16,
+    3
+   ],
+   "offset": 0,
+   "length": 48
+  },
+  {
+   "name": "embed.bias",
+   "shape": [
+    16
+   ],
+   "offset": 48,
+   "length": 16
+  },
+  {
+   "name": "L1.e1.weight",
+   "shape": [
+    16,
+    33
+   ],
+   "offset": 64,
+   "length": 528
+  },
+  {
+   "name": "L1.e1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 592,
+   "length": 16
+  },
+  {
+   "name": "L1.e2.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 608,
+   "length": 256
+  },
+  {
+   "name": "L1.e2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 864,
+   "length": 16
+  },
+  {
+   "name": "L1.cw.weight",
+   "shape": [
+    1,
+    16
+   ],
+   "offset": 880,
+   "length": 16
+  },
+  {
+   "name": "L1.cw.bias",
+   "shape": [
+    1
+   ],
+   "offset": 896,
+   "length": 1
+  },
+  {
+   "name": "L1.n1.weight",
+   "shape": [
+    16,
+    32
+   ],
+   "offset": 897,
+   "length": 512
+  },
+  {
+   "name": "L1.n1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1409,
+   "length": 16
+  },
+  {
+   "name": "L1.n2.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1425,
+   "length": 256
+  },
+  {
+   "name": "L1.n2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1681,
+   "length": 16
+  },
+  {
+   "name": "L2.e1.weight",
+   "shape": [
+    16,
+    33
+   ],
+   "offset": 1697,
+   "length": 528
+  },
+  {
+   "name": "L2.e1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2225,
+   "length": 16
+  },
+  {
+   "name": "L2.e2.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 2241,
+   "length": 256
+  },
+  {
+   "name": "L2.e2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2497,
+   "length": 16
+  },
+  {
+   "name": "L2.cw.weight",
+   "shape": [
+    1,
+    16
+   ],
+   "offset": 2513,
+   "length": 16
+  },
+  {
+   "name": "L2.cw.bias",
+   "shape": [
+    1
+   ],
+   "offset": 2529,
+   "length": 1
+  },
+  {
+   "name": "L2.n1.weight",
+   "shape": [
+    16,
+    32
+   ],
+   "offset": 2530,
+   "length": 512
+  },
+  {
+   "name": "L2.n1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 3042,
+   "length": 16
+  },
+  {
+   "name": "L2.n2.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 3058,
+   "length": 256
+  },
+  {
+   "name": "L2.n2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 3314,
+   "length": 16
+  },
+  {
+   "name": "o1.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 3330,
+   "length": 256
+  },
+  {
+   "name": "o1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 3586,
+   "length": 16
+  },
+  {
+   "name": "share.weight",
+   "shape": [
+    1,
+    16
+   ],
+   "offset": 3602,
+   "length": 16
+  },
+  {
+   "name": "share.bias",
+   "shape": [
+    1
+   ],
+   "offset": 3618,
+   "length": 1
+  }
+ ],
+ "layers": [
+  {
+   "id": "pos",
+   "op": "input",
+   "label": {
+    "en": "Atom positions",
+    "zh": "原子位置"
+   },
+   "in": [
+    "pos"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "desc": {
+    "en": "x and y of every atom, in molecule units.",
+    "zh": "每个原子的 x 和 y，单位是分子单位。"
+   },
+   "axes": [
+    "n",
+    "xy"
+   ]
+  },
+  {
+   "id": "kind",
+   "op": "input",
+   "label": {
+    "en": "Atom kinds (one-hot)",
+    "zh": "原子种类（独热）"
+   },
+   "in": [
+    "kind"
+   ],
+   "outShape": [
+    "N",
+    3
+   ],
+   "desc": {
+    "en": "Row i has a 1 in the column of atom i's kind.",
+    "zh": "第 i 行在原子 i 的种类那一列是 1。"
+   },
+   "axes": [
+    "n",
+    "f"
+   ]
+  },
+  {
+   "id": "embed",
+   "op": "linear",
+   "label": {
+    "en": "Atom numbers h",
+    "zh": "原子的数 h"
+   },
+   "in": [
+    "kind"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 3,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 71
+   }
+  },
+  {
+   "id": "L1.d2",
+   "op": "pair_dist2",
+   "label": {
+    "en": "Layer 1: squared distances",
+    "zh": "第 1 层：距离平方"
+   },
+   "in": [
+    "pos"
+   ],
+   "outShape": [
+    "N",
+    "N"
+   ],
+   "axes": [
+    "n",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 26
+   }
+  },
+  {
+   "id": "L1.edge",
+   "op": "edge_concat",
+   "label": {
+    "en": "Layer 1: message inputs",
+    "zh": "第 1 层：消息的输入"
+   },
+   "in": [
+    "embed",
+    "L1.d2"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    33
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 31
+   }
+  },
+  {
+   "id": "L1.e1",
+   "op": "linear",
+   "label": {
+    "en": "Layer 1: message network 1",
+    "zh": "第 1 层：消息网络 1"
+   },
+   "in": [
+    "L1.edge"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 33,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 55
+   }
+  },
+  {
+   "id": "L1.e1act",
+   "op": "silu",
+   "label": {
+    "en": "Layer 1: SiLU",
+    "zh": "第 1 层：SiLU"
+   },
+   "in": [
+    "L1.e1"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 62
+   }
+  },
+  {
+   "id": "L1.e2",
+   "op": "linear",
+   "label": {
+    "en": "Layer 1: message network 2",
+    "zh": "第 1 层：消息网络 2"
+   },
+   "in": [
+    "L1.e1act"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 56
+   }
+  },
+  {
+   "id": "L1.msg",
+   "op": "silu",
+   "label": {
+    "en": "Layer 1: messages",
+    "zh": "第 1 层：消息"
+   },
+   "in": [
+    "L1.e2"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 62
+   }
+  },
+  {
+   "id": "L1.cw",
+   "op": "linear",
+   "label": {
+    "en": "Layer 1: push weights",
+    "zh": "第 1 层：推力权重"
+   },
+   "in": [
+    "L1.msg"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    1
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 1
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "L1.push",
+   "op": "vec_sum",
+   "label": {
+    "en": "Layer 1: pushes",
+    "zh": "第 1 层：推动"
+   },
+   "in": [
+    "pos",
+    "L1.cw"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "axes": [
+    "n",
+    "xy"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 63
+   }
+  },
+  {
+   "id": "L1.pos",
+   "op": "add",
+   "label": {
+    "en": "Layer 1: moved positions",
+    "zh": "第 1 层：移动后的位置"
+   },
+   "in": [
+    "pos",
+    "L1.push"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "axes": [
+    "n",
+    "xy"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 65
+   }
+  },
+  {
+   "id": "L1.agg",
+   "op": "nb_sum",
+   "label": {
+    "en": "Layer 1: summed messages",
+    "zh": "第 1 层：消息之和"
+   },
+   "in": [
+    "L1.msg"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L1.cat",
+   "op": "concat",
+   "label": {
+    "en": "Layer 1: h and the message sum",
+    "zh": "第 1 层：h 与消息之和"
+   },
+   "in": [
+    "embed",
+    "L1.agg"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "params": {
+    "axis": 1
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L1.n1",
+   "op": "linear",
+   "label": {
+    "en": "Layer 1: node network 1",
+    "zh": "第 1 层：节点网络 1"
+   },
+   "in": [
+    "L1.cat"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "L1.n1act",
+   "op": "silu",
+   "label": {
+    "en": "Layer 1: SiLU",
+    "zh": "第 1 层：SiLU"
+   },
+   "in": [
+    "L1.n1"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L1.n2",
+   "op": "linear",
+   "label": {
+    "en": "Layer 1: node network 2",
+    "zh": "第 1 层：节点网络 2"
+   },
+   "in": [
+    "L1.n1act"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "L1.h",
+   "op": "add",
+   "label": {
+    "en": "Layer 1: new atom numbers h",
+    "zh": "第 1 层：新的原子数 h"
+   },
+   "in": [
+    "embed",
+    "L1.n2"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L2.d2",
+   "op": "pair_dist2",
+   "label": {
+    "en": "Layer 2: squared distances",
+    "zh": "第 2 层：距离平方"
+   },
+   "in": [
+    "L1.pos"
+   ],
+   "outShape": [
+    "N",
+    "N"
+   ],
+   "axes": [
+    "n",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 26
+   }
+  },
+  {
+   "id": "L2.edge",
+   "op": "edge_concat",
+   "label": {
+    "en": "Layer 2: message inputs",
+    "zh": "第 2 层：消息的输入"
+   },
+   "in": [
+    "L1.h",
+    "L2.d2"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    33
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 31
+   }
+  },
+  {
+   "id": "L2.e1",
+   "op": "linear",
+   "label": {
+    "en": "Layer 2: message network 1",
+    "zh": "第 2 层：消息网络 1"
+   },
+   "in": [
+    "L2.edge"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 33,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 55
+   }
+  },
+  {
+   "id": "L2.e1act",
+   "op": "silu",
+   "label": {
+    "en": "Layer 2: SiLU",
+    "zh": "第 2 层：SiLU"
+   },
+   "in": [
+    "L2.e1"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 62
+   }
+  },
+  {
+   "id": "L2.e2",
+   "op": "linear",
+   "label": {
+    "en": "Layer 2: message network 2",
+    "zh": "第 2 层：消息网络 2"
+   },
+   "in": [
+    "L2.e1act"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 56
+   }
+  },
+  {
+   "id": "L2.msg",
+   "op": "silu",
+   "label": {
+    "en": "Layer 2: messages",
+    "zh": "第 2 层：消息"
+   },
+   "in": [
+    "L2.e2"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 62
+   }
+  },
+  {
+   "id": "L2.cw",
+   "op": "linear",
+   "label": {
+    "en": "Layer 2: push weights",
+    "zh": "第 2 层：推力权重"
+   },
+   "in": [
+    "L2.msg"
+   ],
+   "outShape": [
+    "N",
+    "N",
+    1
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 1
+   },
+   "axes": [
+    "n",
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "L2.push",
+   "op": "vec_sum",
+   "label": {
+    "en": "Layer 2: pushes",
+    "zh": "第 2 层：推动"
+   },
+   "in": [
+    "L1.pos",
+    "L2.cw"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "axes": [
+    "n",
+    "xy"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 63
+   }
+  },
+  {
+   "id": "L2.agg",
+   "op": "nb_sum",
+   "label": {
+    "en": "Layer 2: summed messages",
+    "zh": "第 2 层：消息之和"
+   },
+   "in": [
+    "L2.msg"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L2.cat",
+   "op": "concat",
+   "label": {
+    "en": "Layer 2: h and the message sum",
+    "zh": "第 2 层：h 与消息之和"
+   },
+   "in": [
+    "L1.h",
+    "L2.agg"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "params": {
+    "axis": 1
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L2.n1",
+   "op": "linear",
+   "label": {
+    "en": "Layer 2: node network 1",
+    "zh": "第 2 层：节点网络 1"
+   },
+   "in": [
+    "L2.cat"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "L2.n1act",
+   "op": "silu",
+   "label": {
+    "en": "Layer 2: SiLU",
+    "zh": "第 2 层：SiLU"
+   },
+   "in": [
+    "L2.n1"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "L2.n2",
+   "op": "linear",
+   "label": {
+    "en": "Layer 2: node network 2",
+    "zh": "第 2 层：节点网络 2"
+   },
+   "in": [
+    "L2.n1act"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "L2.h",
+   "op": "add",
+   "label": {
+    "en": "Layer 2: new atom numbers h",
+    "zh": "第 2 层：新的原子数 h"
+   },
+   "in": [
+    "L1.h",
+    "L2.n2"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "force",
+   "op": "add",
+   "label": {
+    "en": "Forces: the pushes of both layers",
+    "zh": "力：两层推动之和"
+   },
+   "in": [
+    "L1.push",
+    "L2.push"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "axes": [
+    "n",
+    "xy"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 81
+   }
+  },
+  {
+   "id": "o1",
+   "op": "linear",
+   "label": {
+    "en": "Energy head 1",
+    "zh": "能量头 1"
+   },
+   "in": [
+    "L2.h"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 73
+   }
+  },
+  {
+   "id": "o1act",
+   "op": "silu",
+   "label": {
+    "en": "Energy head: SiLU",
+    "zh": "能量头：SiLU"
+   },
+   "in": [
+    "o1"
+   ],
+   "outShape": [
+    "N",
+    16
+   ],
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 82
+   }
+  },
+  {
+   "id": "share",
+   "op": "linear",
+   "label": {
+    "en": "Energy share of each atom",
+    "zh": "每个原子的能量份额"
+   },
+   "in": [
+    "o1act"
+   ],
+   "outShape": [
+    "N",
+    1
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 1
+   },
+   "axes": [
+    "n",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 74
+   }
+  },
+  {
+   "id": "energy",
+   "op": "sum_atoms",
+   "label": {
+    "en": "Energy",
+    "zh": "能量"
+   },
+   "in": [
+    "share"
+   ],
+   "outShape": [
+    1
+   ],
+   "axes": [
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/egnn/model.py",
+    "line": 82
+   }
+  }
+ ],
+ "training": {
+  "dataset": "synthetic 2-D toy molecules (pipeline/egnn/make_data.ts with the page's mol.ts): 3 atom kinds, 2-10 atoms, a made-up Morse pair energy and its exact forces",
+  "steps": 19140,
+  "batchSize": 128,
+  "epochs": 60,
+  "bestEpoch": 59,
+  "optimizer": "Adam lr 0.002 (cosine to 0); loss mse(E)/var(E) + mse(F)/var(F); batches of equal atom counts",
+  "hardware": "cuda (training, 146.3 s); CPU float32 (evaluation, export)",
+  "metrics": {
+   "energyMAE": 0.045233,
+   "forceMAE": 0.128743,
+   "energyMAD": 3.023919,
+   "forceMAD": 0.693597,
+   "testN": 5000
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000305,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 10,
+  "edgeCases": [
+   "one-atom",
+   "crowded",
+   "max-atoms"
+  ],
+  "perLayer": {
+   "L1.d2": 0.00000381,
+   "L1.edge": 0.00000381,
+   "L1.e1": 0.00000763,
+   "L1.e1act": 0.00000191,
+   "L1.e2": 0.00000381,
+   "L1.msg": 0.00000286,
+   "L1.cw": 0.00000763,
+   "L1.push": 0.00000119,
+   "L1.pos": 0.00000119,
+   "L1.agg": 0.00000763,
+   "L1.cat": 0.00000763,
+   "L1.n1": 0.0000153,
+   "L1.n1act": 0.00000286,
+   "L1.n2": 0.0000031,
+   "L1.h": 0.0000031,
+   "L2.d2": 0.0000134,
+   "L2.edge": 0.0000134,
+   "L2.e1": 0.0000229,
+   "L2.e1act": 0.00000429,
+   "L2.e2": 0.00000477,
+   "L2.msg": 0.00000525,
+   "L2.cw": 0.00000423,
+   "L2.push": 0.00000191,
+   "L2.agg": 0.0000305,
+   "L2.cat": 0.0000305,
+   "L2.n1": 0.0000114,
+   "L2.n1act": 0.00000238,
+   "L2.n2": 9.54e-7,
+   "L2.h": 0.0000031,
+   "force": 0.00000286,
+   "o1": 0.00000143,
+   "o1act": 0.00000143,
+   "share": 7.15e-7,
+   "energy": 9.54e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/egnn/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "pos",
+   "adapter": "points2d",
+   "kind": "points2d",
+   "shape": [
+    "N",
+    2
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "xy"
+   ]
+  },
+  {
+   "name": "kind",
+   "adapter": "points2d",
+   "kind": "points2d",
+   "shape": [
+    "N",
+    3
+   ],
+   "dtype": "f32",
+   "axes": [
+    "n",
+    "f"
+   ]
+  }
+ ],
+ "outputs": [
+  "energy",
+  "force"
+ ],
+ "dims": {
+  "N": {
+   "min": 1,
+   "max": 12,
+   "label": {
+    "en": "atoms",
+    "zh": "原子"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ }
+}

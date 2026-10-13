@@ -9,7 +9,10 @@
 //   4. otherwise atlas starts one: node --import lib/devwatch.ts <vite>/bin/vite.js dev --port N --strictPort in this
 //      site (one process, no npm or shell in between, so stopping it stops vite; its esbuild child exits with it).
 //      The port: --port (AK003 when something else listens there), else the package's port when free, else the first
-//      free port from 5210 up.
+//      free port from 5210 up. K4: a started server must then answer the identity probe; when another server answers on
+//      that port (a lane's server took it between the free-port check and vite's start: ppo-reacher's e2e ran against
+//      another lane's page and reported "no guided lesson"), this one is stopped and the next free port is tried (3
+//      tries; with --port: AK003 at once).
 // The identity probe: a random token written to .svelte-kit/atlas-dev-probe.txt must come back from GET
 // /.svelte-kit/atlas-dev-probe.txt, which a vite dev server serves from its own root only, so a server of another lane or of
 // the main tree never matches. (.svelte-kit, not .atlas: the main tree's vite.config.ts does not allow .atlas, so the probe
@@ -227,10 +230,34 @@ export async function devServer(o: ServerOpts = {}): Promise<DevServer> {
 		if (await probeSite(wanted, site)) return { base: `http://localhost:${wanted}`, port: wanted, how: 'reused', why: `a dev server of this site already on port ${wanted}`, kept: false, stop: noop };
 		if (o.port !== undefined) throw new AtlasError('AK003', `port ${o.port} is busy (and not a dev server of this site)`, { fix: `stop what runs there, pick another --port, or test that server with --base http://localhost:${o.port}` });
 	}
-	// 4. start one
-	const port = o.port ?? (await pickPort({ preferred: own, slug: o.slug, root: r.root }));
-	const why = o.port !== undefined ? '--port' : own === port ? "the package's port" : own ? `the package's port ${own} is busy` : 'the first free port from 5210';
-	const { pid } = await startServer(site, port, { keep: o.keep, idleMin: o.idleMin });
+	// 4. start one; K4: it must answer the identity probe (another server may have taken the port meanwhile)
+	const tried: number[] = [];
+	let port = 0;
+	let pid = 0;
+	for (let attempt = 0; ; attempt++) {
+		port = o.port ?? (await pickPort({ preferred: attempt ? null : own, slug: o.slug, root: r.root, exclude: tried }));
+		tried.push(port);
+		let started: { pid: number } | null = null;
+		let failure: unknown = null;
+		try {
+			started = await startServer(site, port, { keep: o.keep, idleMin: o.idleMin });
+		} catch (e) {
+			failure = e;
+		}
+		if (started && ((await probeSite(port, site, 8000)) || (await probeSite(port, site, 15000)))) {
+			pid = started.pid;
+			break;
+		}
+		if (started) {
+			killTree(started.pid);
+			if (o.keep && readRecord(site)?.pid === started.pid) rmSync(recordFile(site), { force: true });
+		}
+		if (o.port !== undefined || attempt >= 2)
+			throw failure instanceof AtlasError
+				? failure
+				: new AtlasError('AK003', `the dev server started on port ${port}, but ${failure ? 'did not come up' : 'another server answers there (not this site)'}${tried.length > 1 ? ` (tried ports ${tried.join(', ')})` : ''}`, { fix: `stop the other dev servers (npm run atlas -- lanes lists the lanes), or pass a free --port` });
+	}
+	const why = o.port !== undefined ? '--port' : own === port ? "the package's port" : own ? `the package's port ${own} is busy` : tried.length > 1 ? `ports ${tried.slice(0, -1).join(', ')} answered as another server` : 'the first free port from 5210';
 	let stopped = false;
 	const stop = () => {
 		if (stopped || o.keep) return;

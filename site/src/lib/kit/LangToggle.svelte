@@ -1,25 +1,60 @@
-<!-- Language toggle (English ⇄ 中文). Persists the choice (try/catch) and updates <html lang>. -->
+<!--
+  Language switch (English ⇄ 中文). Persists the choice (try/catch) and updates <html lang>.
+    variant 'seg'   an EN | 中文 segmented control (desktop bars)
+    variant 'flip'  one button that names the other language (phones)
+    variant 'auto'  both, the segment from 760 px up and the flip below (the default)
+-->
 <script lang="ts">
-	import { i18n, toggleLang, ui } from '$lib/i18n/i18n.svelte';
+	import { i18n, setLang, toggleLang, ui } from '$lib/i18n/i18n.svelte';
+
+	let { variant = 'auto' }: { variant?: 'auto' | 'seg' | 'flip' } = $props();
 </script>
 
-<button
-	type="button"
-	class="btn ghost lang"
-	onclick={toggleLang}
-	aria-label={i18n.lang === 'en' ? 'Switch to Chinese (中文)' : '切换到英文 (English)'}
-	lang={i18n.lang === 'en' ? 'zh-CN' : 'en'}
->
-	<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.3" /><path d="M1.8 8h12.4M8 1.7c2 2.2 2 10.4 0 12.6M8 1.7c-2 2.2-2 10.4 0 12.6" /></svg>
-	<span>{i18n.lang === 'en' ? ui('switchToZh') : 'EN'}</span>
-</button>
+{#if variant !== 'flip'}
+	<div class="seg lang-seg" class:auto={variant === 'auto'} role="group" aria-label={ui('language')}>
+		<button type="button" lang="en" aria-pressed={i18n.lang === 'en'} onclick={() => setLang('en')}>EN</button>
+		<button type="button" lang="zh-CN" aria-pressed={i18n.lang === 'zh'} onclick={() => setLang('zh')}>中文</button>
+	</div>
+{/if}
+{#if variant !== 'seg'}
+	<button
+		type="button"
+		class="icon-btn flip"
+		class:auto={variant === 'auto'}
+		onclick={toggleLang}
+		aria-label={i18n.lang === 'en' ? '中文 · Switch to Chinese' : 'EN · 切换到英文'}
+		lang={i18n.lang === 'en' ? 'zh-CN' : 'en'}
+	>
+		{i18n.lang === 'en' ? '中文' : 'EN'}
+	</button>
+{/if}
 
 <style>
-	.lang {
-		white-space: nowrap;
-		flex: 0 0 auto;
+	.lang-seg {
+		flex: none;
+		flex-wrap: nowrap;
+	}
+	.lang-seg button {
+		min-width: 44px;
+	}
+	.flip {
+		width: auto;
+		min-width: 44px;
 		padding: 0 10px;
-		min-height: 36px;
-		gap: 6px;
+		font-size: var(--t-sm);
+		font-weight: var(--w-title);
+		white-space: nowrap;
+		color: var(--ink);
+	}
+	.flip.auto {
+		display: none;
+	}
+	@media (max-width: 759px) {
+		.lang-seg.auto {
+			display: none;
+		}
+		.flip.auto {
+			display: inline-grid;
+		}
 	}
 </style>

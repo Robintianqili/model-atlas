@@ -60,7 +60,7 @@
 	.fc {
 		margin: 0;
 		padding: 12px 16px;
-		background: var(--surface);
+		background: var(--panel);
 		border: 1px solid var(--rule);
 		border-radius: var(--r3);
 		min-width: 0;
@@ -70,7 +70,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		color: var(--ink-2);
 		margin-bottom: 4px;
 	}
@@ -85,7 +85,7 @@
 		align-items: baseline;
 		gap: 4px 16px;
 		margin: 6px 0 0;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		color: var(--ink-2);
 	}
 	.where dl {

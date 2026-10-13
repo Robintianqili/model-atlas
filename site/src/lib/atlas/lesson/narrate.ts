@@ -4,6 +4,8 @@
 // fmt: n3 (3 significant digits) | n2 n4 n5 n6 (that many significant digits: n4 shows a small change that n3 rounds
 // away) | int | pct | signed | shape | label | tok. Without a fmt, exact integers print as integers and other numbers as n3.
 // An unresolved or non-finite value renders "…" and is reported in `missing` (lint AK401).
+// R1 (redesign W2): {name@ref} is {name} whose number names a stage target (StepDef.refs[ref]): the value prints as
+// {name} does, and the placeholder record keeps the ref (a number chip rings that target).
 // K2: on a step the empty input skipped (At.skipped) the sentences whose values do not exist yet are left out and the
 // narration ends with EMPTY_LINE (a look hint drops them silently), so the learner never reads "…" next to the empty note.
 import type { I18n } from '../types/core.ts';
@@ -11,16 +13,27 @@ import type { Focus } from '../types/process.ts';
 import type { At, Narration, TmplVal } from '../types/lesson.ts';
 import type { ExplainerRuntime, PackageModules } from '../types/runtime.ts';
 import { atFact } from './facts.ts';
-import { fmt3, fmtInt, fmtPct, sigDigits, visibleToken } from '../core/format.ts';
+import { fmt3, fmtInt, fmtPct, fmtSci, sigDigits, visibleToken } from '../core/format.ts';
 
 export type Lang = 'en' | 'zh';
-export const FORMATS = ['n3', 'n2', 'n4', 'n5', 'n6', 'int', 'pct', 'signed', 'shape', 'label', 'tok'] as const;
+export const FORMATS = ['n3', 'n2', 'n4', 'n5', 'n6', 'int', 'pct', 'pct2', 'sci', 'signed', 'shape', 'label', 'tok'] as const;
 export const PLACEHOLDER_RE = /\{([A-Za-z_][\w.:#@-]*)(?:\|([A-Za-z0-9]+))?\}/g;
 export const MISSING = '…';
 
-export function placeholders(text: string | undefined): { name: string; fmt?: string }[] {
+/** R1: a placeholder name and the stage target its number names ({y@cell}: name 'y', ref 'cell'). Names with a ':'
+ *  (fact:<key>) never carry a ref. */
+export function splitRef(name: string): { name: string; ref?: string } {
+	const i = name.lastIndexOf('@');
+	if (i <= 0 || name.startsWith('fact:')) return { name };
+	return { name: name.slice(0, i), ref: name.slice(i + 1) || undefined };
+}
+
+export function placeholders(text: string | undefined): { name: string; fmt?: string; ref?: string }[] {
 	if (!text) return [];
-	return [...text.matchAll(PLACEHOLDER_RE)].map((m) => ({ name: m[1], fmt: m[2] }));
+	return [...text.matchAll(PLACEHOLDER_RE)].map((m) => {
+		const r = splitRef(m[1]);
+		return r.ref ? { name: r.name, fmt: m[2], ref: r.ref } : { name: r.name, fmt: m[2] };
+	});
 }
 
 export function placeholderNames(text: string | undefined): string[] {
@@ -52,6 +65,11 @@ export function formatValue(v: unknown, fmt: string | undefined, lang: Lang): st
 			return fmtInt(v);
 		case 'pct':
 			return fmtPct(v);
+		// K4: two decimals of a share near 0% or 100%, and scientific notation without the calculator's e
+		case 'pct2':
+			return fmtPct(v, 2);
+		case 'sci':
+			return fmtSci(v);
 		case 'signed':
 			return v > 0 ? `+${fmt3(v)}` : fmt3(v);
 		case 'shape':
@@ -141,11 +159,52 @@ export function sentences(text: string, lang: Lang): string[] {
 export interface RenderOpts {
 	/** K2, a skipped step: end with EMPTY_LINE when a sentence was left out (default true; a look hint passes false) */
 	emptyLine?: boolean;
+	/** R1: wrap the value of every {name@ref} in chip marks (chipParts splits them; the lesson renders number chips) */
+	chips?: boolean;
 }
 
-/** How many more "…" the rendered text has than its template (K2, lint): a vars() value that prints "…" itself. */
+/** R1 number chips: private-use marks around a {name@ref} value in a chip rendering (never in plain narration). */
+export const CHIP = { open: '\uE000', sep: '\uE001', close: '\uE002' } as const;
+const CHIP_RE = /\uE000([^\uE001]*)\uE001([^\uE002]*)\uE002/g;
+
+/** A chip rendering split into text and chips. */
+export function chipParts(text: string): ({ text: string } | { ref: string; text: string })[] {
+	const out: ({ text: string } | { ref: string; text: string })[] = [];
+	let last = 0;
+	for (const m of text.matchAll(CHIP_RE)) {
+		if (m.index! > last) out.push({ text: text.slice(last, m.index) });
+		out.push({ ref: m[1], text: m[2] });
+		last = m.index! + m[0].length;
+	}
+	if (last < text.length) out.push({ text: text.slice(last) });
+	return out;
+}
+
+/** The plain text of a chip rendering. */
+export const stripChips = (text: string): string => text.replace(CHIP_RE, '$2');
+
+/** Does a template name a stage target ({name@ref}) in either language? */
+export const hasRefs = (t: { en?: string; zh?: string } | undefined): boolean => !!t && [t.en, t.zh].some((x) => placeholders(x).some((p) => p.ref));
+
+/** K4: how many gap marks a text shows: a "…" that stands alone (next to no letter, digit or CJK character), as the
+ *  resolver prints a missing value in English ("the loss is ….", "token “…”"). A literal ellipsis inside a word or a
+ *  range ("是…的首都", "−1…1", "Training…") is text, not a gap (TransE and behavior-cloning had to reword them). A
+ *  Chinese gap sits between characters ("损失是…。"), so the English pass and lint's missing values catch it. */
+export function gapMarks(text: string): number {
+	let n = 0;
+	const w = /[\p{L}\p{N}]/u;
+	for (let i = text.indexOf(MISSING); i >= 0; i = text.indexOf(MISSING, i + 1)) {
+		const a = text[i - 1] ?? '';
+		const b = text[i + 1] ?? '';
+		if (!(w.test(a) || w.test(b))) n++;
+	}
+	return n;
+}
+
+/** How many more "…" the rendered text has than its template (K2, lint): a vars() value that prints "…" itself. K4:
+ *  only gap marks count (gapMarks). */
 export function extraEllipses(rendered: string, template: string | undefined): number {
-	const n = (s: string) => s.split(MISSING).length - 1;
+	const n = gapMarks;
 	return n(rendered) - n((template ?? '').replace(PLACEHOLDER_RE, ''));
 }
 
@@ -169,7 +228,8 @@ export function render<R extends ExplainerRuntime>(tmpl: Narration<R> | undefine
 	}
 	const seen: Placeholder[] = [];
 	const missing: string[] = [];
-	const text = src.replace(PLACEHOLDER_RE, (_m, name: string, fmt: string | undefined) => {
+	const text = src.replace(PLACEHOLDER_RE, (_m, raw: string, fmt: string | undefined) => {
+		const { name, ref } = splitRef(raw);
 		const r = resolveName(name, vars, rt, at);
 		let s = formatValue(r.value, fmt ?? r.fmt, lang);
 		// K2: on a skipped step a vars() fallback that prints "…", nothing, or a raw NaN (no frame to read yet) is a
@@ -178,6 +238,7 @@ export function render<R extends ExplainerRuntime>(tmpl: Narration<R> | undefine
 		const ok = s !== null;
 		seen.push({ name, fmt: fmt ?? r.fmt, value: r.value, focus: r.focus, ok, from: r.from });
 		if (!ok && !missing.includes(name)) missing.push(name);
+		if (s !== null && ref && o.chips) return `${CHIP.open}${ref}${CHIP.sep}${s}${CHIP.close}`;
 		return s !== null ? s : skipped ? GAP : MISSING;
 	});
 	if (skipped && missing.length) {

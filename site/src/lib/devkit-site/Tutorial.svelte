@@ -12,6 +12,7 @@
 	import Html from './Html.svelte';
 	import Produces from './Produces.svelte';
 	import HelloEmbed from './HelloEmbed.svelte';
+	import Pager from './Pager.svelte';
 	import { withBase } from './base.ts';
 	import type { TutorialData } from './types.ts';
 
@@ -46,9 +47,9 @@
 	</p>
 {/snippet}
 
-<div class="container tut">
+<div class="tut">
 	<header class="head">
-		<p class="eyebrow">DevKit · {t({ en: 'Tutorial', zh: '教程' })}</p>
+		<p class="eyebrow">DevKit · {t({ en: 'Tutorial', zh: '教程' })} · {t({ en: `${page.steps.length} steps`, zh: `${page.steps.length} 步` })}</p>
 		<h1>{t({ en: 'Build hello-xor step by step', zh: '一步一步做出 hello-xor' })}</h1>
 		<p class="lede">
 			{t({
@@ -56,7 +57,7 @@
 				zh: 'hello-xor 是工具包自带的例子：一个学习 XOR 的 2-2-1 网络，三种类型都用到了。本教程按指南第 4 节的顺序进行。命令和指南一样，做的是你自己的包 my-xor；文件和结果则来自 hello-xor，是在网站构建时从真实的包里截取的。'
 			})}
 		</p>
-		<p class="muted small">
+		<p class="small">
 			{t({ en: 'Use ← and → or the buttons to move between steps. The full text of each step is in the guide:', zh: '用 ← 和 → 键或按钮切换步骤。每一步的完整说明见指南：' })}
 			<a href={withBase(page.guide, base)}>{t({ en: 'Walk-through: your first package', zh: '动手做第一个包' })}</a>
 		</p>
@@ -74,46 +75,52 @@
 		</p>
 		<HelloEmbed slug={page.hello.slug} spec={page.hello.spec} />
 	</section>
+
+	<Pager label={t({ en: 'Previous and next page', zh: '上一页和下一页' })} prev={{ href: '/devkit/', title: t({ en: 'Overview', zh: '概览' }) }} next={{ href: '/devkit/guide/', title: t({ en: 'The DevKit guide', zh: 'DevKit 指南' }) }} />
 </div>
 
 <style>
 	.tut {
-		padding-top: var(--s6);
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: var(--s5);
+		gap: var(--s6);
+	}
+	.head .eyebrow {
+		margin: 0 0 var(--s2);
 	}
 	.head h1 {
 		margin-bottom: var(--s3);
 	}
-	.head p {
-		margin-bottom: 8px;
+	.head .lede {
+		margin-bottom: var(--s3);
 	}
 	.small {
-		font-size: var(--fs-sm);
+		margin: 0;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--muted);
 	}
 	.st {
 		display: grid;
-		gap: 12px;
+		gap: var(--s3);
 		min-width: 0;
 	}
 	.st > div {
 		min-width: 0;
 	}
 	.k {
-		margin: 0 0 4px;
-		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--muted);
+		margin: 0 0 var(--s1);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		font-weight: var(--w-ui);
+		color: var(--ink-2);
 	}
 	.st :global(.dk-md .code) {
 		margin-bottom: 0;
 	}
 	.endnote {
 		margin: 0;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 	}
 	.embed {
 		padding-top: var(--s5);
@@ -121,11 +128,11 @@
 		scroll-margin-top: calc(var(--header-h) + 12px);
 		min-width: 0;
 	}
-	.embed h2 {
-		font-size: var(--fs-xl);
-	}
 	.intro {
 		color: var(--ink-2);
-		max-width: var(--measure);
+		max-width: 75ch;
+	}
+	.tut > :global(.pg) {
+		margin-top: 0;
 	}
 </style>

@@ -24,7 +24,7 @@
 		role?: 'param' | 'act';
 		cell?: number;
 	}
-	let { values, rows, cols, kind = 'diverging', domain, label, hover = $bindable(null), mark = null, role = 'act', cell = 46 }: Props = $props();
+	let { values, rows, cols, kind = 'diverging', domain, label, hover = $bindable(null), mark = null, role = 'act', cell = 56 }: Props = $props();
 	const scale = $derived(makeScale(kind, domain, themeState.resolved));
 	const idx = $derived(Array.from({ length: rows * cols }, (_, i) => i));
 </script>
@@ -57,7 +57,7 @@
 		justify-items: start;
 	}
 	figcaption {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		display: flex;
 		gap: 4px;
@@ -67,7 +67,7 @@
 	.w {
 		font-family: var(--font-mono);
 		font-weight: 700;
-		font-size: 10px;
+		font-size: var(--t-xs);
 		padding: 0 3px;
 		border: 1.5px double var(--param);
 		border-radius: 2px;
@@ -90,15 +90,15 @@
 	.c {
 		display: grid;
 		place-items: center;
-		font-size: 10.5px;
-		letter-spacing: -0.03em;
+		font-size: var(--t-xs);
+		letter-spacing: -0.02em;
 		white-space: nowrap;
 		overflow: hidden;
 		cursor: crosshair;
 	}
 	.c.long {
-		font-size: 9px;
-		letter-spacing: -0.06em;
+		font-size: var(--t-xs);
+		letter-spacing: -0.05em;
 	}
 	.c.on {
 		outline: 2px solid var(--highlight);

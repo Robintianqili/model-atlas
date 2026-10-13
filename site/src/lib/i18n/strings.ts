@@ -2,41 +2,55 @@
  * UI string dictionary. Every key has English and Chinese. Use `ui('key')` in components.
  * Placeholders: `{name}` is replaced from the vars object: ui('stepOf', { i: 3, n: 10 }).
  * Page-specific prose does not belong here: write it inline with t({ en, zh }) or as an article.
+ *
+ * Three dictionaries (redesign wave F): UI is the site-wide vocabulary that every page carries; LESSON_UI (the lesson
+ * app: views, Next, Start, Skip, feedback, cover, end card) and CATALOG_UI (cards, filters, paths, the atlas) are
+ * separate exports, so a page bundles them only when it uses lui() / cui() (i18n.svelte.ts).
  */
 export const UI = {
 	// site chrome
-	siteName: { en: 'Model Atlas', zh: '模型图鉴' },
 	siteTagline: { en: 'See every layer of a model work on your own input.', zh: '用你自己的输入，看模型每一层如何工作。' },
 	skipToContent: { en: 'Skip to content', zh: '跳到正文' },
-	navHome: { en: 'Home', zh: '首页' },
 	navAtlas: { en: 'Atlas', zh: '图鉴' },
 	navTrain: { en: 'Training concepts', zh: '训练概念' },
-	navTrainShort: { en: 'Training', zh: '训练' },
 	navGlossary: { en: 'Glossary', zh: '术语表' },
 	navAbout: { en: 'About', zh: '关于' },
 	navDevkit: { en: 'Build your own', zh: '自己动手' },
-	navDevkitShort: { en: 'DevKit', zh: '自己动手' },
 	navKit: { en: 'Component kit', zh: '组件库' },
+	navLessons: { en: 'Lessons', zh: '课程' },
+	navPaths: { en: 'Paths', zh: '学习路径' },
+	navMain: { en: 'Site', zh: '网站导航' },
+	searchLabel: { en: 'Search lessons and terms', zh: '搜索课程与术语' },
+	searchOpen: { en: 'Search', zh: '搜索' },
+	footerLearn: { en: 'Learn', zh: '学习' },
+	footerBuild: { en: 'Build', zh: '构建' },
+	footerAllLessons: { en: 'All lessons', zh: '全部课程' },
+	footerPaths: { en: 'Learning paths', zh: '学习路径' },
+	footerDevkit: { en: 'DevKit: build a lesson', zh: 'DevKit：自己做一节课' },
+	footerSource: { en: 'Source code', zh: '源代码' },
+	footerPrivacyLink: { en: 'Privacy', zh: '隐私' },
+	footerNumbers: {
+		en: 'Every number on this site is computed from your input in your browser, or recorded from a real run and marked so. Nothing you draw or type leaves your device.',
+		zh: '本站的每个数，要么是在你的浏览器里根据你的输入算出的，要么来自一次真实运行并标明。你画的、写的内容不会离开你的设备。'
+	},
+	footerLegal: {
+		en: 'Code: MIT. Lesson text, articles and figures: CC BY 4.0. Datasets, vocabularies and fonts keep their own licences.',
+		zh: '代码采用 MIT 许可证；课程文字、文章和插图采用 CC BY 4.0；数据集、词表和字体保留各自的许可证。'
+	},
+	footerTech: {
+		en: 'A static site: every model runs or is replayed in your browser. Fonts: Atkinson Hyperlegible Next and JetBrains Mono (SIL OFL). Math: KaTeX (MIT).',
+		zh: '纯静态网站：所有模型都在你的浏览器中运行或回放。字体：Atkinson Hyperlegible Next 和 JetBrains Mono（SIL OFL）。公式：KaTeX（MIT）。'
+	},
 	menu: { en: 'Menu', zh: '菜单' },
-	closeMenu: { en: 'Close menu', zh: '关闭菜单' },
 	language: { en: 'Language', zh: '语言' },
-	switchToZh: { en: '中文', zh: '中文' },
-	switchToEn: { en: 'English', zh: 'English' },
-	switchLangLabel: { en: 'Switch language to Chinese', zh: '切换为英文' },
 	theme: { en: 'Theme', zh: '主题' },
 	themeLight: { en: 'Light', zh: '浅色' },
 	themeDark: { en: 'Dark', zh: '深色' },
 	themeSystem: { en: 'System', zh: '跟随系统' },
 	themeToggleLabel: { en: 'Color theme: {mode}. Click to change.', zh: '配色：{mode}。点击切换。' },
-	footerPrivacy: {
-		en: 'Your drawings, text and other inputs never leave your device. No analytics, no third-party requests.',
-		zh: '你的绘画、文本等输入不会离开你的设备。无统计脚本，无第三方请求。'
-	},
 	footerLicenses: { en: 'Licenses and credits', zh: '许可与致谢' },
-	footerHowNumbers: { en: 'How the numbers are computed', zh: '数字是如何计算的' },
-	backToTop: { en: 'Back to top', zh: '回到顶部' },
+	footerHowNumbers: { en: 'How numbers are made', zh: '数字从哪里来' },
 	onThisPage: { en: 'On this page', zh: '本页内容' },
-	learnMore: { en: 'Learn more', zh: '了解更多' },
 	open: { en: 'Open', zh: '打开' },
 	close: { en: 'Close', zh: '关闭' },
 	show: { en: 'Show', zh: '显示' },
@@ -63,6 +77,11 @@ export const UI = {
 	provPrecision: { en: 'Precision', zh: '精度' },
 	provTolerance: { en: 'Max |diff| vs {against}', zh: '与 {against} 的最大绝对误差' },
 	provApproximate: { en: 'approximate (quantized)', zh: '近似（量化）' },
+	provLiveNote: { en: 'computed from your input, now', zh: '根据你的输入现场计算' },
+	provPrecomputedNote: { en: 'recorded from a real run', zh: '来自一次真实运行的记录' },
+	provIllustrativeNote: { en: 'a drawing, not model output', zh: '示意图，不是模型输出' },
+	provLegend: { en: 'Where the numbers come from', zh: '数字的来源' },
+	minutes: { en: '≈ {m} min', zh: '约 {m} 分钟' },
 	statusLive: { en: 'Live', zh: '可玩' },
 	statusPrecomputed: { en: 'Precomputed', zh: '预计算' },
 	statusPlanned: { en: 'Planned', zh: '计划中' },
@@ -88,7 +107,6 @@ export const UI = {
 	runtime: { en: 'Runtime', zh: '运行方式' },
 	precision: { en: 'Precision', zh: '数值精度' },
 	prerequisites: { en: 'Before this, read', zh: '建议先读' },
-	noPrerequisites: { en: 'No prerequisites.', zh: '无前置要求。' },
 	whatItWillShow: { en: 'What this page will show', zh: '这个页面将展示什么' },
 	howYouPlay: { en: 'How you will play with it', zh: '你将如何互动' },
 	engine: { en: 'Engine', zh: '实现方式' },
@@ -105,9 +123,7 @@ export const UI = {
 	countPlanned: { en: '{n} planned', zh: '{n} 个计划中' },
 	livePages: { en: 'Live now', zh: '现在可玩' },
 	plannedPages: { en: 'Planned', zh: '计划中' },
-	allAreas: { en: 'All areas', zh: '全部领域' },
 	browseAtlas: { en: 'Browse the atlas', zh: '浏览图鉴' },
-	openPage: { en: 'Open page', zh: '打开页面' },
 	section: { en: 'Section', zh: '章节' },
 	inV1: { en: 'v1 page', zh: 'v1 页面' },
 
@@ -185,7 +201,6 @@ export const UI = {
 		en: 'Reduced motion is on, so steps advance only when you press Next.',
 		zh: '已开启减少动态效果，只有点击“下一步”时才前进。'
 	},
-	playerKeys: { en: 'Space: play or pause. Arrow keys: step.', zh: '空格：播放/暂停。方向键：单步。' },
 
 	// guided lesson (Walkthrough)
 	secLesson: { en: 'Step by step', zh: '分步课程' },
@@ -306,7 +321,6 @@ export const UI = {
 	changePrediction: { en: 'Change', zh: '修改' },
 	predictionSaved: { en: 'Saved. You will see it again at the end of the page.', zh: '已保存。你会在页面末尾再次看到它。' },
 	glossaryLink: { en: 'Open in glossary', zh: '在术语表中查看' },
-	seeOnPage: { en: 'See it on', zh: '在此页面中查看' },
 	launcherDraw: { en: 'Draw', zh: '画画' },
 	launcherType: { en: 'Type', zh: '打字' },
 	launcherTitle: { en: 'Start from your own input', zh: '从你自己的输入开始' },
@@ -318,3 +332,139 @@ export const UI = {
 } as const;
 
 export type UIKey = keyof typeof UI;
+
+/**
+ * The lesson app (redesign spec §4.4, §5): view tabs, the action bar, feedback, the cover and the end card. Read with
+ * lui('key', vars) from i18n.svelte.ts.
+ */
+export const LESSON_UI = {
+	// views (hash-addressed panels of a lesson route)
+	views: { en: 'Views', zh: '视图' },
+	viewLesson: { en: 'Lesson', zh: '课程' },
+	viewExplore: { en: 'Explore', zh: '探索' },
+	viewArticle: { en: 'How it works', zh: '原理' },
+	viewCode: { en: 'Code', zh: '代码' },
+	viewTraining: { en: 'Training', zh: '训练' },
+	viewTrainingLong: { en: 'Training and data', zh: '训练与数据' },
+	viewPitfalls: { en: 'Pitfalls', zh: '常见误区' },
+	viewSources: { en: 'Sources', zh: '资料来源' },
+	viewTryThis: { en: 'Try this', zh: '试一试' },
+	viewCheck: { en: 'Check yourself', zh: '自测' },
+	backToLesson: { en: 'Back to the lesson · step {k} of {n}', zh: '回到课程 · 第 {k} / {n} 步' },
+	// landmarks and labels
+	stage: { en: 'Stage', zh: '演示区' },
+	steps: { en: 'Steps', zh: '步骤' },
+	controls: { en: 'Lesson controls', zh: '课程控制' },
+	more: { en: 'More', zh: '更多' },
+	aboutModel: { en: 'About this model', zh: '关于这个模型' },
+	aboutLesson: { en: 'About this lesson', zh: '关于这节课' },
+	crumbAtlas: { en: 'Atlas', zh: '图鉴' },
+	// eyebrow and progress
+	stepOf: { en: 'Step {k} of {n}', zh: '第 {k} / {n} 步' },
+	stepOfIn: { en: '{chapter} · step {k} of {n}', zh: '{chapter} · 第 {k} / {n} 步' },
+	goToStep: { en: 'Step {k}: {title}', zh: '第 {k} 步：{title}' },
+	animated: { en: 'animated step', zh: '带动画的步骤' },
+	done: { en: 'done', zh: '已完成' },
+	// the action bar and the Next button
+	back: { en: 'Back', zh: '上一步' },
+	play: { en: 'Play', zh: '播放' },
+	pause: { en: 'Pause', zh: '暂停' },
+	next: { en: 'Next', zh: '下一步' },
+	nextStep: { en: 'Next · step {k}', zh: '下一步 · 第 {k} 步' },
+	start: { en: 'Start', zh: '开始' },
+	startStep: { en: 'Start · step {k}', zh: '开始 · 第 {k} 步' },
+	resumeAt: { en: 'Resume at step {k}', zh: '从第 {k} 步继续' },
+	startOver: { en: 'Start over', zh: '从头开始' },
+	resumed: { en: 'Resumed at step {k}', zh: '已回到第 {k} 步' },
+	continue: { en: 'Continue', zh: '继续' },
+	continueStep: { en: 'Continue · step {k}', zh: '继续 · 第 {k} 步' },
+	skip: { en: 'Skip', zh: '跳过' },
+	skipStep: { en: 'Skip · step {k}', zh: '跳过 · 第 {k} 步' },
+	finish: { en: 'Finish', zh: '完成' },
+	restart: { en: 'Restart the lesson', zh: '重新开始这节课' },
+	// narration parts
+	look: { en: 'Look', zh: '看这里' },
+	why: { en: 'Why?', zh: '为什么？' },
+	yourTurn: { en: 'Your turn', zh: '轮到你了' },
+	predict: { en: 'Predict', zh: '先预测' },
+	showMe: { en: 'Show me', zh: '直接看答案' },
+	answerFirst: { en: 'Answer first.', zh: '先作答。' },
+	answerFirstBody: { en: 'The stage shows its numbers once you commit.', zh: '你作答之后，演示区才会显示数字。' },
+	right: { en: 'Right.', zh: '答对了。' },
+	notQuite: { en: 'Not quite.', zh: '不太对。' },
+	whyItMatters: { en: 'Why it matters', zh: '为什么重要' },
+	showAsText: { en: 'Show as text', zh: '以文字显示' },
+	showNumbers: { en: 'Show the {n} numbers', zh: '显示这 {n} 个数' },
+	// the input chip and sheet
+	yourInput: { en: 'Your input', zh: '你的输入' },
+	yourDrawing: { en: 'Your drawing', zh: '你的画' },
+	yourText: { en: 'Your text', zh: '你的文字' },
+	edit: { en: 'Edit', zh: '修改' },
+	redraw: { en: 'Redraw', zh: '重画' },
+	// the cover
+	coverMeta: { en: 'Lesson · {n} steps · ≈ {m} min · in your browser', zh: '课程 · {n} 步 · 约 {m} 分钟 · 在你的浏览器中运行' },
+	byTheEnd: { en: 'By the end you can', zh: '学完后你能' },
+	showsAtStep: { en: 'The lesson shows you at step {k}.', zh: '课程会在第 {k} 步告诉你答案。' },
+	// the end card
+	recap: { en: 'What you saw', zh: '你看到了什么' },
+	predictions: { en: 'Your predictions: {k} of {n} right', zh: '你的预测：{n} 题答对 {k} 题' },
+	upNext: { en: 'Up next', zh: '下一课' },
+	goDeeper: { en: 'Go deeper', zh: '深入了解' },
+	exploreNote: { en: 'Every layer and number, freely', zh: '自由查看每一层、每个数' },
+	articleNote: { en: 'The idea in one article', zh: '一篇文章讲清原理' },
+	codeNote: { en: 'The code, and how it was checked', zh: '代码，以及如何核对' },
+	trainingNote: { en: 'How it learned, and from what', zh: '它怎么学的，用了什么数据' },
+	// the About sheet
+	parity: { en: 'Checked against {against} on {n} inputs: every layer within {tol}.', zh: '在 {n} 个输入上与 {against} 对照：每一层的误差都在 {tol} 以内。' },
+	learnedNumbers: { en: '{n} learned numbers', zh: '{n} 个学到的参数' },
+	keys: { en: 'Keys: ← → steps · Enter next · 1-4 answer · Esc close', zh: '按键：← → 切换步骤 · Enter 下一步 · 1-4 作答 · Esc 关闭' }
+} as const;
+export type LessonUIKey = keyof typeof LESSON_UI;
+
+/**
+ * Catalog pages (redesign spec §4.5, §6): cards, rows, filters, paths, areas. Read with cui('key', vars) from
+ * i18n.svelte.ts.
+ */
+export const CATALOG_UI = {
+	lessonsCount: { en: '{n} step-by-step lessons', zh: '{n} 节分步课程' },
+	lessonsN: { en: '{n} lessons', zh: '{n} 节课' },
+	methodsCount: { en: '{n} training methods', zh: '{n} 种训练方法' },
+	liveAndPlanned: { en: '{n} live · {m} planned', zh: '{n} 节可学 · {m} 节计划中' },
+	liveN: { en: '{n} live', zh: '{n} 节可学' },
+	plannedN: { en: 'Planned · {n}', zh: '计划中 · {n}' },
+	notLiveYet: { en: 'Not live yet', zh: '尚未上线' },
+	planned: { en: 'Planned', zh: '计划中' },
+	coming: { en: 'coming', zh: '即将上线' },
+	comingN: { en: '{n} coming', zh: '{n} 节即将上线' },
+	allN: { en: 'All {n}', zh: '全部 {n}' },
+	andMore: { en: 'and {n} more', zh: '另外 {n} 个' },
+	stepsMin: { en: '{n} steps · ≈ {m} min', zh: '{n} 步 · 约 {m} 分钟' },
+	pathMeta: { en: '{n} lessons · ≈ {m} min', zh: '{n} 节课 · 约 {m} 分钟' },
+	startWith: { en: 'Start with {name}', zh: '从 {name} 开始' },
+	browseAll: { en: 'Browse all {n} lessons', zh: '浏览全部 {n} 节课' },
+	byInput: { en: 'Or start from your kind of input', zh: '或者从你的输入类型开始' },
+	startHere: { en: 'Start here', zh: '从这里开始' },
+	paths: { en: 'Learning paths', zh: '学习路径' },
+	byArea: { en: 'Browse by area', zh: '按领域浏览' },
+	methods: { en: 'Training methods', zh: '训练方法' },
+	modelsByArea: { en: 'Models by area', zh: '各领域的模型' },
+	allLessons: { en: 'All lessons', zh: '全部课程' },
+	followIt: { en: 'Follow it step by step', zh: '一步一步跟着看' },
+	kind: { en: 'Kind', zh: '类型' },
+	kindAll: { en: 'All', zh: '全部' },
+	kindModels: { en: 'Models', zh: '模型' },
+	kindMethods: { en: 'Training methods', zh: '训练方法' },
+	layout: { en: 'Layout', zh: '布局' },
+	rows: { en: 'Rows', zh: '列表' },
+	pictures: { en: 'Pictures', zh: '图卡' },
+	filters: { en: 'Filters', zh: '筛选' },
+	jumpTo: { en: 'Jump to', zh: '跳到' },
+	noMatch: { en: 'Nothing matches “{q}”.', zh: '没有与“{q}”匹配的内容。' },
+	clearFilters: { en: 'Clear filters', zh: '清除筛选' },
+	usedIn: { en: 'Used in', zh: '用在' },
+	related: { en: 'Related terms', zh: '相关术语' },
+	willShow: { en: 'What this lesson will show', zh: '这节课将展示什么' },
+	liveFirst: { en: 'Before this, try', zh: '可以先学' },
+	notFoundBody: { en: 'This page is not here. Search, or start from the lessons.', zh: '找不到这个页面。可以搜索，或者从课程开始。' }
+} as const;
+export type CatalogUIKey = keyof typeof CATALOG_UI;

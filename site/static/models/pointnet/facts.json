@@ -1,0 +1,95 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testAcc": {
+   "value": 0.9983999729156494,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "testN": {
+   "value": 5000,
+   "unit": "clouds",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "critShare": {
+   "value": 0.29450595647823175,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "critMean": {
+   "value": 14.056,
+   "unit": "points",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "deadMean": {
+   "value": 4.5334,
+   "unit": "features",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "halfFlip": {
+   "value": 0.12460000067949295,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "halfAcc": {
+   "value": 0.8755999803543091,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "strayFlip": {
+   "value": 0.6777999997138977,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "strayAcc": {
+   "value": 0.32120001316070557,
+   "unit": "share",
+   "source": "pipeline/pointnet/stats.py (CPU float32, 5,000 test clouds of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "trainN": {
+   "value": 30000,
+   "unit": "clouds",
+   "source": "pipeline/pointnet/train.py",
+   "measured": "2026-10-12"
+  },
+  "epochs": {
+   "value": 60,
+   "unit": "epochs",
+   "source": "pipeline/pointnet/train.py",
+   "measured": "2026-10-12"
+  },
+  "bestEpoch": {
+   "value": 41,
+   "unit": "epoch",
+   "source": "pipeline/pointnet/train.py",
+   "measured": "2026-10-12"
+  },
+  "nMin": {
+   "value": 16,
+   "unit": "points",
+   "source": "pipeline/pointnet/make_data.ts (fewest points of a training cloud)",
+   "measured": "2026-10-12"
+  },
+  "nMax": {
+   "value": 200,
+   "unit": "points",
+   "source": "pipeline/pointnet/make_data.ts (most points of a training cloud)",
+   "measured": "2026-10-12"
+  },
+  "stray": {
+   "value": 3,
+   "unit": "radii",
+   "source": "shapes.ts STRAY (where the limits step puts the stray point)",
+   "measured": "2026-10-12"
+  }
+ }
+}

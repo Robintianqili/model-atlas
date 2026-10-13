@@ -7,7 +7,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 	import { base } from '$app/paths';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import Num from '$lib/kit/Num.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import { fmt3, fmtBytes, fmtCount, fmtInt, visibleToken } from '$lib/kit/format';
@@ -240,16 +239,6 @@
 						{t({ en: 'Step', zh: '第' })} <span class="num">{fmtInt(step)}</span>{t({ en: '', zh: ' 步' })}
 						{#if ck.label}<span class="tag">{t(ck.label)}</span>{/if}
 					</h4>
-					<ProvenanceBadge
-						mode="live"
-						compact
-						precision="fp16"
-						approximate
-						note={{
-							en: 'Runs the fp16 checkpoint file in your browser. On the same fp16 weights the JS forward pass matches PyTorch within 1.2e-5.',
-							zh: '在你的浏览器里运行 fp16 检查点文件。在同样的 fp16 权重上，JS 前向计算与 PyTorch 的差距在 1.2e-5 以内。'
-						}}
-					/>
 				</div>
 				<p class="small muted">
 					{t({ en: `${fmtCount(ck.tokens)} tokens read so far (${fmt3(ck.tokens / FACTS.trainTokens)} passes over the stories)`, zh: `到此已读 ${fmtCount(ck.tokens)} 个词元（把故事读了 ${fmt3(ck.tokens / FACTS.trainTokens)} 遍）` })}
@@ -462,7 +451,7 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.uni {

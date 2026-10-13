@@ -1,0 +1,14 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "gpt2Layers": { "value": 12, "unit": "layers of GPT-2 small (124M parameters)", "source": "GPT-2 small configuration: n_layer 12, n_head 12, n_embd 768 (64 per head), n_ctx 1024 (Radford et al. 2019; openai-community/gpt2 config.json)", "measured": "2026-10-13" },
+  "gpt2Heads": { "value": 12, "unit": "attention heads per layer of GPT-2 small", "source": "GPT-2 small configuration (as gpt2Layers)", "measured": "2026-10-13" },
+  "gpt2DHead": { "value": 64, "unit": "numbers per head of GPT-2 small (768 / 12)", "source": "GPT-2 small configuration (as gpt2Layers)", "measured": "2026-10-13" },
+  "gpt2Ctx": { "value": 1024, "unit": "tokens in GPT-2's context window", "source": "GPT-2 small configuration (as gpt2Layers)", "measured": "2026-10-13" },
+  "llamaLayers": { "value": 32, "unit": "layers of Llama 2 7B", "source": "Llama 2 7B: 32 layers, 32 attention heads (each with its own keys and values), model width 4096 (128 per head), context 4096 tokens (Touvron et al. 2023, Llama 2; meta-llama/Llama-2-7b-hf config.json)", "measured": "2026-10-13" },
+  "llamaHeads": { "value": 32, "unit": "key-value heads per layer of Llama 2 7B", "source": "Llama 2 7B configuration (as llamaLayers)", "measured": "2026-10-13" },
+  "llamaDHead": { "value": 128, "unit": "numbers per head of Llama 2 7B (4096 / 32)", "source": "Llama 2 7B configuration (as llamaLayers)", "measured": "2026-10-13" },
+  "llamaCtx": { "value": 4096, "unit": "tokens in Llama 2's context window", "source": "Llama 2 7B configuration (as llamaLayers)", "measured": "2026-10-13" },
+  "halfBytes": { "value": 2, "unit": "bytes per number in fp16 or bf16, the usual cache format of large models", "source": "IEEE 754 half precision and bfloat16 are 16-bit formats", "measured": "2026-10-13" }
+ }
+}

@@ -264,7 +264,7 @@
 		box-shadow: inset 0 0 0 1px var(--generated);
 	}
 	.tok.sm {
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.cand {
 		display: inline-block;
@@ -295,7 +295,7 @@
 	}
 	.lab {
 		font-family: var(--font-mono);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		white-space: pre;
 		color: var(--ink);
 	}
@@ -312,14 +312,14 @@
 		top: -2px;
 		left: 3px;
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		font-weight: 700;
 	}
 	.ticks {
 		display: flex;
 		justify-content: space-between;
 		margin: 0;
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.hint {

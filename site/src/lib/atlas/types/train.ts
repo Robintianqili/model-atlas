@@ -26,6 +26,11 @@ export interface TrainerDef<D = unknown, M extends Module = Module, B = unknown,
   /** K1 (additive): atlas parity's twin runs. `sgd`: options for the plain-SGD run (default: the page's options with
    *  optimizer 'sgd'; a stiff loss may need a smaller lr there, e.g. { lr: 1e-3 }). */
   twin?: { sgd?: Partial<O> & Record<string, unknown> };
+  /** K4 (additive): a constraint applied after every optimizer step, outside the gradient (TransE's unit-length entity
+   *  vectors, a max-norm): it changes the parameters in place. Fine update frames show the parameters after it and say
+   *  so (metrics.projected = 1, so updateOf and train-step never claim "old − lr × g = new"); the twin mirrors it with an
+   *  optional project(model, cfg) in pipeline/<slug>/twin.py, run under torch.no_grad(). */
+  project?(m: M, opt: O): void;
 }
 // W1-B1: train/trainer.ts trainingProcess(def): ProcessDef<D, O, TrainState>
 //   phases: 'init'; coarse 'snapshot' every snapshotEvery (metrics on every step); fine 'forward' → 'loss' → 'backward' → 'update'.

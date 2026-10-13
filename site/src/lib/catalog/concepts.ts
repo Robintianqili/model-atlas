@@ -1,7 +1,8 @@
 /**
  * Training-concepts track: every row of brief §6, grouped by section.
  * Live in v0: tokenization, next-token-prediction, transfer-learning (hand-built routes). Live since K2: loss-gradient-descent
- * (a concept package, explainers/loss-gradient-descent/, rendered by the /train/[slug] route). Everything else is planned.
+ * (a concept package, explainers/loss-gradient-descent/, rendered by the /train/[slug] route). Concept packages that went
+ * live later (batch 6 onward) carry status 'live' and a `lesson`; every other row is planned.
  * `links` are catalog model slugs (validated by scripts/check-catalog.ts). The brief's own link
  * names are mapped through LINK_ALIASES when they differ (tiny-cnn -> tinycnn, sd -> stable-diffusion, …).
  */
@@ -117,49 +118,70 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'backprop',
 		section: 'foundations',
 		title: f('Backpropagation and autograd', '反向传播与自动求导'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
 			'Edit any input value and the whole graph recomputes. Step the backward pass one chain-rule edge at a time, with gradients shown as "?" until they are reached, and check them numerically.',
 			'修改任意输入值，整张计算图重新计算。一次走一条链式法则的边来执行反向传播，未算到的梯度显示为“?”，并可用数值梯度检验。'
 		),
-		engine: 'In-house Value engine (micrograd-style); the same core powers live training',
+		engine: 'Own autograd core (checked against PyTorch)',
 		mode: 'live',
-		links: ['mlp-playground', 'tinygpt']
+		links: ['mlp-playground', 'tinygpt'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Run a tiny computation graph forward, walk its backward pass one chain-rule edge at a time (a node used twice adds both shares), check it numerically, then watch the same rule fill in the nine gradients of a 2-2-1 network and fade through a flat tanh.',
+				'把一张很小的计算图正向算一遍，再沿链式法则一条边一条边地走反向传播（被用两次的节点要把两份加起来），用数值方法检验，然后看同样的规则怎样算出 2-2-1 网络的九个梯度，又怎样在平坦的 tanh 处衰减。'
+			)
+		}
 	},
 	{
 		slug: 'optimizers',
 		section: 'foundations',
 		title: f('Optimizers, learning-rate schedules and warm-up', '优化器、学习率调度与预热'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'SGD, momentum, Adam and AdamW race on one loss surface, with the optimizer state drawn as arrows and boxes. Pick a schedule, run an LR range test on TinyGPT and scrub through a grid of precomputed runs.',
-			'SGD、动量、Adam、AdamW 在同一个损失曲面上赛跑，优化器状态画成箭头与方框。选择学习率调度，在 TinyGPT 上做学习率区间测试，并浏览预计算的训练网格。'
+			'SGD, momentum, Adam and AdamW race on a long valley, a saddle and a bumpy bowl, with the optimizer state drawn as a momentum arrow and squared-gradient squares, and one update each of SGD, momentum and Adam worked out with the real numbers. Run a learning-rate range test on a small live network, pick a schedule with or without warm-up and watch it train, and toggle gradient clipping next to a cliff.',
+			'SGD、动量法、Adam 和 AdamW 在狭长山谷、鞍点和坑洼的碗上赛跑，优化器状态画成动量箭头和梯度平方方块，并用真实的数值算出 SGD、动量法和 Adam 各一次更新。在一个实时训练的小网络上做学习率区间测试，选择带或不带预热的调度并观察训练，在悬崖边切换梯度裁剪。'
 		),
-		engine: 'JS on analytic surfaces + live 2D MLP + precomputed TinyGPT sweep',
-		mode: 'both',
-		links: ['tinygpt', 'mlp-playground']
+		engine: 'Kit optimizers on analytic surfaces + live 2-8-8-2 MLP',
+		mode: 'live',
+		links: ['mlp-playground', 'char-rnn'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Four optimizers race down a long valley; work out one update of SGD, momentum and Adam with the real numbers, race on your own landscape, see that no optimizer wins everywhere, then run a learning-rate range test, rescue a too-large rate with warm-up and stop an exploding gradient with clipping.',
+				'四个优化器沿狭长山谷赛跑；用真实的数值算出 SGD、动量法和 Adam 的一次更新，在你自己的地形上比赛，看到没有哪个优化器处处都赢；然后做学习率区间测试，用预热救下过大的学习率，再用梯度裁剪拦住梯度爆炸。'
+			)
+		}
 	},
 	{
 		slug: 'regularization',
 		section: 'foundations',
-		title: f('Batch size, regularization and overfitting', '批大小、正则化与过拟合'),
-		status: 'planned',
+		title: f('Overfitting and regularization', '过拟合与正则化'),
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'Watch train and test curves split apart; add L1/L2, weight decay, dropout (units blinking per step) and data augmentation on TinyCNN drawings; mark early stopping.',
-			'看训练曲线和测试曲线如何分开；加入 L1/L2、权重衰减、dropout（神经元逐步闪烁）以及 TinyCNN 手绘数据增强；标出早停点。'
+			'Watch the training and test curves split apart as a big network overfits a few noisy points of two moons, predict whether a smaller network does better, then fight overfitting with early stopping, an L2 penalty (its real term in the loss), dropout (units blinking per update) and nudged training points. Turn five knobs until the test loss drops, and see how TinyCNN was trained (augmented drawings, weight decay, the kept epoch).',
+			'看一个大网络在两个月牙的少量带噪声的点上过拟合，训练曲线和测试曲线逐渐分开；预测更小的网络会不会更好，再用早停、L2 惩罚（损失里真实的那一项）、dropout（单元每次更新随机熄灭）和挪动训练点来对付过拟合。调节五个旋钮让测试损失降下来，并看看 TinyCNN 是怎么训练的（增强过的手绘图、权重衰减、保留的那一轮）。'
 		),
 		engine: '2D MLP + TinyCNN',
 		mode: 'live',
-		links: ['mlp-playground', 'classic-ml', 'tinycnn']
+		links: ['mlp-playground', 'classic-ml', 'tinycnn'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Watch a big network learn few noisy points by heart while its test loss climbs, then fight it with live runs: a smaller network, early stopping, an L2 penalty, dropout and augmented data; close the gap yourself and overdo it.',
+				'看一个大网络把少量有噪声的点背下来、测试损失却不断上升，再用实时训练来对付它：更小的网络、早停、L2 惩罚、dropout 和数据增强；自己动手缩小差距，最后看看用力过猛会怎样。'
+			)
+		}
 	},
 	{
 		slug: 'init-normalization',
 		section: 'foundations',
 		title: f('Initialization and normalization', '初始化与归一化'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
 			'Activation and gradient histograms per layer under zero, too-small, Xavier, He and too-large initialization; BatchNorm vs LayerNorm on the same tensor.',
@@ -167,13 +189,20 @@ export const CONCEPTS: ConceptEntry[] = [
 		),
 		engine: 'Tiny MLP / TinyGPT tensors',
 		mode: 'live',
-		links: ['tinygpt', 'resnet-18']
+		links: ['tinygpt', 'resnet-18'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Start one deep network five ways and watch each layer\'s numbers and gradients fade, hold or blow up; then normalize the same tensor with BatchNorm and LayerNorm, and see where BatchNorm breaks.',
+				'用五种方式初始化同一个深层网络，看每一层的数值和梯度怎样衰减、保持或爆炸；再用 BatchNorm 和 LayerNorm 归一化同一个张量，看看 BatchNorm 在哪里失效。'
+			)
+		}
 	},
 	{
 		slug: 'residual-connections',
 		section: 'foundations',
 		title: f('Residual connections and vanishing gradients', '残差连接与梯度消失'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
 			'Toggle skip connections in a 20-layer MLP and watch the gradient-norm bars per layer.',
@@ -181,7 +210,14 @@ export const CONCEPTS: ConceptEntry[] = [
 		),
 		engine: 'Own core',
 		mode: 'live',
-		links: ['resnet-18', 'tinygpt']
+		links: ['resnet-18', 'tinygpt'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Watch a 20-layer network fail to learn, find where its gradient vanishes, follow the gradient through one skip connection with the real numbers, then train both networks and change the depth.',
+				'看一个 20 层的网络学不动，找到它的梯度在哪里消失；用真实的数值跟着梯度穿过一个跳跃连接；然后训练两个网络，再改变深度。'
+			)
+		}
 	},
 	{
 		slug: 'loss-choice',
@@ -272,43 +308,64 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'decoding',
 		section: 'pretraining',
 		title: f('Decoding and sampling', '解码与采样'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
-			'Apply temperature, top-k and top-p to the same cached logits and generate token by token.',
-			'在同一组缓存的 logits 上调节温度、top-k、top-p，并逐个词元生成。'
+			'Temperature, top-k and top-p applied to the same cached TinyGPT logits for your prompt, with the cutoffs drawn and the chances renormalized; greedy against sampling with a fixed seed, token by token; why greedy loops.',
+			'在 TinyGPT 对你的提示算出的同一组缓存 logits 上调节温度、top-k、top-p，画出截断线并重新归一化概率；逐个词元比较贪心和固定种子的采样；看贪心为什么会循环。'
 		),
-		engine: 'Shared output-head component',
+		engine: 'TinyGPT live',
 		mode: 'live',
-		links: ['tinygpt', 'gpt-2', 'whisper-tiny', 'tinyseq2seq']
+		links: ['tinygpt', 'gpt-2', 'whisper-tiny', 'tinyseq2seq'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'One row of TinyGPT’s scores for your prompt becomes chances; temperature, top-k and top-p reshape them with the cutoffs drawn; then TinyGPT writes token by token, greedy against sampling with a fixed seed, and you see why greedy loops.',
+				'TinyGPT 对你的提示算出的一行分数变成概率；温度、top-k、top-p 重新调整它们，并画出截断线；然后 TinyGPT 逐个词元写作，比较贪心和固定种子的采样，并看清贪心为什么会循环。'
+			)
+		}
 	},
 	{
 		slug: 'self-supervised-objectives',
 		section: 'pretraining',
 		title: f('Self-supervised objectives: an overview', '自监督目标总览'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'One sentence or image, many objectives: what is hidden and what is predicted under causal LM, masked LM, span corruption, denoising, fill-in-the-middle, contrastive learning, MAE, JEPA and diffusion, each drawn as a mask pattern.',
-			'同一句话或同一张图，多种目标：因果语言模型、掩码语言模型、片段破坏、去噪、中间填充、对比学习、MAE、JEPA 与扩散各自遮住什么、预测什么，都画成遮罩图案。'
+			'One sentence and one drawing, many objectives: TinyGPT’s next-token probabilities and TinyBERT’s guesses for a token you click, live; the 80/10/10 rule on your text; next-sentence prediction, span corruption, text infilling, fill in the middle, masked autoencoding, JEPA, contrastive views and added noise drawn as labelled mask patterns.',
+			'一句话、一幅简笔画，多种目标：实时看 TinyGPT 预测下一个词元的概率，以及 TinyBERT 对你点中的词元的猜测；在你的文字上演示 80/10/10 规则；下一句预测、片段破坏、文本填充、中间填充、掩码自编码、JEPA、对比视图和加噪声都画成标明“示意”的遮罩图案。'
 		),
-		engine: 'TinyGPT live + illustrative mask diagrams (labeled)',
+		engine: 'TinyGPT + TinyBERT live + illustrative mask diagrams (labeled)',
 		mode: 'both',
-		links: ['tinygpt', 'tinybert', 'tinyvit']
+		links: ['tinygpt', 'tinybert', 'tinyvit', 'tinyclip'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'One sentence and one drawing, many objectives: what each hides and what it predicts. TinyGPT and TinyBERT run live on your text (next token, a token you click, the 80/10/10 rule); next-sentence prediction, spans, masked patches and contrastive views are labelled drawings.',
+				'一句话、一幅简笔画，多种目标：每种目标藏起什么、预测什么。TinyGPT 和 TinyBERT 在你的文字上实时运行（下一个词元、你点中的词元、80/10/10 规则）；下一句预测、片段、被遮的图块和对比视图是标明“示意”的图。'
+			)
+		}
 	},
 	{
 		slug: 'masked-lm',
 		section: 'pretraining',
 		title: f('Masked language modeling', '掩码语言模型'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
-			'Click any token to mask it, animate the 80/10/10 rule, and compare TinyBERT with TinyGPT trained on the same corpus; mask amino acids with ESM-2.',
-			'点击任意词元将其遮住，动画演示 80/10/10 规则，对比在同一语料上训练的 TinyBERT 与 TinyGPT；用 ESM-2 遮蔽氨基酸。'
+			'Click any token of your sentence to hide it and read TinyBERT’s guesses live; compute the loss on the hidden positions only; watch the 80/10/10 rule draw a batch with real counts and send your row to TinyBERT; set TinyBERT beside TinyGPT on the same sentence to see which context each reads.',
+			'点你句子里的任意词元把它藏起来，实时读出 TinyBERT 的猜测；只在被藏的位置上算损失；看 80/10/10 规则在一个批次上抽签（真实计数），并把你那一行交给 TinyBERT；在同一句话上把 TinyBERT 和 TinyGPT 放在一起，看各自读到哪些上下文。'
 		),
-		engine: 'TinyBERT, ESM-2',
+		engine: 'TinyBERT + TinyGPT live',
 		mode: 'live',
-		links: ['tinybert', 'bert-base', 'esm-2']
+		links: ['tinybert', 'tinygpt'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Hide tokens of your own sentence and read TinyBERT’s live guesses, compute the loss on the hidden positions only, watch the 80/10/10 rule draw a batch and send your row to TinyBERT, and set it beside TinyGPT on the same sentence.',
+				'在你自己的句子里藏起词元，读 TinyBERT 的实时猜测；只在被藏的位置上算损失；看 80/10/10 规则在一个批次上抽签，并把你那一行交给 TinyBERT；再在同一句话上把它和 TinyGPT 放在一起比较。'
+			)
+		}
 	},
 	{
 		slug: 'next-sentence-prediction',
@@ -328,15 +385,22 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'contrastive-learning',
 		section: 'pretraining',
 		title: f('Contrastive learning (CLIP, InfoNCE, SimCLR)', '对比学习（CLIP、InfoNCE、SimCLR）'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'Add your own drawings and captions to a batch, see the N×N similarity matrix, drag the temperature and watch the loss; a training slider morphs the matrix from noise to a clean diagonal.',
-			'把你的画和描述加入一个批次，查看 N×N 相似度矩阵，拖动温度看损失变化；训练进度滑块让矩阵从噪声变成清晰的对角线。'
+			'Add your own drawings and captions to a batch, see the N×N similarity matrix from the live TinyCLIP, drag the temperature and watch the InfoNCE loss; a training slider morphs the matrix from noise to a clean diagonal, and SimCLR’s two distorted views of each drawing make a second matrix.',
+			'把你的画和描述加入一个批次，查看实时运行的 TinyCLIP 给出的 N×N 相似度矩阵，拖动温度看 InfoNCE 损失变化；训练进度滑块让矩阵从噪声变成清晰的对角线；每幅画的两个 SimCLR 变形视图构成第二个矩阵。'
 		),
-		engine: 'TinyCLIP live; CLIP precomputed',
+		engine: 'TinyCLIP live; checkpoints of a training re-run precomputed',
 		mode: 'live',
-		links: ['tinyclip', 'clip']
+		links: ['tinyclip', 'clip'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Build a batch of drawings and captions, read TinyCLIP’s table of cosines, work out the InfoNCE loss and drag its temperature, watch training turn the table into a diagonal, then make SimCLR’s pairs from two distorted views and meet the false negatives the loss cannot see.',
+				'搭一批画和描述，读懂 TinyCLIP 的余弦表，算出 InfoNCE 损失并拖动它的温度，看训练把这张表变成一条对角线，再用两个变形视图造出 SimCLR 的正样本对，并认识损失看不见的伪负样本。'
+			)
+		}
 	},
 	{
 		slug: 'masked-autoencoding',
@@ -492,15 +556,22 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'catastrophic-forgetting',
 		section: 'finetuning',
 		title: f('Catastrophic forgetting', '灾难性遗忘'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
 			"Train a 2D MLP on task A, then task B, and watch A's decision boundary erode live. Try replay, a pull toward the old weights, freezing and a lower learning rate.",
 			'先在任务 A 上训练二维 MLP，再训练任务 B，实时观察 A 的决策边界被侵蚀。尝试经验回放、向旧权重的拉力、冻结和更低的学习率。'
 		),
-		engine: '2D playground (live) + TinyGPT (precomputed)',
-		mode: 'both',
-		links: ['mlp-playground', 'tinygpt']
+		engine: 'Own autograd core in a worker',
+		mode: 'live',
+		links: ['mlp-playground'],
+		lesson: {
+			steps: 9,
+			summary: f(
+				'Train a small network on task A, then on task B, and watch A disappear; see why the two tasks fight over the same weights, then try replay, a pull toward the old weights, freezing and a smaller learning rate, and what each one costs.',
+				'先在任务 A 上训练一个小网络，再训练任务 B，看着 A 被忘掉；弄清两个任务为什么在争同一组权重，再试试回放、拉向旧权重、冻结和更小的学习率，以及每种办法的代价。'
+			)
+		}
 	},
 	{
 		slug: 'multitask-intermediate',
@@ -577,16 +648,23 @@ export const CONCEPTS: ConceptEntry[] = [
 	{
 		slug: 'lora',
 		section: 'peft',
-		title: f('LoRA, QLoRA and DoRA', 'LoRA、QLoRA 与 DoRA'),
-		status: 'planned',
+		title: f('LoRA and QLoRA', 'LoRA 与 QLoRA'),
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'A live parameter counter (r·(d_in + d_out) vs d_in·d_out); animate W₀ + (α/r)·BA with B starting at zero, so step 0 equals the base model; live LoRA on TinyGPT and precomputed rank sweeps.',
-			'实时参数计数器（r·(d_in + d_out) 对比 d_in·d_out）；动画演示 W₀ + (α/r)·BA，B 从零开始，因此第 0 步等于基础模型；在 TinyGPT 上实时 LoRA，以及预计算的秩扫描。'
+			'A live parameter counter, r·(d_in + d_out) against d_in·d_out, from a 16 × 16 toy layer up to GPT-2 small; train W₀ + (α/r)·BA live at your rank with B starting at zero, so step 0 equals the base model; ranks 1 to 8 against full fine-tuning; and the training memory of full fine-tuning, LoRA and QLoRA.',
+			'实时参数计数器：r·(d_in + d_out) 对比 d_in·d_out，从 16 × 16 的玩具层一直到 GPT-2 small；在你选的秩上实时训练 W₀ + (α/r)·BA，B 从零开始，所以第 0 步就是基础模型；秩 1 到 8 与全量微调对比；以及全量微调、LoRA 与 QLoRA 的训练内存。'
 		),
-		engine: 'Analytic JS + own core + precomputed sweeps',
-		mode: 'both',
-		links: ['gpt-2', 'tinygpt', 'flow-2d', 'stable-diffusion']
+		engine: 'Own autograd core in a worker',
+		mode: 'live',
+		links: ['gpt-2', 'tinygpt', 'flow-2d', 'stable-diffusion'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Count what LoRA trains, watch B grow from zero on a real layer until it learns the change a new task needs, find the smallest rank that does the job, and see where LoRA saves less than it seems.',
+				'数一数 LoRA 训练多少个数，看 B 在一个真实的层上从零长起来，直到学会新任务需要的改变，找出够用的最小秩，再看 LoRA 在哪里省得没有看上去那么多。'
+			)
+		}
 	},
 	{
 		slug: 'adapters-prefix',
@@ -723,21 +801,28 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'number-formats',
 		section: 'compression',
 		title: f('Number formats and mixed precision', '数值格式与混合精度'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
-			'Click bits for FP32, FP16, BF16, FP8 (e4m3, e5m2), FP4, INT4 and NF4 and see the value, range and rounding error change.',
-			'点击 FP32、FP16、BF16、FP8（e4m3、e5m2）、FP4、INT4、NF4 的各个比特位，查看数值、范围与舍入误差的变化。'
+			'Click the bits of one number in FP32, FP16, BF16, FP8 (e4m3, e5m2), FP4, INT8, INT4 and NF4 and watch the stored value, the rounding error and the gap to the next number change; cast TinyGPT’s real weights to each format and measure its perplexity; see why mixed precision keeps fp32 master weights.',
+			'点击一个数在 FP32、FP16、BF16、FP8（e4m3、e5m2）、FP4、INT8、INT4 和 NF4 中的各个比特位，看存下的值、舍入误差和到下一个数的间隔怎样变化；把 TinyGPT 的真实权重转换成每种格式，测出它的困惑度；再看混合精度为什么要保留 fp32 主权重。'
 		),
 		engine: 'JS',
 		mode: 'live',
-		links: []
+		links: ['tinygpt'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Click the bits of one number in fp32, fp16, bf16, FP8, FP4, int8, int4 and NF4, see where each format runs out of range or precision, cast a real TinyGPT to each, and see why mixed precision keeps fp32 master weights.',
+				'点击一个数在 fp32、fp16、bf16、FP8、FP4、int8、int4 和 NF4 中的各个比特位，看每种格式在哪里耗尽范围或精度，把真实的 TinyGPT 换成每种格式，再看混合精度为什么要保留 fp32 主权重。'
+			)
+		}
 	},
 	{
 		slug: 'quantization',
 		section: 'compression',
 		title: f('Quantization', '量化'),
-		status: 'planned',
+		status: 'live',
 		v1: true,
 		interaction: f(
 			'A rounding ledger for 8 values (absmax vs affine, clipping, block size); one outlier wrecking the scale; quantize a TinyGPT layer and watch logits, top-1 and perplexity change.',
@@ -745,7 +830,14 @@ export const CONCEPTS: ConceptEntry[] = [
 		),
 		engine: 'JS + real models',
 		mode: 'live',
-		links: ['tinygpt', 'kokoro', 'slimsam', 'dinov2']
+		links: ['tinygpt', 'kokoro', 'slimsam', 'dinov2'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Look at one number bit by bit, round eight numbers to int8 and int4 by hand, watch one outlier wreck the scale, then quantize a real TinyGPT in your browser and measure what it costs.',
+				'逐位查看一个数，亲手把八个数舍入成 int8 和 int4，看一个离群值怎样毁掉缩放比例，再在浏览器里量化一个真实的 TinyGPT，测量它的代价。'
+			)
+		}
 	},
 	{
 		slug: 'ptq-qat',
@@ -993,32 +1085,49 @@ export const CONCEPTS: ConceptEntry[] = [
 		slug: 'kv-cache',
 		section: 'inference',
 		title: f('KV cache and prompt caching', 'KV 缓存与提示缓存'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
-			'TinyGPT generation with and without the cache: recomputed cells grayed out, a cache-memory counter and shared-prefix reuse across two prompts.',
-			'TinyGPT 有无缓存的生成对比：重复计算的单元变灰、缓存内存计数器，以及两个提示词之间的共享前缀复用。'
+			'TinyGPT continues your prompt twice, without and with a KV cache: an attention grid shows the work done again in orange and the work the cache skips in gray, with live counts of multiply-adds and cache memory (GPT-2 small and Llama 2 7B by the same formula) and a check that both runs pick the same tokens. A second prompt reuses the first one’s cached prefix up to the first different token.',
+			'TinyGPT 把你的提示词续写两遍，一遍不用 KV 缓存，一遍用：注意力网格里橙色是重复计算的部分，灰色是缓存省下的计算；实时统计乘加次数和缓存内存（用同一公式算出 GPT-2 small 和 Llama 2 7B 的），并核对两遍选出的词元相同。第二个提示词复用第一个提示词缓存的前缀，直到第一个不同的词元为止。'
 		),
 		engine: 'TinyGPT live',
 		mode: 'live',
-		links: ['tinygpt', 'gpt-2']
+		links: ['tinygpt', 'gpt-2'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Watch TinyGPT redo all its work for every new token, keep the keys and values in a cache instead, count the memory and the multiply-adds, check that the answers stay the same, then share a cached prefix between two prompts and see where sharing stops.',
+				'看 TinyGPT 每生成一个新词元就把所有计算重做一遍，改用缓存保存键和值，算出内存和乘加次数，验证答案不变，再让两个提示词共享缓存的前缀，看共享在哪里停止。'
+			)
+		}
 	},
 	{
 		slug: 'attention-variants',
 		section: 'inference',
 		title: f('Attention variants (MHA, MQA, GQA, MLA)', '注意力变体（MHA、MQA、GQA、MLA）'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
-		interaction: f('A head-sharing diagram with a KV-cache size calculator, and TinyGPT trained with MHA vs GQA.', '头共享示意图与 KV 缓存大小计算器，以及分别用 MHA 与 GQA 训练的 TinyGPT。'),
-		engine: 'Analytic + precomputed',
+		interaction: f(
+			'Pick a published model or set your own layers, heads, KV heads, head width, tokens and bytes, and see the KV cache of MHA, GQA, MQA and MLA next to a head-sharing diagram. Follow one shared-key attention computation on TinyGPT, convert its trained heads to 2 and 1 KV heads in the browser and measure the damage, then see how much uptraining repairs (measured in PyTorch).',
+			'选一个已发表的模型，或自己设定层数、头数、KV 头数、头宽、词元数和字节数，对照头共享示意图看 MHA、GQA、MQA 和 MLA 的 KV 缓存。在 TinyGPT 上跟着做一次共用键的注意力计算，在浏览器里把它训练好的头转换成 2 个和 1 个 KV 头并测出损失，再看继续训练能修复多少（用 PyTorch 测得）。'
+		),
+		engine: 'Analytic + TinyGPT live + precomputed',
 		mode: 'both',
-		links: ['tinygpt']
+		links: ['tinygpt'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Count what the KV cache stores, see which heads share keys and values in MHA, GQA, MQA and MLA, follow one shared-key attention computation on TinyGPT, size the caches of published models, and measure what sharing costs a trained model.',
+				'数一数 KV 缓存存了什么，看清 MHA、GQA、MQA 和 MLA 中哪些头共用键和值，在 TinyGPT 上跟着做一次共用键的注意力计算，算出已发表模型的缓存大小，再测一测共享会让训练好的模型付出什么代价。'
+			)
+		}
 	},
 	{
 		slug: 'positional-encodings',
 		section: 'inference',
 		title: f('Positional encodings and long context', '位置编码与长上下文'),
-		status: 'planned',
+		status: 'live',
 		v1: false,
 		interaction: f(
 			'Sinusoidal vs learned vs RoPE (rotate the 2D pair) vs ALiBi (a bias ramp), and extrapolation beyond the training context.',
@@ -1026,7 +1135,14 @@ export const CONCEPTS: ConceptEntry[] = [
 		),
 		engine: 'Live + precomputed',
 		mode: 'both',
-		links: ['tinygpt']
+		links: ['tinygpt'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Shuffle your sentence and watch attention not notice, read TinyGPT’s learned position table, compute a sinusoidal encoding, turn a query with RoPE, ramp scores with ALiBi, then see which encodings survive text four times longer than training.',
+				'打乱你的句子，看注意力察觉不到；读 TinyGPT 学到的位置表，算一个正弦位置编码，用 RoPE 旋转查询，用 ALiBi 给分数加斜坡，再看哪些编码在比训练长四倍的文本上还能用。'
+			)
+		}
 	},
 	{
 		slug: 'speculative-decoding',

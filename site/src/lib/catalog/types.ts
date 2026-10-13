@@ -79,8 +79,10 @@ export interface ModelEntry {
 	size?: string;
 	runtime: string;
 	mode: Mode;
-	/** One-line hook. */
+	/** One-line hook: at most 100 English and 50 Chinese characters, written to fit two lines of a card, never cut. */
 	hook: I18n;
+	/** A short name (at most 24 characters) for path stations; the name is used when absent. */
+	short?: I18n;
 	/** What the page will show (layers or steps to animate). */
 	shows: I18n;
 	/** Caveats such as unverified licenses. */
@@ -96,6 +98,8 @@ export interface LessonInfo {
 	steps: number;
 	/** one line: what the lesson walks through */
 	summary: I18n;
+	/** reading time in minutes: round(words / 180 + steps x 20 s + beats x 30 s), from `atlas lesson <slug> print` */
+	minutes?: number;
 }
 
 export type SectionSlug =
@@ -127,6 +131,11 @@ export interface ConceptEntry {
 	v1: boolean;
 	/** P0 = part of the first version; P2 = explicitly later */
 	tier?: 'P0' | 'P2';
+	/** One-line hook for cards (at most 100 English and 50 Chinese characters); the lesson summary, cut at its last full
+	 *  stop before 100 characters, stands in until the content wave writes one. */
+	hook?: I18n;
+	/** A short title (at most 24 characters) for path stations; the title is used when absent. */
+	short?: I18n;
 	/** the playable interaction, summarized */
 	interaction: I18n;
 	engine: string;

@@ -158,7 +158,7 @@
 		position: absolute;
 		left: -4px;
 		top: -6px;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		line-height: 1;
 		padding: 1px 3px;
 		border-radius: 4px;

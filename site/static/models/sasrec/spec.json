@@ -1,0 +1,978 @@
+{
+ "slug": "sasrec",
+ "name": {
+  "en": "Sequential recommender (tiny SASRec)",
+  "zh": "序列推荐（小型 SASRec）"
+ },
+ "version": "2026-10-12",
+ "params": 2144,
+ "precision": "fp32",
+ "input": {
+  "kind": "ratings",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "item.weight",
+   "shape": [
+    31,
+    16
+   ],
+   "offset": 0,
+   "length": 496
+  },
+  {
+   "name": "pos.weight",
+   "shape": [
+    12,
+    16
+   ],
+   "offset": 496,
+   "length": 192
+  },
+  {
+   "name": "ln1.weight",
+   "shape": [
+    16
+   ],
+   "offset": 688,
+   "length": 16
+  },
+  {
+   "name": "ln1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 704,
+   "length": 16
+  },
+  {
+   "name": "q.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 720,
+   "length": 256
+  },
+  {
+   "name": "q.bias",
+   "shape": [
+    16
+   ],
+   "offset": 976,
+   "length": 16
+  },
+  {
+   "name": "k.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 992,
+   "length": 256
+  },
+  {
+   "name": "k.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1248,
+   "length": 16
+  },
+  {
+   "name": "v.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1264,
+   "length": 256
+  },
+  {
+   "name": "v.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1520,
+   "length": 16
+  },
+  {
+   "name": "ln2.weight",
+   "shape": [
+    16
+   ],
+   "offset": 1536,
+   "length": 16
+  },
+  {
+   "name": "ln2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1552,
+   "length": 16
+  },
+  {
+   "name": "ffn.fc1.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1568,
+   "length": 256
+  },
+  {
+   "name": "ffn.fc1.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1824,
+   "length": 16
+  },
+  {
+   "name": "ffn.fc2.weight",
+   "shape": [
+    16,
+    16
+   ],
+   "offset": 1840,
+   "length": 256
+  },
+  {
+   "name": "ffn.fc2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2096,
+   "length": 16
+  },
+  {
+   "name": "ln.weight",
+   "shape": [
+    16
+   ],
+   "offset": 2112,
+   "length": 16
+  },
+  {
+   "name": "ln.bias",
+   "shape": [
+    16
+   ],
+   "offset": 2128,
+   "length": 16
+  }
+ ],
+ "layers": [
+  {
+   "id": "item",
+   "op": "embedding",
+   "label": {
+    "en": "Item rows",
+    "zh": "商品行"
+   },
+   "in": [
+    "ids"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 28
+   }
+  },
+  {
+   "id": "pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "Position rows",
+    "zh": "位置行"
+   },
+   "in": [
+    "ids"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "x",
+   "op": "add",
+   "label": {
+    "en": "Item + position",
+    "zh": "商品 + 位置"
+   },
+   "in": [
+    "item",
+    "pos"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 44
+   }
+  },
+  {
+   "id": "ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "LayerNorm 1",
+    "zh": "层归一化 1"
+   },
+   "in": [
+    "x"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "q",
+   "op": "linear",
+   "label": {
+    "en": "Queries Q",
+    "zh": "查询 Q"
+   },
+   "in": [
+    "ln1"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16,
+    "nHead": 1,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "k",
+   "op": "linear",
+   "label": {
+    "en": "Keys K",
+    "zh": "键 K"
+   },
+   "in": [
+    "ln1"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16,
+    "nHead": 1,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "v",
+   "op": "linear",
+   "label": {
+    "en": "Values V",
+    "zh": "值 V"
+   },
+   "in": [
+    "ln1"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16,
+    "nHead": 1,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 52
+   }
+  },
+  {
+   "id": "att.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Attention scores QKᵀ/√d",
+    "zh": "注意力分数 QKᵀ/√d"
+   },
+   "in": [
+    "q",
+    "k"
+   ],
+   "outShape": [
+    1,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 1,
+    "dHead": 16
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "att.masked",
+   "op": "causal_mask",
+   "label": {
+    "en": "Causal mask",
+    "zh": "因果掩码"
+   },
+   "in": [
+    "att.scores"
+   ],
+   "outShape": [
+    1,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "att.w",
+   "op": "softmax",
+   "label": {
+    "en": "Attention weights",
+    "zh": "注意力权重"
+   },
+   "in": [
+    "att.masked"
+   ],
+   "outShape": [
+    1,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "att.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Weighted sum of values",
+    "zh": "值的加权和"
+   },
+   "in": [
+    "att.w",
+    "v"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "nHead": 1,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 52
+   }
+  },
+  {
+   "id": "add1",
+   "op": "add",
+   "label": {
+    "en": "Add attention",
+    "zh": "加上注意力"
+   },
+   "in": [
+    "x",
+    "att.mix"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 52
+   }
+  },
+  {
+   "id": "ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "LayerNorm 2",
+    "zh": "层归一化 2"
+   },
+   "in": [
+    "add1"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "ffn.fc1",
+   "op": "linear",
+   "label": {
+    "en": "FFN: layer 1",
+    "zh": "前馈网络：第 1 层"
+   },
+   "in": [
+    "ln2"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 35
+   }
+  },
+  {
+   "id": "ffn.relu",
+   "op": "relu",
+   "label": {
+    "en": "FFN: ReLU",
+    "zh": "前馈网络：ReLU"
+   },
+   "in": [
+    "ffn.fc1"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "ffn.fc2",
+   "op": "linear",
+   "label": {
+    "en": "FFN: layer 2",
+    "zh": "前馈网络：第 2 层"
+   },
+   "in": [
+    "ffn.relu"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 36
+   }
+  },
+  {
+   "id": "add2",
+   "op": "add",
+   "label": {
+    "en": "Add the FFN",
+    "zh": "加上前馈网络"
+   },
+   "in": [
+    "add1",
+    "ffn.fc2"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "ln",
+   "op": "layernorm",
+   "label": {
+    "en": "Last LayerNorm",
+    "zh": "最后的层归一化"
+   },
+   "in": [
+    "add2"
+   ],
+   "outShape": [
+    "T",
+    16
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 54
+   }
+  },
+  {
+   "id": "logits",
+   "op": "linear",
+   "label": {
+    "en": "Score of every product",
+    "zh": "每件商品的分数"
+   },
+   "in": [
+    "ln"
+   ],
+   "outShape": [
+    "T",
+    31
+   ],
+   "params": {
+    "inFeatures": 16,
+    "outFeatures": 31
+   },
+   "w": {
+    "weight": "item.weight"
+   },
+   "desc": {
+    "en": "Row t times every row of the item table (the same table the clicks were looked up in): the score of each product as the next click.",
+    "zh": "第 t 行乘以商品表的每一行（就是查点击时用的那张表）：每件商品作为下一次点击的分数。"
+   },
+   "axes": [
+    "t",
+    "vocab"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Shares of the next click",
+    "zh": "下一次点击的份额"
+   },
+   "in": [
+    "logits"
+   ],
+   "outShape": [
+    "T",
+    31
+   ],
+   "axes": [
+    "t",
+    "vocab"
+   ],
+   "code": {
+    "file": "pipeline/sasrec/model.py",
+    "line": 57
+   }
+  }
+ ],
+ "training": {
+  "dataset": "synthetic shop sessions from world.ts: 8,000 sessions, 55,954 next clicks",
+  "steps": 3780,
+  "metrics": {
+   "test_hit5": 0.835,
+   "test_hit5_markov": 0.822,
+   "test_hit5_pop": 0.307,
+   "test_hit5_shuffled": 0.647
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000191,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 8,
+  "edgeCases": [
+   "one",
+   "twelve",
+   "drone"
+  ],
+  "perLayer": {
+   "ln1": 2.38e-7,
+   "q": 2.38e-7,
+   "k": 3.58e-7,
+   "v": 0.00000143,
+   "att.scores": 3.58e-7,
+   "att.masked": 3.58e-7,
+   "att.w": 1.19e-7,
+   "att.mix": 0.00000143,
+   "add1": 0.00000143,
+   "ln2": 7.15e-7,
+   "ffn.fc1": 9.54e-7,
+   "ffn.relu": 9.54e-7,
+   "ffn.fc2": 9.54e-7,
+   "add2": 0.00000167,
+   "ln": 0.00000113,
+   "logits": 0.00000191,
+   "probs": 2.98e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/sasrec/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "ids",
+   "adapter": "clicks",
+   "kind": "ratings",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 12,
+   "label": {
+    "en": "clicks",
+    "zh": "点击数"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "classes": [
+  {
+   "id": "p0",
+   "en": "Camera",
+   "zh": "相机"
+  },
+  {
+   "id": "p1",
+   "en": "Lens",
+   "zh": "镜头"
+  },
+  {
+   "id": "p2",
+   "en": "Tripod",
+   "zh": "三脚架"
+  },
+  {
+   "id": "p3",
+   "en": "Memory card",
+   "zh": "存储卡"
+  },
+  {
+   "id": "p4",
+   "en": "Camera bag",
+   "zh": "相机包"
+  },
+  {
+   "id": "p5",
+   "en": "Tent",
+   "zh": "帐篷"
+  },
+  {
+   "id": "p6",
+   "en": "Sleeping bag",
+   "zh": "睡袋"
+  },
+  {
+   "id": "p7",
+   "en": "Camp stove",
+   "zh": "野营炉"
+  },
+  {
+   "id": "p8",
+   "en": "Headlamp",
+   "zh": "头灯"
+  },
+  {
+   "id": "p9",
+   "en": "Water filter",
+   "zh": "净水器"
+  },
+  {
+   "id": "p10",
+   "en": "Coffee beans",
+   "zh": "咖啡豆"
+  },
+  {
+   "id": "p11",
+   "en": "Grinder",
+   "zh": "磨豆机"
+  },
+  {
+   "id": "p12",
+   "en": "Kettle",
+   "zh": "手冲壶"
+  },
+  {
+   "id": "p13",
+   "en": "Paper filters",
+   "zh": "滤纸"
+  },
+  {
+   "id": "p14",
+   "en": "Mug",
+   "zh": "马克杯"
+  },
+  {
+   "id": "p15",
+   "en": "Running shoes",
+   "zh": "跑鞋"
+  },
+  {
+   "id": "p16",
+   "en": "Sports watch",
+   "zh": "运动手表"
+  },
+  {
+   "id": "p17",
+   "en": "Yoga mat",
+   "zh": "瑜伽垫"
+  },
+  {
+   "id": "p18",
+   "en": "Dumbbells",
+   "zh": "哑铃"
+  },
+  {
+   "id": "p19",
+   "en": "Water bottle",
+   "zh": "运动水壶"
+  },
+  {
+   "id": "p20",
+   "en": "Game console",
+   "zh": "游戏机"
+  },
+  {
+   "id": "p21",
+   "en": "Controller",
+   "zh": "手柄"
+  },
+  {
+   "id": "p22",
+   "en": "Headset",
+   "zh": "耳机"
+  },
+  {
+   "id": "p23",
+   "en": "Racing game",
+   "zh": "赛车游戏"
+  },
+  {
+   "id": "p24",
+   "en": "Charging dock",
+   "zh": "充电座"
+  },
+  {
+   "id": "p25",
+   "en": "Stand mixer",
+   "zh": "厨师机"
+  },
+  {
+   "id": "p26",
+   "en": "Baking tray",
+   "zh": "烤盘"
+  },
+  {
+   "id": "p27",
+   "en": "Cookbook",
+   "zh": "食谱"
+  },
+  {
+   "id": "p28",
+   "en": "Measuring cups",
+   "zh": "量杯"
+  },
+  {
+   "id": "p29",
+   "en": "Oven mitts",
+   "zh": "隔热手套"
+  },
+  {
+   "id": "p30",
+   "en": "Drone",
+   "zh": "无人机"
+  }
+ ],
+ "clicks": [
+  2737,
+  2405,
+  1839,
+  2433,
+  1747,
+  2322,
+  2098,
+  1628,
+  2039,
+  1443,
+  3601,
+  2825,
+  2186,
+  2580,
+  2661,
+  2939,
+  2420,
+  2061,
+  1519,
+  2379,
+  2349,
+  2628,
+  2192,
+  1779,
+  1404,
+  1620,
+  1767,
+  1860,
+  1328,
+  1165,
+  0
+ ],
+ "popTop5": [
+  10,
+  15,
+  11,
+  0,
+  14
+ ]
+}

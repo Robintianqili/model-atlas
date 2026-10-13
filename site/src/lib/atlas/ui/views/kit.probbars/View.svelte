@@ -12,7 +12,7 @@
 	import TokenChips from '$lib/kit/TokenChips.svelte';
 	import { categorical } from '$lib/kit/color';
 	import { themeState } from '$lib/kit/theme.svelte';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import Notice from '../kit.parts/Notice.svelte';
 	import { outLabels, stageModel, stageTrace, tokenIds, tokenTexts } from '../kit.parts/stage.ts';
@@ -26,7 +26,7 @@
 	const D = $derived(distOf(P, rowPick));
 	const model = $derived(stageModel(P));
 	const ids = $derived(tokenIds(stageTrace(P), model));
-	const tokens = $derived(D && D.rows > 1 ? tokenTexts(P, D.rows, ids) : []);
+	const tokens = $derived(D && D.rows > 1 ? tokenTexts(P, D.rows, ids, i18n.lang) : []);
 	const labels = $derived(outLabels(P, model));
 	const nameOf = (i: number) => {
 		const l = labels?.(i);

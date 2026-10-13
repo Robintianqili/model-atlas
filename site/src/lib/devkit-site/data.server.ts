@@ -22,6 +22,7 @@ import { record } from '../atlas/process/record.ts';
 import { trainingProcess } from '../atlas/train/trainer.ts';
 import { fmtBytes } from '../atlas/core/format.ts';
 import { MODEL_BY_SLUG } from '../catalog/models.ts';
+import { CONCEPT_BY_SLUG } from '../catalog/concepts.ts';
 import helloManifest from '../explainers/hello-xor/explainer.ts';
 import helloLesson from '../explainers/hello-xor/lesson.ts';
 import * as helloTrainers from '../explainers/hello-xor/trainer.ts';
@@ -64,6 +65,15 @@ function ctx(): Ctx {
 export function devkitPaths(): string[] {
 	const { g } = ctx();
 	return devkitPagePaths(g);
+}
+
+/** The guide's sections (number, slug, English and Chinese title): the docs navigation that every DevKit page shows.
+ *  Checked by the same local-machine guard as the pages. */
+export function devkitNav(): SectionRef[] {
+	const nav = ctx().g.sections.map(ref);
+	const hits = findLocalStrings(JSON.stringify(nav));
+	if (hits.length) throw new Error(`The DevKit navigation would publish notes about the maintainers' own computer (src/lib/devkit-site/local.ts):\n${hits.map((h) => `  - ${h}`).join('\n')}`);
+	return nav;
 }
 
 /** The data of one page, or null for an unknown path. Throws when the page would publish a note about the maintainers'
@@ -169,7 +179,7 @@ function guideIndex({ g }: Ctx): GuideIndexData {
 		kind: 'guide',
 		title: g.title,
 		introHtml: linkSections(renderIntro(g), g, null),
-		sections: g.sections.map((x) => ({ ...ref(x), summary: SECTION_ZH[x.slug]?.summary ?? '', subs: x.subs.length }))
+		sections: g.sections.map((x) => ({ ...ref(x), subs: x.subs.length }))
 	};
 }
 
@@ -261,7 +271,11 @@ async function views({ s, g }: Ctx): Promise<ViewsData> {
 		} catch {
 			describe = null;
 		}
-		out.push({ key, title: t2(meta.title), kinds: [...meta.kinds], minHeight: meta.minHeight ?? null, describe, pkg, ops: s.ops.filter((o) => zoomKeyOf(o.zoom) === key).map((o) => o.op) });
+		// a package's live lesson, where its view can be seen at work
+		const m = pkg ? MODEL_BY_SLUG[pkg] : undefined;
+		const c = pkg ? CONCEPT_BY_SLUG[pkg] : undefined;
+		const lesson = m?.status === 'live' ? { href: `${BASE}/m/${pkg}/`, name: t2(m.name) } : c?.status === 'live' ? { href: `${BASE}/train/${pkg}/`, name: t2(c.title) } : null;
+		out.push({ key, title: t2(meta.title), kinds: [...meta.kinds], minHeight: meta.minHeight ?? null, describe, pkg, lesson, ops: s.ops.filter((o) => zoomKeyOf(o.zoom) === key).map((o) => o.op) });
 	};
 	// the key a lesson step names is the meta's own key (the folder name when a meta has none)
 	for (const [path, mod] of Object.entries(kitMetas)) await add(mod.default.key || /\/views\/([^/]+)\/meta\.ts$/.exec(path)![1], mod.default, null);

@@ -49,6 +49,7 @@
 		status = 'loading';
 		try {
 			const m = await import('./demo-ui.ts');
+			if (key.includes('/')) await m.preparePackageViews();
 			const v = m.allViews().find((x) => x.key === key);
 			if (!v?.comp) throw new Error(`no view '${key}'`);
 			note = m.DEMO_NOTE;
@@ -92,11 +93,11 @@
 
 <div class="demo" bind:this={el}>
 	<div class="bar">
-		<span class="lbl">{t({ en: 'Live demo', zh: '实时演示' })} · <code>{key}</code></span>
+		<span class="lbl">{t({ en: 'Live demo', zh: '实时演示' })} <code>{key}</code></span>
 		<ProvenanceBadge mode="illustrative" compact {note} />
 	</div>
 	{#if stages.length > 1}
-		<div class="segmented" role="group" aria-label={t({ en: 'Demos of this view', zh: '这个视图的演示' })}>
+		<div class="seg picks" role="group" aria-label={t({ en: 'Demos of this view', zh: '这个视图的演示' })}>
 			{#each stages as s, i (i)}
 				<button type="button" aria-pressed={i === pick} onclick={() => (pick = i)}>{t(s.label)}</button>
 			{/each}
@@ -111,7 +112,7 @@
 		{:else if status === 'error'}
 			<p class="bad">{t({ en: 'The demo could not be shown:', zh: '演示无法显示：' })} {err}</p>
 		{:else}
-			<p class="muted wait">{t({ en: 'The demo loads when you scroll here…', zh: '滚动到这里时加载演示…' })}</p>
+			<p class="wait">{t({ en: 'The demo loads when you scroll here…', zh: '滚动到这里时加载演示…' })}</p>
 		{/if}
 	</div>
 	{#if say && text}
@@ -120,41 +121,55 @@
 </div>
 
 <style>
+	/* one container: a head row (what it is, its provenance) over the stage, on the lesson's --stage surface */
 	.demo {
 		display: grid;
-		gap: 8px;
 		min-width: 0;
+		border: 1px solid var(--rule);
+		border-radius: var(--r4);
+		background: var(--stage);
+		overflow: hidden;
 	}
 	.bar {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: 6px 10px;
+		gap: var(--s1) var(--s3);
+		padding: var(--s2) var(--s3) var(--s2) var(--s4);
+		border-bottom: 1px solid var(--rule);
+		background: var(--panel);
 	}
 	.lbl {
-		font-size: var(--fs-sm);
-		font-weight: 600;
+		display: inline-flex;
+		align-items: baseline;
+		gap: var(--s2);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		font-weight: var(--w-ui);
 	}
 	.lbl code {
-		font-size: 0.85em;
-		font-weight: 400;
+		font-weight: var(--w-body);
+		color: var(--ink-2);
+		overflow-wrap: anywhere;
+	}
+	.picks {
+		margin: var(--s3) var(--s4) 0;
+		justify-self: start;
 	}
 	.stage {
 		min-width: 0;
 		padding: var(--s4);
-		border: 1px solid var(--rule);
-		border-radius: var(--r3);
-		background: var(--surface);
 	}
-	@media (max-width: 560px) {
+	@media (max-width: 559px) {
 		.stage {
-			padding: 10px;
+			padding: var(--s3);
 		}
 	}
 	.wait {
 		margin: 0;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
+		color: var(--muted);
 	}
 	.bad {
 		margin: 0;
@@ -162,8 +177,11 @@
 	}
 	.desc {
 		margin: 0;
-		font-size: var(--fs-xs);
+		padding: var(--s2) var(--s4) var(--s3);
+		border-top: 1px solid var(--rule);
+		background: var(--panel);
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
 		color: var(--ink-2);
-		max-width: var(--measure);
 	}
 </style>

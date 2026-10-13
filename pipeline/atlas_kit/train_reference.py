@@ -11,6 +11,8 @@ The twin module (pipeline/<slug>/twin.py) provides
                                                          (labels arrive as floats: call .long() where needed); loss may
                                                          use torch.autograd.grad(..., create_graph=True)
     optimizer(model, cfg) -> torch.optim.Optimizer       optional; default from cfg like the TS trainer (below)
+    project(model, cfg) -> None                          optional (K4): the TrainerDef.project constraint, run after
+                                                         every optimizer step under torch.no_grad()
 
 Fixture (atlas-train-fixture/1): { slug, source, trainer, seed, opt, steps, init: {name: {shape, data}},
 batches: [{step, batch: {key: {shape, data}}}], ts: {losses, grads0, final} }.
@@ -101,6 +103,7 @@ def train_reference(fixture: str, twin: str, out: str, steps: int | None = None)
     losses: list[float] = []
     grads0: dict = {}
     named = dict(model.named_parameters())
+    project = getattr(mod, "project", None)
     for b in batches:
         batch = {k: (_t(v) if isinstance(v, dict) and "data" in v else v) for k, v in b["batch"].items()}
         opt.zero_grad(set_to_none=False)
@@ -110,6 +113,9 @@ def train_reference(fixture: str, twin: str, out: str, steps: int | None = None)
             grads0 = {k: _plain(p.grad if p.grad is not None else torch.zeros_like(p)) for k, p in named.items()}
         losses.append(float(loss.item()))
         opt.step()
+        if callable(project):
+            with torch.no_grad():
+                project(model, cfg)
     res = {"format": "atlas-train-reference/1", "steps": k_steps, "torch": torch.__version__, "losses": losses, "grads0": grads0,
            "final": {k: _plain(v) for k, v in model.state_dict().items()}}
     write_json(out, res)

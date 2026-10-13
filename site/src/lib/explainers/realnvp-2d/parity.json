@@ -1,0 +1,64 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "realnvp-2d",
+ "checked": "2026-10-13",
+ "sources": {
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 8.79e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-13"
+  },
+  "sgd1": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 5.69e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-13"
+  },
+  "rings": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 9.75e-16,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-13"
+  },
+  "flow": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.71e-14,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "sample": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 3.09e-14,
+   "frames": 9,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "ringSample": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.19e-15,
+   "frames": 9,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  }
+ }
+}

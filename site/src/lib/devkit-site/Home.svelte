@@ -1,13 +1,16 @@
 <!--
-  /devkit/: what the DevKit is and who it is for, the three kinds with a live example lesson each, the workflow, the
-  afternoon test and the quick start. The counts, examples, commands, quick start and test result are read from the
-  kit's sources at build time (home.ts).
+  /devkit/: what the DevKit is and who it is for, the kit today (its counts, the lessons built with it, the afternoon
+  test), the three kinds with a live example lesson each, the workflow as a route line, and the quick start in two tabs.
+  The counts, examples, commands, quick start and test result are read from the kit's sources at build time (home.ts).
+  One page at a laptop's height budget (redesign spec §12, W3: at most 3 screens at 1280 x 800).
 -->
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { i18n, t } from '$lib/i18n/i18n.svelte';
+	import Glyph from './Glyph.svelte';
+	import { arrow, code, flask, quiz } from './icons.ts';
 	import Html from './Html.svelte';
-	import type { HomeData, T2 } from './types.ts';
+		import type { HomeData, T2 } from './types.ts';
 
 	let { page }: { page: HomeData } = $props();
 
@@ -27,91 +30,143 @@
 		{ n: page.counts.commands, label: { en: 'CLI commands', zh: '条命令' }, href: `/devkit/guide/${guideSec(12)?.slug ?? ''}/` },
 		{ n: page.counts.codes, label: { en: 'error codes', zh: '个错误代码' }, href: '/devkit/contribute/#error-codes' }
 	]);
+	const share = $derived(page.built.live ? page.built.kit.length / page.built.live : 0);
+	const personas: { icon: string; title: T2; text: T2 }[] = [
+		{
+			icon: code,
+			title: { en: 'You know PyTorch', zh: '你会 PyTorch' },
+			text: {
+				en: 'Train a small model as you always do and describe its forward pass once in Python; the kit checks every layer of its browser copy against PyTorch. Then you write the lesson as typed data. You do not need Svelte.',
+				zh: '像平时一样训练一个小模型，用 Python 把它的前向计算描述一遍，工具包会把浏览器里的版本逐层与 PyTorch 对比。然后你用带类型的数据写课程。你不需要会 Svelte。'
+			}
+		},
+		{
+			icon: flask,
+			title: { en: 'You write JavaScript or teach', zh: '你写 JavaScript，或者你是老师' },
+			text: {
+				en: 'Live training and step-by-step algorithms need Node only: a trainer or a process in TypeScript, then the lesson. A Python twin is optional and earns a stronger badge.',
+				zh: '实时训练和逐步运行的算法只需要 Node：用 TypeScript 写一个训练器或过程，再写课程。Python 对照是可选的，能换来更强的徽章。'
+			}
+		},
+		{
+			icon: quiz,
+			title: { en: 'You care about honest numbers', zh: '你在意数字是否诚实' },
+			text: {
+				en: 'Every number in a lesson is bound to a computed value, every stage carries a provenance badge, and every claim that is not computed live has a test. The checks enforce it, not good intentions.',
+				zh: '课程里的每个数都绑定到计算结果，每个舞台都有出处徽章，每个不是实时算出的论断都有测试。靠的是自动检查，而不是自觉。'
+			}
+		}
+	];
+
+	// the quick start: two tabs (set up once, build a package); the long command list opens in place
+	let tab = $state<'setup' | 'build'>('setup');
+	let allLines = $state(false);
+	const quickLines = $derived((page.quick.html.match(/\n/g)?.length ?? 0) + 1);
+	const CLIP = 12;
+	function tabKey(e: KeyboardEvent) {
+		if (!page.start.setupHtml || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+		e.preventDefault();
+		tab = e.key === 'Home' ? 'setup' : e.key === 'End' ? 'build' : tab === 'setup' ? 'build' : 'setup';
+		document.getElementById(`qs-tab-${tab}`)?.focus();
+	}
 </script>
 
-<div class="container home">
+<div class="home">
 	<header class="hero">
-		<p class="eyebrow">DevKit · {t({ en: 'Build your own', zh: '自己动手' })}</p>
-		<h1>{t({ en: 'Build your own illustration', zh: '自己动手做一个模型图解' })}</h1>
-		<p class="lede">
-			{t({
-				en: 'The DevKit is the toolkit for building this site’s guided lessons: a command line, a kit of views and a lesson format. If you know PyTorch, you can add a model. You write a few files of plain data and functions; the kit makes the page, the step-by-step lesson with real numbers and the checks. You do not need to know Svelte.',
-				zh: 'DevKit 是制作本站分步课程的工具包：一个命令行、一套视图和一种课程格式。只要你会 PyTorch，就能加一个模型。你只写几个文件，内容是普通的数据和函数；页面、带真实数字的分步课程和各项检查都由工具包生成。你不需要会 Svelte。'
-			})}
-		</p>
-		<div class="cta">
-			<a class="btn primary" href="{base}/devkit/tutorial/">{t({ en: 'Start the tutorial', zh: '从教程开始' })}</a>
-			<a class="btn" href="{base}/devkit/guide/">{t({ en: 'Read the guide', zh: '阅读指南' })}</a>
-		</div>
-		{#if page.start.statusHtml}
-			<div class="status" role="note">
-				{#if i18n.lang === 'zh' && page.start.statusZh}
-					<p lang="zh-CN">{page.start.statusZh}</p>
-				{:else}
-					<Html html={page.start.statusHtml} />
-				{/if}
-				<p class="small muted">{t({ en: 'From CONTRIBUTING.md:', zh: '来自 CONTRIBUTING.md：' })} <a href="{base}/devkit/contribute/#how">{t({ en: 'the contributor path', zh: '贡献者的路径' })}</a></p>
-			</div>
-		{/if}
-		<ul class="counts" aria-label={t({ en: 'The kit today', zh: '工具包现状' })}>
-			{#each counts as c (c.href)}
-				<li><a href={`${base}${c.href}`}><span class="n num">{c.n}</span> <span class="l">{t(c.label)}</span></a></li>
-			{/each}
-		</ul>
-		{#if page.built.live}
-			<p class="built small">
+		<div class="intro">
+			<p class="eyebrow">DevKit · {t({ en: 'for builders', zh: '给制作者' })}</p>
+			<h1>{t({ en: 'Build your own lesson', zh: '自己动手做一节课' })}</h1>
+			<p class="lede">
 				{t({
-					en: `${page.built.kit.length} of the ${page.built.live} live model lessons are built with it so far${page.built.kit.length ? ':' : '.'}`,
-					zh: `本站已上线的 ${page.built.live} 个模型课程中，目前有 ${page.built.kit.length} 个是用它做的${page.built.kit.length ? '：' : '。'}`
+					en: 'The toolkit behind this site’s guided lessons: a command line, a kit of views and a lesson format. You write a few files of plain data and functions; the kit makes the page, the step-by-step lesson with real numbers, and the checks.',
+					zh: '本站分步课程背后的工具包：一个命令行、一套视图和一种课程格式。你只写几个文件，内容是普通的数据和函数；页面、带真实数字的分步课程和各项检查都由工具包生成。'
 				})}
-				{#each page.built.kit as k, i (k.slug)}{i ? ' · ' : ' '}<a href="{base}/m/{k.slug}/">{t(k.name)}</a>{/each}{page.built.kit.length ? t({ en: '.', zh: '。' }) : ''}
-				{t({ en: 'The others were made by hand, without the kit.', zh: '其余的是不用工具包、手工做的页面。' })}
 			</p>
-		{/if}
-		<p class="gen muted">
-			{t({ en: 'These numbers, the guide, the reference and the tutorial’s files and results are read from the kit’s own files when the site is built, so the pages grow with the kit.', zh: '这些数字、指南、参考，以及教程里的文件和结果，都在网站构建时从工具包自己的文件读出，所以页面会随工具包一起增长。' })}
-		</p>
+			<div class="cta">
+				<a class="btn btn-act" href="{base}/devkit/tutorial/">{t({ en: 'Start the tutorial', zh: '从教程开始' })}<Glyph d={arrow} size={18} /></a>
+				<a class="btn" href="{base}/devkit/guide/">{t({ en: 'Read the guide', zh: '阅读指南' })}</a>
+			</div>
+			<ul class="who" aria-label={t({ en: 'Who it is for', zh: '适合谁' })}>
+				{#each personas as p (p.title.en)}
+					<li>
+						<Glyph d={p.icon} size={18} />
+						<p><strong>{t(p.title)}{t({ en: '.', zh: '。' })}</strong> {t(p.text)}</p>
+					</li>
+				{/each}
+			</ul>
+		</div>
+
+		<aside class="today" aria-labelledby="today-h">
+			<h2 id="today-h">{t({ en: 'The kit today', zh: '工具包现状' })}</h2>
+			<ul class="counts">
+				{#each counts as c (c.href)}
+					<li><a href="{base}{c.href}"><span class="n num">{c.n}</span><span class="l">{t(c.label)}</span></a></li>
+				{/each}
+			</ul>
+			{#if page.built.live}
+				<div class="built">
+					<p>
+						{t({
+							en: `${page.built.kit.length} of the ${page.built.live} live model lessons are built with it.`,
+							zh: `已上线的 ${page.built.live} 个模型课程中，有 ${page.built.kit.length} 个是用它做的。`
+						})}
+					</p>
+					<div class="meter" aria-hidden="true"><span style="width: {(share * 100).toFixed(1)}%"></span></div>
+					{#if page.built.kit.length}
+						<details>
+							<summary>{t({ en: `Show the ${page.built.kit.length}`, zh: `列出这 ${page.built.kit.length} 个` })}</summary>
+							<p class="names">
+								{#each page.built.kit as k, i (k.slug)}{i ? ' · ' : ''}<a href="{base}/m/{k.slug}/">{t(k.name)}</a>{/each}{t({ en: '.', zh: '。' })}
+								{t({ en: 'The others were made by hand, without the kit.', zh: '其余的是不用工具包、手工做的页面。' })}
+							</p>
+						</details>
+					{/if}
+				</div>
+			{/if}
+			<div class="test">
+				<p class="tk">{t({ en: 'The afternoon test', zh: '“一个下午”测试' })}</p>
+				<p class="tv"><span class="num">{t({ en: `${mins} min ${secs} s`, zh: `${mins} 分 ${secs} 秒` })}</span></p>
+				<p class="ts">
+					{t({
+						en: `A fresh agent with only the guide built ${page.afternoon.built} to green gates, and listed ${page.afternoon.gaps} gaps that are now fixed.`,
+						zh: `一个只拿到指南的全新智能体做出了 ${page.afternoon.built} 并通过所有关卡，还列出了 ${page.afternoon.gaps} 处已修正的问题。`
+					})}
+				</p>
+				<details>
+					<summary>{t({ en: 'How the test works', zh: '测试是怎么做的' })}</summary>
+					<p>
+						{t({
+							en: `Before the guide was published, a fresh agent that had only the guide built ${page.afternoon.built}, an XOR network with a sigmoid output, from the scaffold to a draft that passes every automated gate, in ${mins} min ${secs} s of wall-clock time. It also listed ${page.afternoon.gaps} places where the guide was unclear or wrong; the guide on this site is the version after those fixes. A person needs longer than an agent: the reading, the training and the lesson writing take most of an afternoon, which is the test's name and its target.`,
+							zh: `指南发布之前，一个只拿到指南的全新智能体从脚手架开始，做出了 ${page.afternoon.built}（一个输出层用 sigmoid 的 XOR 网络），直到草稿通过所有自动关卡，实际用时 ${mins} 分 ${secs} 秒。它还列出了指南中 ${page.afternoon.gaps} 处不清楚或有错的地方；本站的指南是修正之后的版本。人比智能体需要更多时间：阅读、训练和写课程会占去一个下午的大部分，这正是测试名字的由来，也是它的目标。`
+						})}
+					</p>
+					<p>{t({ en: 'The full record: research/devkit/afternoon-test.md in the repository.', zh: '完整记录：仓库中的 research/devkit/afternoon-test.md。' })}</p>
+				</details>
+			</div>
+			<p class="gen">{t({ en: 'Read from the kit’s own files when the site is built, so this page grows with the kit.', zh: '这些内容在网站构建时从工具包自己的文件读出，所以页面会随工具包一起增长。' })}</p>
+		</aside>
 	</header>
 
-	<section aria-labelledby="who-h">
-		<h2 id="who-h">{t({ en: 'Who it is for', zh: '适合谁' })}</h2>
-		<div class="who">
-			<div class="panel">
-				<h3>{t({ en: 'You know PyTorch', zh: '你会 PyTorch' })}</h3>
-				<p>{t({ en: 'Train a small model as you always do, describe its forward pass once in Python, and the kit checks every layer of its browser copy against PyTorch. Then you write the lesson as typed data.', zh: '像平时一样训练一个小模型，用 Python 把它的前向计算描述一遍，工具包会把浏览器里的版本逐层与 PyTorch 对比。然后你用带类型的数据写课程。' })}</p>
-			</div>
-			<div class="panel">
-				<h3>{t({ en: 'You write JavaScript or teach', zh: '你写 JavaScript，或者你是老师' })}</h3>
-				<p>{t({ en: 'Live training and step-by-step algorithms need Node only: a trainer or a process in TypeScript, then the lesson. A Python twin is optional and earns a stronger badge.', zh: '实时训练和逐步运行的算法只需要 Node：用 TypeScript 写一个训练器或过程，再写课程。Python 对照是可选的，能换来更强的徽章。' })}</p>
-			</div>
-			<div class="panel">
-				<h3>{t({ en: 'You care about honest numbers', zh: '你在意数字是否诚实' })}</h3>
-				<p>{t({ en: 'Every number in a lesson is bound to a computed value, every stage carries a provenance badge, and every claim that is not computed live has a test. The checks enforce it, not good intentions.', zh: '课程里的每个数都绑定到计算结果，每个舞台都有出处徽章，每个不是实时算出的论断都有测试。靠的是自动检查，而不是自觉。' })}</p>
-			</div>
-		</div>
-	</section>
-
 	<section aria-labelledby="kinds-h">
-		<h2 id="kinds-h">{t({ en: 'Three kinds of illustration', zh: '三种图解' })}</h2>
-		<p class="intro">
-			{t({ en: 'Every lesson plays a tape of recorded frames; what makes the frames is the kind. One package can mix kinds. Each kind below links to a live lesson built with the kit.', zh: '每节课都播放一条记录好的“磁带”；生成帧的方式就是图解的类型。一个包可以混合几种类型。下面每种类型都链接到一节用工具包做成、已经上线的课程。' })}
+		<div class="sh">
+			<h2 id="kinds-h">{t({ en: 'Three kinds of illustration', zh: '三种图解' })}</h2>
 			<a href="{base}/devkit/guide/{guideSec(2)?.slug ?? ''}/">{t({ en: 'Guide section 2', zh: '指南第 2 节' })}</a>
+		</div>
+		<p class="sub">
+			{t({ en: 'Every lesson plays a tape of recorded frames; the kind is what makes the frames. One package can mix kinds.', zh: '每节课都播放一条记录好的“磁带”；生成帧的方式就是图解的类型。一个包可以混合几种类型。' })}
 		</p>
 		<div class="kinds">
 			{#each page.kinds as k (k.kind)}
-				<article class="kind panel">
-					<p class="badge"><span class="letter" aria-hidden="true">{k.kind}</span> {t({ en: `Kind ${k.kind}`, zh: `${k.kind} 类` })}</p>
+				<article class="kind">
+					<p class="kh"><span class="letter" aria-hidden="true">{k.kind}</span><span>{t({ en: `Kind ${k.kind}`, zh: `${k.kind} 类` })}</span></p>
 					<h3>{t(k.name)}</h3>
-					<p>{t(k.what)}</p>
-					<p class="small"><strong>{t({ en: 'You write:', zh: '你要写：' })}</strong> {t(k.youWrite)}</p>
-					<div class="ex">
-						<p class="small muted">{t({ en: 'Live example', zh: '已上线的示例' })}</p>
-						<a class="exlink" href="{base}/m/{k.example.slug}/#lesson">
-							<strong>{t(k.example.name)}</strong>
-							{#if k.example.steps}<span class="chip">{t({ en: `${k.example.steps} steps`, zh: `${k.example.steps} 步` })}</span>{/if}
-						</a>
-						{#if k.example.summary}<p class="small">{t(k.example.summary)}</p>{/if}
-					</div>
+					<p class="what">{t(k.what)}</p>
+					<p class="write"><span>{t({ en: 'You write', zh: '你要写' })}</span>{t(k.youWrite)}</p>
+					<a class="ex" href="{base}/m/{k.example.slug}/#lesson">
+						<span class="exk">{t({ en: 'Live example', zh: '已上线的示例' })}</span>
+						<span class="exn">{t(k.example.name)}{#if k.example.steps}<span class="steps">{t({ en: ` · ${k.example.steps} steps`, zh: ` · ${k.example.steps} 步` })}</span>{/if}</span>
+						<Glyph d={arrow} size={16} />
+					</a>
 				</article>
 			{/each}
 		</div>
@@ -119,212 +174,288 @@
 
 	<section aria-labelledby="flow-h">
 		<h2 id="flow-h">{t({ en: 'From an idea to a live page', zh: '从想法到上线的页面' })}</h2>
-		<p class="intro">{t({ en: `${page.workflow.length} steps, each with its commands. The first ${yours} are yours; a teaching reviewer and the maintainers do the rest.`, zh: `${page.workflow.length} 个步骤，每一步都有对应的命令。前 ${yours} 步由你完成，其余由教学评审者和维护者完成。` })}</p>
-		<ol class="flow">
+		<p class="sub">{t({ en: `${page.workflow.length} steps, each with its commands. The first ${yours} are yours; a teaching reviewer and the maintainers do the rest.`, zh: `${page.workflow.length} 个步骤，每一步都有对应的命令。前 ${yours} 步由你完成，其余由教学评审者和维护者完成。` })}</p>
+		<ol class="route">
 			{#each page.workflow as w, i (w.id)}
-				<li class="node" class:theirs={w.who !== 'you'}>
-					<span class="step num" aria-hidden="true">{i + 1}</span>
-					<span class="name">{t(w.name)}</span>
-					<span class="cmds">{#each w.cmds as c (c.name)}<code title={c.summary}>atlas {c.name}</code>{/each}</span>
-					<span class="what">{t(w.what)}</span>
-					<span class="by">{t(who[w.who])}</span>
+				<li class="st" class:theirs={w.who !== 'you'}>
+					<span class="dot" aria-hidden="true">{i + 1}</span>
+					<span class="body">
+						<span class="name">{t(w.name)}</span>
+						<span class="cmds">{#each w.cmds as c (c.name)}<code title={c.summary}>atlas {c.name}</code>{/each}</span>
+						<span class="what">{t(w.what)}</span>
+						<span class="by">{t(who[w.who])}</span>
+					</span>
 				</li>
 			{/each}
 		</ol>
 	</section>
 
-	<section aria-labelledby="test-h" class="test">
-		<h2 id="test-h">{t({ en: 'The afternoon test', zh: '“一个下午”测试' })}</h2>
-		<div class="testcard panel">
-			<p class="big num">{t({ en: `${mins} min ${secs} s`, zh: `${mins} 分 ${secs} 秒` })}</p>
-			<div>
-				<p>
-					{t({
-						en: `Before the guide was published, a fresh agent that had only the guide built ${page.afternoon.built}, an XOR network with a sigmoid output, from the scaffold to a draft that passes every automated gate, in ${mins} min ${secs} s of wall-clock time.`,
-						zh: `指南发布之前，一个只拿到指南的全新智能体从脚手架开始，做出了 ${page.afternoon.built}（一个输出层用 sigmoid 的 XOR 网络），直到草稿通过所有自动关卡，实际用时 ${mins} 分 ${secs} 秒。`
-					})}
-				</p>
-				<p>
-					{t({
-						en: `It also listed ${page.afternoon.gaps} places where the guide was unclear or wrong; the guide on this site is the version after those fixes. A person needs longer than an agent: the reading, the training and the lesson writing take most of an afternoon, which is the test's name and its target.`,
-						zh: `它还列出了指南中 ${page.afternoon.gaps} 处不清楚或有错的地方；本站的指南是修正之后的版本。人比智能体需要更多时间：阅读、训练和写课程会占去一个下午的大部分，这正是测试名字的由来，也是它的目标。`
-					})}
-				</p>
-				<p class="small muted">{t({ en: 'The full record: research/devkit/afternoon-test.md in the repository.', zh: '完整记录：仓库中的 research/devkit/afternoon-test.md。' })}</p>
-			</div>
-		</div>
-	</section>
-
 	<section aria-labelledby="quick-h">
-		<h2 id="quick-h">{t({ en: 'Quick start', zh: '快速开始' })}</h2>
-		{#if page.start.setupHtml}
-			<h3 class="qh"><span class="num">1</span> {t({ en: 'Set up once', zh: '准备一次环境' })}</h3>
-			<p class="intro">
-				{t({ en: 'The setup steps of CONTRIBUTING.md, for your own computer. Guide section 1 has the details.', zh: 'CONTRIBUTING.md 里的准备步骤（英文原文），适用于你自己的电脑。细节见指南第 1 节。' })}
-				<a href="{base}/devkit/guide/{guideSec(1)?.slug ?? ''}/">{t({ en: 'Guide section 1', zh: '指南第 1 节' })}</a>
-			</p>
-			<Html html={page.start.setupHtml} class="setup" />
-			<h3 class="qh"><span class="num">2</span> {t({ en: 'Build a package', zh: '做一个包' })}</h3>
-		{/if}
-		<p class="intro">
-			{t({ en: 'The commands of the walk-through, in order, from the site folder. They are taken from the guide when the site is built; read the guide’s text for each before you run it.', zh: '走一遍流程要用到的命令，按顺序排列，都在 site 文件夹里运行。它们在网站构建时取自指南；运行每条命令之前，先读指南里对应的说明。' })}
+		<div class="sh">
+			<h2 id="quick-h">{t({ en: 'Quick start', zh: '快速开始' })}</h2>
 			<a href="{base}/devkit/guide/{guideSec(4)?.slug ?? ''}/">{t({ en: 'Guide section 4', zh: '指南第 4 节' })}</a>
-		</p>
-		<Html html={page.quick.html} />
-		<p class="intro">
-			{t({ en: 'Building with Claude Code? The repository’s project skill', zh: '用 Claude Code 来做？仓库里的项目技能' })}
-			<code>.claude/skills/model-atlas-builder/</code>
-			{t({
-				en: 'gives the agent this routine in short form: the quick checks while you iterate and one full check at the end, reuse before you write, the teaching bar, the chart and accessibility rules, and the review.',
-				zh: '把这套流程简要地交给智能体：修改时用快速检查，最后只做一次完整检查；先复用再动手写；教学标准、图表和无障碍规则，以及评审。'
-			})}
-			<a href="{base}/devkit/contribute/#how">{t({ en: 'More in CONTRIBUTING.md', zh: '详见 CONTRIBUTING.md' })}</a>
-		</p>
-	</section>
-
-	<section aria-labelledby="next-h">
-		<h2 id="next-h">{t({ en: 'Where next', zh: '接下来' })}</h2>
-		<div class="next">
-			<a class="panel go" href="{base}/devkit/tutorial/"><strong>{t({ en: 'Tutorial', zh: '教程' })}</strong><span>{t({ en: 'Build hello-xor step by step, with its real files.', zh: '用真实文件一步一步做出 hello-xor。' })}</span></a>
-			<a class="panel go" href="{base}/devkit/guide/"><strong>{t({ en: 'Guide', zh: '指南' })}</strong><span>{t({ en: 'The full DevKit guide, section by section.', zh: '完整的 DevKit 指南，按章节阅读。' })}</span></a>
-			<a class="panel go" href="{base}/devkit/reference/ops/"><strong>{t({ en: 'Op reference', zh: '算子参考' })}</strong><span>{t({ en: 'Every core op with its formula, narration and a demo.', zh: '每个核心算子的公式、旁白和演示。' })}</span></a>
-			<a class="panel go" href="{base}/devkit/reference/views/"><strong>{t({ en: 'View reference', zh: '视图参考' })}</strong><span>{t({ en: 'Every view a lesson step can show, live.', zh: '课程每一步可以显示的视图，实时演示。' })}</span></a>
-			<a class="panel go" href="{base}/devkit/contribute/"><strong>{t({ en: 'Contribute', zh: '参与贡献' })}</strong><span>{t({ en: 'The rules, the checklist, the gates and every error code.', zh: '规则、检查清单、关卡和所有错误代码。' })}</span></a>
+		</div>
+		{#if page.start.setupHtml}
+			<div class="seg tabs" role="tablist" aria-label={t({ en: 'Quick start', zh: '快速开始' })}>
+				<button type="button" role="tab" id="qs-tab-setup" aria-selected={tab === 'setup'} aria-controls="qs-setup" tabindex={tab === 'setup' ? 0 : -1} onclick={() => (tab = 'setup')} onkeydown={tabKey}>
+					{t({ en: '1 · Set up once', zh: '1 · 准备一次环境' })}
+				</button>
+				<button type="button" role="tab" id="qs-tab-build" aria-selected={tab === 'build'} aria-controls="qs-build" tabindex={tab === 'build' ? 0 : -1} onclick={() => (tab = 'build')} onkeydown={tabKey}>
+					{t({ en: '2 · Build a package', zh: '2 · 做一个包' })}
+				</button>
+			</div>
+			<div class="panel-q" role="tabpanel" id="qs-setup" aria-labelledby="qs-tab-setup" hidden={tab !== 'setup'}>
+				<p class="sub">
+					{t({ en: 'The setup steps of CONTRIBUTING.md, for your own computer. Guide section 1 has the details.', zh: 'CONTRIBUTING.md 里的准备步骤（英文原文），适用于你自己的电脑。细节见指南第 1 节。' })}
+				</p>
+				<div class="setup-grid">
+				<Html html={page.start.setupHtml} class="setup compact" />
+				{#if page.start.statusHtml}
+					<div class="status" role="note">
+						{#if i18n.lang === 'zh' && page.start.statusZh}
+							<p lang="zh-CN">{page.start.statusZh}</p>
+						{:else}
+							<Html html={page.start.statusHtml} class="compact" />
+						{/if}
+						<p class="from">{t({ en: 'From CONTRIBUTING.md:', zh: '来自 CONTRIBUTING.md：' })} <a href="{base}/devkit/contribute/#how">{t({ en: 'the contributor path', zh: '贡献者的路径' })}</a></p>
+					</div>
+				{/if}
+				</div>
+			</div>
+		{/if}
+		<div class="panel-q" role={page.start.setupHtml ? 'tabpanel' : undefined} id="qs-build" aria-labelledby={page.start.setupHtml ? 'qs-tab-build' : undefined} hidden={!!page.start.setupHtml && tab !== 'build'}>
+			<p class="sub">
+				{t({ en: 'The commands of the walk-through, in order, from the site folder. They are taken from the guide when the site is built; read the guide’s text for each before you run it.', zh: '走一遍流程要用到的命令，按顺序排列，都在 site 文件夹里运行。它们在网站构建时取自指南；运行每条命令之前，先读指南里对应的说明。' })}
+			</p>
+			<div class="clip" class:open={allLines || quickLines <= CLIP} style:--clip="{CLIP * 22 + 24 + 37}px">
+				<Html html={page.quick.html} />
+			</div>
+			{#if quickLines > CLIP}
+				<button type="button" class="btn btn-quiet more" aria-expanded={allLines} onclick={() => (allLines = !allLines)}>
+					{allLines ? t({ en: 'Show fewer lines', zh: '收起' }) : t({ en: `Show all ${quickLines} lines`, zh: `显示全部 ${quickLines} 行` })}
+				</button>
+			{/if}
+			<p class="note">
+				{t({ en: 'Building with Claude Code? The repository’s project skill', zh: '用 Claude Code 来做？仓库里的项目技能' })}
+				<code>.claude/skills/model-atlas-builder/</code>
+				{t({
+					en: 'gives the agent this routine in short form: the quick checks while you iterate and one full check at the end, reuse before you write, the teaching bar, the chart and accessibility rules, and the review.',
+					zh: '把这套流程简要地交给智能体：修改时用快速检查，最后只做一次完整检查；先复用再动手写；教学标准、图表和无障碍规则，以及评审。'
+				})}
+				<a href="{base}/devkit/contribute/#how">{t({ en: 'More in CONTRIBUTING.md', zh: '详见 CONTRIBUTING.md' })}</a>
+			</p>
 		</div>
 	</section>
+
 </div>
 
 <style>
 	.home {
-		padding-top: var(--s6);
+		container-type: inline-size;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: var(--s6);
+		gap: calc(var(--s6) + var(--s2));
 	}
-	.hero h1 {
+
+	/* hero: the words, and beside them the kit today */
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--s5);
+		align-items: start;
+	}
+	@container (min-width: 820px) {
+		.hero {
+			grid-template-columns: minmax(0, 1fr) 320px;
+			gap: var(--s6);
+		}
+	}
+	.intro .eyebrow {
+		margin: 0 0 var(--s2);
+	}
+	.intro h1 {
 		margin-bottom: var(--s3);
 	}
 	.cta {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 10px;
-		margin: var(--s4) 0 var(--s5);
+		gap: var(--s3);
+		margin-top: var(--s5);
+	}
+	.today {
+		display: grid;
+		gap: var(--s4);
+		padding: var(--s4) var(--s5) var(--s5);
+		border: 1px solid var(--rule);
+		border-radius: var(--r4);
+		background: var(--panel);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+	}
+	.today h2 {
+		margin: 0;
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
 	}
 	.counts {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--s1) var(--s3);
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 	.counts a {
-		display: inline-flex;
+		display: flex;
 		align-items: baseline;
-		gap: 6px;
-		padding: 6px 12px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r-pill);
-		background: var(--surface);
+		gap: var(--s2);
+		padding: 2px 0;
 		color: var(--ink-2);
 		text-decoration: none;
-		font-size: var(--fs-sm);
 	}
-	.counts a:hover {
-		border-color: var(--accent);
-		color: var(--ink);
+	.counts a:hover .l {
+		text-decoration: underline;
 	}
 	.counts .n {
-		font-weight: 700;
+		min-width: 2ch;
+		font-size: var(--t-lg);
+		font-weight: var(--w-ui);
 		color: var(--ink);
-		font-size: var(--fs-md);
 	}
-	.gen {
-		margin: 10px 0 0;
-		font-size: var(--fs-xs);
-		max-width: var(--measure);
+	.built,
+	.test {
+		display: grid;
+		gap: var(--s2);
+		padding-top: var(--s3);
+		border-top: 1px solid var(--rule);
 	}
-	.status {
-		max-width: calc(var(--measure) + 40px);
-		margin: 0 0 var(--s4);
-		padding: 10px 14px;
-		border-left: 3px solid var(--pre);
-		border-radius: 0 var(--r2) var(--r2) 0;
-		background: var(--surface-2);
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
-	}
-	.status p {
-		margin: 0 0 6px;
-	}
-	.status p:last-child {
+	.built p,
+	.test p {
 		margin: 0;
 	}
-	.status :global(.dk-md p) {
-		margin-bottom: 6px;
+	.meter {
+		height: 6px;
+		border-radius: var(--r-pill);
+		background: var(--rule);
+		overflow: hidden;
 	}
-	.built {
-		margin: 12px 0 0;
-		max-width: var(--measure);
+	.meter span {
+		display: block;
+		height: 100%;
+		background: var(--ink-2);
+	}
+	details summary {
+		padding-block: 6px;
+		cursor: pointer;
+		color: var(--ink);
+		font-weight: var(--w-ui);
+	}
+	details p {
+		margin: var(--s1) 0 var(--s2);
 		color: var(--ink-2);
 	}
-	.qh {
+	.names {
+		line-height: var(--lh-sm);
+	}
+	.tk {
+		color: var(--muted);
+	}
+	.tv {
+		font-size: var(--t-2xl);
+		line-height: var(--lh-2xl);
+		font-weight: var(--w-title);
+	}
+	.ts {
+		color: var(--ink-2);
+	}
+	.gen {
+		margin: 0;
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
+		color: var(--muted);
+	}
+
+	/* who it is for: three short lines under the call to action */
+	.who {
+		display: grid;
+		gap: var(--s3);
+		margin: var(--s5) 0 0;
+		padding: var(--s4) 0 0;
+		border-top: 1px solid var(--rule);
+		list-style: none;
+	}
+	.who li {
+		display: grid;
+		grid-template-columns: 18px minmax(0, 1fr);
+		gap: var(--s3);
+		align-items: start;
+	}
+	.who li :global(.icon) {
+		margin-top: 1px;
+		color: var(--ink-2);
+	}
+	.who p {
+		margin: 0;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--ink-2);
+		max-width: 75ch;
+	}
+	.who strong {
+		color: var(--ink);
+		font-weight: var(--w-ui);
+	}
+
+	/* section heads */
+	.sh {
 		display: flex;
-		align-items: center;
-		gap: 10px;
-		margin: var(--s4) 0 var(--s2);
-		font-size: var(--fs-lg);
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--s1) var(--s4);
 	}
-	.qh .num {
-		display: inline-grid;
-		place-items: center;
-		width: 26px;
-		height: 26px;
-		border-radius: 50%;
-		background: var(--accent-soft);
-		color: var(--accent-strong);
-		font-size: var(--fs-sm);
-		font-weight: 700;
+	.sh h2,
+	section > h2 {
+		margin: 0 0 var(--s1);
 	}
-	section h2 {
-		font-size: var(--fs-xl);
-		margin-bottom: var(--s3);
+	.sh a {
+		font-size: var(--t-sm);
 	}
-	.intro {
+	.sub {
+		margin: 0 0 var(--s4);
 		color: var(--ink-2);
-		max-width: var(--measure);
+		max-width: 75ch;
 	}
-	.who,
+
+	/* the three kinds */
 	.kinds {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
-		gap: var(--s4);
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--s3);
 	}
-	.panel h3 {
-		font-size: var(--fs-lg);
-		margin-bottom: 8px;
-	}
-	.panel p {
-		margin-bottom: 10px;
-	}
-	.panel p:last-child {
-		margin-bottom: 0;
-	}
-	.small {
-		font-size: var(--fs-sm);
+	@container (min-width: 700px) {
+		.kinds {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
 	}
 	.kind {
 		display: flex;
 		flex-direction: column;
+		gap: var(--s2);
+		padding: var(--s4);
+		border: 1px solid var(--rule);
+		border-radius: var(--r4);
+		background: var(--panel);
 	}
-	.badge {
+	.kind p,
+	.kind h3 {
+		margin: 0;
+	}
+	.kh {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+		gap: var(--s2);
+		font-size: var(--t-sm);
 		color: var(--muted);
 	}
 	.letter {
@@ -332,159 +463,235 @@
 		place-items: center;
 		width: 28px;
 		height: 28px;
-		border-radius: 8px;
-		background: var(--accent);
-		color: var(--accent-ink);
-		font-weight: 700;
-		font-size: var(--fs-md);
+		border-radius: var(--r2);
+		background: var(--act);
+		color: var(--act-ink);
+		font-weight: var(--w-title);
+	}
+	.kind h3 {
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
+	}
+	.what,
+	.write {
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--ink-2);
+	}
+	.write span {
+		display: block;
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
+		color: var(--muted);
 	}
 	.ex {
-		margin-top: auto;
-		padding-top: 10px;
-		border-top: 1px solid var(--rule);
-	}
-	.ex p {
-		margin-bottom: 4px;
-	}
-	.exlink {
-		display: inline-flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 8px;
-		font-size: var(--fs-lg);
-		margin-bottom: 4px;
-	}
-	.flow {
 		display: grid;
-		grid-template-columns: repeat(6, minmax(0, 1fr));
-		gap: 14px;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 0 var(--s2);
+		margin-top: auto;
+		padding-top: var(--s3);
+		border-top: 1px solid var(--rule);
+		color: var(--ink);
+		text-decoration: none;
+	}
+	.exk {
+		grid-column: 1;
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
+		color: var(--muted);
+	}
+	.exn {
+		grid-column: 1;
+		font-weight: var(--w-ui);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+	.ex:hover .exn {
+		text-decoration-thickness: 2px;
+	}
+	.ex :global(.icon) {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+	}
+	.steps {
+		font-weight: var(--w-body);
+		color: var(--muted);
+	}
+
+	/* the workflow: a route line through numbered stations; the stations done by others are outlined, their line dashed */
+	.route {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
-	.node {
+	.st {
 		position: relative;
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		padding: 12px;
-		border: 1px solid var(--rule);
-		border-top: 3px solid var(--accent);
-		border-radius: var(--r2);
-		background: var(--surface);
+		display: grid;
+		align-content: start;
+		grid-template-columns: 32px minmax(0, 1fr);
+		gap: var(--s3);
+		padding-bottom: var(--s4);
+	}
+	.st:not(:last-child)::after {
+		content: '';
+		position: absolute;
+		left: 14.5px;
+		top: 32px;
+		bottom: 0;
+		border-left: 3px solid var(--ink);
+	}
+	.st:has(+ .theirs)::after,
+	.st.theirs:not(:last-child)::after {
+		border-left-style: dashed;
+		border-left-color: var(--ink-2);
+	}
+	.dot {
+		position: relative;
+		z-index: 1;
+		display: inline-grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: var(--act);
+		color: var(--act-ink);
+		font-weight: var(--w-title);
+		font-size: var(--t-sm);
+		font-variant-numeric: tabular-nums;
+	}
+	.theirs .dot {
+		background: var(--panel);
+		color: var(--ink);
+		box-shadow: inset 0 0 0 2px var(--ink-2);
+	}
+	.body {
+		display: grid;
+		gap: var(--s1);
 		min-width: 0;
 	}
-	.node.theirs {
-		border-top-color: var(--pre);
-		background: var(--surface-2);
-	}
-	.node:not(:last-child)::after {
-		content: '→';
-		position: absolute;
-		right: -13px;
-		top: 18px;
-		color: var(--muted);
-		font-size: 14px;
-		line-height: 1;
-	}
-	.step {
-		font-size: var(--fs-xs);
-		color: var(--muted);
-	}
 	.name {
-		font-family: var(--font-display);
-		font-weight: 650;
-		font-size: var(--fs-lg);
-		line-height: 1.2;
+		font-weight: var(--w-title);
+		line-height: 32px;
 	}
 	.cmds {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 4px;
+		gap: var(--s1);
 	}
 	.cmds code {
-		padding: 1px 6px;
-		border-radius: 4px;
-		background: var(--surface-2);
-		font-size: 0.74rem;
+		padding: 0 6px;
+		border: 1px solid var(--rule);
+		border-radius: var(--r1);
+		background: var(--panel);
+		font-size: var(--t-xs);
+		line-height: 20px;
 		white-space: nowrap;
 	}
-	.theirs .cmds code {
-		background: var(--surface);
-	}
-	.what {
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
-		line-height: 1.45;
+	.route .what {
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 	.by {
-		margin-top: auto;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
 		color: var(--muted);
 	}
-	@media (max-width: 1060px) {
-		.flow {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+	@container (min-width: 820px) {
+		.route {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+			column-gap: var(--s3);
 		}
-		.node:nth-child(3)::after {
-			content: none;
-		}
-	}
-	@media (max-width: 640px) {
-		.flow {
+		.st {
 			grid-template-columns: minmax(0, 1fr);
-			gap: 18px;
+			gap: var(--s2);
+			padding-bottom: 0;
 		}
-		.node:not(:last-child)::after {
-			content: '↓';
-			right: auto;
-			left: 50%;
-			top: auto;
-			bottom: -17px;
+		.st:not(:last-child)::after {
+			left: 32px;
+			right: calc(-1 * var(--s3));
+			top: 14.5px;
+			bottom: auto;
+			border-left: 0;
+			border-top: 3px solid var(--ink);
 		}
-		.node:nth-child(3)::after {
-			content: '↓';
+		.st:has(+ .theirs)::after,
+		.st.theirs:not(:last-child)::after {
+			border-left: 0;
+			border-top-style: dashed;
+			border-top-color: var(--ink-2);
+		}
+		.name {
+			line-height: var(--lh-md);
 		}
 	}
-	.testcard {
+
+	/* quick start */
+	.tabs {
+		margin-bottom: var(--s4);
+	}
+	.panel-q[hidden] {
+		display: none;
+	}
+	.setup-grid {
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
-		gap: var(--s5);
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--s4) var(--s5);
 		align-items: start;
 	}
-	.big {
-		margin: 0;
-		font-size: var(--fs-2xl);
-		font-weight: 700;
-		color: var(--accent-strong);
-		white-space: nowrap;
-	}
-	@media (max-width: 640px) {
-		.testcard {
-			grid-template-columns: minmax(0, 1fr);
-			gap: var(--s3);
+	@container (min-width: 820px) {
+		.setup-grid {
+			grid-template-columns: minmax(0, 1fr) 300px;
 		}
 	}
-	.next {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
-		gap: var(--s3);
-	}
-	.go {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		color: var(--ink);
-		text-decoration: none;
-	}
-	.go strong {
-		color: var(--accent-strong);
-	}
-	.go span {
-		font-size: var(--fs-sm);
+	.status {
+		padding: var(--s3) var(--s4);
+		border: 1px solid var(--rule);
+		border-left: 3px solid var(--line-control);
+		border-radius: 0 var(--r3) var(--r3) 0;
+		background: var(--panel);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 		color: var(--ink-2);
 	}
-	.go:hover {
-		border-color: var(--accent);
+	.status p {
+		margin: 0 0 var(--s2);
+	}
+	.status .from {
+		margin: var(--s2) 0 0;
+		color: var(--muted);
+	}
+	.clip {
+		position: relative;
+		max-height: var(--clip);
+		overflow: hidden;
+	}
+	.clip.open {
+		max-height: none;
+	}
+	.clip:not(.open)::after {
+		content: '';
+		position: absolute;
+		inset: auto 1px 1px;
+		height: 56px;
+		border-radius: 0 0 var(--r3) var(--r3);
+		background: linear-gradient(to bottom, transparent, var(--well));
+		pointer-events: none;
+	}
+	.clip :global(.code) {
+		margin-bottom: 0;
+	}
+	.more {
+		margin-top: var(--s2);
+	}
+	.note {
+		margin: var(--s4) 0 0;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--ink-2);
+		max-width: 75ch;
 	}
 </style>

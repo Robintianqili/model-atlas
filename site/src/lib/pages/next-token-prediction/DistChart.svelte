@@ -218,11 +218,11 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.axis {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 	}
 	.uni {

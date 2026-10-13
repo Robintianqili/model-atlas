@@ -209,7 +209,7 @@
 	}
 	.tick {
 		fill: var(--muted);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 	}
 </style>

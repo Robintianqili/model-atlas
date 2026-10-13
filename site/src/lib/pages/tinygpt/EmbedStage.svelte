@@ -127,7 +127,7 @@
 		justify-items: start;
 	}
 	figcaption {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 		line-height: 1.35;
 	}

@@ -81,7 +81,7 @@
 		</div>
 		<p class="note">{t({ en: 'Each box is one pre-token. Merges happen only inside a box, never across two boxes.', zh: '每个方框是一个预分词片段。合并只发生在方框内部，绝不会跨越两个方框。' })}</p>
 	{:else}
-		<p class="muted">{t({ en: 'Your text is empty. Pick a preset or type something under “Your text”.', zh: '你的文本是空的。在“你的文本”里选一个预设，或者输入一些内容。' })}</p>
+		<p class="muted">{t({ en: 'Your text is empty. Open “Your text” at the top of the stage: pick a preset or type something.', zh: '你的文本是空的。打开演示区顶部的“你的文本”，选一个预设，或者输入一些内容。' })}</p>
 	{/if}
 </div>
 

@@ -32,8 +32,8 @@
 
 <figure class="cb">
 	<figcaption>
-		<span class="num">{caption ? t(caption) : lang}</span>
-		<button type="button" class="btn ghost copy" onclick={copy}>{copied ? '✓' : t({ en: 'Copy', zh: '复制' })}</button>
+		<span class="cap">{caption ? t(caption) : lang}</span>
+		<button type="button" class="btn ghost copy" onclick={copy}>{copied ? t({ en: 'Copied', zh: '已复制' }) : t({ en: 'Copy', zh: '复制' })}</button>
 	</figcaption>
 	<pre use:keyScroll><code
 			>{#each lines as l, i (i)}<span class="ln" class:hl={highlight.includes(i + start)}><span class="no" aria-hidden="true">{i + start}</span>{l || ' '}
@@ -42,41 +42,60 @@
 </figure>
 
 <style>
+	/* redesign spec §6.8: mono 14/22 on --well, a head with the file and a copy button; the highlighted line has the
+	   "here" style (an ink bar on a pale row), not the look-here yellow */
 	.cb {
 		margin: 0;
 		border: 1px solid var(--rule);
-		border-radius: var(--r2);
+		border-radius: var(--r3);
 		overflow: hidden;
-		background: var(--surface-2);
+		background: var(--well);
 		min-width: 0;
 	}
 	figcaption {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 2px 4px 2px 12px;
+		gap: var(--s3);
+		min-height: 36px;
+		padding: 0 4px 0 var(--s4);
 		border-bottom: 1px solid var(--rule);
-		font-size: var(--fs-xs);
+		background: color-mix(in srgb, var(--sunken) 45%, var(--well));
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
 		color: var(--muted);
 	}
+	/* a file path or a sentence: the sans, wrapping on narrow screens */
+	.cap {
+		min-width: 0;
+		padding-block: 6px;
+		overflow-wrap: anywhere;
+	}
 	.copy {
-		min-height: 28px;
-		font-size: var(--fs-xs);
+		flex: none;
+		min-height: 30px;
+		padding: 0 var(--s3);
+		border-radius: var(--r2);
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
 	}
 	pre {
 		margin: 0;
-		padding: 8px 0;
+		font-variant-ligatures: none;
+		padding: var(--s2) 0;
 		border-radius: 0;
-		font-size: 0.82rem;
+		background: none;
+		font-size: var(--t-sm);
+		line-height: 22px;
 	}
 	.ln {
 		display: block;
-		padding-right: 12px;
+		padding-right: var(--s4);
 		white-space: pre;
 	}
 	.ln.hl {
-		background: var(--accent-soft);
-		box-shadow: inset 3px 0 0 var(--accent);
+		background: var(--here-bg);
+		box-shadow: inset 3px 0 0 var(--here);
 	}
 	.no {
 		display: inline-block;

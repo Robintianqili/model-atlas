@@ -4,7 +4,6 @@
   (b) MNLI first, then RTE vs RTE directly, 5 seeds (research/bert_improve.json)
 -->
 <script lang="ts">
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { categorical } from '$lib/kit/color';
 	import { themeState } from '$lib/kit/theme.svelte';
 	import { fmtInt } from '$lib/kit/format';
@@ -28,7 +27,6 @@
 	<figure class="fig">
 		<figcaption>
 			<span>{t({ en: 'Frozen BERT features + linear probe vs full fine-tuning (dev accuracy %)', zh: '冻结的 BERT 特征 + 线性探针 vs 全量微调（验证集正确率 %）' })}</span>
-			<ProvenanceBadge mode="precomputed" compact note={{ en: 'From our BERT reproduction (research/bert_facts.json).', zh: '来自我们的 BERT 复现（research/bert_facts.json）。' }} />
 		</figcaption>
 		<ul class="legend">
 			<li><svg width="14" height="12" aria-hidden="true"><path d={markerPath('circle', 4.5)} transform="translate(7,6)" fill={cFrozen} /></svg>{t({ en: 'frozen features (best probe)', zh: '冻结特征（最佳探针）' })}</li>
@@ -105,7 +103,7 @@
 		stroke: var(--rule);
 	}
 	.tick {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		font-family: var(--font-mono);
 	}
@@ -128,7 +126,7 @@
 		paint-order: stroke;
 	}
 	.val {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 		font-family: var(--font-mono);
 	}

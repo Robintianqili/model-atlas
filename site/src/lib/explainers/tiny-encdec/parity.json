@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "tiny-encdec",
+ "checked": "2026-10-12",
+ "sources": {
+  "decode": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 9.16e-16,
+   "frames": 23,
+   "fixtures": 16,
+   "checked": "2026-10-12"
+  }
+ }
+}

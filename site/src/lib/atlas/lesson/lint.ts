@@ -126,13 +126,15 @@ export async function lintLesson(
 					}
 					if (lang === 'en') {
 						const same = samePrint(r);
-						if (same)
+						// K4: a step may name values that coincide on purpose or by chance (lint: { same: [names] })
+						const quiet = (step.src as { lint?: { same?: string[] } }).lint?.same ?? [];
+						if (same && !quiet.includes(same.a) && !quiet.includes(same.b))
 							push({
 								code: 'AK410',
 								level: 'warn',
 								...where,
 								message: `${field}: {${same.a}} = ${same.va} and {${same.b}} = ${same.vb} both print as "${same.text}", so the learner sees no difference`,
-								fix: 'narrate the change itself (a vars() entry such as drop: before - after), or give both more digits with {name|n4}'
+								fix: 'narrate the change itself (a vars() entry such as drop: before - after), or give both more digits with {name|n4}; two unrelated values that coincide: lint: { same: [name] } on the step'
 							});
 					}
 					for (const name of r.missing) {
@@ -156,7 +158,19 @@ export async function lintLesson(
 			for (const [what, fn] of [
 				['focus', () => step.focus(rt, pos.at)],
 				['props', () => step.props(rt, pos.at)],
-				['task.done', () => step.task?.done(rt, pos.at)]
+				['task.done', () => step.task?.done(rt, pos.at)],
+				// K4: the live predict parts must give a valid question on every fixture, in both languages
+				[
+					'predictAt',
+					() => {
+						const p = step.predictAt?.(rt, pos.at);
+						if (!p || !step.predict) return;
+						const options = p.options ?? step.predict.options;
+						const answer = p.answer ?? step.predict.answer;
+						if (!(Number.isInteger(answer) && answer >= 0 && answer < options.length)) throw new Error(`answer ${answer} is not one of the ${options.length} options`);
+						for (const x of [...(p.options ?? []), ...(p.explain ? [p.explain] : [])]) if (!x?.en?.trim() || !x?.zh?.trim()) throw new Error(`an option or the explanation has no ${!x?.en?.trim() ? 'en' : 'zh'}: ${JSON.stringify(x).slice(0, 60)}`);
+					}
+				]
 			] as const) {
 				try {
 					fn();

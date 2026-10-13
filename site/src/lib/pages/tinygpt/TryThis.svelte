@@ -239,7 +239,7 @@
 	}
 	.tag {
 		display: inline-block;
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

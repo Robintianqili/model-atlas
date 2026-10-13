@@ -66,8 +66,8 @@ panels on one domain or two lines on one axis.
 ## 5. The axe gate (AK604) and its fixes
 
 `atlas e2e` scans every step of every pass with axe (WCAG 2.1 A and AA). Serious and critical violations fail `check`;
-moderate and minor ones warn. While iterating, `e2e <slug> --axe warn`; read `notes/shots/<slug>/contact/axe.txt`
-(each rule with its steps, nodes and help link) and `axe-<pass>.json`.
+moderate and minor ones warn. Read `notes/shots/<slug>/contact/axe.txt` from the full check (each rule with its steps,
+nodes and help link) and `axe-<pass>.json`; after a fix, re-run that gate alone (`check <slug> --only e2e`).
 
 | axe rule | Cause | Kit fix |
 |---|---|---|
@@ -84,8 +84,8 @@ Kit components (CodeBlock, Tex, FormulaCard, TensorGrid, the kit views) already 
 themes.
 
 Outside the gate: `atlas e2e` scans package lesson pages only. A change to a hand-built page (`/m/tinycnn/`,
-`/m/tinygpt/`, the three hand-built concepts) or a site page (home, atlas, glossary, about, `/devkit/`) needs its own
-scan before a release.
+`/m/tinygpt/`, the three hand-built concepts) or a site page (home, atlas, glossary, about, `/devkit/`) gets its axe
+scan in the full-site sweep before a public release.
 
 ## 6. Design skills
 

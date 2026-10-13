@@ -1,7 +1,8 @@
 <!--
   Tooltip: shows `tip` (text) or the `content` snippet on hover, keyboard focus or tap.
   Escape closes it. The wrapper is focusable unless `focusable={false}` (use that when the
-  child is already a button or link; focus inside still opens the tip).
+  child is already a button or link; focus inside still opens the tip). `onopen` runs each time it opens (Term loads
+  the glossary definitions there).
 
   <Tooltip tip="Full value: 0.123456">0.123</Tooltip>
   <Tooltip>{#snippet content()}<b>Rich</b> tip{/snippet}<span>hover me</span></Tooltip>
@@ -20,6 +21,8 @@
 		class?: string;
 		/** max bubble width in px */
 		width?: number;
+		/** called each time the tip opens (hover, focus or tap): lazy content loads here */
+		onopen?: () => void;
 	}
 
 	let {
@@ -29,7 +32,8 @@
 		focusable = true,
 		placement = 'top',
 		class: klass = '',
-		width = 280
+		width = 280,
+		onopen
 	}: Props = $props();
 
 	const id = $props.id();
@@ -58,6 +62,7 @@
 	});
 
 	function show() {
+		if (!open) onopen?.();
 		open = true;
 	}
 	function hide() {
@@ -67,6 +72,7 @@
 		// a tap on touch devices: pin open / closed. Mouse users get hover anyway.
 		if ((e as PointerEvent).pointerType === 'mouse') return;
 		pinned = !pinned;
+		if (pinned && !open) onopen?.();
 		open = pinned;
 	}
 	function onkey(e: KeyboardEvent) {
@@ -118,7 +124,7 @@
 		cursor: help;
 	}
 	.tt[role='button']:focus-visible {
-		outline: 2px solid var(--accent);
+		outline: 2px solid var(--ink);
 		outline-offset: 2px;
 		border-radius: 3px;
 	}
@@ -128,14 +134,14 @@
 		z-index: 60;
 		width: max-content;
 		transform: translateX(calc(-50% + var(--shift)));
-		padding: 8px 10px;
-		border-radius: var(--r2);
+		padding: 10px 12px;
+		border-radius: var(--r3);
 		background: var(--ink);
-		color: var(--bg);
-		font-family: var(--font-body);
-		font-size: var(--fs-sm);
-		font-weight: 400;
-		line-height: 1.45;
+		color: var(--paper);
+		font-family: var(--font-sans);
+		font-size: var(--t-sm);
+		font-weight: var(--w-body);
+		line-height: var(--lh-sm);
 		letter-spacing: normal;
 		text-transform: none;
 		text-align: left;

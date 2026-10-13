@@ -339,7 +339,10 @@ export function trainingProcess<D, M extends Module, B, O extends TrainOpt>(def:
 					}
 					take(yield frame);
 					if (last || stop) break;
-					if (finite) optim.step();
+					if (finite) {
+						optim.step();
+						def.project?.(model, opt);
+					}
 					k++;
 				} else {
 					take(yield { phase: 'forward', step: k, state: { step: k, batch: batchTensors(b), acts }, metrics: { step: k, lr } });
@@ -357,13 +360,15 @@ export function trainingProcess<D, M extends Module, B, O extends TrainOpt>(def:
 					take(yield { phase: 'backward', step: k, state: { step: k, grads }, metrics: { step: k, loss: L, lr, gradNorm: gradNorm(params) } });
 					const prev = copyParams(params);
 					optim.step();
+					// K4: a constraint after the step (TransE's unit length); the frame then says the update was projected
+					if (def.project) def.project(model, opt);
 					const wd = (optim as { weightDecay?: number }).weightDecay ?? 0;
 					take(
 						yield {
 							phase: 'update',
 							step: k,
 							state: { step: k, params: copyParams(params), prev, grads, opt: copyOptState(optim.state()), lr, optimizer: optName() },
-							metrics: { step: k, loss: L, lr, weightDecay: wd }
+							metrics: { step: k, loss: L, lr, weightDecay: wd, ...(def.project ? { projected: 1 } : {}) }
 						}
 					);
 					k++;

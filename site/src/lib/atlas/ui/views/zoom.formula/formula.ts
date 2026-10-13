@@ -1,7 +1,7 @@
 // Which formula zoom.formula shows (pure TS; meta.ts uses it for describe()).
 import type { I18n } from '../../../types/index.ts';
 import type { Frame, PhaseDef } from '../../../types/process.ts';
-import { layerLabel, resolveUnit, unitWhere, axesOfId, type Props } from '../kit.parts/stage.ts';
+import { axesOfId, axisNames, layerLabel, type Props, resolveUnit, unitWhere } from '../kit.parts/stage.ts';
 
 export interface FormulaSpec {
 	tex: string;
@@ -69,7 +69,7 @@ export function formulaOf(p: Props): FormulaSpec | null {
 	const r = resolveUnit(p);
 	if (r.e && r.op?.def.formula) {
 		const out = r.trace?.t[r.e.layer];
-		const w = unitWhere(r.e.unit, out ? axesOfId(r.model, r.e.layer, out.shape) : []);
+		const w = unitWhere(r.e.unit, out ? axesOfId(r.model, r.e.layer, out.shape) : [], undefined, undefined, axisNames(p));
 		const name = layerLabel(r.model, r.e.layer);
 		return { tex: r.op.def.formula, values: { ...r.e.values }, caption: caption ?? { en: `${name.en}, ${w.en}`, zh: `${name.zh ?? name.en}，${w.zh}` }, legend, from: 'op' };
 	}

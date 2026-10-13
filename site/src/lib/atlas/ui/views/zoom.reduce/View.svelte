@@ -15,7 +15,7 @@
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import SpatialMaps from '../kit.parts/SpatialMaps.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, domainOf, layerLabel, resolveUnit, scanDriven, tensorOf, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, domainOf, gridRows, layerLabel, resolveUnit, scanDriven, tensorOf, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -29,13 +29,19 @@
 	const id = $derived(e?.layer ?? R.id ?? '');
 	const out = $derived(R.trace && id ? R.trace.t[id] : null);
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
-	const where = $derived(e ? unitWhere(e.unit, axes) : null);
+	const where = $derived(e ? unitWhere(e.unit, axes, undefined, undefined, axisNames(P)) : null);
 	const xId = $derived(e?.reads[0]?.tensor ?? '');
 	const xT = $derived(R.trace && xId ? tensorOf(R.trace, xId) : null);
 	const spatial = $derived(!!xT && xT.shape.length === 3 && axes.join() === 'c,y,x');
 	const terms = $derived(e?.terms ?? []);
-	const k = $derived(e?.layout?.rows ?? Math.round(Math.sqrt(terms.length)));
+	// K4: without a layout the window is the most square grid that holds exactly its terms (3 terms: 1 × 3, never a 2 × 2
+	// grid with an empty NaN cell)
+	const k = $derived(e?.layout?.rows ?? gridRows(terms.length));
 	const kc = $derived(e?.layout?.cols ?? (k ? Math.ceil(terms.length / k) : 0));
+	// K4: a plain sum (every weight 1) or a mean (every weight 1/n) says so, instead of "each number is weighted"
+	const same = $derived(terms.length > 1 && terms.every((x) => x.w === terms[0].w));
+	const plainSum = $derived(same && terms[0].w === 1);
+	const mean = $derived(same && Math.abs(terms[0].w * terms.length - 1) < 1e-9);
 	const isMax = $derived(terms.length > 0 && terms.every((x) => x.w === 0 || x.w === 1) && terms.filter((x) => x.w === 1).length === 1);
 	const win = $derived(terms.findIndex((x) => x.w === 1));
 	const ch = $derived(spatial && e ? e.unit[0] : 0);
@@ -93,7 +99,7 @@
 					label={{ en: 'window', zh: '窗口' }}
 				/>
 			</figure>
-			<span class="op" aria-hidden="true">{isMax ? '→ max →' : '→ Σ w·x →'}</span>
+			<span class="op" aria-hidden="true">{isMax ? '→ max →' : plainSum ? '→ Σ x →' : mean ? '→ mean →' : '→ Σ w·x →'}</span>
 			<span class="res num"><Num value={e.result} signed /></span>
 		</div>
 		<p class="txt">
@@ -102,12 +108,16 @@
 					en: `The largest of the ${terms.length} numbers is ${fmt3(terms[win].x)} (${posName(win).en}). It is copied to the output; the other ${terms.length - 1} are dropped.`,
 					zh: `${terms.length} 个数中最大的是 ${fmt3(terms[win].x)}（${posName(win).zh}）。它被复制到输出，其余 ${terms.length - 1} 个被丢掉。`
 				})}
+			{:else if plainSum}
+				{t({ en: `The ${terms.length} numbers are added: ${fmt3(e.result)}.`, zh: `这 ${terms.length} 个数相加：${fmt3(e.result)}。` })}
+			{:else if mean}
+				{t({ en: `The mean of the ${terms.length} numbers (their sum divided by ${terms.length}): ${fmt3(e.result)}.`, zh: `这 ${terms.length} 个数的平均值（总和除以 ${terms.length}）：${fmt3(e.result)}。` })}
 			{:else}
 				{t({ en: `Each number is weighted and the results are added: ${fmt3(e.result)}.`, zh: `每个数乘以权重后相加：${fmt3(e.result)}。` })}
 			{/if}
 		</p>
 
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 
@@ -130,7 +140,7 @@
 		gap: 3px;
 	}
 	.ng figcaption {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.op {

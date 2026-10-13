@@ -18,7 +18,7 @@
 	import { categorical } from '$lib/kit/color';
 	import { themeState } from '$lib/kit/theme.svelte';
 	import { fmt3 } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import Notice from '../kit.parts/Notice.svelte';
 	import { domainOf, outLabels, stageModel, stageTrace, tokenIds, tokenTexts } from '../kit.parts/stage.ts';
@@ -34,7 +34,7 @@
 	const model = $derived(stageModel(P));
 	const ids = $derived(tokenIds(stageTrace(P), model));
 	const T = $derived(X && (X.axes[0] === 't' || X.axes[1] === 'tq') ? (X.axes[0] === 't' ? shape[0] : shape[1]) : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, ids) : []);
+	const tokens = $derived(T ? tokenTexts(P, T, ids, i18n.lang) : []);
 	const labels = $derived(outLabels(P, model));
 	/** the focused cell of this tensor (step focus, or the stage's unit) */
 	const focusCell = $derived.by<number[] | null>(() => {

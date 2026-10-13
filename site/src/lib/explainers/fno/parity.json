@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "fno",
+ "checked": "2026-10-12",
+ "sources": {
+  "solve": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 51,
+   "fixtures": 9,
+   "checked": "2026-10-12"
+  }
+ }
+}

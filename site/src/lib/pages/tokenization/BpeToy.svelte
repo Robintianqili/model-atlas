@@ -5,36 +5,28 @@
   how one token was built, the learned vocabulary, and tokens vs vocabulary size.
 -->
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import TextInputBar from '$lib/kit/TextInputBar.svelte';
 	import StepPlayer from '$lib/kit/StepPlayer.svelte';
 	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { t, i18n } from '$lib/i18n/i18n.svelte';
 	import { fmtInt } from '$lib/kit/format';
-	import { bytesToDisplay, type BPETokenizer } from '$lib/models/bpe';
+	import { bytesToDisplay } from '$lib/models/bpe';
 	import Chips from './Chips.svelte';
 	import Tok from './Tok.svelte';
 	import type { ChipItem } from './types';
 	import TokenCurve from './TokenCurve.svelte';
-	import { segment, mergeTree, type TrainTrace, type MergeTree, type PairCount } from './train';
+	import { segment, mergeTree, type MergeTree, type PairCount } from './train';
 	import { PRESETS } from './presets';
-	import { conn } from './state.svelte';
+	import type { TokPage } from './page.svelte';
 
-	interface Props {
-		text: string;
-		k: number;
-		trace: TrainTrace | null;
-		/** the text the current trace was trained on (bindable; `text` may be newer while training) */
-		trained?: string;
-		tiny: BPETokenizer | null;
-	}
-	let { text = $bindable(), k = $bindable(), trace = $bindable(), trained = $bindable(''), tiny }: Props = $props();
-
-	const MAX_MERGES = 767; // the same number of merges TinyGPT's tokenizer has
-	let training = $state(false);
-	let ms = $state(0);
-	let error = $state('');
-	let seq = 0;
+	// The page trains the text (TokPage.train, in its Web Worker): the lesson needs the trace too, also while this view is closed.
+	let { P }: { P: TokPage } = $props();
+	const trace = $derived(P.trace);
+	const tiny = $derived(P.tiny);
+	const text = $derived(P.trainText);
+	const training = $derived(P.training);
+	const ms = $derived(P.ms);
+	const error = $derived(P.trainError || P.loadError);
 	// raw: the pairs come from the (raw) trace; a $state proxy of one would never be === to it
 	let hoverPair = $state.raw<PairCount | null>(null);
 	/** the selected chip, remembered by the byte it starts at, so it stays on the same text across merges */
@@ -46,42 +38,12 @@
 		selByte = null;
 	});
 
-	async function run(txt: string) {
-		const c = conn.client;
-		if (!c || !tiny) return;
-		const my = ++seq;
-		training = true;
-		try {
-			const r = await c.train(txt, MAX_MERGES, tiny.pattern, tiny.merges);
-			if (my !== seq) return;
-			trace = r.trace;
-			trained = txt;
-			ms = r.ms;
-			error = '';
-			if (k > r.trace.merges.length) k = r.trace.merges.length;
-		} catch (e) {
-			if (my === seq) error = e instanceof Error ? e.message : String(e);
-		} finally {
-			if (my === seq) training = false;
-		}
-	}
-
-	// re-train (debounced) whenever the text changes or the worker becomes available.
-	// `trace` is read untracked: tracking it made every new trace schedule another training run
-	// (a loop of about 4 trainings per second while the page sat idle).
-	$effect(() => {
-		const txt = text;
-		if (!conn.client || !tiny) return;
-		const id = setTimeout(() => run(txt), untrack(() => trace) ? 250 : 0);
-		return () => clearTimeout(id);
-	});
-
 	const K = $derived(trace?.merges.length ?? 0);
 	// keep k inside 0 … K (a "Try this" may ask for the last merge before training has finished)
 	$effect(() => {
-		if (trace && k > K) k = K;
+		if (trace && P.k > K) P.k = K;
 	});
-	const kk = $derived(Math.min(k, K));
+	const kk = $derived(Math.min(P.k, K));
 	const segs = $derived(trace && tiny ? segment(text, tiny.pattern, trace.merges, kk) : []);
 	const tokensNow = $derived(trace ? (kk === 0 ? trace.initialTokenCount : trace.steps[kk - 1].tokenCount) : 0);
 	const bytesN = $derived(trace?.initialTokenCount ?? 0);
@@ -183,7 +145,7 @@
 
 <div class="toy">
 	<TextInputBar
-		bind:value={text}
+		bind:value={P.trainText}
 		multiline
 		rows={5}
 		maxLength={2000}
@@ -206,7 +168,7 @@
 	</p>
 
 	{#if trace}
-		<StepPlayer count={K + 1} bind:step={k} interval={700} label={{ en: 'Merge by merge', zh: '逐次合并' }}>
+		<StepPlayer count={K + 1} bind:step={P.k} interval={700} label={{ en: 'Merge by merge', zh: '逐次合并' }}>
 			{#snippet children()}
 				<p class="vocab-read" id="vocab-size">
 					<span>{t({ en: 'Vocabulary', zh: '词表' })} = <span class="num">256</span> {t({ en: 'bytes', zh: '个字节' })} + <span class="num acc">{kk}</span> {t({ en: 'merges', zh: '次合并' })} = <b class="num">{256 + kk}</b></span>
@@ -321,7 +283,7 @@
 		<div class="grid2 lower">
 			<div class="chart">
 				<h4>{t({ en: 'Tokens in your text vs vocabulary size', zh: '文本词元数与词表大小' })}</h4>
-				<TokenCurve series={curve} k={kk} pickMax={K} label={{ en: 'Tokens in your text vs vocabulary size', zh: '文本词元数与词表大小' }} onpick={(v) => (k = v)} />
+				<TokenCurve series={curve} k={kk} pickMax={K} label={{ en: 'Tokens in your text vs vocabulary size', zh: '文本词元数与词表大小' }} onpick={(v) => (P.k = v)} />
 				<p class="hint">
 					{#if i18n.lang === 'zh'}
 						用上 TinyGPT 全部 767 次合并，你的文本是 <b class="num">{fmtInt(trace.tiny[trace.tiny.length - 1])}</b> 个词元；只用它的前 <span class="num">{kk}</span> 次合并（和你现在一样多），是 <b class="num">{fmtInt(tinyAtK)}</b> 个。

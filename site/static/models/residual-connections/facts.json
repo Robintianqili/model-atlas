@@ -1,0 +1,29 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "gptBlocks": {
+   "value": 4,
+   "unit": "blocks",
+   "source": "static/models/tinygpt/spec.json (nLayer)",
+   "measured": "2026-10-13"
+  },
+  "gptAdds": {
+   "value": 8,
+   "unit": "additions",
+   "source": "static/models/tinygpt/spec.json (layers with op add named L*.resid1, L*.resid2)",
+   "measured": "2026-10-13"
+  },
+  "gptNorms": {
+   "value": 9,
+   "unit": "layers",
+   "source": "static/models/tinygpt/spec.json (layers with op layernorm)",
+   "measured": "2026-10-13"
+  },
+  "gptWidth": {
+   "value": 76,
+   "unit": "numbers per token",
+   "source": "static/models/tinygpt/spec.json (dModel)",
+   "measured": "2026-10-13"
+  }
+ }
+}

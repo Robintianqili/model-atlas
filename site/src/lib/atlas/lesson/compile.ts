@@ -6,6 +6,10 @@
 // (undeclared source), AK405 (view not registered, when a view list is given), AK406 (missing zh), AK407 (lesson shape),
 // AK409 (a 'reviewed' lesson made only of auto steps), AK411 (a step term in no glossary, when a glossary is given),
 // AK412 (a predict step's narration gives the answer away, warning), AK501 (TODO markers), AK502 (provenance).
+// Redesign W2 (R1, all warnings): AK413 (chapters: 2-4, 1-6 steps each, every step in exactly one, in order), AK414 (a
+// look line over 25 words), AK415 (a narration over 60 words; the gate stays AK407 at 90), AK416 (an index typed as
+// "W0": use <sub> or W₀), AK417 (a Why answer over 120 words, or a Why summary that is not a question), AK418
+// (page.poster names no step of the lesson).
 import type { I18n, PredictQuestion, Provenance } from '../types/core.ts';
 import type { AtlasSpec } from '../types/spec.ts';
 import type { OpDef, OpRegistry } from '../types/op.ts';
@@ -14,7 +18,7 @@ import type { At, AutoRef, CompiledStep, LessonDef, LintIssue, Narration, StepDe
 import type { ExplainerManifest, InputAdapter } from '../types/explainer.ts';
 import type { ExplainerRuntime } from '../types/runtime.ts';
 import { isAutoRef, sourceDef, sourcesOf, stepSlug } from './define.ts';
-import { FORMATS, literalNumbers, placeholderNames, placeholders, renderI18n, sentenceCount, wordCount } from './narrate.ts';
+import { FORMATS, hasRefs, literalNumbers, placeholderNames, placeholders, renderI18n, sentenceCount, wordCount } from './narrate.ts';
 import { planLesson } from './plan.ts';
 
 export interface CompileCtx {
@@ -64,6 +68,16 @@ export interface CompiledLesson {
 	steps: AtlasCompiledStep[];
 	issues: LintIssue[];
 	plan: StepDef[];
+	/** R1: LessonDef.chapters (the steps that exist, in lesson order) */
+	chapters?: { id: string; title: I18n; steps: string[] }[];
+	/** R1: LessonDef.recap, rendered over a step's moment */
+	recap?: ((rt: ExplainerRuntime, at: At) => I18n)[];
+}
+
+/** An index typed into a word ("W0", "x1"): AK416 asks for a subscript (placeholders are not text). */
+export function typedIndices(text: string | undefined): string[] {
+	const plain = (text ?? '').replace(/\{[^}]*\}/g, ' ');
+	return [...new Set(plain.match(/\b[A-Za-z]0\b/g) ?? [])];
 }
 
 const PROVENANCE = new Set<Provenance>(['live', 'precomputed', 'illustrative']);
@@ -114,11 +128,22 @@ export function compileStep(s: StepDef<any>, o: { origin: 'auto' | 'author'; aut
 	if (s.play !== undefined) step.play = s.play;
 	if (s.select) step.select = s.select;
 	if (s.predict) step.predict = s.predict;
+	if (s.predictAt) step.predictAt = (rt: ExplainerRuntime, at: At) => s.predictAt!(rt, at);
 	if (s.task) step.task = s.task;
 	if (s.compare) step.compare = s.compare;
 	if (s.kindOf) step.kindOf = s.kindOf;
 	if (s.linger !== undefined) step.linger = s.linger;
 	if (s.duration !== undefined) step.duration = s.duration;
+	if (s.why) {
+		const why = s.why;
+		step.why = { q: why.q, a: (rt: ExplainerRuntime, at: At) => renderI18n(why.a as Narration<ExplainerRuntime>, rt, withSource(at, source)) };
+	}
+	if (s.refs) step.refs = (rt: ExplainerRuntime, at: At) => s.refs!(rt, at);
+	if (hasRefs(s.narration) || hasRefs(s.look)) {
+		step.chips = {};
+		if (hasRefs(s.narration)) step.chips.narration = (rt: ExplainerRuntime, at: At) => renderI18n(s.narration as Narration<ExplainerRuntime>, rt, withSource(at, source), { chips: true });
+		if (s.look && hasRefs(s.look)) step.chips.look = (rt: ExplainerRuntime, at: At) => renderI18n(s.look as Narration<ExplainerRuntime>, rt, withSource(at, source), { emptyLine: false, chips: true });
+	}
 	return step;
 }
 
@@ -215,6 +240,8 @@ export function compileLesson(def: LessonDef<any> | null, ctx: CompileCtx): Comp
 		const glossary = new Set((m.glossary ?? []).map((g) => g.id));
 		for (const id of s.terms) if (ctx.terms && !ctx.terms(id) && !glossary.has(id)) err('AK411', `term '${id}' is in neither the site glossary nor manifest.glossary`, { ...at, fix: 'use a glossary id (src/lib/catalog/glossary.ts), or add { id, term, def } to manifest.glossary' });
 		const q: PredictQuestion | undefined = src.predict;
+		// K4: predictAt gives the live options, answer and explanation; the question itself stays in predict
+		if (src.predictAt && !q) err('AK407', 'predictAt needs predict (the question, and the options and answer it falls back to)', at);
 		if (q) {
 			// K1: the title and the look hint show before the answer too
 			for (const [field, text] of [
@@ -237,5 +264,54 @@ export function compileLesson(def: LessonDef<any> | null, ctx: CompileCtx): Comp
 		if (src.compare) for (const k of [src.compare.a, src.compare.b]) if (!sourceDef(m, k)) err('AK404', `compare source '${k}' is not declared`, at);
 		if (src.provenance && typeof src.provenance === 'object' && src.provenance.note && !hasZh(src.provenance.note)) err('AK406', 'the provenance note has no zh', { ...at, lang: 'zh' });
 	}
-	return { id: lesson.id ?? 'lesson', title: lesson.title, summary: lesson.summary, steps, issues, plan };
+	// ------------------------------------------------------------------ R1 (redesign W2): chapters, recap, caps (warnings)
+	const ids = steps.map((s) => s.id);
+	let chapters: CompiledLesson['chapters'];
+	if (lesson.chapters?.length) {
+		const cs = lesson.chapters;
+		const flat = cs.flatMap((c) => c.steps.map(stepSlug));
+		if (cs.length < 2 || cs.length > 4) warn('AK413', `the lesson has ${cs.length} chapters (aim for 2-4)`);
+		for (const c of cs) {
+			if (!hasZh(c.title)) warn('AK413', `chapter '${c.id}' has no zh title`, { lang: 'zh' });
+			if (c.steps.length < 1 || c.steps.length > 6) warn('AK413', `chapter '${c.id}' has ${c.steps.length} steps (1-6)`);
+			for (const sid of c.steps) if (!ids.includes(stepSlug(sid))) warn('AK413', `chapter '${c.id}' names step '${sid}', which the lesson does not have`, { fix: `step ids: ${ids.join(', ')}` });
+		}
+		const missing = ids.filter((id) => !flat.includes(id));
+		const twice = flat.filter((id, i) => flat.indexOf(id) !== i);
+		if (missing.length) warn('AK413', `steps in no chapter: ${missing.join(', ')}`);
+		if (twice.length) warn('AK413', `steps in two chapters: ${[...new Set(twice)].join(', ')}`);
+		const order = flat.filter((id) => ids.includes(id)).map((id) => ids.indexOf(id));
+		if (order.some((v, i) => i > 0 && v < order[i - 1])) warn('AK413', 'the chapters list the steps out of lesson order');
+		chapters = cs.map((c) => ({ id: c.id, title: c.title, steps: c.steps.map(stepSlug).filter((id) => ids.includes(id)) }));
+	}
+	let recap: CompiledLesson['recap'];
+	if (lesson.recap?.length) {
+		if (lesson.recap.length > 3) warn('AK413', `the recap has ${lesson.recap.length} lines (at most 3)`);
+		recap = lesson.recap.slice(0, 3).map((r) => (rt: ExplainerRuntime, at: At) => renderI18n(r as Narration<ExplainerRuntime>, rt, at));
+	}
+	for (const s of steps) {
+		const src = s.src;
+		const at = { step: s.id };
+		const w = src.narration?.en ? wordCount(src.narration.en) : 0;
+		if (w > 60 && w <= 90) warn('AK415', `narration has ${w} words (the content pass caps it at 60; move the rest into why)`, at);
+		const lw = src.look?.en ? wordCount(src.look.en) : 0;
+		if (lw > 25) warn('AK414', `the look line has ${lw} words (at most 25, naming one thing in the stage)`, at);
+		for (const [field, text] of [
+			['title', src.title?.en],
+			['narration', src.narration?.en],
+			['look', src.look?.en]
+		] as const) {
+			const typed = typedIndices(text);
+			if (typed.length) warn('AK416', `the ${field} types the index ${typed.join(', ')} as a word: write W₀ (or <sub>0</sub>)`, at);
+		}
+		if (src.why) {
+			const aw = src.why.a?.en ? wordCount(src.why.a.en) : 0;
+			if (aw > 120) warn('AK417', `the Why answer has ${aw} words (at most 120)`, at);
+			if (!/[?？]\s*$/.test(src.why.q?.en ?? '')) warn('AK417', 'the Why summary should be a question', at);
+			if (!hasZh(src.why.q) || !hasZh(src.why.a as I18n)) warn('AK406', 'the Why needs zh', { ...at, lang: 'zh' });
+		}
+	}
+	const poster = (m.page as { poster?: { step?: string } } | undefined)?.poster?.step;
+	if (poster && !ids.includes(stepSlug(poster))) warn('AK418', `page.poster names step '${poster}', which the lesson does not have`, { fix: `step ids: ${ids.join(', ')}` });
+	return { id: lesson.id ?? 'lesson', title: lesson.title, summary: lesson.summary, steps, issues, plan, ...(chapters ? { chapters } : {}), ...(recap ? { recap } : {}) };
 }

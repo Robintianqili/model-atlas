@@ -1,0 +1,25 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "attention-variants",
+ "checked": "2026-10-13",
+ "sources": {
+  "cache": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "share": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0.00000936,
+   "frames": 6,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  }
+ }
+}

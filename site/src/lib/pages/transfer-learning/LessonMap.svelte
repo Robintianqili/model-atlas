@@ -14,7 +14,7 @@
 	const names = $derived<[string, string]>([t(clsName(0)), t(clsName(1))]);
 	const trail = $derived(L.trail.map((d) => ({ feat: d.feat, n: d.n })));
 	const padLabel = $derived(L.source.kind === 'drawn' ? { en: 'your drawing', zh: '你的画' } : { en: 'this drawing', zh: '这张画' });
-	/** the next held-out test drawing of a class (the same as ‹ › in the “Your drawing” panel) */
+	/** the next held-out test drawing of a class (the same as ‹ › on the stage header’s “Your drawing” chip) */
 	function another(cls: 0 | 1) {
 		const s = L.source;
 		if (s.kind === 'test' && s.cls === cls) L.stepTest(1);
@@ -24,9 +24,9 @@
 
 <div class="lm">
 	{#if L.pca}
-		<PcaMap pca={L.pca} items={[]} pad={L.feat} head={null} trained={false} preset={true} {names} testFeats={null} testLabels={null} {trail} showBar={false} {padLabel} />
+		<PcaMap pca={L.pca} items={[]} pad={L.feat} head={null} trained={false} preset={true} {names} testFeats={null} testLabels={null} {trail} showBar={false} {padLabel} badge={false} />
 	{/if}
-	<!-- one-column layouts (phones): the “Your drawing” panel is far below, so offer the same picks right under the map -->
+	<!-- the same picks as the “Your drawing” chip, right under the map (the chip hides ‹ › on phones) -->
 	<div class="again">
 		<span class="muted">{t({ en: 'Try another drawing:', zh: '换一张试试：' })}</span>
 		<button type="button" class="btn" onclick={() => another(0)}><span class="dot a"></span>{t({ en: 'next ladder', zh: '下一张梯子' })}</button>

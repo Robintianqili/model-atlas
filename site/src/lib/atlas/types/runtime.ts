@@ -9,7 +9,10 @@ import type { LessonDef } from './lesson.ts';
 export interface Preprocessed { tensors: Record<string, AnyTensor>; steps: { id: string; label: I18n; tensor?: Tensor; note?: I18n }[]; empty: boolean; notes?: I18n[]
   /** Revision 1b (additive), text adapters: the display text of each input position, and of any vocabulary id (views show
    *  them instead of '#id'; text-bpe fills both when it has the tokenizer). */
-  tokens?: string[]; vocab?: string[] | ((id: number) => string) }
+  tokens?: string[]; vocab?: string[] | ((id: number) => string)
+  /** K4 (additive): bilingual display names of the input positions (items, clicks, nodes: what a non-text model's rows
+   *  are), preferred to `tokens` by the kit views in the page's language */
+  names?: I18n[] }
 export type SourceDef =
   | { kind: 'trace'; inputs?: string[]; assets?: string }   // assets: another model's folder under static/ ('models/tinycnn'), read via legacy.ts
   | { kind: 'scan'; of: string; layer: string | ((rt: ExplainerRuntime) => string); unit?: (rt: ExplainerRuntime) => number[]; order?: 'raster' | 'peak-first'; stride?: number }
@@ -69,6 +72,9 @@ export interface ExplainerRuntime {
   num(path: string): number;                             // NaN when missing or not a number (lint AK401)
   ensure(source: string, c: Cursor): Promise<number>;    // load/run until the cursor exists; returns a clamped frame index
   setInput(raw: unknown): void;                          // re-runs sources; steps re-resolve their cursors
+  /** K4 (additive): the input presets the runtime loaded (the presets file, or the adapter's presets with
+   *  input.presetsFromAdapter); the runtime always filled it, the type did not say so */
+  readonly presets?: readonly { id: string; label: I18n; raw: unknown }[];
 }
 // W1-C: runtime/runtime.ts createRuntime(pkg: PackageModules, o: { fetch: FetchLike; base: string; input?: unknown; runner?: SourceRunner }): Promise<ExplainerRuntime>
 //       runtime/fake.ts fakeRuntime(partial): ExplainerRuntime (view demos, tests)

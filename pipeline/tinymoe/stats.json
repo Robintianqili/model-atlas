@@ -1,0 +1,706 @@
+{
+ "windows": 4000,
+ "window": 64,
+ "chars": 256000,
+ "caps": [
+  1.0,
+  1.25,
+  1.5,
+  2.0
+ ],
+ "val": {
+  "moe": 1.08914,
+  "noaux": 1.09456,
+  "dense": 1.1682
+ },
+ "params": {
+  "moe": 49418,
+  "noaux": 49418,
+  "dense": 32330
+ },
+ "active": {
+  "moe": 32650,
+  "noaux": 32650,
+  "dense": 32330
+ },
+ "moe": [
+  {
+   "share": [
+    0.33393,
+    0.28346,
+    0.19486,
+    0.18774
+   ],
+   "chance": [
+    0.22636,
+    0.26237,
+    0.27489,
+    0.23638
+   ],
+   "balance": 0.99162,
+   "busiest": 0.33393,
+   "quietest": 0.18774,
+   "dropped": {
+    "1.0": {
+     "slots": 0.11861,
+     "both": 0.03837,
+     "cap": 32
+    },
+    "1.25": {
+     "slots": 0.02618,
+     "both": 0.00061,
+     "cap": 40
+    },
+    "1.5": {
+     "slots": 0.00072,
+     "both": 0.0,
+     "cap": 48
+    },
+    "2.0": {
+     "slots": 0.0,
+     "both": 0.0,
+     "cap": 64
+    }
+   },
+   "top": [
+    [
+     {
+      "char": "b",
+      "share": 1.0,
+      "count": 3160
+     },
+     {
+      "char": "c",
+      "share": 1.0,
+      "count": 3589
+     },
+     {
+      "char": "f",
+      "share": 1.0,
+      "count": 2921
+     },
+     {
+      "char": "o",
+      "share": 1.0,
+      "count": 13465
+     },
+     {
+      "char": "p",
+      "share": 1.0,
+      "count": 3973
+     },
+     {
+      "char": "x",
+      "share": 1.0,
+      "count": 362
+     }
+    ],
+    [
+     {
+      "char": " ",
+      "share": 1.0,
+      "count": 49855
+     },
+     {
+      "char": "a",
+      "share": 1.0,
+      "count": 17307
+     },
+     {
+      "char": "O",
+      "share": 1.0,
+      "count": 539
+     },
+     {
+      "char": "T",
+      "share": 1.0,
+      "count": 2384
+     },
+     {
+      "char": "n",
+      "share": 0.9968,
+      "count": 11505
+     },
+     {
+      "char": ",",
+      "share": 0.9907,
+      "count": 2790
+     }
+    ],
+    [
+     {
+      "char": "d",
+      "share": 1.0,
+      "count": 11023
+     },
+     {
+      "char": "f",
+      "share": 1.0,
+      "count": 2921
+     },
+     {
+      "char": "g",
+      "share": 1.0,
+      "count": 3721
+     },
+     {
+      "char": "l",
+      "share": 1.0,
+      "count": 7869
+     },
+     {
+      "char": "m",
+      "share": 1.0,
+      "count": 5197
+     },
+     {
+      "char": "s",
+      "share": 1.0,
+      "count": 9772
+     }
+    ],
+    [
+     {
+      "char": "\n",
+      "share": 1.0,
+      "count": 1736
+     },
+     {
+      "char": "e",
+      "share": 1.0,
+      "count": 23657
+     },
+     {
+      "char": "h",
+      "share": 1.0,
+      "count": 12301
+     },
+     {
+      "char": "i",
+      "share": 1.0,
+      "count": 10971
+     },
+     {
+      "char": "k",
+      "share": 1.0,
+      "count": 2485
+     },
+     {
+      "char": "v",
+      "share": 1.0,
+      "count": 1305
+     }
+    ]
+   ]
+  },
+  {
+   "share": [
+    0.20634,
+    0.28516,
+    0.22777,
+    0.28073
+   ],
+   "chance": [
+    0.27083,
+    0.25727,
+    0.27503,
+    0.19687
+   ],
+   "balance": 0.98863,
+   "busiest": 0.28516,
+   "quietest": 0.20634,
+   "dropped": {
+    "1.0": {
+     "slots": 0.07225,
+     "both": 0.01314,
+     "cap": 32
+    },
+    "1.25": {
+     "slots": 0.00514,
+     "both": 0.0,
+     "cap": 40
+    },
+    "1.5": {
+     "slots": 3e-05,
+     "both": 0.0,
+     "cap": 48
+    },
+    "2.0": {
+     "slots": 0.0,
+     "both": 0.0,
+     "cap": 64
+    }
+   },
+   "top": [
+    [
+     {
+      "char": " ",
+      "share": 1.0,
+      "count": 49855
+     },
+     {
+      "char": ".",
+      "share": 1.0,
+      "count": 5202
+     },
+     {
+      "char": ",",
+      "share": 1.0,
+      "count": 2790
+     },
+     {
+      "char": "!",
+      "share": 1.0,
+      "count": 471
+     },
+     {
+      "char": "\n",
+      "share": 0.9919,
+      "count": 1736
+     },
+     {
+      "char": "s",
+      "share": 0.8985,
+      "count": 9772
+     }
+    ],
+    [
+     {
+      "char": "p",
+      "share": 1.0,
+      "count": 3973
+     },
+     {
+      "char": "v",
+      "share": 1.0,
+      "count": 1305
+     },
+     {
+      "char": "w",
+      "share": 1.0,
+      "count": 5126
+     },
+     {
+      "char": "B",
+      "share": 1.0,
+      "count": 362
+     },
+     {
+      "char": "H",
+      "share": 1.0,
+      "count": 717
+     },
+     {
+      "char": "L",
+      "share": 1.0,
+      "count": 521
+     }
+    ],
+    [
+     {
+      "char": "I",
+      "share": 1.0,
+      "count": 652
+     },
+     {
+      "char": "O",
+      "share": 1.0,
+      "count": 539
+     },
+     {
+      "char": "T",
+      "share": 1.0,
+      "count": 2384
+     },
+     {
+      "char": "a",
+      "share": 0.9999,
+      "count": 17307
+     },
+     {
+      "char": "e",
+      "share": 0.9999,
+      "count": 23657
+     },
+     {
+      "char": "o",
+      "share": 0.9999,
+      "count": 13465
+     }
+    ],
+    [
+     {
+      "char": "h",
+      "share": 0.9972,
+      "count": 12301
+     },
+     {
+      "char": "i",
+      "share": 0.9946,
+      "count": 10971
+     },
+     {
+      "char": "k",
+      "share": 0.9879,
+      "count": 2485
+     },
+     {
+      "char": "'",
+      "share": 0.9836,
+      "count": 548
+     },
+     {
+      "char": "d",
+      "share": 0.8829,
+      "count": 11023
+     },
+     {
+      "char": ",",
+      "share": 0.8806,
+      "count": 2790
+     }
+    ]
+   ]
+  }
+ ],
+ "noaux": [
+  {
+   "share": [
+    0.29924,
+    0.32856,
+    0.17333,
+    0.19887
+   ],
+   "chance": [
+    0.21642,
+    0.32606,
+    0.24287,
+    0.21466
+   ],
+   "balance": 1.0267,
+   "busiest": 0.32856,
+   "quietest": 0.17333,
+   "dropped": {
+    "1.0": {
+     "slots": 0.12865,
+     "both": 0.05162,
+     "cap": 32
+    },
+    "1.25": {
+     "slots": 0.02652,
+     "both": 0.00221,
+     "cap": 40
+    },
+    "1.5": {
+     "slots": 0.00039,
+     "both": 0.0,
+     "cap": 48
+    },
+    "2.0": {
+     "slots": 0.0,
+     "both": 0.0,
+     "cap": 64
+    }
+   },
+   "top": [
+    [
+     {
+      "char": "b",
+      "share": 1.0,
+      "count": 3160
+     },
+     {
+      "char": "c",
+      "share": 1.0,
+      "count": 3589
+     },
+     {
+      "char": "f",
+      "share": 1.0,
+      "count": 2921
+     },
+     {
+      "char": "h",
+      "share": 1.0,
+      "count": 12301
+     },
+     {
+      "char": "B",
+      "share": 1.0,
+      "count": 362
+     },
+     {
+      "char": "S",
+      "share": 1.0,
+      "count": 1085
+     }
+    ],
+    [
+     {
+      "char": "n",
+      "share": 1.0,
+      "count": 11505
+     },
+     {
+      "char": "u",
+      "share": 1.0,
+      "count": 4783
+     },
+     {
+      "char": "O",
+      "share": 1.0,
+      "count": 539
+     },
+     {
+      "char": "T",
+      "share": 1.0,
+      "count": 2384
+     },
+     {
+      "char": "b",
+      "share": 0.9994,
+      "count": 3160
+     },
+     {
+      "char": "L",
+      "share": 0.9866,
+      "count": 521
+     }
+    ],
+    [
+     {
+      "char": "d",
+      "share": 1.0,
+      "count": 11023
+     },
+     {
+      "char": "g",
+      "share": 1.0,
+      "count": 3721
+     },
+     {
+      "char": "k",
+      "share": 1.0,
+      "count": 2485
+     },
+     {
+      "char": "l",
+      "share": 1.0,
+      "count": 7869
+     },
+     {
+      "char": "m",
+      "share": 1.0,
+      "count": 5197
+     },
+     {
+      "char": "s",
+      "share": 1.0,
+      "count": 9772
+     }
+    ],
+    [
+     {
+      "char": "\n",
+      "share": 1.0,
+      "count": 1736
+     },
+     {
+      "char": "e",
+      "share": 1.0,
+      "count": 23657
+     },
+     {
+      "char": "i",
+      "share": 1.0,
+      "count": 10971
+     },
+     {
+      "char": "v",
+      "share": 1.0,
+      "count": 1305
+     },
+     {
+      "char": "I",
+      "share": 1.0,
+      "count": 652
+     },
+     {
+      "char": "w",
+      "share": 0.9887,
+      "count": 5126
+     }
+    ]
+   ]
+  },
+  {
+   "share": [
+    0.25856,
+    0.19284,
+    0.20271,
+    0.3459
+   ],
+   "chance": [
+    0.29461,
+    0.12566,
+    0.2669,
+    0.31283
+   ],
+   "balance": 1.05086,
+   "busiest": 0.3459,
+   "quietest": 0.19284,
+   "dropped": {
+    "1.0": {
+     "slots": 0.11285,
+     "both": 0.02322,
+     "cap": 32
+    },
+    "1.25": {
+     "slots": 0.03542,
+     "both": 0.00027,
+     "cap": 40
+    },
+    "1.5": {
+     "slots": 0.00196,
+     "both": 0.0,
+     "cap": 48
+    },
+    "2.0": {
+     "slots": 0.0,
+     "both": 0.0,
+     "cap": 64
+    }
+   },
+   "top": [
+    [
+     {
+      "char": " ",
+      "share": 1.0,
+      "count": 49855
+     },
+     {
+      "char": "\n",
+      "share": 1.0,
+      "count": 1736
+     },
+     {
+      "char": "p",
+      "share": 1.0,
+      "count": 3973
+     },
+     {
+      "char": "\"",
+      "share": 1.0,
+      "count": 1539
+     },
+     {
+      "char": "s",
+      "share": 0.9879,
+      "count": 9772
+     },
+     {
+      "char": "!",
+      "share": 0.9873,
+      "count": 471
+     }
+    ],
+    [
+     {
+      "char": "B",
+      "share": 1.0,
+      "count": 362
+     },
+     {
+      "char": "S",
+      "share": 1.0,
+      "count": 1085
+     },
+     {
+      "char": "T",
+      "share": 1.0,
+      "count": 2384
+     },
+     {
+      "char": "I",
+      "share": 0.9785,
+      "count": 652
+     },
+     {
+      "char": "h",
+      "share": 0.9415,
+      "count": 12301
+     },
+     {
+      "char": "n",
+      "share": 0.925,
+      "count": 11505
+     }
+    ],
+    [
+     {
+      "char": "o",
+      "share": 1.0,
+      "count": 13465
+     },
+     {
+      "char": ".",
+      "share": 1.0,
+      "count": 5202
+     },
+     {
+      "char": ",",
+      "share": 1.0,
+      "count": 2790
+     },
+     {
+      "char": "!",
+      "share": 1.0,
+      "count": 471
+     },
+     {
+      "char": "a",
+      "share": 0.9999,
+      "count": 17307
+     },
+     {
+      "char": "e",
+      "share": 0.9957,
+      "count": 23657
+     }
+    ],
+    [
+     {
+      "char": "c",
+      "share": 1.0,
+      "count": 3589
+     },
+     {
+      "char": "f",
+      "share": 1.0,
+      "count": 2921
+     },
+     {
+      "char": "h",
+      "share": 1.0,
+      "count": 12301
+     },
+     {
+      "char": "m",
+      "share": 1.0,
+      "count": 5197
+     },
+     {
+      "char": "B",
+      "share": 1.0,
+      "count": 362
+     },
+     {
+      "char": "L",
+      "share": 1.0,
+      "count": 521
+     }
+    ]
+   ]
+  }
+ ]
+}

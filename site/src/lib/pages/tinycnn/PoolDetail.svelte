@@ -143,6 +143,11 @@
 		max-width: 440px;
 		min-width: 0;
 	}
+	/* the lesson (pair): inside the lesson app's stage pane (a size container) the maps leave room for the formula under
+	   them; elsewhere 100cqh is the viewport height */
+	.maps.pair figure {
+		max-width: clamp(190px, calc(100cqh - 400px), 440px);
+	}
 	figcaption {
 		font-size: var(--fs-xs);
 		color: var(--ink-2);

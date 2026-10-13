@@ -5,6 +5,8 @@
        a tape loaded from a file carries the tex only, and then the frame's metrics fill it;
     3. the op formula of the stage's unit explanation (kind A), with explain() values.
   Under it: the numbers that filled it (so nothing is only in the picture) and, on tapes, where the frame is.
+  K4: props.digits (2-6, default 3) sets the significant digits of the numbers in the formula and under it; a short exact
+  value (0.25) prints as itself; a card narrower than 520 px also breaks a long two-term line after its '+'.
 -->
 <script lang="ts">
 	import FormulaCard from '$lib/kit/FormulaCard.svelte';
@@ -23,6 +25,8 @@
 	const names = $derived((P.props.names ?? {}) as Record<string, Text>);
 	const chips = $derived(P.props.chips === true || Object.keys(names).length > 0);
 	const shown = $derived(F && chips ? Object.entries(F.values).filter(([k]) => F.tex.includes(`{{${k}}}`) || F.tex.includes(`{{ ${k} }}`)) : []);
+	const nd = $derived(Number.isInteger(P.props.digits) && (P.props.digits as number) >= 2 && (P.props.digits as number) <= 6 ? (P.props.digits as number) : 3);
+	let width = $state(0);
 	$effect(() => {
 		if (P.autoplay && F) P.onend();
 	});
@@ -31,13 +35,13 @@
 {#if !F}
 	<Notice text={{ en: 'No formula for this stage: give the step props.tex, or point it at a frame whose phase has a formula.', zh: '这一步没有公式：请给步骤设置 props.tex，或让它指向一个其阶段带有公式的帧。' }} />
 {:else}
-	<div class="fz">
+	<div class="fz" bind:clientWidth={width}>
 		{#if F.where}<p class="wh">{t(F.where)}</p>{/if}
-		<FormulaCard tex={alignTex(F.tex)} values={texValues(F.values)} caption={F.caption} where={F.legend as { tex: string; text: Text }[]} provenance={P.provenance} />
+		<FormulaCard tex={alignTex(F.tex, 3, { narrow: width > 0 && width < 520 })} values={texValues(F.values, nd)} digits={nd} caption={F.caption} where={F.legend as { tex: string; text: Text }[]} provenance={P.provenance} />
 		{#if shown.length}
 			<dl class="vals num" aria-label={t({ en: 'The numbers in the formula', zh: '公式中的数' })}>
 				{#each shown as [k, v] (k)}
-					<div><dt>{names[k] ? t(names[k]) : k}</dt><dd>{typeof v === 'number' ? (Number.isInteger(v) ? String(v) : fmt3(v, 4)) : v}</dd></div>
+					<div><dt>{names[k] ? t(names[k]) : k}</dt><dd>{typeof v === 'number' ? (Number.isInteger(v) ? String(v) : fmt3(v, Math.max(4, nd))) : v}</dd></div>
 				{/each}
 			</dl>
 		{/if}

@@ -44,8 +44,8 @@
 <div class="code">
 	<p class="lead">
 		<Lang>
-			{#snippet en()}The model as it was defined and trained in PyTorch (<code>pipeline/tinycnn/common.py</code>). The highlighted lines belong to the layer selected above: <strong>{t(S.layer(S.sel.layer).label)}</strong>. This page does not run Python.{/snippet}
-			{#snippet zh()}这是模型在 PyTorch 中的定义和训练代码（<code>pipeline/tinycnn/common.py</code>）。高亮的行属于上面选中的层：<strong>{t(S.layer(S.sel.layer).label)}</strong>。本页并不运行 Python。{/snippet}
+			{#snippet en()}The model as it was defined and trained in PyTorch (<code>pipeline/tinycnn/common.py</code>). The highlighted lines belong to the layer selected in Explore: <strong>{t(S.layer(S.sel.layer).label)}</strong>. This page does not run Python.{/snippet}
+			{#snippet zh()}这是模型在 PyTorch 中的定义和训练代码（<code>pipeline/tinycnn/common.py</code>）。高亮的行属于在“探索”里选中的层：<strong>{t(S.layer(S.sel.layer).label)}</strong>。本页并不运行 Python。{/snippet}
 		</Lang>
 	</p>
 	<CodeBlock code={MODEL_SOURCE} lang="python" start={MODEL_SOURCE_START} highlight={CODE_LINES[S.sel.layer] ?? []} caption="pipeline/tinycnn/common.py · PyTorch" />

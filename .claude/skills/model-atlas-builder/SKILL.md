@@ -43,9 +43,19 @@ Speed comes from running fewer and cheaper checks and writing less code. It neve
 
 | Role | Target | Does | Skips |
 |---|---|---|---|
-| Builder | 35-40 min per package (long training aside) | lane, scaffold from the closest package, numbers, lesson, self-review against the teaching bar, simplify pass, one full check, review packet, notes | full checks and 4- or 5-pass e2e while iterating; clicking through every step by hand |
-| Reviewer | 25-30 min | reads the contact sheets, `lesson-print.txt` and `axe.txt` first, then `lesson <slug> print` on the fixtures, clicks only where those cannot answer, fixes inside the package, one final full check, verdict | repeating the builder's checks after each edit; manual walks of every width, language and theme |
-| Integrator (main session) | per batch | merge, promote, one combined check, one commit per package, LOG.md, delete merged lanes | rewriting packages beyond the catalog patch |
+| Builder | 35-40 min per package (long training aside) | lane, scaffold from the closest package, numbers, lesson, self-review against the teaching bar, simplify pass, one full check (its e2e is the package's only one), review packet, notes | e2e while iterating (`check --quick` is the loop); `--passes all`; clicking through every step by hand |
+| Reviewer | 25-30 min | reads the contact sheets, `lesson-print.txt` and `axe.txt` first, then `lesson <slug> print` on the fixtures, clicks only where those cannot answer, fixes inside the package, `check <slug> --quick`, verdict | e2e and the full check (only when the packet is missing or stale); repeating the builder's checks; manual walks of every width, language and theme |
+| Integrator (main session) | per batch | merge, promote, one `check --all` without e2e slugs (it trusts the lanes' results), one commit per package, LOG.md, delete merged lanes | e2e of the merged packages; rewriting packages beyond the catalog patch |
+
+**Lean gates.** Run few and cheap checks, never one that already passed, and spend the time on fixing and landing:
+
+- **Builder**: `check --quick` while iterating; ONE e2e (the default 2 passes) inside the single full check at the end.
+- **Reviewer**: no e2e; read the packet (contact sheets, `lesson-print.txt`, `axe.txt`). Re-run only when the packet
+  is missing or stale (no contact sheets, or a view, adapter or layout change after the check it names).
+- **Integrator**: `check --all` without e2e slugs; trust the lanes' results.
+- **A kit or layout change**: one default-pass e2e on about 6 packages of different kinds (`check --all <slugs>`).
+- **A full-site browser sweep** (one screenshot per page) only before a public release.
+- **AK603** (a long task) never blocks and is never re-run.
 
 The full protocols, the report format and the integration routine: [references/roles.md](references/roles.md).
 
@@ -54,29 +64,33 @@ The full protocols, the report format and the integration routine: [references/r
 From `site/` (a lane's `site/` in parallel work):
 
 ```
-npm run atlas -- worktree <slug> --from-git HEAD      # parallel agents: a lane from the last commit; cd .work/<slug>/site
+npm run atlas -- worktree <slug> --from-git HEAD      # parallel agents: a lane from the last commit; cd to the folder it prints
 npm run atlas -- new model <slug> --like <closest>    # or --template <name>, or --kind ... --input ...; concepts: new concept
 npm run atlas -- py pipeline/<slug>/train.py          # kind A, then: export <slug>
 npm run atlas -- run <slug> <source> --frames 0..20   # kinds B and C: the tape as a table, before any page
 npm run atlas -- lesson <slug> lint --cap 200         # while writing the lesson; lesson <slug> print to read it
-npm run atlas -- check <slug> --quick                 # seconds after a lesson edit (parity and op tests cached)
-npm run atlas -- e2e <slug> --axe warn                # 2 passes; then look at notes/shots/<slug>/contact/
-npm run atlas -- check <slug>                         # ONCE, when the package is done
+npm run atlas -- check <slug> --quick                 # the loop: seconds after a lesson edit (parity and op tests cached)
+npm run atlas -- check <slug>                         # ONCE, when the package is done: its e2e (2 passes) is the only one
 npm run atlas -- review <slug>                        # notes/review-<slug>.md for the reviewer
+npm run atlas -- promote <slug> --verify              # the catalog patch from manifest.catalog, checked on a copy
 npm run atlas -- e2e --stop-server                    # before you finish: stop the kept dev server
 ```
 
 - **Start from the closest package** with `--like` (a working lesson, claims and notes to rewrite) rather than from an
   empty template. The table of packages by kind and input is in [references/reuse-ladder.md](references/reuse-ladder.md).
-- **Look, do not walk.** `e2e` writes a contact sheet per pass (every step, labelled), `lesson-print.txt` (every
-  narration with its numbers, en and zh) and `axe.txt`. Read those; open a browser only for what they cannot show (an
-  interaction, an animation, a task's reaction).
-- **One full check.** If it fails, fix and re-run only what failed (`e2e <slug>`, or `check <slug> --only lesson`),
-  then run the full check once more at the very end. `check <slug> --fast` re-runs every gate without the cache when
-  you suspect it (§10). A full check takes 3-9 minutes: run it in the background with its output in a log file.
+- **Look, do not walk.** The full check's e2e writes a contact sheet per pass (every step, labelled),
+  `lesson-print.txt` (every narration with its numbers, en and zh) and `axe.txt` to `notes/shots/<slug>/contact/`.
+  Read those; open a browser only for what they cannot show (an interaction, an animation, a task's reaction). While
+  you write a view, look at it on the dev server (`npm run dev -- --port <port>`), not with e2e.
+- **One full check.** If it fails, fix and re-run only the gate that failed (`check <slug> --only e2e`, or
+  `--only lesson`), never the gates that passed. AK603 (a long task) only warns: do not re-run for it.
+  `check <slug> --fast` re-runs every gate without the cache when you suspect it (§10). A full check takes 3-9 minutes:
+  run it in the background with its output in a log file.
 - **Notes as you go.** `notes/<slug>.md` has What, Decisions, Final numbers (measured only), How to re-run and Kit
   issues; it survives a lost context.
-- **Page code ≤ 1,000 lines** (the check report counts it).
+- **Page code ≤ 1,000 lines** (the check report counts it; the manifest's `catalog` block does not count).
+- **The catalog entry comes from the package**: name, family, inputs, mode, hook, shows, runtime, params and size go
+  into `manifest.catalog`; `promote <slug> --verify` applies them to a copy of the catalog and checks it.
 
 Check modes, e2e passes, the dev server, lanes and the AK quick fixes: [references/procedure.md](references/procedure.md).
 
@@ -136,10 +150,11 @@ section, inside the kit's tokens, fonts and components (KIT.md §4): no new font
 ## The accessibility gate (AK604)
 
 `atlas e2e` scans every step of every pass with axe (WCAG 2.1 A and AA); `check` fails on a serious or critical
-violation. Iterate with `e2e <slug> --axe warn` and read `contact/axe.txt`. The kit's fixes: `use:keyScroll` for a box
-that scrolls; the `-text` color tokens for text and `scale.ink(v)` / `inkOn(rgb)` on colored cells; `--muted` and a
-dashed border instead of `opacity` on text; `role="group"` for an `<svg>` that holds buttons; `role="row"` around ARIA
-table cells; only `<dt>`/`<dd>` inside a `<dl>`. Details: [references/charts-and-a11y.md](references/charts-and-a11y.md).
+violation. Read `contact/axe.txt` from the full check; after a fix, re-run that gate alone (`check <slug> --only e2e`).
+The kit's fixes: `use:keyScroll` for a box that scrolls; the `-text` color tokens for text and `scale.ink(v)` /
+`inkOn(rgb)` on colored cells; `--muted` and a dashed border instead of `opacity` on text; `role="group"` for an
+`<svg>` that holds buttons; `role="row"` around ARIA table cells; only `<dt>`/`<dd>` inside a `<dl>`. Details:
+[references/charts-and-a11y.md](references/charts-and-a11y.md).
 
 ## Before merge: the simplify pass
 

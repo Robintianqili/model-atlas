@@ -141,7 +141,7 @@
 	.tick,
 	.axl {
 		fill: var(--muted);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 	}
 	.relu {

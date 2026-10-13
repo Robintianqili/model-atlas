@@ -29,9 +29,9 @@
 		<Auto {slug} {spec} />
 	</div>
 {:else}
-	<div class="load panel">
+	<div class="load">
 		<p>{t({ en: 'It loads the kit and the package, and runs its sources in your browser, the live training included.', zh: '这会加载工具包和这个包，并在你的浏览器里运行它的各个来源，包括实时训练。' })}</p>
-		<button type="button" class="btn primary" onclick={load} disabled={status === 'loading'}>
+		<button type="button" class="btn" onclick={load} disabled={status === 'loading'}>
 			{status === 'loading' ? t({ en: 'Loading…', zh: '正在加载…' }) : t({ en: 'Load the hello-xor lesson here', zh: '在这里加载 hello-xor 课程' })}
 		</button>
 		{#if status === 'error'}<p class="bad">{err}</p>{/if}
@@ -42,8 +42,8 @@
 	.frame {
 		margin-top: var(--s3);
 		border: 1px solid var(--rule-strong);
-		border-radius: var(--r3);
-		background: var(--bg);
+		border-radius: var(--r4);
+		background: var(--paper);
 		overflow: hidden;
 		min-width: 0;
 	}
@@ -52,15 +52,25 @@
 		padding-bottom: var(--s4);
 	}
 	.load {
-		display: grid;
-		gap: 10px;
-		justify-items: start;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s3) var(--s5);
+		padding: var(--s4) var(--s5);
+		border: 1px solid var(--rule);
+		border-radius: var(--r4);
+		background: var(--panel);
 	}
 	.load p {
+		flex: 1 1 280px;
 		margin: 0;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 		color: var(--ink-2);
 	}
 	.bad {
+		flex-basis: 100%;
 		color: var(--div-neg-text);
 	}
 </style>

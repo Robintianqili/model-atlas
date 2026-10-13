@@ -6,12 +6,10 @@
 -->
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import { fmt3, fmtPct, visibleToken } from '$lib/kit/format';
 	import type { NtpLesson } from './lessonState.svelte';
 	import { pickSorted, softmax64, sortedIds } from './lessonMath';
-	import { FACTS } from './facts';
 
 	let { L }: { L: NtpLesson } = $props();
 	const S = $derived(L.S);
@@ -122,7 +120,6 @@
 <div class="sm">
 	<div class="top">
 		<p class="eyebrow">{t({ en: 'The token after your sentence', zh: '你的句子之后的词元' })}</p>
-		<ProvenanceBadge mode="live" compact precision="fp32" tolerance={FACTS.tolerance} against="PyTorch fp32" />
 	</div>
 	<p class="gen" aria-live="polite">
 		<span class="prompt">{promptTail}</span><span class="new">{S.decode(gen)}</span>{#if pending}<span class="pend">{S.disp(pending.id)}</span>{/if}{#if busy}<span class="caret" aria-hidden="true">▍</span>{/if}
@@ -407,7 +404,7 @@
 	}
 	.sl {
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--bg);
 		white-space: pre;
 		overflow: hidden;
@@ -440,7 +437,7 @@
 		top: 100%;
 		left: 0;
 		margin-top: 2px;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		white-space: nowrap;
 		background: var(--surface);
 		padding: 0 3px;

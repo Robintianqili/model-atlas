@@ -1,0 +1,61 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "number-formats",
+ "checked": "2026-10-13",
+ "sources": {
+  "formats": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "big": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "tiny": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "huge": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "sweep": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 4.5e-7,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "sum": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 101,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  }
+ }
+}

@@ -1,0 +1,113 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "blankShare": {
+   "value": 0.8173035979270935,
+   "unit": "share of the 32 columns of 7,000 test words whose top symbol is the blank",
+   "source": "pipeline/crnn-ocr/export.py measure() (CPU float32, 7,000 test words of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "testWrong": {
+   "value": 10,
+   "unit": "test words read wrong",
+   "source": "pipeline/crnn-ocr/export.py measure() (CPU float32, 7,000 test words of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "params": {
+   "value": 43435,
+   "unit": "parameters",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "trainWords": {
+   "value": 80000,
+   "unit": "words",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "epochs": {
+   "value": 40,
+   "unit": "epochs",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "bestEpoch": {
+   "value": 32,
+   "unit": "epoch (counting from 0)",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "testAcc": {
+   "value": 0.9985714285714286,
+   "unit": "share of test words read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "valAcc": {
+   "value": 0.9765,
+   "unit": "share of validation words read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "testWords": {
+   "value": 7000,
+   "unit": "words",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "wildAcc": {
+   "value": 0.8775714285714286,
+   "unit": "share of 7,000 messier words (glyphs.ts wild 2.2) read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc1": {
+   "value": 1.0,
+   "unit": "share of the 1,000 test words of 1 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc2": {
+   "value": 1.0,
+   "unit": "share of the 1,000 test words of 2 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc3": {
+   "value": 1.0,
+   "unit": "share of the 1,000 test words of 3 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc4": {
+   "value": 0.998,
+   "unit": "share of the 1,000 test words of 4 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc5": {
+   "value": 0.999,
+   "unit": "share of the 1,000 test words of 5 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc6": {
+   "value": 0.995,
+   "unit": "share of the 1,000 test words of 6 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "acc7": {
+   "value": 0.998,
+   "unit": "share of the 1,000 test words of 7 digits read exactly",
+   "source": "pipeline/crnn-ocr/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "maxLen": {
+   "value": 7,
+   "unit": "digits (longest training word)",
+   "source": "pipeline/crnn-ocr/make_data.ts",
+   "measured": "2026-10-12"
+  }
+ }
+}

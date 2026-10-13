@@ -30,6 +30,10 @@ export interface StepDef<R extends ExplainerRuntime = ExplainerRuntime> {
   focus?: (rt: R, at: At) => Focus[];
   provenance: Provenance | { mode: Provenance; note: I18n };
   predict?: PredictQuestion;                             // stage dimmed until answered; Play waits
+  /** K4 (additive): the live parts of the predict question, from the learner's own input: options (the codes this patch
+   *  may snap to), the answer index (which expert takes this token) and an explanation with live numbers (shown only
+   *  after the answer, so it gives nothing away); merged over `predict`, which still holds the question */
+  predictAt?: (rt: R, at: At) => Partial<Pick<PredictQuestion, 'options' | 'answer' | 'explain'>>;
   task?: { prompt: I18n; done: (rt: R, at: At) => boolean; hint?: I18n
     /** K0 (additive): the status line until done (default: 'Not yet: do what the task says.') */
     waiting?: I18n
@@ -39,6 +43,15 @@ export interface StepDef<R extends ExplainerRuntime = ExplainerRuntime> {
   kindOf?: 'limits' | 'breakIt';                         // marks the honest-limits step the lesson shape rule asks for
   terms?: string[];
   waitForDone?: boolean; linger?: number; duration?: number;
+  /** K4 (additive): lint options of this step: same lists placeholder names that may print the same as another value
+   *  (AK410 stays quiet for them: two unrelated quantities that happen to coincide on a fixture) */
+  lint?: { same?: string[] };
+  /** R1 (redesign W2, additive): the "Why?" disclosure under the narration: a question as its summary (shown as is) and a
+   *  short answer (a narration template, at most 120 words; AK417) */
+  why?: { q: I18n; a: Narration<R> };
+  /** R1 (additive): number-chip targets: a placeholder written {name@ref} names one of these; hover, focus or tap on its
+   *  number moves the stage's ring to that focus */
+  refs?: (rt: R, at: At) => Record<string, Focus>;
 }
 /** Auto step ids: 'input' | 'op:<layer>' | 'group:<id>' | 'output' | 'train:<motif>@<source>' | 'proc:<motif>@<source>'
  *  (Wave-0 deviation from §4.6: R is constrained to ExplainerRuntime because Partial<StepDef<R>> requires it.) */
@@ -49,6 +62,12 @@ export interface LessonDef<R extends ExplainerRuntime = ExplainerRuntime> {
   title: I18n; summary: I18n;                            // summary -> catalog lesson.summary (promote)
   steps: (StepDef<R> | AutoRef<R>)[];
   fixtures?: FixtureDef[];                               // adapter edge fixtures are always added
+  /** R1 (redesign W2, additive): 2-4 chapters of 1-6 steps each, every step in exactly one chapter, in order (AK413).
+   *  The rail labels them and the eyebrow reads "<chapter> · step k of n". */
+  chapters?: { id: string; title: I18n; steps: string[] }[];
+  /** R1 (additive): up to 3 facts the learner saw, with their real numbers, for the end card (templates over the last
+   *  step's moment; default: the chapter titles) */
+  recap?: Narration<R>[];
 }
 export interface CompiledStep {
   id: string; origin: 'auto' | 'author'; autoId?: string;
@@ -57,7 +76,16 @@ export interface CompiledStep {
   play?: StepDef['play']; focus(rt: ExplainerRuntime, at: At): Focus[];
   provenance: { mode: Provenance; note?: I18n }; select?(rt: ExplainerRuntime): Partial<SelectionState>;
   predict?: PredictQuestion; task?: StepDef['task']; compare?: StepDef['compare']; kindOf?: StepDef['kindOf']; terms: string[];
+  /** K4: StepDef.predictAt (the live options, answer and explanation) */
+  predictAt?(rt: ExplainerRuntime, at: At): Partial<Pick<PredictQuestion, 'options' | 'answer' | 'explain'>>;
   waitForDone: boolean; linger?: number; duration?: number;
+  /** R1: StepDef.why with its answer rendered */
+  why?: { q: I18n; a(rt: ExplainerRuntime, at: At): I18n };
+  /** R1: StepDef.refs */
+  refs?(rt: ExplainerRuntime, at: At): Record<string, Focus>;
+  /** R1: the narration and the look line with their {name@ref} values in chip marks (lesson/narrate.ts chipParts);
+   *  present only when a template names a ref */
+  chips?: { narration?(rt: ExplainerRuntime, at: At): I18n; look?(rt: ExplainerRuntime, at: At): I18n };
 }
 export interface LintIssue { code: string; level: 'error' | 'warn'; step?: string; fixture?: string; lang?: 'en' | 'zh'; message: string; fix?: string }
 // W1-C: lesson/define.ts defineLesson, auto, autoAll, defineExplainer;  lesson/plan.ts planLesson(spec | null, ops, manifest) -> StepDef[]

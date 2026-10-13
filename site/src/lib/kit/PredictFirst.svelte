@@ -49,17 +49,17 @@
 		gap: 10px;
 		padding: 16px 18px;
 		border-radius: var(--r3);
-		background: var(--accent-soft);
-		border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+		background: var(--here-bg);
+		border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
 	}
 	.eyebrow {
 		margin: 0;
-		color: var(--accent-strong);
+		color: var(--ink);
 	}
 	.q {
 		margin: 0;
-		font-family: var(--font-display);
-		font-size: var(--fs-lg);
+		font-family: var(--font-sans);
+		font-size: var(--t-lg);
 		font-weight: 600;
 	}
 	.opts {
@@ -72,16 +72,16 @@
 		align-items: flex-start;
 		padding: 8px 12px;
 		border-radius: var(--r2);
-		background: var(--surface);
+		background: var(--panel);
 		border: 1px solid var(--rule);
 		cursor: pointer;
 	}
 	.opt.on {
-		border-color: var(--accent);
+		border-color: var(--ink);
 	}
 	.opt input {
 		margin-top: 0.3em;
-		accent-color: var(--accent);
+		accent-color: var(--ink);
 	}
 	.btn {
 		justify-self: start;
@@ -92,12 +92,12 @@
 	.link {
 		border: 0;
 		background: none;
-		color: var(--accent);
+		color: var(--ink);
 		text-decoration: underline;
 		padding: 0 4px;
 	}
 	.small {
 		margin: 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 	}
 </style>

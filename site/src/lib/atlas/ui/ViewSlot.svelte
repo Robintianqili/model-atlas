@@ -61,10 +61,10 @@
 	{#if ready}
 		{#if Comp}
 			<!-- explicit props, not {...stage}: spread props would pull Svelte's spread helpers into the chunk every page shares.
-			     K1: setInput and shared reach the view too (setInput was dropped here, so views never received it). -->
-			<Comp rt={stage.rt} source={stage.source} at={stage.at} focus={stage.focus} sel={stage.sel} ctx={stage.ctx} provenance={stage.provenance} autoplay={stage.autoplay} onend={stage.onend} props={stage.props} setInput={stage.setInput} shared={stage.shared} />
+			     K1: setInput and shared reach the view too (setInput was dropped here, so views never received it). R1: density too. -->
+			<Comp rt={stage.rt} source={stage.source} at={stage.at} focus={stage.focus} sel={stage.sel} ctx={stage.ctx} provenance={stage.provenance} autoplay={stage.autoplay} onend={stage.onend} props={stage.props} setInput={stage.setInput} shared={stage.shared} density={stage.density} />
 		{:else}
-			<FallbackView rt={stage.rt} source={stage.source} at={stage.at} focus={stage.focus} sel={stage.sel} ctx={stage.ctx} provenance={stage.provenance} autoplay={stage.autoplay} onend={stage.onend} props={stage.props} setInput={stage.setInput} shared={stage.shared} />
+			<FallbackView rt={stage.rt} source={stage.source} at={stage.at} focus={stage.focus} sel={stage.sel} ctx={stage.ctx} provenance={stage.provenance} autoplay={stage.autoplay} onend={stage.onend} props={stage.props} setInput={stage.setInput} shared={stage.shared} density={stage.density} />
 		{/if}
 	{/if}
 	{#if text && ready}

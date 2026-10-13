@@ -118,12 +118,13 @@
 				{/each}
 			</ol>
 			<p class="verdict">
-				{t({ en: 'Final answer', zh: '最终答案' })} <span class="tok">{S.idLabel(L.finalTop[pos])}</span>:
+				<!-- class atlas-answer: hidden while a lesson predict gates the stage (the lens step asks for this answer) -->
+				<span class="atlas-answer">{t({ en: 'Final answer', zh: '最终答案' })} <span class="tok">{S.idLabel(L.finalTop[pos])}</span>:
 				{#if decided === 0}
 					{t({ en: 'already the top guess right after the embedding (no block needed).', zh: '嵌入之后就已经是第一猜测（不需要任何块）。' })}
 				{:else}
 					{t({ en: 'it becomes the top guess, and stays there, at', zh: '从这一步开始成为第一猜测并保持不变：' })} <b>{t(pointLabel(L.points[decided]))}</b>{t({ en: '.', zh: '。' })}
-				{/if}
+				{/if}</span>
 				<span class="muted">{t({ en: 'Bars: probability of the final answer at each step (# = its rank).', zh: '条形：最终答案在每一步的概率（# 为排名）。' })}</span>
 				<span class="muted">{t({ en: 'The first row usually “predicts” the input token itself: the output head is the embedding table, so a token’s own embedding matches its own row best. The blocks have to move the vector away from that.', zh: '第一行通常“预测”出输入词元本身：输出头就是嵌入表，词元自己的嵌入与自己那一行最相近。各个块的工作就是把向量从那里推开。' })}</span>
 			</p>
@@ -259,7 +260,7 @@
 	}
 	.tok.sm {
 		color: var(--muted);
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.others {
 		display: flex;
@@ -285,7 +286,7 @@
 		background: var(--accent);
 	}
 	.final-p .num {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.verdict {
@@ -307,7 +308,7 @@
 		border-collapse: separate;
 		border-spacing: 1px;
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	th,
 	td {
@@ -346,7 +347,7 @@
 	}
 	.colbtn {
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		border: 1px solid var(--rule);
 		background: var(--surface);
 		border-radius: 3px;

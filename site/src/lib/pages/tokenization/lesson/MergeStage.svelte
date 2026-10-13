@@ -212,7 +212,7 @@
 			box-shadow 350ms ease;
 	}
 	.ch :global(.hex) {
-		font-size: 0.72em;
+		font-size: max(var(--t-xs), 0.72em);
 		color: var(--ink-2);
 	}
 	.c0 {

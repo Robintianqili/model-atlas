@@ -1,119 +1,194 @@
+<!--
+  An area page (redesign spec §6.5): the area's one-line intro and counts, its learning path when one exists, all its
+  live lessons as rows, every planned model with what it will show (no tier codes), and the training methods whose
+  lessons use these models. Data from the build-time index (+page.server.ts).
+-->
 <script lang="ts">
 	import { base } from '$app/paths';
-	import ModelCard from '$lib/kit/ModelCard.svelte';
-	import ConceptCard from '$lib/kit/ConceptCard.svelte';
-	import { AREAS } from '$lib/catalog/areas';
-	import { MODELS, sortModels } from '$lib/catalog/models';
-	import { CONCEPTS } from '$lib/catalog/concepts';
-	import type { Tier } from '$lib/catalog/types';
+	import Icon from '$lib/kit/Icon.svelte';
+	import LessonRow from '$lib/kit/catalog/LessonRow.svelte';
+	import PathLine from '$lib/kit/catalog/PathLine.svelte';
+	import SectionChip from '$lib/kit/catalog/SectionChip.svelte';
+	import { glyphFor, left, right } from '$lib/kit/catalog/glyphs';
 	import { t, ui } from '$lib/i18n/i18n.svelte';
-	import type { UIKey } from '$lib/i18n/strings';
+	import { ct } from '$lib/kit/catalog/text';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const area = $derived(data.area);
-	const models = $derived(sortModels(MODELS.filter((m) => m.area === area.slug)));
-	const live = $derived(models.filter((m) => m.status === 'live'));
-	const start = $derived(live[0] ?? models.find((m) => m.tier === 'P0' || m.tier === 'V1') ?? models[0]);
-	const tiers: Tier[] = ['P0', 'V1', 'P1', 'P2'];
-	const tierKey: Record<Tier, UIKey> = { P0: 'tierP0', V1: 'tierV1', P1: 'tierP1', P2: 'tierP2' };
-	const groups = $derived(
-		tiers.map((tr) => ({ tier: tr, items: models.filter((m) => m.status !== 'live' && m.tier === tr) })).filter((g) => g.items.length)
-	);
-	const slugs = $derived(new Set(models.map((m) => m.slug)));
-	const concepts = $derived(CONCEPTS.filter((c) => c.links.some((l) => slugs.has(l))).slice(0, 8));
-	const idx = $derived(AREAS.findIndex((a) => a.slug === area.slug));
-	const prev = $derived(AREAS[(idx - 1 + AREAS.length) % AREAS.length]);
-	const next = $derived(AREAS[(idx + 1) % AREAS.length]);
+	const g = $derived(data.group);
+	const SHOWN = 6;
+	let allPlanned = $state(false);
+	const planned = $derived(allPlanned ? data.planned : data.planned.slice(0, SHOWN));
 </script>
 
-<svelte:head><title>{t(area.name)} · {ui('navAtlas')} · Model Atlas</title></svelte:head>
+<svelte:head><title>{t(g.name)} · {ct('allLessons')} · Model Atlas</title></svelte:head>
 
-<div class="container page">
-	<nav class="crumbs" aria-label="Breadcrumb">
-		<a href="{base}/atlas/">{ui('navAtlas')}</a> / <span>{t(area.name)}</span>
+<div class="container area">
+	<nav class="crumbs" aria-label={t({ en: 'Breadcrumb', zh: '面包屑导航' })}>
+		<a href="{base}/atlas/">{ct('allLessons')}</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">{t(g.name)}</span>
 	</nav>
 	<header class="head">
-		<p class="eyebrow num">{String(area.n).padStart(2, '0')} / {AREAS.length}</p>
-		<h1>{t(area.name)}</h1>
-		<p class="lede">{t(area.blurb)}</p>
-		<p class="muted">
-			{ui('countModels', { n: models.length })} · {ui('countLive', { n: live.length })} · {ui('countPlanned', { n: models.length - live.length })}
-			· {t(area.examples)}
+		<h1><Icon d={glyphFor(g.slug)} glyph size={28} />{t(g.name)}</h1>
+		<p class="lede">{t(g.blurb)}</p>
+		<p class="meta">
+			{g.live ? ct('liveAndPlanned', { n: g.live, m: g.planned }) : t({ en: `${g.planned} planned, none live yet`, zh: `${g.planned} 节计划中，暂无可学` })}
+			{#if g.examples}{' · '}{t(g.examples)}{/if}
 		</p>
 	</header>
 
-	{#if start}
-		<section class="block" aria-labelledby="start-h">
-			<h2 id="start-h">{t({ en: 'Start here', zh: '从这里开始' })}</h2>
-			<div class="start"><ModelCard model={start} showArea={false} /></div>
+	{#if data.path}
+		<section class="block" aria-labelledby="path-h">
+			<h2 id="path-h" class="sub">{t({ en: 'A path through this area', zh: '这个领域的一条路径' })}</h2>
+			<PathLine path={data.path} />
 		</section>
 	{/if}
 
-	{#if live.length > 1 || (live.length === 1 && live[0] !== start)}
+	{#if data.lessons.length}
 		<section class="block" aria-labelledby="live-h">
-			<h2 id="live-h">{ui('livePages')}</h2>
-			<div class="cards">{#each live as m (m.slug)}<ModelCard model={m} showArea={false} />{/each}</div>
+			<h2 id="live-h" class="sub">{t({ en: `Lessons you can run now · ${data.lessons.length}`, zh: `现在可以学的课程 · ${data.lessons.length}` })}</h2>
+			<ul class="rows">
+				{#each data.lessons as l (l.slug)}
+					<li><LessonRow lesson={l} sprites={data.sprites} /></li>
+				{/each}
+			</ul>
 		</section>
 	{/if}
 
-	{#each groups as g (g.tier)}
-		<section class="block" aria-labelledby="tier-{g.tier}">
-			<h2 id="tier-{g.tier}">{ui('plannedPages')} · <span class="num">{ui(tierKey[g.tier])}</span></h2>
-			<div class="cards">{#each g.items as m (m.slug)}<ModelCard model={m} showArea={false} />{/each}</div>
+	{#if data.planned.length}
+		<section class="block" aria-labelledby="planned-h">
+			<h2 id="planned-h" class="sub">{ct('plannedN', { n: data.planned.length })}</h2>
+			<ul class="plist">
+				{#each planned as p (p.slug)}
+					<li>
+						<a href="{base}{p.href}">{t(p.title)}</a>
+						{#if p.shows}<span>{t(p.shows)}</span>{/if}
+					</li>
+				{/each}
+			</ul>
+			{#if data.planned.length > SHOWN && !allPlanned}
+				<button type="button" class="btn more" onclick={() => (allPlanned = true)}>{t({ en: `Show ${data.planned.length - SHOWN} more`, zh: `再显示 ${data.planned.length - SHOWN} 个` })}</button>
+			{/if}
 		</section>
-	{/each}
+	{/if}
 
-	{#if concepts.length}
-		<section class="block" aria-labelledby="concepts-h">
-			<h2 id="concepts-h">{ui('seeAlsoConcepts')}</h2>
-			<div class="cards">{#each concepts as c (c.slug)}<ConceptCard concept={c} compact showSection />{/each}</div>
+	{#if data.sections.length}
+		<section class="block" aria-labelledby="methods-h">
+			<h2 id="methods-h" class="sub">{t({ en: 'Training methods that use these models', zh: '用到这些模型的训练方法' })}</h2>
+			<ul class="secs">
+				{#each data.sections as s (s.slug)}
+					<li><SectionChip group={s} /></li>
+				{/each}
+			</ul>
 		</section>
 	{/if}
 
 	<nav class="pn" aria-label={ui('areas')}>
-		<a href="{base}/atlas/{prev.slug}/">← {t(prev.name)}</a>
-		<a href="{base}/atlas/{next.slug}/">{t(next.name)} →</a>
+		<a href="{base}/atlas/{data.prev.slug}/"><Icon d={left} size={16} />{t(data.prev.name)}</a>
+		<a href="{base}/atlas/{data.next.slug}/">{t(data.next.name)}<Icon d={right} size={16} /></a>
 	</nav>
 </div>
 
 <style>
-	.page {
-		padding-top: var(--s5);
+	.area ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 	.crumbs {
-		font-size: var(--fs-sm);
+		padding-top: 24px;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 		color: var(--muted);
-		margin-bottom: var(--s3);
+	}
+	.crumbs a {
+		color: var(--ink-2);
+	}
+	.sep {
+		margin: 0 8px;
 	}
 	.head {
-		display: grid;
-		gap: 6px;
+		padding: 12px 0 4px;
 	}
-	.head h1,
-	.head p {
+	h1 {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin: 0 0 6px;
+	}
+	.lede {
+		margin: 0 0 6px;
+	}
+	.meta {
 		margin: 0;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--muted);
 	}
 	.block {
-		padding-top: var(--s5);
+		padding-top: 32px;
 	}
-	.block h2 {
-		font-size: var(--fs-xl);
+	.sub {
+		margin: 0 0 12px;
+		font-size: var(--t-lg);
+		line-height: var(--lh-lg);
 	}
-	.start {
-		max-width: 420px;
+	.block :global(.path) {
+		border-top: 1px solid var(--rule);
 	}
-	.cards {
+	.rows {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-		gap: 12px;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 2px 28px;
+	}
+	.plist {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px 32px;
+	}
+	.plist li {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding-left: 12px;
+		border-left: 2px dashed var(--line-control);
+	}
+	.plist a {
+		font-weight: var(--w-ui);
+		color: var(--ink-2);
+	}
+	.plist span {
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--muted);
+	}
+	.more {
+		margin-top: 14px;
+	}
+	.secs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 12px;
 	}
 	.pn {
 		display: flex;
 		justify-content: space-between;
 		gap: 12px;
-		margin-top: var(--s7);
-		padding-top: var(--s4);
+		margin-top: 40px;
+		padding-top: 16px;
 		border-top: 1px solid var(--rule);
+	}
+	.pn a {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 44px;
+		font-weight: var(--w-ui);
+		color: var(--ink-2);
+	}
+	@media (max-width: 959px) {
+		.rows,
+		.plist {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 </style>

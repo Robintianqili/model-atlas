@@ -1,0 +1,149 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "bigTokens": {
+   "value": 64000,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "next tokens scored (1,000 windows of the validation split)",
+   "measured": "2026-10-12"
+  },
+  "bigPpl0": {
+   "value": 6.8786,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity of the fp32 model on those tokens",
+   "measured": "2026-10-12"
+  },
+  "pplAll8t": {
+   "value": 6.9097,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int8 per tensor",
+   "measured": "2026-10-12"
+  },
+  "klAll8t": {
+   "value": 0.00462,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int8 per tensor) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll8t": {
+   "value": 0.9625,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplAll8c": {
+   "value": 6.8862,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int8 per channel",
+   "measured": "2026-10-12"
+  },
+  "klAll8c": {
+   "value": 0.00146,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int8 per channel) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll8c": {
+   "value": 0.9793,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplAll8b": {
+   "value": 6.8808,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int8 per block",
+   "measured": "2026-10-12"
+  },
+  "klAll8b": {
+   "value": 0.00051,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int8 per block) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll8b": {
+   "value": 0.9865,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplAll4t": {
+   "value": 36.5644,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int4 per tensor",
+   "measured": "2026-10-12"
+  },
+  "klAll4t": {
+   "value": 1.67895,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int4 per tensor) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll4t": {
+   "value": 0.3584,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplAll4c": {
+   "value": 9.1622,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int4 per channel",
+   "measured": "2026-10-12"
+  },
+  "klAll4c": {
+   "value": 0.29138,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int4 per channel) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll4c": {
+   "value": 0.7145,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplAll4b": {
+   "value": 8.1702,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, every linear weight matrix int4 per block",
+   "measured": "2026-10-12"
+  },
+  "klAll4b": {
+   "value": 0.17065,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "mean KL(fp32 || int4 per block) per position, nats",
+   "measured": "2026-10-12"
+  },
+  "agreeAll4b": {
+   "value": 0.7841,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "share of positions whose top-1 token matches fp32",
+   "measured": "2026-10-12"
+  },
+  "pplLay8t": {
+   "value": 6.8858,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, only L0.mlp.fc.weight int8 per tensor",
+   "measured": "2026-10-12"
+  },
+  "pplLay4t": {
+   "value": 9.7518,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, only L0.mlp.fc.weight int4 per tensor",
+   "measured": "2026-10-12"
+  },
+  "pplLay4c": {
+   "value": 7.2877,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, only L0.mlp.fc.weight int4 per channel",
+   "measured": "2026-10-12"
+  },
+  "pplLay4b": {
+   "value": 7.1416,
+   "source": "pipeline/quantization/prepare.py",
+   "unit": "perplexity, only L0.mlp.fc.weight int4 per block",
+   "measured": "2026-10-12"
+  }
+ }
+}

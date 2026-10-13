@@ -3,14 +3,12 @@
   1,024 tokens (live, fp32): all bars sorted, the top guesses as labeled bars, and their sum.
 -->
 <script lang="ts">
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import Num from '$lib/kit/Num.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import LessonWindow from './LessonWindow.svelte';
 	import DistChart from './DistChart.svelte';
 	import TopBars from './TopBars.svelte';
 	import type { NtpLesson } from './lessonState.svelte';
-	import { FACTS } from './facts';
 
 	let { L }: { L: NtpLesson } = $props();
 	const S = $derived(L.S);
@@ -22,7 +20,6 @@
 <div class="ds">
 	<div class="top">
 		<LessonWindow {L} />
-		<ProvenanceBadge mode="live" compact precision="fp32" tolerance={FACTS.tolerance} against="PyTorch fp32" />
 	</div>
 	{#if L.pos < 1}
 		<p class="muted">{t({ en: 'Type at least two tokens.', zh: '至少输入两个词元。' })}</p>

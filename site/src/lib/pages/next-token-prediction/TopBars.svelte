@@ -101,7 +101,7 @@
 		text-overflow: ellipsis;
 	}
 	.id {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.track {
@@ -127,10 +127,8 @@
 		position: absolute;
 		left: calc(1.6em + 14px);
 		bottom: 2px;
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-weight: 700;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
 		color: var(--real-text);
 	}
 </style>

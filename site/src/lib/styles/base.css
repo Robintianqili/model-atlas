@@ -1,4 +1,4 @@
-/* Base styles and small utilities shared by every page. Tokens come from tokens.css. */
+/* Base styles and the shared utilities (SPEC §3-§4.3). Tokens come from tokens.css. */
 
 *,
 *::before,
@@ -15,62 +15,68 @@ html {
 body {
 	margin: 0;
 	min-height: 100vh;
-	background: var(--bg);
+	background: var(--paper);
 	color: var(--ink);
-	font-family: var(--font-body);
-	font-size: 1.0625rem;
-	line-height: var(--lh-body);
+	font-family: var(--font-sans);
+	font-size: var(--t-md);
+	font-weight: var(--w-body);
+	line-height: var(--lh-md);
 	font-optical-sizing: auto;
 	-webkit-font-smoothing: antialiased;
 	overflow-x: hidden;
 }
 
-:lang(zh) body,
+/* Chinese: 1.7 for UI and cards (narration and articles set 1.8 themselves), no tracking */
 :root:lang(zh-CN) body {
-	line-height: 1.75;
-	letter-spacing: 0.01em;
+	line-height: 1.7;
 }
 
+/* Titles: the sans at 700, tight Latin tracking; no uppercase, no letter-spaced labels anywhere.
+   Page titles are --t-2xl; the home headline sets --t-3xl itself. */
 h1,
 h2,
 h3,
 h4 {
-	font-family: var(--font-display);
-	font-weight: 600;
-	line-height: 1.15;
-	letter-spacing: -0.01em;
+	font-family: var(--font-sans);
+	font-weight: var(--w-title);
+	letter-spacing: -0.015em;
 	margin: 0 0 var(--s3);
 	text-wrap: balance;
 }
 h1 {
-	font-size: var(--fs-3xl);
-	font-weight: 650;
+	font-size: var(--t-2xl);
+	line-height: var(--lh-2xl);
+	letter-spacing: -0.02em;
 }
 h2 {
-	font-size: var(--fs-2xl);
+	font-size: var(--t-xl);
+	line-height: var(--lh-xl);
 }
 h3 {
-	font-size: var(--fs-xl);
+	font-size: var(--t-lg);
+	line-height: var(--lh-lg);
 }
 h4 {
-	font-size: var(--fs-lg);
+	font-size: var(--t-md);
+	line-height: var(--lh-md);
 }
 :root:lang(zh-CN) :is(h1, h2, h3, h4) {
-	letter-spacing: 0.02em;
-	font-weight: 700;
+	letter-spacing: 0;
+	line-height: 1.35;
 }
 
 p {
 	margin: 0 0 var(--s4);
 }
 
+/* Links are ink (the teal is gone), underlined */
 a {
-	color: var(--accent);
+	color: var(--ink);
 	text-decoration-thickness: 1px;
 	text-underline-offset: 3px;
 }
 a:hover {
-	color: var(--accent-strong);
+	color: var(--ink);
 	text-decoration-thickness: 2px;
 }
 
@@ -93,31 +99,51 @@ button {
 	cursor: pointer;
 }
 
+/* Mono is for numbers, coordinates, shapes, formulas and code only. font-size-adjust matches its x-height to the
+   words, so the computed size stays on the scale (no 0.92em). */
 code,
 kbd,
 pre,
 samp {
 	font-family: var(--font-mono);
-	font-size: 0.9em;
+	font-size-adjust: var(--mono-adjust);
 }
 
-kbd {
+kbd,
+.kbd {
 	display: inline-block;
-	padding: 0 0.4em;
+	min-width: 18px;
+	padding: 2px 5px;
 	border: 1px solid var(--rule-strong);
 	border-bottom-width: 2px;
-	border-radius: var(--r1);
-	background: var(--surface);
-	font-size: 0.82em;
-	line-height: 1.5;
+	border-radius: 5px;
+	background: var(--panel);
+	color: var(--muted);
+	font: 600 var(--t-xs) / 1 var(--font-mono);
+	text-align: center;
+}
+/* key hints only where there is a keyboard-like pointer; the keys still work everywhere */
+@media (hover: none) {
+	.kbd.hint,
+	kbd.hint {
+		display: none;
+	}
 }
 
 pre {
 	overflow-x: auto;
 	padding: var(--s3) var(--s4);
-	background: var(--surface-2);
+	background: var(--well);
 	border-radius: var(--r2);
-	line-height: 1.5;
+	font-size: var(--t-sm);
+	line-height: 22px;
+}
+
+/* indices are always <sub> (W₀, xₜ), at the 12 px floor */
+sub {
+	font-size: var(--t-xs);
+	line-height: 0;
+	vertical-align: -0.25em;
 }
 
 hr {
@@ -127,12 +153,15 @@ hr {
 }
 
 ::selection {
-	background: var(--accent-soft);
+	background: var(--mark-soft);
+	color: var(--ink);
 }
 
-/* Focus: always visible for keyboard users. */
+/* Focus: always visible for keyboard users. Two-tone (SPEC §5.10): the outline is ink and its 2 px offset is panel, so
+   it shows on every surface in both themes (--focus-ring is the same ring as a box-shadow, for components that clip
+   outlines). */
 :focus-visible {
-	outline: 2px solid var(--accent);
+	outline: 2px solid var(--ink);
 	outline-offset: 2px;
 	border-radius: 2px;
 }
@@ -158,18 +187,45 @@ hr {
 	padding-inline: var(--gutter);
 }
 
-.num {
+/* a number: mono, tabular, x-height matched. .num also marks containers of numbers with prose inside (a readout line,
+   a joined vector) in older views, so only the number chip .nc is kept on one line ("y = 1.50"); wrap a single
+   number that must not break in .nc or give it white-space: nowrap where it sits. */
+.num,
+.nc {
 	font-family: var(--font-mono);
-	font-variant-numeric: tabular-nums slashed-zero;
-	font-feature-settings: 'zero' 1;
-	letter-spacing: -0.01em;
+	font-variant-numeric: tabular-nums;
+	font-size-adjust: var(--mono-adjust);
+}
+/* a number chip in prose (B's graft): a bound narration number at 600; signed tensor values take the data colours'
+   text tokens; a chip that names a stage target (data-ref) has a dotted underline and moves the ring there */
+.nc {
+	font-weight: var(--w-ui);
+	border-radius: var(--r1);
+	padding: 0 2px;
+	white-space: nowrap;
+}
+.nc.pos {
+	color: var(--div-pos-text);
+}
+.nc.neg {
+	color: var(--div-neg-text);
+}
+.nc[data-ref] {
+	cursor: default;
+	text-decoration: underline dotted color-mix(in srgb, currentColor 55%, transparent) 1.5px;
+	text-underline-offset: 4px;
+}
+.nc[data-ref]:hover,
+.nc[data-ref]:focus-visible {
+	background: var(--here-bg);
 }
 
+/* eyebrows are sentence case in the sans: "Convolution · step 2 of 10" */
 .eyebrow {
-	font-family: var(--font-mono);
-	font-size: var(--fs-xs);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+	font-family: var(--font-sans);
+	font-size: var(--t-sm);
+	line-height: var(--lh-sm);
+	font-weight: var(--w-ui);
 	color: var(--muted);
 }
 
@@ -178,13 +234,20 @@ hr {
 }
 
 .lede {
-	font-size: var(--fs-lg);
+	font-size: var(--t-lg);
+	line-height: var(--lh-lg);
 	color: var(--ink-2);
 	max-width: var(--measure);
 }
 
+/* article typography (How it works): an 18/30 column (zh 18/32) */
 .prose {
-	max-width: var(--measure);
+	max-width: 680px;
+	font-size: var(--t-lg);
+	line-height: 30px;
+}
+:root:lang(zh-CN) .prose {
+	line-height: 32px;
 }
 .prose :is(h2, h3) {
 	margin-top: var(--s6);
@@ -193,29 +256,32 @@ hr {
 	margin-top: var(--s1);
 }
 
-/* Buttons */
+/* ------------------------------------------------------------- buttons (SPEC §4.3) */
+
+/* default: panel fill, a control outline; secondary actions (Back, Redraw, Show me, Browse) */
 .btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--s2);
-	min-height: 40px;
-	padding: 0 var(--s4);
-	border: 1px solid var(--rule-strong);
-	border-radius: var(--r2);
-	background: var(--surface);
+	min-height: 44px;
+	padding: 0 18px;
+	border: 1px solid var(--line-control);
+	border-radius: var(--r3);
+	background: var(--panel);
 	color: var(--ink);
-	font-size: var(--fs-sm);
-	font-weight: 600;
-	line-height: 1;
+	font-size: var(--t-md);
+	font-weight: var(--w-ui);
+	line-height: var(--lh-sm);
 	text-decoration: none;
 	transition:
 		background var(--dur-1) var(--ease),
-		border-color var(--dur-1) var(--ease);
+		border-color var(--dur-1) var(--ease),
+		color var(--dur-1) var(--ease);
 	touch-action: manipulation;
 }
 .btn:hover {
-	background: var(--surface-2);
+	border-color: var(--ink-2);
 	color: var(--ink);
 }
 .btn:disabled,
@@ -223,87 +289,230 @@ hr {
 	opacity: 0.5;
 	cursor: not-allowed;
 }
+/* act: ink fill with a 3 px lip; the one primary per screen (Next, Start, Continue, the home call to action) */
+.btn-act,
 .btn.primary {
-	background: var(--accent);
-	border-color: var(--accent);
-	color: var(--accent-ink);
+	background: var(--act);
+	border-color: var(--act);
+	color: var(--act-ink);
+	box-shadow: inset 0 -3px 0 var(--act-lip);
 }
+.btn-act:hover,
 .btn.primary:hover {
-	background: var(--accent-strong);
-	border-color: var(--accent-strong);
-	color: var(--accent-ink);
+	background: var(--act-hover);
+	border-color: var(--act-hover);
+	color: var(--act-ink);
 }
+/* quiet: no outline until hover (Play, Why it matters, Restart) */
+.btn-quiet,
 .btn.ghost {
 	background: transparent;
 	border-color: transparent;
 }
+.btn-quiet:hover,
 .btn.ghost:hover {
-	background: var(--surface-2);
+	background: var(--well);
+	border-color: transparent;
 }
 .btn.icon {
-	width: 40px;
+	width: 44px;
 	padding: 0;
 }
 .btn[aria-pressed='true'] {
-	background: var(--accent-soft);
-	border-color: var(--accent);
+	background: var(--here-bg);
+	border-color: var(--ink);
+	color: var(--ink);
+}
+/* a 44 x 44 tool button (top bars) */
+.icon-btn {
+	display: inline-grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--r3);
+	background: transparent;
+	color: var(--ink-2);
+	text-decoration: none;
+	transition: background var(--dur-1) var(--ease);
+	touch-action: manipulation;
+}
+.icon-btn:hover {
+	background: var(--well);
 	color: var(--ink);
 }
 
-/* Chips and badges */
-.chip {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35em;
-	padding: 0.1em 0.6em;
-	border: 1px solid var(--rule);
-	border-radius: var(--r-pill);
-	background: var(--surface);
-	font-size: var(--fs-xs);
-	line-height: 1.6;
-	white-space: nowrap;
-	color: var(--ink-2);
-}
+/* ------------------------------------------------------------- Choice: one selector in three densities */
 
-/* Segmented control (radio-like group of buttons) */
+/* segmented: <= 5 options (language, rank, speed, view toggle, kind); the old .segmented is the same control.
+   (A <span class="seg"> is a bar segment in some hand-built pages, so spans are left alone.) */
+.seg:not(span),
 .segmented {
 	display: inline-flex;
-	padding: 2px;
-	border: 1px solid var(--rule);
-	border-radius: var(--r2);
-	background: var(--surface-2);
-	gap: 2px;
 	flex-wrap: wrap;
+	gap: 2px;
+	padding: 3px;
+	border: 1px solid var(--rule);
+	border-radius: var(--r3);
+	background: var(--well);
 }
+.seg > :is(button, a),
 .segmented button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	min-height: 32px;
-	padding: 0 var(--s3);
+	padding: 0 12px;
 	border: 0;
-	border-radius: 6px;
+	border-radius: 9px;
 	background: transparent;
-	font-size: var(--fs-sm);
-	color: var(--ink-2);
+	color: var(--muted);
+	font-size: var(--t-sm);
+	font-weight: var(--w-ui);
+	line-height: var(--lh-sm);
+	text-decoration: none;
+	touch-action: manipulation;
 }
+.seg > :is(button, a):hover,
+.segmented button:hover {
+	color: var(--ink);
+}
+.seg > [aria-pressed='true'],
+.seg > [aria-checked='true'],
+.seg > [aria-selected='true'],
+.seg > [aria-current='true'],
+.seg > [aria-current='page'],
 .segmented button[aria-pressed='true'],
 .segmented button[aria-checked='true'],
 .segmented button[aria-selected='true'] {
-	background: var(--surface);
+	background: var(--panel);
 	color: var(--ink);
-	box-shadow: var(--shadow-1);
-	font-weight: 600;
+	box-shadow:
+		var(--shadow-1),
+		0 0 0 1px var(--rule-strong);
+}
+@media (pointer: coarse) {
+	.seg > :is(button, a),
+	.segmented button {
+		min-height: 38px;
+	}
 }
 
-/* Panels */
-.panel {
-	background: var(--surface);
-	border: 1px solid var(--rule);
+/* chips: a static pill (a tag), or a pill button (presets, input kinds, jump bars). Pressed is the here style (a pale
+   fill, an ink outline), which is also what the older components assume when they restyle a pressed chip's background;
+   filter chips on catalog pages add .fill for the act style (ink fill). */
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 1px 10px;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-pill);
+	background: var(--panel);
+	color: var(--ink-2);
+	font-size: var(--t-xs);
+	line-height: var(--lh-xs);
+	white-space: nowrap;
+}
+:is(button, a).chip {
+	min-height: 32px;
+	padding: 0 14px;
+	border-color: var(--line-control);
+	font-size: var(--t-sm);
+	font-weight: var(--w-ui);
+	line-height: var(--lh-sm);
+	text-decoration: none;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+:is(button, a).chip:hover {
+	border-color: var(--ink-2);
+	color: var(--ink);
+}
+.chip .c {
+	font-size: var(--t-xs);
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+.chip[aria-pressed='true'],
+.chip[aria-current='true'] {
+	background: var(--here-bg);
+	border-color: var(--ink);
+	color: var(--ink);
+	box-shadow: inset 0 0 0 1px var(--ink);
+}
+.chip.fill[aria-pressed='true'],
+.chip.fill[aria-current='true'] {
+	background: var(--act);
+	border-color: var(--act);
+	color: var(--act-ink);
+	box-shadow: none;
+}
+.chip.fill[aria-pressed='true'] .c,
+.chip.fill[aria-current='true'] .c {
+	color: var(--act-ink);
+}
+@media (pointer: coarse) {
+	:is(button, a).chip {
+		min-height: 40px;
+	}
+}
+
+/* options: full-width answer buttons with a key hint (predict and your-turn); role=radio inside a radiogroup.
+   Buttons only: the hand-built quizzes style their own <label class="opt">. */
+button.opt {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: var(--s3);
+	width: 100%;
+	min-height: 48px;
+	padding: 8px 12px;
+	border: 1px solid var(--line-control);
 	border-radius: var(--r3);
+	background: var(--panel);
+	color: var(--ink);
+	font-size: var(--t-md);
+	line-height: var(--lh-md);
+	text-align: left;
+	touch-action: manipulation;
+}
+button.opt:hover {
+	border-color: var(--ink-2);
+}
+button.opt[aria-checked='true'] {
+	border-color: var(--ink);
+	box-shadow: inset 0 0 0 1px var(--ink);
+}
+button.opt.ok {
+	border-color: var(--ok);
+	background: var(--ok-soft);
+	box-shadow: inset 0 0 0 1px var(--ok);
+}
+button.opt.no {
+	border-color: var(--no);
+	background: var(--no-soft);
+	box-shadow: inset 0 0 0 1px var(--no);
+}
+button.opt.dim {
+	border-color: var(--rule-strong);
+	color: var(--muted);
+}
+
+/* ------------------------------------------------------------- surfaces */
+
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--rule);
+	border-radius: var(--r4);
 	padding: var(--s4);
 }
 
 /* Range inputs */
 input[type='range'] {
-	accent-color: var(--accent);
+	accent-color: var(--ink);
 	min-height: 28px;
 }
 
@@ -331,7 +540,10 @@ input[type='range'] {
 
 @media (forced-colors: active) {
 	.btn,
-	.chip {
+	.chip,
+	button.opt,
+	.seg:not(span),
+	.segmented {
 		border: 1px solid CanvasText;
 	}
 }

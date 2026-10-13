@@ -39,11 +39,24 @@ export interface ExplainerManifest {
           /** K2 (additive): the loss-curve props of the auto Training section (default: the loss): { metric: 'meanLen' },
            *  { metrics: ['lossD', 'lossG'], refs: [{ y: 1.386, label }] }, labels, log, smooth. A metric recorded only at
            *  snapshot frames (a metrics() value) draws through them. */
-          trainingCurve?: { metric?: string; metrics?: string[]; labels?: Record<string, I18n>; log?: boolean | 'auto'; smooth?: number; refs?: { y: number; label?: I18n }[] } };
+          trainingCurve?: { metric?: string; metrics?: string[]; labels?: Record<string, I18n>; log?: boolean | 'auto'; smooth?: number; refs?: { y: number; label?: I18n }[] };
+          /** R1 (redesign wave F, additive): the step whose stage is the lesson's thumbnail in the catalog (`atlas thumbs`).
+           *  Default: the first step whose view is a figure (not a text, table or tape view). */
+          poster?: { step: string };
+          /** R1 (additive): the cover's stage (step 0, answer first): a view key and the source it reads. Default: the layer
+           *  strip for a package with a spec, else the poster step's stage. */
+          cover?: { view: string; source?: string } };
   credits: Credit[];                                     // promote appends to static/licenses.json
   glossary?: { id: string; term: I18n; def: I18n; related?: string[] }[];   // promote prints the glossary.ts patch
-  /** promote prints the models.ts patch, plus tech-zh.ts entries for runtime/params/size */
-  catalog?: { hook?: I18n; shows?: I18n; runtime?: I18n; params?: I18n; size?: I18n; prereqs?: string[] };
+  /** promote prints the models.ts patch, plus tech-zh.ts entries for runtime/params/size. K4 (additive): name (the
+   *  page's h1 and title), family, inputs (catalog InputKinds) and mode, so the whole entry comes from the package and
+   *  `promote --verify` / `--apply` can apply it; the block is data only the CLI reads (not counted as page code). */
+  catalog?: { hook?: I18n; shows?: I18n; runtime?: I18n; params?: I18n; size?: I18n; prereqs?: string[]
+    name?: I18n; family?: I18n; inputs?: string[]; mode?: 'live' | 'precomputed' | 'both'
+    /** R1 (redesign wave F, additive): a short name for path stations (at most 24 characters). `hook` (at most 100 English
+     *  and 50 Chinese characters) is copied for concepts too. lesson.minutes is the reading time the content wave sets
+     *  (round(words / 180 + steps x 20 s + beats x 30 s)). */
+    short?: I18n; lesson?: { minutes?: number } };
   budget?: { autoLoadBytes?: number };
 }
 /** Input adapters: atlas/adapters/<id>/adapter.ts (pure) + Capture.svelte. kind is a catalog InputKind. */

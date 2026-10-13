@@ -11,6 +11,8 @@ const size = (f: string) => statSync(join(DIR, f)).size;
 export const load: PageServerLoad = () => {
 	const spec = JSON.parse(readFileSync(join(DIR, 'spec.json'), 'utf8')) as TinyCNNSpec;
 	return {
+		// the lesson app (redesign spec §6.1): no site header or footer around this page
+		chrome: 'lesson' as const,
 		spec,
 		bytes: {
 			// loaded on every visit

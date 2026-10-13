@@ -1,20 +1,15 @@
 <!--
-  The transfer-learning guided lesson: eight steps from a forced 10-way guess to a trained 2-way
-  head and the same idea at BERT scale, one focused view at a time (kit Walkthrough). Steps 1–6
-  are live (the learner's drawing, the shipped TinyCNN, a head trained in the browser); steps 7–8
-  are precomputed (finetune.json, our BERT reproduction). The lesson keeps its own state
-  (lesson.svelte.ts), so it never moves the "Explore freely" parts below.
+  The transfer-learning guided lesson: eight steps from a forced 10-way guess to a trained 2-way head and the same idea
+  at BERT scale, one focused view at a time (kit Walkthrough, the page's Lesson view). Steps 1–6 are live (the
+  learner's drawing, the shipped TinyCNN, a head trained in the browser); steps 7–8 are precomputed (finetune.json, our
+  BERT reproduction). The drawing is picked or drawn with the stage header's chip (InputChip) and its sheet
+  (InputSheet). The lesson keeps its own state (lessonState.svelte.ts), so it never moves the Explore view.
 -->
 <script lang="ts">
 	import Walkthrough from '$lib/kit/Walkthrough.svelte';
-	import DrawPad from '$lib/kit/DrawPad.svelte';
-	import { categorical } from '$lib/kit/color';
-	import { themeState, motion } from '$lib/kit/theme.svelte';
 	import { fmtPct, fmtInt } from '$lib/kit/format';
-	import { t, i18n } from '$lib/i18n/i18n.svelte';
-	import type { WalkStep } from '$lib/kit/types';
-	import type { Stroke } from '$lib/kit/draw';
-	import Thumb from './Thumb.svelte';
+	import { t } from '$lib/i18n/i18n.svelte';
+	import type { StageProv, WalkStep } from '$lib/kit/types';
 	import LessonMeet from './LessonMeet.svelte';
 	import LessonFeatures from './LessonFeatures.svelte';
 	import LessonMap from './LessonMap.svelte';
@@ -23,7 +18,7 @@
 	import { LESSON_N, LESSON_STEPS, clsName, type LessonState } from './lessonState.svelte';
 	import type { Component } from 'svelte';
 
-	let { L, tolerance }: { L: LessonState; tolerance?: number } = $props();
+	let { L, tolerance, error = null }: { L: LessonState; tolerance?: number; error?: string | null } = $props();
 
 	let index = $state(0);
 
@@ -55,12 +50,7 @@
 	$effect(() => {
 		if (L.engine) for (const id of Object.keys(LOADERS)) loadStage(id);
 	});
-	let padOpen = $state(false);
-	// the pad strokes live here (the lesson state only receives them through L.drawing)
-	let strokes = $state<Stroke[]>([]);
-
 	const classes = $derived(L.engine?.spec.classes ?? BASE_CLASSES);
-	const cname = (i: number) => (i18n.lang === 'zh' ? classes[i].zh : classes[i].en);
 	const pct = (v: number) => (v * 100).toFixed(1) + '%';
 	/** the most common top guess over all 1,500 test drawings of a new class (finetune.json, precomputed) */
 	function topGuess(w: 'ladder' | 'envelope') {
@@ -94,8 +84,8 @@
 				};
 			},
 			look: {
-				en: 'Pick a ladder or an envelope in the “Your drawing” panel, or draw your own: steps 1–6 all use that drawing.',
-				zh: '在“你的画”面板里选一张梯子或信封，或者自己画一张：第 1–6 步都会用这张画。'
+				en: 'Pick a ladder or an envelope with “Your drawing” at the top of the stage, or draw your own: steps 1–6 all use that drawing.',
+				zh: '用演示区顶部的“你的画”选一张梯子或信封，或者自己画一张：第 1–6 步都会用这张画。'
 			},
 			duration: 20000
 		},
@@ -230,34 +220,56 @@
 		}
 	];
 
-	function pick(cls: 0 | 1) {
-		L.pickTest(cls);
-		strokes = [];
-		L.drawnInput = null;
-	}
-	function step(d: number) {
-		L.stepTest(d);
-	}
-	const src = $derived(L.source);
-	/** narrow layouts: scroll to the narration under the stage (below the sticky lesson bar) */
-	function readBelow(e: MouseEvent) {
-		const wt = (e.currentTarget as HTMLElement).closest('section.wt');
-		const narr = wt?.querySelector<HTMLElement>('.narr');
-		if (!wt || !narr) return;
-		const bar = wt.querySelector<HTMLElement>('.bar')?.getBoundingClientRect().bottom ?? 0;
-		window.scrollTo({ top: window.scrollY + narr.getBoundingClientRect().top - Math.max(0, bar) - 8, behavior: motion.reduced ? 'auto' : 'smooth' });
-		narr.querySelector<HTMLElement>('h3')?.setAttribute('tabindex', '-1');
-		narr.querySelector<HTMLElement>('h3')?.focus({ preventScroll: true });
-	}
+	// the stage header's one provenance label per step (step 1's top-guess shares carry their own precomputed label)
+	const live32 = (): StageProv => ({ mode: 'live', precision: 'fp32', tolerance, against: 'PyTorch fp32', short: { en: '· TinyCNN on your drawing', zh: '· TinyCNN 处理你的画' } });
+	const PROV: Record<string, StageProv | (() => StageProv)> = {
+		meet: live32,
+		features: live32,
+		map: {
+			mode: 'live',
+			note: { en: 'Your drawing is projected live; the gray context points and the two map axes were computed offline from the same model (pca.json).', zh: '你的画是实时投影的；灰色参照点和地图的两个坐标轴是用同一个模型离线算好的（pca.json）。' },
+			short: { en: '· your drawing, on a precomputed map', zh: '· 你的画，落在预先算好的地图上' }
+		},
+		head: {
+			mode: 'live',
+			note: { en: 'The new head is created right here in your browser (seeded); the features come from the shipped TinyCNN.', zh: '新输出头就在你的浏览器里创建（固定种子）；特征来自发布的 TinyCNN。' },
+			short: { en: '· a new head, in your browser', zh: '· 新输出头，在你的浏览器里' }
+		},
+		onestep: {
+			mode: 'live',
+			note: { en: 'Computed here from the lesson’s head (step 0) and the frozen features of the 16 training drawings. The update is checked against the trainer’s own weights after step 1.', zh: '由课程里的输出头（第 0 步）和 16 张训练图的冻结特征在这里算出。更新结果已与训练器自己第 1 步之后的权重核对过。' },
+			short: { en: '· one step, computed here', zh: '· 这一步就在这里计算' }
+		},
+		repeat: {
+			mode: 'live',
+			note: { en: 'Trained in your browser when the lesson loaded (seed 0); the replay shows every step.', zh: '课程加载时在你的浏览器里训练（种子 0）；回放展示每一步。' },
+			short: { en: '· trained in your browser', zh: '· 在你的浏览器里训练' }
+		},
+		few: {
+			mode: 'precomputed',
+			note: { en: 'TinyCNN fine-tuning runs, 5 seeds per method and size, on 3,000 test drawings (finetune.json).', zh: 'TinyCNN 的微调实验：每种方法、每种数据量各 5 个种子，在 3,000 张测试图上评估（finetune.json）。' },
+			short: { en: '· 5 runs per method, recorded', zh: '· 每种方法 5 次运行的记录' }
+		},
+		bert: {
+			mode: 'precomputed',
+			note: { en: 'From our BERT reproduction (research/bert_facts.json, research/bert_improve.json).', zh: '来自我们的 BERT 复现（research/bert_facts.json、research/bert_improve.json）。' },
+			short: { en: '· our BERT reproduction', zh: '· 我们的 BERT 复现' }
+		}
+	};
+	for (const st of steps) st.prov = PROV[st.id];
+
+	const chapters = [
+		{ title: { en: 'The problem', zh: '问题' }, count: 3 },
+		{ title: { en: 'A new head', zh: '新的输出头' }, count: 3 },
+		{ title: { en: 'When to freeze', zh: '何时冻结' }, count: 2 }
+	];
 </script>
 
-<Walkthrough {steps} bind:index ready={!!L.engine} label={{ en: 'Transfer learning, step by step', zh: '迁移学习分步课程' }} stageMinHeight={400}>
+<Walkthrough {steps} bind:index {chapters} ready={!!L.engine} label={{ en: 'Teach a trained model two new things with a few drawings', zh: '用几张画教训练好的模型认识两样新东西' }}>
 	{#snippet stage(step, ctx)}
-		<div class="ntitle">
-			<p aria-hidden="true"><span class="num">{ctx.index + 1}/{steps.length}</span> {t(step.title)}</p>
-			<button type="button" class="btn ghost" onclick={readBelow}>{t({ en: 'Read', zh: '看说明' })} ↓</button>
-		</div>
-		{#if !L.engine}
+		{#if error}
+			<p class="err" role="alert">{t({ en: `Could not load the model files: ${error}`, zh: `模型文件加载失败：${error}` })}</p>
+		{:else if !L.engine}
 			<p class="muted">{t({ en: 'Loading the model…', zh: '正在加载模型…' })}</p>
 		{:else if step.id === 'meet'}
 			<LessonMeet {L} {tolerance} />
@@ -273,237 +285,42 @@
 		{/if}
 	{/snippet}
 
-	{#snippet aside(ctx)}
-		<div class="you">
-			<div class="you-h">
-				<h4>{t({ en: 'Your drawing', zh: '你的画' })}</h4>
-				<span class="muted src">{t(L.label())}</span>
-			</div>
-			<div class="you-row">
-				<Thumb data={L.input} size={56} alt={t({ en: 'The drawing the lesson uses, as the model sees it', zh: '课程正在用的画（模型看到的样子）' })} />
-				<div class="answers">
-					{#if L.old}
-						<p>
-							<span class="lbl">{t({ en: '10-class model:', zh: '10 类模型：' })}</span>
-							<span class="sw" style="background: {categorical(L.old.top, themeState.resolved)}"></span><strong>{cname(L.old.top)}</strong>
-							<span class="num">{fmtPct(L.old.p)}</span>
-						</p>
-					{:else}
-						<p class="muted">{t({ en: 'Draw something, or pick a drawing.', zh: '画点什么，或者选一张画。' })}</p>
-					{/if}
-					{#if ctx.index >= 3 && L.fresh}
-						{@const k = L.fresh.top as 0 | 1}
-						<p>
-							<span class="lbl">{t({ en: `New head, step ${L.headStep}:`, zh: `新输出头，第 ${L.headStep} 步：` })}</span>
-							<span class="dot {k === 0 ? 'a' : 'b'}"></span><strong>{t(clsName(k))}</strong>
-							<span class="num">{fmtPct(L.fresh.probs[k])}</span>
-						</p>
-					{/if}
-				</div>
-			</div>
-			<div class="srcs">
-				<div class="segmented" role="group" aria-label={t({ en: 'Which drawing the lesson uses', zh: '课程用哪张画' })}>
-					<button type="button" aria-pressed={src.kind === 'test' && src.cls === 0} onclick={() => pick(0)}>{t({ en: 'A ladder', zh: '梯子' })}</button>
-					<button type="button" aria-pressed={src.kind === 'test' && src.cls === 1} onclick={() => pick(1)}>{t({ en: 'An envelope', zh: '信封' })}</button>
-					<button type="button" aria-pressed={src.kind === 'drawn'} aria-expanded={padOpen} onclick={() => (padOpen = !padOpen)}>
-						<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-						{t({ en: 'Draw', zh: '自己画' })}
-					</button>
-				</div>
-				{#if src.kind === 'test'}
-					<span class="nav">
-						<button type="button" class="btn ghost icon" onclick={() => step(-1)} aria-label={t({ en: 'Previous test drawing', zh: '上一张测试图' })}>‹</button>
-						<span class="num muted">{src.i + 1}/{L.testCount}</span>
-						<button type="button" class="btn ghost icon" onclick={() => step(1)} aria-label={t({ en: 'Next test drawing', zh: '下一张测试图' })}>›</button>
-					</span>
-				{/if}
-			</div>
-			{#if padOpen}
-				<DrawPad
-					bind:strokes
-					brush={0.055}
-					size={190}
-					showBrush={false}
-					onchange={(s) => L.drawing(s, true)}
-					ondraw={(s) => L.drawing(s)}
-					label={{ en: 'Lesson drawing pad', zh: '课程画板' }}
-				/>
+	{#snippet recap()}
+		<ul class="recap">
+			<li>{t({ en: `The frozen body (4,152 learned numbers) turns any drawing into 256 features; the new head trains 514 parameters on top.`, zh: `冻结的主体（4,152 个学来的数）把任何画变成 256 个特征；新输出头在上面训练 514 个参数。` })}</li>
+			{#if L.run}
+				<li>{t({ en: `On 200 held-out drawings the head went from ${pct(L.run.testAcc[0])} to ${pct(L.run.testAcc[LESSON_STEPS])} in ${LESSON_STEPS} steps, trained on ${LESSON_N} + ${LESSON_N} drawings.`, zh: `在 200 张留出的测试图上，输出头用 ${LESSON_N} + ${LESSON_N} 张画训练 ${LESSON_STEPS} 步，正确率从 ${pct(L.run.testAcc[0])} 升到 ${pct(L.run.testAcc[LESSON_STEPS])}。` })}</li>
 			{/if}
-			<p class="hint">
-				{t({
-					en: 'These ladders and envelopes are test drawings the lesson never trains on (held-out drawings), and your own drawings are never added to training either: the lesson’s head learns from 8 + 8 other drawings.',
-					zh: '这里的梯子和信封都是课程从不拿来训练的测试图（留出的测试图），你自己画的也不会加进训练集：课程里的输出头从另外 8 + 8 张画中学习。'
-				})}
-			</p>
-		</div>
+			{#if L.finetune}
+				<li>{t({ en: `With 1 drawing per class: head only ${ft('head')}, full fine-tuning ${ft('full')}, from scratch ${ft('scratch')} (5 runs each).`, zh: `每类只有 1 张画时：只训练输出头 ${ft('head')}，全量微调 ${ft('full')}，从零训练 ${ft('scratch')}（各 5 次运行）。` })}</li>
+			{/if}
+		</ul>
 	{/snippet}
 
 	{#snippet end()}
-		<div class="fin">
-			<p>
-				<strong>{t({ en: 'That is transfer learning.', zh: '这就是迁移学习。' })}</strong>
-				{t({
-					en: 'Reuse what a trained network already computes: with few examples, freeze it and train a small head; with more data, fine-tune more; for a small task, a related big task first can help. Below, explore freely: train a head on your own two classes, mislabel examples, read every weight.',
-					zh: '复用训练好的网络已经会算的东西：样本少时，冻结它、只训练一个小输出头；数据多时，就微调更多层；任务很小时，先在相关的大任务上训练可能有帮助。下面可以自由探索：用你自己的两个类别训练输出头、故意标错样本、查看每一个权重。'
-				})}
-			</p>
-			<a class="btn primary" href="#explore">{t({ en: 'Explore freely', zh: '自由探索' })} ↓</a>
-		</div>
+		<p class="fin">
+			<strong>{t({ en: 'That is transfer learning.', zh: '这就是迁移学习。' })}</strong>
+			{t({
+				en: 'Reuse what a trained network already computes: with few examples, freeze it and train a small head; with more data, fine-tune more; for a small task, a related big task first can help. In Explore, train a head on your own two classes, mislabel examples, read every weight.',
+				zh: '复用训练好的网络已经会算的东西：样本少时，冻结它、只训练一个小输出头；数据多时，就微调更多层；任务很小时，先在相关的大任务上训练可能有帮助。在“探索”里，可以用你自己的两个类别训练输出头、故意标错样本、查看每一个权重。'
+			})}
+		</p>
 	{/snippet}
 </Walkthrough>
-<p class="foot muted">
-	{t({
-		en: `Steps 1–6 are computed in your browser: your drawing through the shipped TinyCNN, and a new head trained on ${LESSON_N} + ${LESSON_N} preset drawings (the map’s axes and gray points and the top-guess shares in step 1 were computed offline from the same model). Steps 7 and 8 are precomputed: TinyCNN fine-tuning runs (5 seeds) and our BERT reproduction. The lesson keeps its own state, so the parts below stay where you left them.`,
-		zh: `第 1–6 步都在你的浏览器里实时计算：你的画经过发布的 TinyCNN，新输出头用 ${LESSON_N} + ${LESSON_N} 张预置图训练（地图的坐标轴和灰色参照点，以及第 1 步的首选答案比例，是用同一个模型离线算好的）。第 7、8 步是预计算结果：TinyCNN 的微调实验（5 个种子）和我们的 BERT 复现。课程使用自己的状态，所以下面各部分会停在你离开时的位置。`
-	})}
-</p>
 
 <style>
-	/* only when the lesson is one column (the kit's 860 px container query): title + jump to the narration */
-	.ntitle {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
-		margin: 0 0 10px;
-		padding-bottom: 8px;
-		border-bottom: 1px solid var(--rule);
-	}
-	.ntitle p {
+	.recap {
 		margin: 0;
-		font-family: var(--font-display);
-		font-weight: 650;
-		font-size: var(--fs-md);
-		line-height: 1.25;
-	}
-	.ntitle .num {
-		color: var(--accent);
-		font-size: var(--fs-sm);
-		margin-right: 4px;
-	}
-	.ntitle .btn {
-		flex: none;
-		min-height: 32px;
-		padding: 0 10px;
-		font-size: var(--fs-sm);
-	}
-	@container wt (min-width: 860px) {
-		.ntitle {
-			display: none;
-		}
-	}
-	.you {
+		padding-left: 1.2em;
 		display: grid;
-		gap: 8px;
-		padding: 10px 12px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
-	}
-	.you-h {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 2px 12px;
-	}
-	h4 {
-		margin: 0;
-		font-size: var(--fs-md);
-	}
-	.src {
-		font-size: var(--fs-xs);
-	}
-	.you-row {
-		display: flex;
-		gap: 10px;
-		align-items: center;
-	}
-	.you-row :global(canvas) {
-		border: 1px solid var(--rule);
-	}
-	.answers {
-		display: grid;
-		gap: 2px;
-		font-size: var(--fs-sm);
-		min-width: 0;
-	}
-	.answers p {
-		margin: 0;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 2px 6px;
-	}
-	.lbl {
-		color: var(--ink-2);
-		font-size: var(--fs-xs);
-	}
-	.sw {
-		width: 9px;
-		height: 9px;
-		border-radius: 2px;
-	}
-	.dot {
-		display: inline-block;
-		width: 9px;
-		height: 9px;
-		border-radius: 50%;
-	}
-	.dot.a {
-		background: var(--div-pos);
-	}
-	.dot.b {
-		background: var(--div-neg);
-		border-radius: 2px;
-	}
-	.srcs {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 6px 10px;
-	}
-	.srcs .segmented button {
-		display: inline-flex;
-		align-items: center;
 		gap: 4px;
-		font-size: var(--fs-sm);
 	}
-	.nav {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		font-size: var(--fs-xs);
-	}
-	.nav .btn {
-		min-height: 30px;
-		min-width: 30px;
-		padding: 0 6px;
-	}
-	.you :global(.tools .btn) {
-		min-height: 30px;
-		padding: 0 8px;
-		font-size: var(--fs-xs);
-	}
-	.hint {
-		margin: 0;
-		font-size: var(--fs-xs);
-		color: var(--ink-2);
+	.err {
+		color: var(--no);
 	}
 	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
 		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 </style>

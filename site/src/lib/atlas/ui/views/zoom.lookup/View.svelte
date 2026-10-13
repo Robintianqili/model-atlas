@@ -10,13 +10,13 @@
 	import TokenChips from '$lib/kit/TokenChips.svelte';
 	import RoleFrame from '$lib/kit/RoleFrame.svelte';
 	import Num from '../kit.parts/Num.svelte';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import RowBars from '../kit.parts/RowBars.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, domainOf, layerLabel, resolveUnit, tokenIds, tokenTexts, unitWhere, vocabText } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, domainOf, layerLabel, resolveUnit, tokenIds, tokenTexts, unitWhere, vocabText } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -32,8 +32,8 @@
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
 	const T = $derived(out && axes[0] === 't' ? out.shape[0] : 0);
 	const ids = $derived(tokenIds(R.trace, R.model));
-	const tokens = $derived(T ? tokenTexts(P, T, ids) : []);
-	const where = $derived(e ? unitWhere(e.unit, axes, tokens) : null);
+	const tokens = $derived(T ? tokenTexts(P, T, ids, i18n.lang) : []);
+	const where = $derived(e ? unitWhere(e.unit, axes, tokens, undefined, axisNames(P)) : null);
 	const tableName = $derived(e?.reads[1]?.tensor ?? '');
 	const table = $derived(R.model && tableName ? R.model.weights[tableName] : null);
 	const row = $derived(e ? (e.values.row ?? e.values.id ?? 0) : 0);
@@ -107,7 +107,7 @@
 				<span class="muted">· {t({ en: 'copied unchanged: nothing is computed', zh: '原样复制：没有任何计算' })}</span>
 			</p>
 		{/if}
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 

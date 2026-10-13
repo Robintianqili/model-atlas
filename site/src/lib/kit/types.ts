@@ -88,6 +88,36 @@ export interface PredictQuestion {
 	explain: I18n;
 }
 
+
+/** Stage density (redesign R1, spec §5.4): from the stage pane's size. compact below 600 px wide or 480 px tall (always
+ *  on phones), roomy from 760 x 700, regular otherwise. Views may use it; text never goes below 12 px. */
+export type Density = 'roomy' | 'regular' | 'compact';
+
+/** The provenance label of a step's stage header (R1): a kind, or a kind with its parity detail. */
+export type StageProv = Provenance | { mode: Provenance; precision?: string; tolerance?: number; against?: string; note?: Text; short?: Text };
+
+/** A predict beat in the narration (R1): the stage is gated until the learner answers (spec §5.7). */
+export interface WalkPredict {
+	question: Text;
+	options: Text[];
+	/** index of the right option */
+	answer: number;
+	/** shown after the answer (with its real number) */
+	explain: Text;
+	/** the stage dims and goes inert until the answer (default true) */
+	gate?: boolean;
+}
+
+/** A "your turn" task beat in the narration (R1): the learner acts in the stage, the narration reports. */
+export interface WalkTask {
+	prompt: Text;
+	done: () => boolean;
+	/** the status line while not done / once done */
+	waiting?: Text;
+	doneText?: Text;
+	hint?: Text;
+}
+
 /** What a Walkthrough passes to each step's stage snippet. */
 export interface WalkContext {
 	/** index of the current step (0-based) */
@@ -103,6 +133,12 @@ export interface WalkContext {
 	reduced: boolean;
 	/** call when this step's animation has finished (Play then moves on after `linger` ms) */
 	done: () => void;
+	/** R1: the option the learner chose on this step's predict (-1: revealed with "Show me"; null: not answered) */
+	answered?: number | null;
+	/** R1: the stage is gated (a predict step before the answer): views keep the answer hidden */
+	gated?: boolean;
+	/** R1: the stage pane's density (spec §5.4) */
+	density?: Density;
 }
 
 /** One step of a guided lesson (kit Walkthrough). */
@@ -134,4 +170,22 @@ export interface WalkStep {
 	/** true while the step's numbers are still being computed: its screen-reader announcement waits until it is false
 	 *  (at most 10 s; DevKit K1). Default: announced on entering. */
 	pending?: () => boolean;
+	/** R1: the chapter this step belongs to (or the Walkthrough's `chapters` prop) */
+	chapter?: Text;
+	/** R1: the "Why?" disclosure under the narration: a question as its summary and a short answer */
+	why?: { q: Text; a: Text | (() => Text) };
+	/** R1: the stage header's provenance label */
+	prov?: StageProv | (() => StageProv | undefined);
+	/** R1: number-chip targets ({name@ref} in a narration): what the ring moves to on hover, focus or tap */
+	refs?: Record<string, unknown> | (() => Record<string, unknown>);
+	/** R1: a predict question answered in the narration (the stage is gated until then) */
+	predict?: WalkPredict | (() => WalkPredict | undefined);
+	/** R1: a task the learner does in the stage, shown as a "Your turn" beat in the narration */
+	task?: WalkTask;
+	/** R1: the step animates (a ▸ mark in the step list) */
+	animated?: boolean;
+	/** R1: the narration and look line with number-chip marks ({name@ref}); the plain text stays in narration / look */
+	chips?: { narration?: () => Text; look?: () => Text };
+	/** R1: a number chip is hovered, focused or tapped (its ref), or left (null): move the stage's ring */
+	onref?: (ref: string | null) => void;
 }

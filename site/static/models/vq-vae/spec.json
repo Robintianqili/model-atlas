@@ -1,0 +1,544 @@
+{
+ "slug": "vq-vae",
+ "name": {
+  "en": "VQ-VAE: a drawing as 16 codes",
+  "zh": "VQ-VAE：一幅画变成 16 个码字"
+ },
+ "version": "2026-10-12",
+ "params": 15993,
+ "precision": "fp32",
+ "input": {
+  "kind": "drawing",
+  "shape": [
+   1,
+   28,
+   28
+  ]
+ },
+ "tensors": [
+  {
+   "name": "enc1.weight",
+   "shape": [
+    64,
+    1,
+    7,
+    7
+   ],
+   "offset": 0,
+   "length": 3136
+  },
+  {
+   "name": "enc1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 3136,
+   "length": 64
+  },
+  {
+   "name": "ze.weight",
+   "shape": [
+    8,
+    64,
+    1,
+    1
+   ],
+   "offset": 3200,
+   "length": 512
+  },
+  {
+   "name": "ze.bias",
+   "shape": [
+    8
+   ],
+   "offset": 3712,
+   "length": 8
+  },
+  {
+   "name": "zq.codebook",
+   "shape": [
+    32,
+    8
+   ],
+   "offset": 3720,
+   "length": 256
+  },
+  {
+   "name": "dec1.weight",
+   "shape": [
+    64,
+    8,
+    3,
+    3
+   ],
+   "offset": 3976,
+   "length": 4608
+  },
+  {
+   "name": "dec1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 8584,
+   "length": 64
+  },
+  {
+   "name": "dec2.weight",
+   "shape": [
+    64,
+    64,
+    1,
+    1
+   ],
+   "offset": 8648,
+   "length": 4096
+  },
+  {
+   "name": "dec2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 12744,
+   "length": 64
+  },
+  {
+   "name": "dec3.weight",
+   "shape": [
+    49,
+    64,
+    1,
+    1
+   ],
+   "offset": 12808,
+   "length": 3136
+  },
+  {
+   "name": "dec3.bias",
+   "shape": [
+    49
+   ],
+   "offset": 15944,
+   "length": 49
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your drawing",
+    "zh": "你的画"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28x28 numbers: 0 is empty, 1 is full ink.",
+    "zh": "28x28 个数：0 是空白，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "enc1",
+   "op": "conv2d",
+   "label": {
+    "en": "Encoder: each 7×7 patch → 64 numbers",
+    "zh": "编码器：每个 7×7 图块 → 64 个数"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 7,
+    "stride": 7,
+    "padding": 0,
+    "inChannels": 1,
+    "outChannels": 64
+   },
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 35
+   }
+  },
+  {
+   "id": "enc1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Encoder ReLU",
+    "zh": "编码器 ReLU"
+   },
+   "in": [
+    "enc1"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 43
+   }
+  },
+  {
+   "id": "ze",
+   "op": "conv2d",
+   "label": {
+    "en": "z_e: 8 numbers per patch",
+    "zh": "z_e：每个图块 8 个数"
+   },
+   "in": [
+    "enc1.relu"
+   ],
+   "outShape": [
+    8,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 64,
+    "outChannels": 8
+   },
+   "desc": {
+    "en": "The encoder's output for each of the 16 patches, before it snaps to a code.",
+    "zh": "编码器对 16 个图块各自的输出，还没吸附到码字上。"
+   },
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 36
+   }
+  },
+  {
+   "id": "zq",
+   "op": "vq",
+   "label": {
+    "en": "z_q: the nearest code of each patch",
+    "zh": "z_q：每个图块最近的码字"
+   },
+   "in": [
+    "ze"
+   ],
+   "outShape": [
+    8,
+    4,
+    4
+   ],
+   "desc": {
+    "en": "Each patch's 8 numbers are replaced by the nearest of the 32 codebook entries.",
+    "zh": "每个图块的 8 个数被换成 32 个码本条目里最近的那个。"
+   },
+   "axes": [
+    "d",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 47
+   },
+   "sub": [
+    "dist",
+    "idx"
+   ]
+  },
+  {
+   "id": "dec1",
+   "op": "conv2d",
+   "label": {
+    "en": "Decoder: each code with its neighbours → 64",
+    "zh": "解码器：每个码字连同邻居 → 64"
+   },
+   "in": [
+    "zq"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 8,
+    "outChannels": 64
+   },
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 38
+   }
+  },
+  {
+   "id": "dec1.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder ReLU 1",
+    "zh": "解码器 ReLU 1"
+   },
+   "in": [
+    "dec1"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "dec2",
+   "op": "conv2d",
+   "label": {
+    "en": "Decoder layer 2 (64)",
+    "zh": "解码器第 2 层（64）"
+   },
+   "in": [
+    "dec1.relu"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 64,
+    "outChannels": 64
+   },
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 39
+   }
+  },
+  {
+   "id": "dec2.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder ReLU 2",
+    "zh": "解码器 ReLU 2"
+   },
+   "in": [
+    "dec2"
+   ],
+   "outShape": [
+    64,
+    4,
+    4
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 54
+   }
+  },
+  {
+   "id": "dec3",
+   "op": "conv2d",
+   "label": {
+    "en": "49 pixel scores per patch",
+    "zh": "每个图块 49 个像素分数"
+   },
+   "in": [
+    "dec2.relu"
+   ],
+   "outShape": [
+    49,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 1,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 64,
+    "outChannels": 49
+   },
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "img",
+   "op": "pixel_shuffle",
+   "label": {
+    "en": "Scores laid out as 7×7 blocks",
+    "zh": "分数排成 7×7 的块"
+   },
+   "in": [
+    "dec3"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "params": {
+    "factor": 7
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 55
+   }
+  },
+  {
+   "id": "out",
+   "op": "sigmoid",
+   "label": {
+    "en": "The redrawing",
+    "zh": "重画出的画"
+   },
+   "in": [
+    "img"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/vq-vae/model.py",
+    "line": 59
+   }
+  }
+ ],
+ "training": {
+  "dataset": "Quick, Draw! numpy bitmaps, 5 classes (star, ladder, umbrella, eyeglasses, t-shirt), TinyCNN's split",
+  "steps": 14070,
+  "batchSize": 128,
+  "epochs": 30,
+  "bestEpoch": 30,
+  "optimizer": "Adam lr 0.001, cosine decay to 0 (encoder, decoder); codebook by moving average (decay 0.99); loss = BCE mean over 784 pixels + 0.25 x commitment, straight-through gradient",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32, TF32 off (evaluation)",
+  "metrics": {
+   "test_bce_px": 0.187,
+   "test_commit": 0.1096,
+   "codes_used": 32,
+   "test_n": 7500
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000153,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 12,
+  "edgeCases": [
+   "blank",
+   "dot"
+  ],
+  "perLayer": {
+   "enc1": 0.00000381,
+   "enc1.relu": 7.15e-7,
+   "ze": 7.15e-7,
+   "zq#dist": 0.0000153,
+   "dec1": 0.00000191,
+   "dec1.relu": 0.00000191,
+   "dec2": 0.00000381,
+   "dec2.relu": 0.00000381,
+   "dec3": 0.0000114,
+   "img": 0.0000114,
+   "out": 6.26e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/vq-vae/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "drawing28",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  }
+ ],
+ "outputs": [
+  "out"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "kinds": [
+  {
+   "id": "star",
+   "en": "star",
+   "zh": "星星"
+  },
+  {
+   "id": "ladder",
+   "en": "ladder",
+   "zh": "梯子"
+  },
+  {
+   "id": "umbrella",
+   "en": "umbrella",
+   "zh": "雨伞"
+  },
+  {
+   "id": "eyeglasses",
+   "en": "eyeglasses",
+   "zh": "眼镜"
+  },
+  {
+   "id": "t-shirt",
+   "en": "t-shirt",
+   "zh": "T 恤"
+  }
+ ],
+ "heldOutKinds": [
+  "house",
+  "fish"
+ ]
+}

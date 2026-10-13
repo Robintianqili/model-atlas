@@ -68,7 +68,7 @@
 		{/if}
 		{#if isFirst && kernels && !compact}
 			<div class="kern">
-				<NumGrid values={kernels.subarray(ch * 9, ch * 9 + 9)} rows={3} cols={3} domain={kDom} role="param" label={t({ en: `kernel ${ch} (3×3 weights)`, zh: `卷积核 ${ch}（3×3 权重）` })} cell={44} />
+				<NumGrid values={kernels.subarray(ch * 9, ch * 9 + 9)} rows={3} cols={3} domain={kDom} role="param" label={t({ en: `kernel ${ch} (3×3 weights)`, zh: `卷积核 ${ch}（3×3 权重）` })} cell={54} />
 				<div class="allk">
 					<span class="muted small">{t({ en: 'All 8 kernels of Conv 1-1', zh: 'Conv 1-1 的全部 8 个卷积核' })}</span>
 					<div class="kk">
@@ -163,7 +163,7 @@
 		border: 1px solid var(--rule);
 		border-radius: var(--r1);
 		background: var(--surface);
-		font-size: 10px;
+		font-size: var(--t-xs);
 	}
 	.kb.on {
 		border-color: var(--accent);
@@ -180,7 +180,7 @@
 		gap: 2px;
 	}
 	figcaption {
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 		display: flex;
 		align-items: center;
@@ -207,7 +207,7 @@
 		grid-template-columns: 6.5em 1fr 3.5em;
 		gap: 6px;
 		align-items: center;
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.cn {
 		display: inline-flex;

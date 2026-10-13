@@ -1,33 +1,50 @@
 /*
- * Model Atlas design tokens. Light is the default; dark applies when the OS asks for it
+ * Model Atlas design tokens (redesign 2026-10, SPEC §2-§4). Light is the default; dark applies when the OS asks for it
  * (unless the page is forced light) or when <html data-theme="dark">.
- * Value ramps (diverging / sequential) live in $lib/kit/color.ts so canvas code and CSS agree;
- * the few ramp stops repeated here are for CSS-only legends and chips.
+ *
+ * Three UI signals only: act (ink: the one primary button), look (highlighter yellow: the stage ring, the Look line,
+ * the current rail segment; at most 3 per screen) and here (an ink bar on a pale row: the current item). The data ramps
+ * are the only other colour. Value ramps (diverging / sequential) live in $lib/kit/color.ts so canvas code and CSS agree;
+ * the few ramp stops repeated here are for CSS-only legends and chips. The data grammar tokens are unchanged by the
+ * redesign.
+ *
+ * New code uses the canonical names. The legacy names (--bg, --surface*, --accent*, --fs-*, --font-display, ...) are
+ * aliases at the end of the light block, so every package keeps compiling and follows the theme.
  */
 
 :root {
 	color-scheme: light;
 
-	/* type */
-	--font-cjk: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
-	--font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'PingFang SC', 'Hiragino Sans GB',
-		'Microsoft YaHei', 'Noto Sans CJK SC', serif;
-	--font-body: 'Atkinson Hyperlegible Next Variable', system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+	/* type: Atkinson Hyperlegible Next for words, JetBrains Mono for numbers and code, the system stack for Chinese */
+	--font-sans: 'Atkinson Hyperlegible Next Variable', system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
 		'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
-	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, 'PingFang SC',
-		'Microsoft YaHei', monospace;
-
-	--fs-xs: 0.75rem;
-	--fs-sm: 0.875rem;
-	--fs-md: 1rem;
-	--fs-lg: 1.1875rem;
-	--fs-xl: 1.5rem;
-	--fs-2xl: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem);
-	--fs-3xl: clamp(2.1rem, 1.4rem + 3.2vw, 3.6rem);
-	--lh-body: 1.6;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, 'PingFang SC', 'Microsoft YaHei',
+		monospace;
+	--font-cjk: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+	/* 7 sizes with a 12 px floor (nothing smaller anywhere) */
+	--t-xs: 12px;
+	--t-sm: 14px;
+	--t-md: 16px;
+	--t-lg: 18px;
+	--t-xl: 22px;
+	--t-2xl: 28px;
+	--t-3xl: 44px;
+	--lh-xs: 16px;
+	--lh-sm: 20px;
+	--lh-md: 24px;
+	--lh-lg: 28px;
+	--lh-xl: 28px;
+	--lh-2xl: 34px;
+	--lh-3xl: 48px;
+	--w-body: 400;
+	--w-ui: 600;
+	--w-title: 700;
+	--w-display: 750;
+	/* measured: Atkinson x-height 0.50 em, JetBrains Mono 0.55 em; mono is matched to the words, not shrunk by 0.92em */
+	--mono-adjust: ex-height 0.5;
 	--measure: 68ch;
 
-	/* space, radius, layout */
+	/* space (unchanged scale), radius, layout */
 	--s1: 4px;
 	--s2: 8px;
 	--s3: 12px;
@@ -38,42 +55,69 @@
 	--s8: 72px;
 	--r1: 4px;
 	--r2: 8px;
-	--r3: 14px;
+	--r3: 12px;
+	--r4: 16px;
+	--r5: 20px;
 	--r-pill: 999px;
 	--page-max: 1240px;
-	--gutter: clamp(16px, 4vw, 40px);
-	--header-h: 60px;
+	--gutter: 24px;
+	--header-h: 64px;
+	--ltop-h: 56px;
+	--abar-h: 72px;
+	--narr-w: 440px;
 
-	/* surfaces and ink (paper atlas) */
-	--bg: #f6f3ea;
-	--surface: #fffdf8;
-	--surface-2: #f0ece1;
-	--surface-3: #e6e0d1;
-	--ink: #1d1c18;
-	--ink-2: #46433b;
-	--muted: #67635a;
-	--rule: #dcd5c3;
-	--rule-strong: #b9af98;
-	--shadow-1: 0 1px 2px rgb(40 33 15 / 0.08), 0 1px 1px rgb(40 33 15 / 0.04);
-	--shadow-2: 0 8px 28px rgb(40 33 15 / 0.14), 0 2px 6px rgb(40 33 15 / 0.08);
+	/* motion */
+	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+	--dur-1: 120ms;
+	--dur-2: 180ms;
+	--dur-3: 300ms;
+	--focus-ring: 0 0 0 2px var(--panel), 0 0 0 4px var(--ink);
 
-	/* UI accent (links, focus, current layer, trainable outline). Not a data color. */
-	--accent: #0b6b70;
-	--accent-strong: #074f53;
-	--accent-soft: #d9ecea;
-	--accent-ink: #ffffff;
-
-	/* provenance and status */
+	/* surfaces */
+	--paper: #f4f5f2;
+	--panel: #ffffff;
+	--stage: #eef0ec;
+	--well: #f6f7f4;
+	--sunken: #e7eae6;
+	--raised: #ffffff;
+	/* ink */
+	--ink: #16181b;
+	--ink-2: #3c4147;
+	--muted: #5d636a;
+	--faint: #8a9097;
+	--rule: #e0e3de;
+	--rule-strong: #c6cac3;
+	/* anything that identifies a control (3:1 or more, WCAG 1.4.11); --rule and --rule-strong are decoration only */
+	--line-control: #82888e;
+	/* roles: act, look, here */
+	--act: #16181b;
+	--act-ink: #ffffff;
+	--act-hover: #2c3137;
+	--act-lip: rgb(0 0 0 / 0.3);
+	--mark: #ffd84a;
+	--mark-soft: #fff5c9;
+	--mark-ink: #5c4400;
+	--mark-line: #e0b400;
+	--mark-band: #ffd84a;
+	--mark-band-ink: #16181b;
+	--ring-halo: var(--mark);
+	--here: #16181b;
+	--here-bg: #eceee9;
+	/* feedback and provenance */
+	--ok: #0e7a44;
+	--ok-soft: #e3f4e9;
+	--no: #b3261e;
+	--no-soft: #fbe9e7;
 	--live: #17723f;
 	--live-soft: #dcf1e3;
 	--pre: #3a5596;
 	--pre-soft: #e2e8f6;
 	--illus: #94530a;
 	--illus-soft: #fbead0;
-	--planned: #67635a;
-	--planned-soft: #ebe6da;
+	--shadow-1: 0 1px 2px rgb(16 18 20 / 0.06), 0 1px 1px rgb(16 18 20 / 0.04);
+	--shadow-2: 0 12px 32px rgb(16 18 20 / 0.14), 0 2px 6px rgb(16 18 20 / 0.08);
 
-	/* data grammar (brief §4.7) */
+	/* data grammar (brief §4.7; unchanged) */
 	--div-neg: #1155a9;
 	--div-mid: #f2efec;
 	--div-pos: #b95100;
@@ -83,7 +127,7 @@
 	--q: #2a78d6;
 	--k: #d93b3b;
 	--v: #1a8a4a;
-	/* text versions of the data colors: 4.5:1 or more on --bg, --surface and --surface-2 (WCAG AA) */
+	/* text versions of the data colors: 4.5:1 or more on --paper, --panel, --well and --stage (WCAG AA) */
 	--div-neg-text: #1155a9;
 	--div-pos-text: #a54900;
 	--q-text: #1d62b8;
@@ -96,8 +140,6 @@
 	--param: #46433b;
 	--grad: #a23b72;
 	--mask-hatch: #c9c0aa;
-	--highlight: #1d1c18;
-	--highlight-halo: #fffdf8;
 
 	/* categorical classes (validated order, see color.ts) */
 	--cat-0: #2a78d6;
@@ -111,39 +153,94 @@
 	--cat-8: #0aa2c0;
 	--cat-9: #9b5a14;
 
-	/* motion */
-	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-	--dur-1: 120ms;
-	--dur-2: 220ms;
-	--dur-3: 420ms;
+	/* legacy aliases (SPEC §2.4): defined with var() on :root, so they follow the dark values too. The teal is gone:
+	   links, focus, the current layer and the trainable outline are ink; --font-display is the sans (Fraunces is removed). */
+	--bg: var(--paper);
+	--surface: var(--panel);
+	--surface-2: var(--well);
+	--surface-3: var(--sunken);
+	--accent: var(--ink);
+	--accent-strong: var(--ink);
+	--accent-soft: var(--here-bg);
+	--accent-ink: var(--panel);
+	--font-body: var(--font-sans);
+	--font-display: var(--font-sans);
+	--fs-xs: var(--t-xs);
+	--fs-sm: var(--t-sm);
+	--fs-md: var(--t-md);
+	--fs-lg: var(--t-lg);
+	--fs-xl: var(--t-xl);
+	--fs-2xl: var(--t-2xl);
+	--fs-3xl: var(--t-3xl);
+	--lh-body: 1.6;
+	--highlight: var(--ink);
+	--highlight-halo: var(--panel);
+	--planned: var(--muted);
+	--planned-soft: var(--well);
 }
 
+/* phones: a smaller top of the scale, 16 px gutters, shorter bars */
+@media (max-width: 759px) {
+	:root {
+		--t-lg: 17px;
+		--t-xl: 20px;
+		--t-3xl: 32px;
+		--lh-lg: 26px;
+		--lh-xl: 26px;
+		--lh-3xl: 38px;
+		--gutter: 16px;
+		--header-h: 56px;
+		--ltop-h: 52px;
+		--abar-h: 64px;
+	}
+}
+@media (min-width: 960px) and (max-width: 1099px) {
+	:root {
+		--narr-w: 360px;
+	}
+}
+
+/* dark: the same block under both selectors (the OS asks and the page is not forced light; or forced dark) */
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
 		color-scheme: dark;
-		--bg: #121417;
-		--surface: #1a1d21;
-		--surface-2: #22262b;
-		--surface-3: #2c3137;
-		--ink: #ece8de;
-		--ink-2: #c6c1b4;
-		--muted: #a8a397;
-		--rule: #30353b;
-		--rule-strong: #4a5058;
-		--shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
-		--shadow-2: 0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
-		--accent: #4fc4c0;
-		--accent-strong: #7fd9d5;
-		--accent-soft: #173a3b;
-		--accent-ink: #0b1415;
+		--paper: #0f1113;
+		--panel: #16191c;
+		--stage: #0b0d0f;
+		--well: #1a1e21;
+		--sunken: #23282c;
+		--raised: #1d2125;
+		--ink: #eceee9;
+		--ink-2: #c4c8c2;
+		--muted: #9aa09a;
+		--faint: #71777d;
+		--rule: #272b30;
+		--rule-strong: #3b4147;
+		--line-control: #6f757b;
+		--act: #eceee9;
+		--act-ink: #0f1113;
+		--act-hover: #ffffff;
+		--act-lip: rgb(0 0 0 / 0.22);
+		--mark: #ffd84a;
+		--mark-soft: #2a2716;
+		--mark-ink: #ffd84a;
+		--mark-line: #c9a200;
+		--mark-band: #ffd84a;
+		--mark-band-ink: #0f1113;
+		--here: #eceee9;
+		--here-bg: #20252a;
+		--ok: #4cc38a;
+		--ok-soft: #10291c;
+		--no: #ff8a80;
+		--no-soft: #341614;
 		--live: #62d394;
 		--live-soft: #173326;
 		--pre: #9db3ec;
 		--pre-soft: #1f2a45;
 		--illus: #f1b65c;
 		--illus-soft: #3a2b14;
-		--planned: #a29d91;
-		--planned-soft: #262a2f;
+		--shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
+		--shadow-2: 0 14px 36px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4);
 		--div-neg: #7cbdff;
 		--div-mid: #2e2a27;
 		--div-pos: #ffb160;
@@ -165,8 +262,6 @@
 		--param: #c6c1b4;
 		--grad: #e28ab9;
 		--mask-hatch: #3d434a;
-		--highlight: #ffffff;
-		--highlight-halo: #121417;
 		--cat-0: #3987e5;
 		--cat-1: #d95926;
 		--cat-2: #199e70;
@@ -182,29 +277,43 @@
 
 :root[data-theme='dark'] {
 	color-scheme: dark;
-	--bg: #121417;
-	--surface: #1a1d21;
-	--surface-2: #22262b;
-	--surface-3: #2c3137;
-	--ink: #ece8de;
-	--ink-2: #c6c1b4;
-	--muted: #a8a397;
-	--rule: #30353b;
-	--rule-strong: #4a5058;
-	--shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
-	--shadow-2: 0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
-	--accent: #4fc4c0;
-	--accent-strong: #7fd9d5;
-	--accent-soft: #173a3b;
-	--accent-ink: #0b1415;
+	--paper: #0f1113;
+	--panel: #16191c;
+	--stage: #0b0d0f;
+	--well: #1a1e21;
+	--sunken: #23282c;
+	--raised: #1d2125;
+	--ink: #eceee9;
+	--ink-2: #c4c8c2;
+	--muted: #9aa09a;
+	--faint: #71777d;
+	--rule: #272b30;
+	--rule-strong: #3b4147;
+	--line-control: #6f757b;
+	--act: #eceee9;
+	--act-ink: #0f1113;
+	--act-hover: #ffffff;
+	--act-lip: rgb(0 0 0 / 0.22);
+	--mark: #ffd84a;
+	--mark-soft: #2a2716;
+	--mark-ink: #ffd84a;
+	--mark-line: #c9a200;
+	--mark-band: #ffd84a;
+	--mark-band-ink: #0f1113;
+	--here: #eceee9;
+	--here-bg: #20252a;
+	--ok: #4cc38a;
+	--ok-soft: #10291c;
+	--no: #ff8a80;
+	--no-soft: #341614;
 	--live: #62d394;
 	--live-soft: #173326;
 	--pre: #9db3ec;
 	--pre-soft: #1f2a45;
 	--illus: #f1b65c;
 	--illus-soft: #3a2b14;
-	--planned: #a29d91;
-	--planned-soft: #262a2f;
+	--shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
+	--shadow-2: 0 14px 36px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4);
 	--div-neg: #7cbdff;
 	--div-mid: #2e2a27;
 	--div-pos: #ffb160;
@@ -226,8 +335,6 @@
 	--param: #c6c1b4;
 	--grad: #e28ab9;
 	--mask-hatch: #3d434a;
-	--highlight: #ffffff;
-	--highlight-halo: #121417;
 	--cat-0: #3987e5;
 	--cat-1: #d95926;
 	--cat-2: #199e70;

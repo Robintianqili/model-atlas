@@ -1,0 +1,656 @@
+{
+ "slug": "crnn-ocr",
+ "name": {
+  "en": "Tiny CRNN + CTC",
+  "zh": "微型 CRNN + CTC"
+ },
+ "version": "2026-10-12",
+ "params": 43435,
+ "precision": "fp32",
+ "input": {
+  "kind": "drawing",
+  "shape": [
+   1,
+   16,
+   64
+  ]
+ },
+ "tensors": [
+  {
+   "name": "conv1.weight",
+   "shape": [
+    8,
+    1,
+    3,
+    3
+   ],
+   "offset": 0,
+   "length": 72
+  },
+  {
+   "name": "conv1.bias",
+   "shape": [
+    8
+   ],
+   "offset": 72,
+   "length": 8
+  },
+  {
+   "name": "conv2.weight",
+   "shape": [
+    16,
+    8,
+    3,
+    3
+   ],
+   "offset": 80,
+   "length": 1152
+  },
+  {
+   "name": "conv2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1232,
+   "length": 16
+  },
+  {
+   "name": "fwd.weight_ih",
+   "shape": [
+    128,
+    128
+   ],
+   "offset": 1248,
+   "length": 16384
+  },
+  {
+   "name": "fwd.weight_hh",
+   "shape": [
+    128,
+    32
+   ],
+   "offset": 17632,
+   "length": 4096
+  },
+  {
+   "name": "fwd.bias_ih",
+   "shape": [
+    128
+   ],
+   "offset": 21728,
+   "length": 128
+  },
+  {
+   "name": "fwd.bias_hh",
+   "shape": [
+    128
+   ],
+   "offset": 21856,
+   "length": 128
+  },
+  {
+   "name": "bwd.weight_ih",
+   "shape": [
+    128,
+    128
+   ],
+   "offset": 21984,
+   "length": 16384
+  },
+  {
+   "name": "bwd.weight_hh",
+   "shape": [
+    128,
+    32
+   ],
+   "offset": 38368,
+   "length": 4096
+  },
+  {
+   "name": "bwd.bias_ih",
+   "shape": [
+    128
+   ],
+   "offset": 42464,
+   "length": 128
+  },
+  {
+   "name": "bwd.bias_hh",
+   "shape": [
+    128
+   ],
+   "offset": 42592,
+   "length": 128
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    11,
+    64
+   ],
+   "offset": 42720,
+   "length": 704
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    11
+   ],
+   "offset": 43424,
+   "length": 11
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your writing",
+    "zh": "你写的字"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    1,
+    16,
+    64
+   ],
+   "desc": {
+    "en": "16 x 64 ink values: 0 is paper, 1 is full ink.",
+    "zh": "16 x 64 个墨迹值：0 是纸，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Convolution 1",
+    "zh": "卷积 1"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    8,
+    16,
+    64
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 1,
+    "outChannels": 8
+   },
+   "desc": {
+    "en": "8 kernels of 3 x 3 slide over the strip.",
+    "zh": "8 个 3 x 3 的卷积核在长条上滑动。"
+   },
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 37
+   }
+  },
+  {
+   "id": "relu1",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 1",
+    "zh": "ReLU 1"
+   },
+   "in": [
+    "conv1"
+   ],
+   "outShape": [
+    8,
+    16,
+    64
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "pool1",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Max pooling",
+    "zh": "最大池化"
+   },
+   "in": [
+    "relu1"
+   ],
+   "outShape": [
+    8,
+    8,
+    32
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   },
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Convolution 2",
+    "zh": "卷积 2"
+   },
+   "in": [
+    "pool1"
+   ],
+   "outShape": [
+    16,
+    8,
+    32
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 1,
+    "inChannels": 8,
+    "outChannels": 16
+   },
+   "desc": {
+    "en": "16 kernels of 3 x 3 x 8 over the pooled maps.",
+    "zh": "16 个 3 x 3 x 8 的卷积核作用在池化后的图上。"
+   },
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 38
+   }
+  },
+  {
+   "id": "relu2",
+   "op": "relu",
+   "label": {
+    "en": "Feature maps",
+    "zh": "特征图"
+   },
+   "in": [
+    "conv2"
+   ],
+   "outShape": [
+    16,
+    8,
+    32
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "cols",
+   "op": "columns",
+   "label": {
+    "en": "Columns",
+    "zh": "列"
+   },
+   "in": [
+    "relu2"
+   ],
+   "outShape": [
+    32,
+    128
+   ],
+   "axes": [
+    "t",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 28
+   }
+  },
+  {
+   "id": "fwd",
+   "op": "lstm",
+   "label": {
+    "en": "LSTM, left to right",
+    "zh": "LSTM，从左往右"
+   },
+   "in": [
+    "cols"
+   ],
+   "outShape": [
+    32,
+    32
+   ],
+   "params": {
+    "hidden": 32,
+    "inputSize": 128
+   },
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 47
+   },
+   "sub": [
+    "i",
+    "f",
+    "g",
+    "o",
+    "c",
+    "h"
+   ]
+  },
+  {
+   "id": "rev",
+   "op": "flip",
+   "label": {
+    "en": "Columns, right to left",
+    "zh": "列，从右往左"
+   },
+   "in": [
+    "cols"
+   ],
+   "outShape": [
+    32,
+    128
+   ],
+   "axes": [
+    "t",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "bwd",
+   "op": "lstm",
+   "label": {
+    "en": "LSTM, right to left",
+    "zh": "LSTM，从右往左"
+   },
+   "in": [
+    "rev"
+   ],
+   "outShape": [
+    32,
+    32
+   ],
+   "params": {
+    "hidden": 32,
+    "inputSize": 128
+   },
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 48
+   },
+   "sub": [
+    "i",
+    "f",
+    "g",
+    "o",
+    "c",
+    "h"
+   ]
+  },
+  {
+   "id": "bwd_back",
+   "op": "flip",
+   "label": {
+    "en": "Backward states, in column order",
+    "zh": "反向状态，按列的顺序"
+   },
+   "in": [
+    "bwd"
+   ],
+   "outShape": [
+    32,
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "both",
+   "op": "concat",
+   "label": {
+    "en": "Both directions",
+    "zh": "两个方向"
+   },
+   "in": [
+    "fwd",
+    "bwd_back"
+   ],
+   "outShape": [
+    32,
+    64
+   ],
+   "params": {
+    "axis": 1
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Scores per column",
+    "zh": "每列的分数"
+   },
+   "in": [
+    "both"
+   ],
+   "outShape": [
+    32,
+    11
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 11
+   },
+   "axes": [
+    "x",
+    "class"
+   ],
+   "code": {
+    "file": "pipeline/crnn-ocr/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Chances per column",
+    "zh": "每列的概率"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    32,
+    11
+   ],
+   "axes": [
+    "x",
+    "class"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "synthetic handwriting-like numbers (pipeline/crnn-ocr/make_data.ts with the page's glyphs.ts): 80,000 words of 1-7 digits, jittered shape, size, slant, tilt, spacing and pen width",
+  "epochs": 40,
+  "bestEpoch": 32,
+  "batchSize": 256,
+  "optimizer": "AdamW (weight decay 1e-4), cosine decay, clip 1.0, lr 0.003; CTC loss (blank = class 0)",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32 (evaluation, export)",
+  "metrics": {
+   "test_acc": 0.9985714285714286,
+   "val_acc": 0.9765,
+   "wild_acc": 0.8775714285714286,
+   "test_acc_by_length": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 0.998,
+    "5": 0.999,
+    "6": 0.995,
+    "7": 0.998
+   }
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000191,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 9,
+  "edgeCases": [
+   "blank",
+   "dot",
+   "dash"
+  ],
+  "perLayer": {
+   "conv1": 7.15e-7,
+   "relu1": 4.77e-7,
+   "pool1": 4.77e-7,
+   "conv2": 0.00000238,
+   "relu2": 0.00000238,
+   "cols": 0.00000238,
+   "fwd": 7.75e-7,
+   "fwd#i": 5.96e-7,
+   "fwd#f": 6.26e-7,
+   "fwd#g": 0.00000119,
+   "fwd#o": 7.15e-7,
+   "fwd#c": 0.0000153,
+   "fwd#h": 7.75e-7,
+   "rev": 0.00000238,
+   "bwd": 0.0000011,
+   "bwd#i": 5.36e-7,
+   "bwd#f": 8.64e-7,
+   "bwd#g": 0.00000109,
+   "bwd#o": 0.0000011,
+   "bwd#c": 0.0000191,
+   "bwd#h": 0.0000011,
+   "bwd_back": 0.0000011,
+   "both": 0.0000011,
+   "head": 0.00000572,
+   "probs": 8.94e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/crnn-ocr/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "word-strokes",
+   "kind": "drawing",
+   "shape": [
+    1,
+    16,
+    64
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "classes": [
+  {
+   "id": "blank",
+   "en": "blank (–)",
+   "zh": "空白（–）"
+  },
+  {
+   "id": "0",
+   "en": "0",
+   "zh": "0"
+  },
+  {
+   "id": "1",
+   "en": "1",
+   "zh": "1"
+  },
+  {
+   "id": "2",
+   "en": "2",
+   "zh": "2"
+  },
+  {
+   "id": "3",
+   "en": "3",
+   "zh": "3"
+  },
+  {
+   "id": "4",
+   "en": "4",
+   "zh": "4"
+  },
+  {
+   "id": "5",
+   "en": "5",
+   "zh": "5"
+  },
+  {
+   "id": "6",
+   "en": "6",
+   "zh": "6"
+  },
+  {
+   "id": "7",
+   "en": "7",
+   "zh": "7"
+  },
+  {
+   "id": "8",
+   "en": "8",
+   "zh": "8"
+  },
+  {
+   "id": "9",
+   "en": "9",
+   "zh": "9"
+  }
+ ]
+}

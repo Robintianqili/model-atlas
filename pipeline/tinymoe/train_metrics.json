@@ -1,0 +1,416 @@
+{
+ "moe": {
+  "train_chars": 39347112,
+  "val_chars": 1966956,
+  "params": 49418,
+  "active": 32650,
+  "steps": 12000,
+  "batch": 256,
+  "window": 64,
+  "lr": 0.003,
+  "alpha": 0.01,
+  "seed": 0,
+  "optimizer": "AdamW (weight decay 0.01), warm-up 300, cosine to 0, clip 1.0",
+  "val_loss": 1.08914,
+  "val_bpc": 1.57129,
+  "seconds": 1,
+  "log": [
+   {
+    "step": 500,
+    "loss": 1.7814,
+    "balance": 1.9781
+   },
+   {
+    "step": 1000,
+    "loss": 1.3612,
+    "balance": 1.978
+   },
+   {
+    "step": 1500,
+    "loss": 1.2698,
+    "balance": 1.9805
+   },
+   {
+    "step": 2000,
+    "loss": 1.189,
+    "balance": 1.9868
+   },
+   {
+    "step": 2500,
+    "loss": 1.1837,
+    "balance": 1.9835
+   },
+   {
+    "step": 3000,
+    "loss": 1.206,
+    "balance": 1.9837
+   },
+   {
+    "step": 3500,
+    "loss": 1.17,
+    "balance": 1.984
+   },
+   {
+    "step": 4000,
+    "loss": 1.1801,
+    "balance": 1.9834
+   },
+   {
+    "step": 4500,
+    "loss": 1.132,
+    "balance": 1.9854
+   },
+   {
+    "step": 5000,
+    "loss": 1.1274,
+    "balance": 1.9847
+   },
+   {
+    "step": 5500,
+    "loss": 1.1136,
+    "balance": 1.981
+   },
+   {
+    "step": 6000,
+    "loss": 1.0798,
+    "balance": 1.9807
+   },
+   {
+    "step": 6500,
+    "loss": 1.1404,
+    "balance": 1.9787
+   },
+   {
+    "step": 7000,
+    "loss": 1.1049,
+    "balance": 1.9817
+   },
+   {
+    "step": 7500,
+    "loss": 1.101,
+    "balance": 1.9787
+   },
+   {
+    "step": 8000,
+    "loss": 1.0929,
+    "balance": 1.979
+   },
+   {
+    "step": 8500,
+    "loss": 1.1173,
+    "balance": 1.9808
+   },
+   {
+    "step": 9000,
+    "loss": 1.0936,
+    "balance": 1.9826
+   },
+   {
+    "step": 9500,
+    "loss": 1.0601,
+    "balance": 1.9799
+   },
+   {
+    "step": 10000,
+    "loss": 1.1228,
+    "balance": 1.9811
+   },
+   {
+    "step": 10500,
+    "loss": 1.1188,
+    "balance": 1.9797
+   },
+   {
+    "step": 11000,
+    "loss": 1.0965,
+    "balance": 1.9807
+   },
+   {
+    "step": 11500,
+    "loss": 1.1122,
+    "balance": 1.9807
+   },
+   {
+    "step": 12000,
+    "loss": 1.0854,
+    "balance": 1.9806
+   }
+  ]
+ },
+ "noaux": {
+  "train_chars": 39347112,
+  "val_chars": 1966956,
+  "params": 49418,
+  "active": 32650,
+  "steps": 12000,
+  "batch": 256,
+  "window": 64,
+  "lr": 0.003,
+  "alpha": 0.0,
+  "seed": 0,
+  "optimizer": "AdamW (weight decay 0.01), warm-up 300, cosine to 0, clip 1.0",
+  "val_loss": 1.09456,
+  "val_bpc": 1.57912,
+  "seconds": 0,
+  "log": [
+   {
+    "step": 500,
+    "loss": 1.7922,
+    "balance": 2.1416
+   },
+   {
+    "step": 1000,
+    "loss": 1.3817,
+    "balance": 2.0919
+   },
+   {
+    "step": 1500,
+    "loss": 1.2757,
+    "balance": 2.0915
+   },
+   {
+    "step": 2000,
+    "loss": 1.2029,
+    "balance": 2.0823
+   },
+   {
+    "step": 2500,
+    "loss": 1.1873,
+    "balance": 2.0895
+   },
+   {
+    "step": 3000,
+    "loss": 1.2153,
+    "balance": 2.0831
+   },
+   {
+    "step": 3500,
+    "loss": 1.1737,
+    "balance": 2.0838
+   },
+   {
+    "step": 4000,
+    "loss": 1.1906,
+    "balance": 2.08
+   },
+   {
+    "step": 4500,
+    "loss": 1.1318,
+    "balance": 2.0783
+   },
+   {
+    "step": 5000,
+    "loss": 1.1382,
+    "balance": 2.0811
+   },
+   {
+    "step": 5500,
+    "loss": 1.1143,
+    "balance": 2.0874
+   },
+   {
+    "step": 6000,
+    "loss": 1.0876,
+    "balance": 2.0747
+   },
+   {
+    "step": 6500,
+    "loss": 1.139,
+    "balance": 2.0763
+   },
+   {
+    "step": 7000,
+    "loss": 1.1078,
+    "balance": 2.0742
+   },
+   {
+    "step": 7500,
+    "loss": 1.1055,
+    "balance": 2.0754
+   },
+   {
+    "step": 8000,
+    "loss": 1.094,
+    "balance": 2.0785
+   },
+   {
+    "step": 8500,
+    "loss": 1.1175,
+    "balance": 2.0815
+   },
+   {
+    "step": 9000,
+    "loss": 1.1031,
+    "balance": 2.0751
+   },
+   {
+    "step": 9500,
+    "loss": 1.0679,
+    "balance": 2.0808
+   },
+   {
+    "step": 10000,
+    "loss": 1.1342,
+    "balance": 2.0805
+   },
+   {
+    "step": 10500,
+    "loss": 1.1223,
+    "balance": 2.0721
+   },
+   {
+    "step": 11000,
+    "loss": 1.1034,
+    "balance": 2.0798
+   },
+   {
+    "step": 11500,
+    "loss": 1.1147,
+    "balance": 2.0736
+   },
+   {
+    "step": 12000,
+    "loss": 1.0949,
+    "balance": 2.0782
+   }
+  ]
+ },
+ "dense": {
+  "train_chars": 39347112,
+  "val_chars": 1966956,
+  "params": 32330,
+  "active": 32330,
+  "steps": 12000,
+  "batch": 256,
+  "window": 64,
+  "lr": 0.003,
+  "alpha": 0.0,
+  "seed": 0,
+  "optimizer": "AdamW (weight decay 0.01), warm-up 300, cosine to 0, clip 1.0",
+  "val_loss": 1.1682,
+  "val_bpc": 1.68536,
+  "seconds": 0,
+  "log": [
+   {
+    "step": 500,
+    "loss": 1.8216,
+    "balance": 0.0
+   },
+   {
+    "step": 1000,
+    "loss": 1.4321,
+    "balance": 0.0
+   },
+   {
+    "step": 1500,
+    "loss": 1.3444,
+    "balance": 0.0
+   },
+   {
+    "step": 2000,
+    "loss": 1.2619,
+    "balance": 0.0
+   },
+   {
+    "step": 2500,
+    "loss": 1.2726,
+    "balance": 0.0
+   },
+   {
+    "step": 3000,
+    "loss": 1.2838,
+    "balance": 0.0
+   },
+   {
+    "step": 3500,
+    "loss": 1.2389,
+    "balance": 0.0
+   },
+   {
+    "step": 4000,
+    "loss": 1.259,
+    "balance": 0.0
+   },
+   {
+    "step": 4500,
+    "loss": 1.217,
+    "balance": 0.0
+   },
+   {
+    "step": 5000,
+    "loss": 1.2088,
+    "balance": 0.0
+   },
+   {
+    "step": 5500,
+    "loss": 1.1857,
+    "balance": 0.0
+   },
+   {
+    "step": 6000,
+    "loss": 1.1592,
+    "balance": 0.0
+   },
+   {
+    "step": 6500,
+    "loss": 1.2164,
+    "balance": 0.0
+   },
+   {
+    "step": 7000,
+    "loss": 1.1836,
+    "balance": 0.0
+   },
+   {
+    "step": 7500,
+    "loss": 1.1751,
+    "balance": 0.0
+   },
+   {
+    "step": 8000,
+    "loss": 1.1689,
+    "balance": 0.0
+   },
+   {
+    "step": 8500,
+    "loss": 1.2001,
+    "balance": 0.0
+   },
+   {
+    "step": 9000,
+    "loss": 1.1688,
+    "balance": 0.0
+   },
+   {
+    "step": 9500,
+    "loss": 1.1416,
+    "balance": 0.0
+   },
+   {
+    "step": 10000,
+    "loss": 1.1992,
+    "balance": 0.0
+   },
+   {
+    "step": 10500,
+    "loss": 1.1869,
+    "balance": 0.0
+   },
+   {
+    "step": 11000,
+    "loss": 1.1742,
+    "balance": 0.0
+   },
+   {
+    "step": 11500,
+    "loss": 1.1909,
+    "balance": 0.0
+   },
+   {
+    "step": 12000,
+    "loss": 1.1768,
+    "balance": 0.0
+   }
+  ]
+ }
+}

@@ -37,6 +37,7 @@
 
 	async function loadGallery() {
 		g = await import('$lib/atlas/ui/views/kit.parts/gallery.ts');
+		await g.preparePackageViews();
 		note = g.DEMO_NOTE;
 		ViewStage = g.ViewStage;
 		const out: Entry[] = [];

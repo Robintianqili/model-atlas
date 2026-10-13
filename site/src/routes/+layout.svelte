@@ -13,6 +13,11 @@
 	// ModelPageShell / ConceptPageShell; everywhere else the site tagline is the description.
 	const ownDescription = $derived(/^\/(m|train)\/./.test(page.route.id ?? ''));
 
+	// The chrome switch (redesign spec §6.1): a lesson route's load returns { chrome: 'lesson' } and renders without the
+	// site header and footer. Such a page brings its own skip link, lesson top bar, <main id="main"> and controls.
+	// Catalog pages, planned model pages, the glossary, About and DevKit keep the site chrome.
+	const lesson = $derived((page.data as { chrome?: string }).chrome === 'lesson');
+
 	onMount(() => {
 		initThemeAndMotion();
 		initLang();
@@ -23,11 +28,15 @@
 	{#if !ownDescription}<meta name="description" content={ui('siteTagline')} />{/if}
 </svelte:head>
 
-<SiteHeader />
-<main id="main" tabindex="-1">
+{#if lesson}
 	{@render children()}
-</main>
-<SiteFooter />
+{:else}
+	<SiteHeader />
+	<main id="main" tabindex="-1">
+		{@render children()}
+	</main>
+	<SiteFooter />
+{/if}
 
 <style>
 	main {

@@ -6,4 +6,4 @@
 	let { data }: PageProps = $props();
 </script>
 
-<DevkitPage page={data.page} />
+<DevkitPage page={data.page} nav={data.nav} />

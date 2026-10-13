@@ -200,7 +200,7 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.axis {
@@ -225,7 +225,7 @@
 		stroke-width: 1;
 	}
 	.unilbl {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.sel {

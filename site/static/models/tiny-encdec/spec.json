@@ -1,0 +1,1646 @@
+{
+ "slug": "tiny-encdec",
+ "name": {
+  "en": "Tiny encoder–decoder Transformer",
+  "zh": "小型编码器–解码器 Transformer"
+ },
+ "version": "2026-10-12",
+ "params": 25344,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "src.emb.weight",
+   "shape": [
+    69,
+    32
+   ],
+   "offset": 0,
+   "length": 2208
+  },
+  {
+   "name": "src.pos.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 2208,
+   "length": 1024
+  },
+  {
+   "name": "enc.ln1.weight",
+   "shape": [
+    32
+   ],
+   "offset": 3232,
+   "length": 32
+  },
+  {
+   "name": "enc.ln1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 3264,
+   "length": 32
+  },
+  {
+   "name": "enc.q.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 3296,
+   "length": 1024
+  },
+  {
+   "name": "enc.k.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 4320,
+   "length": 1024
+  },
+  {
+   "name": "enc.v.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 5344,
+   "length": 1024
+  },
+  {
+   "name": "enc.o.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 6368,
+   "length": 1024
+  },
+  {
+   "name": "enc.ln2.weight",
+   "shape": [
+    32
+   ],
+   "offset": 7392,
+   "length": 32
+  },
+  {
+   "name": "enc.ln2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 7424,
+   "length": 32
+  },
+  {
+   "name": "enc.up.weight",
+   "shape": [
+    64,
+    32
+   ],
+   "offset": 7456,
+   "length": 2048
+  },
+  {
+   "name": "enc.down.weight",
+   "shape": [
+    32,
+    64
+   ],
+   "offset": 9504,
+   "length": 2048
+  },
+  {
+   "name": "mem.weight",
+   "shape": [
+    32
+   ],
+   "offset": 11552,
+   "length": 32
+  },
+  {
+   "name": "mem.bias",
+   "shape": [
+    32
+   ],
+   "offset": 11584,
+   "length": 32
+  },
+  {
+   "name": "greedy.emb",
+   "shape": [
+    13,
+    32
+   ],
+   "offset": 11616,
+   "length": 416
+  },
+  {
+   "name": "greedy.pos",
+   "shape": [
+    11,
+    32
+   ],
+   "offset": 12032,
+   "length": 352
+  },
+  {
+   "name": "greedy.ln1_w",
+   "shape": [
+    32
+   ],
+   "offset": 12384,
+   "length": 32
+  },
+  {
+   "name": "greedy.ln1_b",
+   "shape": [
+    32
+   ],
+   "offset": 12416,
+   "length": 32
+  },
+  {
+   "name": "greedy.sq",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 12448,
+   "length": 1024
+  },
+  {
+   "name": "greedy.sk",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 13472,
+   "length": 1024
+  },
+  {
+   "name": "greedy.sv",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 14496,
+   "length": 1024
+  },
+  {
+   "name": "greedy.so",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 15520,
+   "length": 1024
+  },
+  {
+   "name": "greedy.ln2_w",
+   "shape": [
+    32
+   ],
+   "offset": 16544,
+   "length": 32
+  },
+  {
+   "name": "greedy.ln2_b",
+   "shape": [
+    32
+   ],
+   "offset": 16576,
+   "length": 32
+  },
+  {
+   "name": "greedy.cq",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 16608,
+   "length": 1024
+  },
+  {
+   "name": "greedy.ck",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 17632,
+   "length": 1024
+  },
+  {
+   "name": "greedy.cv",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 18656,
+   "length": 1024
+  },
+  {
+   "name": "greedy.co",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 19680,
+   "length": 1024
+  },
+  {
+   "name": "greedy.ln3_w",
+   "shape": [
+    32
+   ],
+   "offset": 20704,
+   "length": 32
+  },
+  {
+   "name": "greedy.ln3_b",
+   "shape": [
+    32
+   ],
+   "offset": 20736,
+   "length": 32
+  },
+  {
+   "name": "greedy.up",
+   "shape": [
+    64,
+    32
+   ],
+   "offset": 20768,
+   "length": 2048
+  },
+  {
+   "name": "greedy.down",
+   "shape": [
+    32,
+    64
+   ],
+   "offset": 22816,
+   "length": 2048
+  },
+  {
+   "name": "greedy.ln_w",
+   "shape": [
+    32
+   ],
+   "offset": 24864,
+   "length": 32
+  },
+  {
+   "name": "greedy.ln_b",
+   "shape": [
+    32
+   ],
+   "offset": 24896,
+   "length": 32
+  },
+  {
+   "name": "greedy.head",
+   "shape": [
+    13,
+    32
+   ],
+   "offset": 24928,
+   "length": 416
+  }
+ ],
+ "layers": [
+  {
+   "id": "src.emb",
+   "op": "embedding",
+   "label": {
+    "en": "Character vectors",
+    "zh": "字符向量"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "src.pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "Position vectors",
+    "zh": "位置向量"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.x0",
+   "op": "add",
+   "label": {
+    "en": "Character + position",
+    "zh": "字符 + 位置"
+   },
+   "in": [
+    "src.emb",
+    "src.pos"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Encoder · LayerNorm 1",
+    "zh": "编码器 · 层归一化 1"
+   },
+   "in": [
+    "enc.x0"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.q",
+   "op": "linear",
+   "label": {
+    "en": "Encoder self-attention · queries Q",
+    "zh": "编码器自注意力 · 查询 Q"
+   },
+   "in": [
+    "enc.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.k",
+   "op": "linear",
+   "label": {
+    "en": "Encoder self-attention · keys K",
+    "zh": "编码器自注意力 · 键 K"
+   },
+   "in": [
+    "enc.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.v",
+   "op": "linear",
+   "label": {
+    "en": "Encoder self-attention · values V",
+    "zh": "编码器自注意力 · 值 V"
+   },
+   "in": [
+    "enc.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Encoder self-attention · scores",
+    "zh": "编码器自注意力 · 分数"
+   },
+   "in": [
+    "enc.q",
+    "enc.k"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ]
+  },
+  {
+   "id": "enc.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Encoder self-attention · weights",
+    "zh": "编码器自注意力 · 权重"
+   },
+   "in": [
+    "enc.scores"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ]
+  },
+  {
+   "id": "enc.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Encoder self-attention · mix of values",
+    "zh": "编码器自注意力 · 值的混合"
+   },
+   "in": [
+    "enc.attn",
+    "enc.v"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.o",
+   "op": "linear",
+   "label": {
+    "en": "Encoder self-attention · output",
+    "zh": "编码器自注意力 · 输出"
+   },
+   "in": [
+    "enc.mix"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.add1",
+   "op": "add",
+   "label": {
+    "en": "Encoder · add attention",
+    "zh": "编码器 · 加上注意力"
+   },
+   "in": [
+    "enc.x0",
+    "enc.o"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Encoder · LayerNorm 2",
+    "zh": "编码器 · 层归一化 2"
+   },
+   "in": [
+    "enc.add1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.up",
+   "op": "linear",
+   "label": {
+    "en": "Encoder · feed-forward up",
+    "zh": "编码器 · 前馈放大"
+   },
+   "in": [
+    "enc.ln2"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.relu",
+   "op": "relu",
+   "label": {
+    "en": "Encoder · ReLU",
+    "zh": "编码器 · ReLU"
+   },
+   "in": [
+    "enc.up"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.down",
+   "op": "linear",
+   "label": {
+    "en": "Encoder · feed-forward down",
+    "zh": "编码器 · 前馈缩回"
+   },
+   "in": [
+    "enc.relu"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 32
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "enc.add2",
+   "op": "add",
+   "label": {
+    "en": "Encoder · add feed-forward",
+    "zh": "编码器 · 加上前馈"
+   },
+   "in": [
+    "enc.add1",
+    "enc.down"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "mem",
+   "op": "layernorm",
+   "label": {
+    "en": "Encoder output (the memory)",
+    "zh": "编码器输出（记忆）"
+   },
+   "in": [
+    "enc.add2"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "greedy",
+   "op": "greedy",
+   "label": {
+    "en": "Greedy decoding: ▶ and the symbols written",
+    "zh": "贪心解码：▶ 和写下的符号"
+   },
+   "in": [
+    "mem"
+   ],
+   "outShape": [
+    11
+   ],
+   "params": {
+    "steps": 11,
+    "bos": 0,
+    "nHead": 2
+   },
+   "axes": [
+    "t"
+   ]
+  },
+  {
+   "id": "tgt.emb",
+   "op": "embedding",
+   "label": {
+    "en": "Symbol vectors",
+    "zh": "符号向量"
+   },
+   "in": [
+    "greedy"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "w": {
+    "weight": "greedy.emb"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "tgt.pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "Decoder position vectors",
+    "zh": "解码器位置向量"
+   },
+   "in": [
+    "greedy"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "w": {
+    "weight": "greedy.pos"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.x0",
+   "op": "add",
+   "label": {
+    "en": "Symbol + position",
+    "zh": "符号 + 位置"
+   },
+   "in": [
+    "tgt.emb",
+    "tgt.pos"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Decoder · LayerNorm 1",
+    "zh": "解码器 · 层归一化 1"
+   },
+   "in": [
+    "dec.x0"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "w": {
+    "weight": "greedy.ln1_w",
+    "bias": "greedy.ln1_b"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.sq",
+   "op": "linear",
+   "label": {
+    "en": "Decoder self-attention (causal) · queries Q",
+    "zh": "解码器自注意力（因果） · 查询 Q"
+   },
+   "in": [
+    "dec.ln1"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.sq"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.sk",
+   "op": "linear",
+   "label": {
+    "en": "Decoder self-attention (causal) · keys K",
+    "zh": "解码器自注意力（因果） · 键 K"
+   },
+   "in": [
+    "dec.ln1"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.sk"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.sv",
+   "op": "linear",
+   "label": {
+    "en": "Decoder self-attention (causal) · values V",
+    "zh": "解码器自注意力（因果） · 值 V"
+   },
+   "in": [
+    "dec.ln1"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.sv"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.sscores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Decoder self-attention (causal) · scores",
+    "zh": "解码器自注意力（因果） · 分数"
+   },
+   "in": [
+    "dec.sq",
+    "dec.sk"
+   ],
+   "outShape": [
+    2,
+    11,
+    11
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16,
+    "causal": true
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ]
+  },
+  {
+   "id": "dec.sattn",
+   "op": "softmax",
+   "label": {
+    "en": "Decoder self-attention (causal) · weights",
+    "zh": "解码器自注意力（因果） · 权重"
+   },
+   "in": [
+    "dec.sscores"
+   ],
+   "outShape": [
+    2,
+    11,
+    11
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ]
+  },
+  {
+   "id": "dec.smix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Decoder self-attention (causal) · mix of values",
+    "zh": "解码器自注意力（因果） · 值的混合"
+   },
+   "in": [
+    "dec.sattn",
+    "dec.sv"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.so",
+   "op": "linear",
+   "label": {
+    "en": "Decoder self-attention (causal) · output",
+    "zh": "解码器自注意力（因果） · 输出"
+   },
+   "in": [
+    "dec.smix"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "w": {
+    "weight": "greedy.so"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.add1",
+   "op": "add",
+   "label": {
+    "en": "Decoder · add self-attention",
+    "zh": "解码器 · 加上自注意力"
+   },
+   "in": [
+    "dec.x0",
+    "dec.so"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Decoder · LayerNorm 2",
+    "zh": "解码器 · 层归一化 2"
+   },
+   "in": [
+    "dec.add1"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "w": {
+    "weight": "greedy.ln2_w",
+    "bias": "greedy.ln2_b"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.cq",
+   "op": "linear",
+   "label": {
+    "en": "Cross-attention · queries Q",
+    "zh": "交叉注意力 · 查询 Q"
+   },
+   "in": [
+    "dec.ln2"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.cq"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.ck",
+   "op": "linear",
+   "label": {
+    "en": "Cross-attention · keys K",
+    "zh": "交叉注意力 · 键 K"
+   },
+   "in": [
+    "mem"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.ck"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.cv",
+   "op": "linear",
+   "label": {
+    "en": "Cross-attention · values V",
+    "zh": "交叉注意力 · 值 V"
+   },
+   "in": [
+    "mem"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "w": {
+    "weight": "greedy.cv"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.cscores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Cross-attention · scores",
+    "zh": "交叉注意力 · 分数"
+   },
+   "in": [
+    "dec.cq",
+    "dec.ck"
+   ],
+   "outShape": [
+    2,
+    11,
+    "T"
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "h",
+    "t",
+    "tk"
+   ]
+  },
+  {
+   "id": "dec.cattn",
+   "op": "softmax",
+   "label": {
+    "en": "Cross-attention · weights",
+    "zh": "交叉注意力 · 权重"
+   },
+   "in": [
+    "dec.cscores"
+   ],
+   "outShape": [
+    2,
+    11,
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ]
+  },
+  {
+   "id": "dec.cmix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Cross-attention · mix of values",
+    "zh": "交叉注意力 · 值的混合"
+   },
+   "in": [
+    "dec.cattn",
+    "dec.cv"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "k",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.co",
+   "op": "linear",
+   "label": {
+    "en": "Cross-attention · output",
+    "zh": "交叉注意力 · 输出"
+   },
+   "in": [
+    "dec.cmix"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "w": {
+    "weight": "greedy.co"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.add2",
+   "op": "add",
+   "label": {
+    "en": "Decoder · add cross-attention",
+    "zh": "解码器 · 加上交叉注意力"
+   },
+   "in": [
+    "dec.add1",
+    "dec.co"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.ln3",
+   "op": "layernorm",
+   "label": {
+    "en": "Decoder · LayerNorm 3",
+    "zh": "解码器 · 层归一化 3"
+   },
+   "in": [
+    "dec.add2"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "w": {
+    "weight": "greedy.ln3_w",
+    "bias": "greedy.ln3_b"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.up",
+   "op": "linear",
+   "label": {
+    "en": "Decoder · feed-forward up",
+    "zh": "解码器 · 前馈放大"
+   },
+   "in": [
+    "dec.ln3"
+   ],
+   "outShape": [
+    11,
+    64
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 64
+   },
+   "w": {
+    "weight": "greedy.up"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.relu",
+   "op": "relu",
+   "label": {
+    "en": "Decoder · ReLU",
+    "zh": "解码器 · ReLU"
+   },
+   "in": [
+    "dec.up"
+   ],
+   "outShape": [
+    11,
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.down",
+   "op": "linear",
+   "label": {
+    "en": "Decoder · feed-forward down",
+    "zh": "解码器 · 前馈缩回"
+   },
+   "in": [
+    "dec.relu"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 32
+   },
+   "w": {
+    "weight": "greedy.down"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.add3",
+   "op": "add",
+   "label": {
+    "en": "Decoder · add feed-forward",
+    "zh": "解码器 · 加上前馈"
+   },
+   "in": [
+    "dec.add2",
+    "dec.down"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "dec.ln",
+   "op": "layernorm",
+   "label": {
+    "en": "Decoder · final LayerNorm",
+    "zh": "解码器 · 最后的层归一化"
+   },
+   "in": [
+    "dec.add3"
+   ],
+   "outShape": [
+    11,
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "w": {
+    "weight": "greedy.ln_w",
+    "bias": "greedy.ln_b"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "logits",
+   "op": "linear",
+   "label": {
+    "en": "A score for every symbol",
+    "zh": "每个符号的分数"
+   },
+   "in": [
+    "dec.ln"
+   ],
+   "outShape": [
+    11,
+    13
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 13
+   },
+   "w": {
+    "weight": "greedy.head"
+   },
+   "axes": [
+    "t",
+    "d"
+   ]
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Chances of each symbol, per step",
+    "zh": "每一步各个符号的概率"
+   },
+   "in": [
+    "logits"
+   ],
+   "outShape": [
+    11,
+    13
+   ],
+   "axes": [
+    "t",
+    "d"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "synthetic dates (make_data.ts, the same pairs as tinyseq2seq)",
+  "steps": 6000,
+  "metrics": {
+   "Training pairs": "60,000",
+   "Exact dates, test (5,000)": "100.0%",
+   "Exact dates, a format it never saw (year first)": "0.0%"
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000691,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 9,
+  "edgeCases": [
+   "one",
+   "max"
+  ],
+  "perLayer": {
+   "enc.ln1": 7.15e-7,
+   "enc.q": 9.54e-7,
+   "enc.k": 9.54e-7,
+   "enc.v": 9.54e-7,
+   "enc.scores": 0.00000238,
+   "enc.mix": 0.00000131,
+   "enc.o": 0.00000107,
+   "enc.add1": 0.00000119,
+   "enc.ln2": 9.54e-7,
+   "enc.up": 0.00000143,
+   "enc.relu": 9.54e-7,
+   "enc.down": 0.00000143,
+   "enc.add2": 0.00000191,
+   "mem": 0.00000125,
+   "dec.ln1": 4.77e-7,
+   "dec.sq": 5.96e-7,
+   "dec.sk": 9.54e-7,
+   "dec.sv": 4.77e-7,
+   "dec.sscores": 9.54e-7,
+   "dec.sattn": 1.79e-7,
+   "dec.smix": 7.15e-7,
+   "dec.so": 7.15e-7,
+   "dec.add1": 9.54e-7,
+   "dec.ln2": 7.15e-7,
+   "dec.cq": 7.15e-7,
+   "dec.ck": 0.00000167,
+   "dec.cv": 0.00000167,
+   "dec.cscores": 0.00000393,
+   "dec.cmix": 0.00000215,
+   "dec.co": 0.00000215,
+   "dec.add2": 0.00000238,
+   "dec.ln3": 0.00000191,
+   "dec.up": 0.00000191,
+   "dec.relu": 0.00000191,
+   "dec.down": 0.00000203,
+   "dec.add3": 0.00000334,
+   "dec.ln": 0.0000031,
+   "logits": 0.00000691,
+   "probs": 6.85e-7,
+   "enc.attn": 2.98e-7,
+   "dec.cattn": 6.56e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tiny-encdec/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "date-text",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 32,
+   "label": {
+    "en": "characters",
+    "zh": "字符"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "alphabet": [
+  "<pad>",
+  "?",
+  " ",
+  ",",
+  ".",
+  "/",
+  "-",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
+ ],
+ "unk": 1,
+ "symbols": [
+  "<s>",
+  "</s>",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "-"
+ ],
+ "steps": 11,
+ "bos": 0,
+ "eos": 1
+}

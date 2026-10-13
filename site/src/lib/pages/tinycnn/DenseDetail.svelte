@@ -250,7 +250,7 @@
 		grid-template-columns: 2.6em 1fr 4.5em;
 		align-items: center;
 		gap: 8px;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		min-height: 16px;
 	}
 	.sl {
@@ -288,7 +288,7 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		font-size: 11.5px;
+		font-size: var(--t-xs);
 	}
 	.pos {
 		color: var(--div-pos-text);

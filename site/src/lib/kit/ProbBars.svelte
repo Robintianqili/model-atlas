@@ -52,9 +52,14 @@
 	const seq = $derived(makeScale('sequential', [0, 1], themeState.resolved));
 	const isChosen = (it: ProbItem) => chosen !== null && (it.id !== undefined ? it.id === chosen : it.label === chosen);
 	const cutAfter = (rank: number) => cutoffs.filter((c) => c.afterRank === rank);
+	// QA 2026-10-13: the four columns need about 224 px; in a narrower box (a view beside a picture on a phone) the
+	// label column shrinks and the "chosen" word is kept for screen readers only (the row's border still marks it),
+	// so the rows no longer push the page sideways (AK602 at 390 px in adversarial-tinycnn)
+	let boxW = $state(0);
+	const narrow = $derived(boxW > 0 && boxW < 240);
 </script>
 
-<figure class="pb">
+<figure class="pb" class:narrow bind:clientWidth={boxW}>
 	{#if label}<figcaption>{t(label)} · <span class="muted">{ui('topK', { k: rows.length })}</span></figcaption>{/if}
 	<ol>
 		{#each rows as it, r (it.id ?? it.label)}
@@ -113,6 +118,19 @@
 		color: var(--ink);
 		cursor: default;
 	}
+	.narrow .row {
+		grid-template-columns: minmax(3.5em, 9em) minmax(16px, 1fr) 4.2em;
+		gap: 6px;
+		padding: 3px 4px;
+	}
+	.narrow .badge {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
 	.row:not(:disabled) {
 		cursor: pointer;
 	}
@@ -145,7 +163,7 @@
 		white-space: pre;
 	}
 	.id {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.sw {
@@ -171,7 +189,7 @@
 		font-size: var(--fs-xs);
 	}
 	.badge {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--accent);
@@ -197,7 +215,7 @@
 		padding: 0 6px;
 		background: var(--surface);
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 	}
 </style>

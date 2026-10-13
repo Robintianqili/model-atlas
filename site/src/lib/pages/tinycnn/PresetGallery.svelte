@@ -155,7 +155,7 @@
 		border-radius: 2px;
 	}
 	.tag {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		padding: 0 5px;
 		border-radius: var(--r-pill);
 		background: var(--illus-soft);
@@ -181,7 +181,7 @@
 		border: 1px solid var(--rule);
 		border-radius: var(--r1);
 		background: var(--surface);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.vb.on {

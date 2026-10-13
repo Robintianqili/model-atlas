@@ -199,7 +199,7 @@
 		<button type="button" class="btn icon" onclick={() => { playing = false; if (step !== 0) prev(); }} aria-label={ui('stepBack')} title={ui('stepBack')} aria-disabled={step === 0}>
 			<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10.5 3 5 8l5.5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
 		</button>
-		<button type="button" class="btn primary play" onclick={toggle} aria-label={reduced ? ui('stepForward') : playing ? ui('pause') : ui('play')}>
+		<button type="button" class="btn play" aria-pressed={!reduced && playing} onclick={toggle} aria-label={reduced ? ui('stepForward') : playing ? ui('pause') : ui('play')}>
 			{#if reduced}
 				{ui('stepForward')}
 			{:else if playing}
@@ -257,14 +257,22 @@
 		min-width: 0;
 	}
 	.ttl {
-		font-size: var(--fs-md);
+		font-size: var(--t-md);
 		margin: 0;
 	}
+	/* the one scrubber of a stage (redesign spec §4.4 Scrubber): a quiet panel; Next stays the only act-styled control */
 	.controls {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 6px;
+		gap: 6px 8px;
+		padding: 6px 8px;
+		border: 1px solid var(--rule);
+		border-radius: var(--r4);
+		background: var(--panel);
+	}
+	.controls :global(.btn) {
+		min-height: 40px;
 	}
 	.play {
 		min-width: 96px;
@@ -274,24 +282,24 @@
 		min-width: 120px;
 	}
 	.pos {
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 		min-width: 6.5em;
 	}
 	.speeds button {
 		min-height: 28px;
 		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 	}
 	.cap {
 		margin: 0;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		color: var(--ink-2);
 	}
 	.list {
 		margin: 0;
 		padding-left: 1.6em;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 	}
 	.list button {
 		border: 0;
@@ -305,11 +313,11 @@
 	.list li.cur button {
 		color: var(--ink);
 		font-weight: 700;
-		background: var(--accent-soft);
+		background: var(--here-bg);
 	}
 	.note {
 		margin: 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 </style>

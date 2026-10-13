@@ -37,8 +37,9 @@ experiments that are not in the catalog, `--dev` makes a lab-only package that i
 
 ## Build a model page
 
-Work on a git branch (`git switch -c model/<slug>`). The `site/.work/` lane copies in the guide exist for the
-maintainers' parallel agents; you do not need them.
+Work on a git branch (`git switch -c model/<slug>`). The lanes in the guide (copies of the site made by
+`npm run atlas -- worktree`, in `site/.work/` or in the folder `lanesDir` names; `site/DEVKIT.md` section 11) exist for
+the maintainers' parallel agents; you do not need them.
 
 ```
 npm run atlas -- new model <slug> --like <package>   # start from a renamed copy of the closest package
@@ -50,14 +51,17 @@ npm run atlas -- run <slug> <source>      # kinds B and C: the tape as a table, 
 npm run dev -- --port <port>              # the port `new` printed (notes/<slug>.md); then /dev/atlas/lab/<slug>/ and /m/<slug>/
 npm run atlas -- lesson <slug> lint
 npm run atlas -- check <slug> --quick     # while you iterate: every gate except the build and the browser test
-npm run atlas -- e2e <slug>               # browser test (Edge; ATLAS_BROWSER_CHANNEL=chromium elsewhere): 2 passes, axe, contact sheets
 npm run atlas -- check <slug>             # once, at the end: every gate, a package-only build and the browser test
 npm run atlas -- review <slug>            # the review packet: notes/review-<slug>.md
+npm run atlas -- promote <slug> --verify  # the catalog patch from manifest.catalog, checked on a copy of the catalog
 ```
 
 Follow `site/DEVKIT.md` section 4 for the walk-through. Every step of your lesson must also work from its deep link
-(`#lesson-<id>`), as the first step a learner opens. `e2e` and `check` reuse your dev server; `npm run atlas -- e2e
---stop-server` stops the one they keep.
+(`#lesson-<id>`), as the first step a learner opens. The full check runs the browser test (`atlas e2e`: Edge, or
+`ATLAS_BROWSER_CHANNEL=chromium` elsewhere) once: 2 passes with an axe scan, and contact sheets in
+`notes/shots/<slug>/contact/`. It is the one browser run your package needs; if a gate fails, fix it and re-run that
+gate alone (`check <slug> --only e2e`). A long-task warning (AK603) never fails a check. `e2e` and `check` reuse your
+dev server; `npm run atlas -- e2e --stop-server` stops the one they keep.
 
 ### Building with Claude Code
 
@@ -70,9 +74,10 @@ repository; the rules below still apply to everything it writes.
 ### The rules your package must keep
 
 - **Only your paths change**: `site/src/lib/explainers/<slug>/**`, `pipeline/<slug>/**`, `site/static/models/<slug>/**`
-  (written by your export script, never by hand), `notes/<slug>.md`. Do not edit `site/src/lib/catalog/*`,
-  `site/static/licenses.json` or the kit; the maintainers apply those changes (`npm run atlas -- promote <slug>` prints
-  them).
+  (written by your export script, never by hand), `notes/<slug>.md` and `notes/review-<slug>.md`. Do not edit
+  `site/src/lib/catalog/*`, `site/static/licenses.json` or the kit. What the catalog entry should say (name, inputs,
+  hook, shows, runtime, sizes) goes into `catalog` in your `explainer.ts`: `npm run atlas -- promote <slug> --verify`
+  checks that patch on a copy of the catalog, and the maintainers apply it (`promote <slug> --apply`).
 - **Every number is real**: narration numbers come from placeholders bound to computed values or to `facts.json`;
   every factual sentence that is not computed live has a claim test (`claims.test.ts`). No `Math.random`.
 - **Every stage carries a provenance badge** (live, precomputed or illustrative with a note).
@@ -85,7 +90,8 @@ repository; the rules below still apply to everything it writes.
   dataset downloads without the maintainers' agreement.
 - **Credits**: every dataset, ported code or idea-with-code goes into `credits` in `explainer.ts` (name, url, licence,
   what it is used for, attribution). No code from GPL, non-commercial or unlicensed projects.
-- **Notes**: `notes/<slug>.md` with What, Decisions, Final numbers (measured only), How to re-run and Kit issues.
+- **Notes**: `notes/<slug>.md` with What, Decisions, Final numbers (measured only), How to re-run and Kit issues (and a
+  Catalog patch section for what `manifest.catalog` cannot carry).
 
 ## Pull request
 
@@ -94,9 +100,12 @@ Open the pull request when `npm run atlas -- check <slug>` is green. Include:
 - the review packet (`notes/review-<slug>.md`) and the contact sheets from `notes/shots/<slug>/contact/`;
 - the measured numbers (accuracy, parity, sizes) and anything you could not make work, with the workaround you used.
 
+A kit change runs `npm run atlas -- check --all` with about six packages of different kinds (one browser test each, on
+the default passes), not with every package.
+
 A teaching reviewer reads the lesson with the checklist in the review packet (measurable goals, one idea per step,
 numbers that match the screen, claims backed by tests, an honest limits step, natural Chinese, correct credits). The
-maintainers merge, run `promote` and apply the catalog patch.
+maintainers merge and apply the catalog patch (`npm run atlas -- promote <slug> --apply`).
 
 ### Continuous integration
 

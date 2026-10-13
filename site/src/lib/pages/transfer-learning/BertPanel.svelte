@@ -311,7 +311,7 @@
 		stroke: var(--ink-2);
 	}
 	.tick {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		font-family: var(--font-mono);
 	}
@@ -331,7 +331,7 @@
 	.val,
 	.lab,
 	.gap {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--ink-2);
 		font-family: var(--font-mono);
 	}

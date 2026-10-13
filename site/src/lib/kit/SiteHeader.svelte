@@ -1,22 +1,41 @@
-<!-- Site header: brand, main navigation, language and theme toggles. Collapses to a menu on phones. -->
+<!--
+  Site header (redesign spec §4.5) on catalog and site pages; lesson routes render their own lesson top bar instead (the
+  root layout's chrome switch). 64 px, sticky, paper at 90 % with a blur and a hairline:
+    1100 px and up   brand · nav (Lessons, Paths, Glossary, About; current = here style) · search · EN|中文 · theme
+    760-1099 px      brand · search · EN|中文 · theme · menu (the nav moves into a sheet)
+    below 760 px     brand · 中文 flip · theme · search icon · menu (56 px)
+  A skip link comes first. DevKit is linked from the footer and About only, never from the learner nav.
+-->
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
+	import Icon from './Icon.svelte';
 	import LangToggle from './LangToggle.svelte';
+	import Mark from './Mark.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import SearchPalette from './catalog/SearchPalette.svelte';
+	import { menu } from './icons';
 	import { ui } from '$lib/i18n/i18n.svelte';
 	import type { UIKey } from '$lib/i18n/strings';
 
-	let menuOpen = $state(false);
-	const links: { href: string; key: UIKey; short?: UIKey }[] = [
-		{ href: '/atlas/', key: 'navAtlas' },
-		{ href: '/train/', key: 'navTrain', short: 'navTrainShort' },
-		{ href: '/glossary/', key: 'navGlossary' },
-		{ href: '/devkit/', key: 'navDevkit', short: 'navDevkitShort' },
-		{ href: '/about/', key: 'navAbout' }
+	const links: { href: string; key: UIKey; routes: RegExp | null }[] = [
+		{ href: '/atlas/', key: 'navLessons', routes: /^\/(atlas|train|m)(\/|$)/ },
+		{ href: '/#paths', key: 'navPaths', routes: null },
+		{ href: '/glossary/', key: 'navGlossary', routes: /^\/glossary(\/|$)/ },
+		{ href: '/about/', key: 'navAbout', routes: /^\/about(\/|$)/ }
 	];
-	// compare route ids (independent of the base path): '/atlas/[area]' is under '/atlas/'
-	const isCurrent = (href: string) => (page.route.id ?? '').startsWith(href.replace(/\/$/, ''));
+	// compare route ids (independent of the base path): '/atlas/[area]' is under Lessons
+	const isCurrent = (l: (typeof links)[number]) => !!l.routes && l.routes.test(page.route.id ?? '');
+
+	// the menu sheet loads on first use (it is not part of every page's shell)
+	let Sheet: Component<any> | null = $state(null);
+	let menuOpen = $state(false);
+	let menuBtn: HTMLButtonElement | undefined = $state();
+	async function openMenu() {
+		Sheet ??= (await import('./Sheet.svelte')).default;
+		menuOpen = true;
+	}
 
 	$effect(() => {
 		void page.url.pathname;
@@ -26,46 +45,41 @@
 
 <a class="skip" href="#main">{ui('skipToContent')}</a>
 <header class="hdr">
-	<div class="inner container">
-		<a class="brand" href="{base}/" aria-label="{ui('siteName')} — {ui('navHome')}">
-			<svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
-				<rect width="32" height="32" rx="7" fill="var(--accent)" />
-				<g fill="var(--accent-ink)">
-					<rect x="6" y="6" width="5" height="5" rx="1" /><rect x="13.5" y="6" width="5" height="5" rx="1" opacity=".55" /><rect x="21" y="6" width="5" height="5" rx="1" opacity=".3" />
-					<rect x="6" y="13.5" width="5" height="5" rx="1" opacity=".55" /><rect x="13.5" y="13.5" width="5" height="5" rx="1" /><rect x="21" y="13.5" width="5" height="5" rx="1" opacity=".55" />
-					<rect x="6" y="21" width="5" height="5" rx="1" opacity=".3" /><rect x="13.5" y="21" width="5" height="5" rx="1" opacity=".55" /><rect x="21" y="21" width="5" height="5" rx="1" />
-				</g>
-			</svg>
-			<span class="name">Model Atlas <span class="zh" lang="zh-CN">模型图鉴</span></span>
+	<div class="inner">
+		<a class="brand" href="{base}/">
+			<Mark size={30} />
+			<span class="nm">Model Atlas</span>
+			<span class="zh" lang="zh-CN">模型图鉴</span>
 		</a>
-		<nav class="nav" class:open={menuOpen} aria-label="Main">
+		<nav class="nav" aria-label={ui('navMain')}>
 			<ul>
 				{#each links as l (l.href)}
-					<li>
-						<a href="{base}{l.href}" aria-current={isCurrent(l.href) ? 'page' : undefined}>
-							<span class="full">{ui(l.key)}</span>{#if l.short}<span class="short">{ui(l.short)}</span>{/if}
-						</a>
-					</li>
+					<li><a href="{base}{l.href}" aria-current={isCurrent(l) ? 'page' : undefined}>{ui(l.key)}</a></li>
 				{/each}
 			</ul>
 		</nav>
+		<div class="find"><SearchPalette /></div>
 		<div class="tools">
 			<LangToggle />
 			<ThemeToggle />
-			<button
-				type="button"
-				class="btn ghost icon menu"
-				aria-expanded={menuOpen}
-				aria-label={menuOpen ? ui('closeMenu') : ui('menu')}
-				onclick={() => (menuOpen = !menuOpen)}
-			>
-				<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-					{#if menuOpen}<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" />{:else}<path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" />{/if}
-				</svg>
+			<button bind:this={menuBtn} type="button" class="icon-btn menu" aria-haspopup="dialog" aria-expanded={menuOpen} aria-label={ui('menu')} onclick={openMenu}>
+				<Icon d={menu} />
 			</button>
 		</div>
 	</div>
 </header>
+
+{#if Sheet}
+	<Sheet bind:open={menuOpen} title={ui('menu')} placement="end" width={360}>
+		<nav aria-label={ui('navMain')}>
+			<ul class="sheet-nav">
+				{#each links as l (l.href)}
+					<li><a href="{base}{l.href}" aria-current={isCurrent(l) ? 'page' : undefined} onclick={() => (menuOpen = false)}>{ui(l.key)}</a></li>
+				{/each}
+			</ul>
+		</nav>
+	</Sheet>
+{/if}
 
 <style>
 	.skip {
@@ -74,9 +88,10 @@
 		top: -60px;
 		z-index: 100;
 		padding: 8px 14px;
-		background: var(--accent);
-		color: var(--accent-ink);
-		border-radius: var(--r2);
+		border-radius: var(--r3);
+		background: var(--act);
+		color: var(--act-ink);
+		font-weight: var(--w-ui);
 	}
 	.skip:focus {
 		top: 8px;
@@ -86,133 +101,144 @@
 		top: 0;
 		z-index: 30;
 		height: var(--header-h);
-		background: color-mix(in srgb, var(--bg) 88%, transparent);
+		background: color-mix(in srgb, var(--paper) 90%, transparent);
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--rule);
 	}
 	.inner {
+		max-width: var(--page-max);
 		height: 100%;
+		margin: 0 auto;
+		padding: 0 var(--gutter);
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		gap: var(--s5);
 	}
 	.brand {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		gap: 10px;
-		text-decoration: none;
+		flex: none;
 		color: var(--ink);
-		flex: 0 0 auto;
-	}
-	.name {
-		font-family: var(--font-display);
-		font-weight: 650;
-		font-size: 1.15rem;
-		letter-spacing: -0.01em;
+		text-decoration: none;
+		font-size: var(--t-md);
+		font-weight: var(--w-title);
 		white-space: nowrap;
 	}
-	.zh {
+	.brand .zh {
 		font-family: var(--font-cjk);
-		font-weight: 500;
-		font-size: 0.85em;
+		font-weight: var(--w-body);
 		color: var(--muted);
-		margin-left: 4px;
-	}
-	.nav {
-		margin-left: auto;
 	}
 	.nav ul {
-		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 2px;
 		margin: 0;
 		padding: 0;
-		display: flex;
-		gap: 2px;
+		list-style: none;
 	}
 	.nav a {
 		display: inline-flex;
 		align-items: center;
-		min-height: 36px;
+		min-height: 40px;
 		padding: 0 12px;
-		border-radius: var(--r2);
+		border-radius: 10px;
 		color: var(--ink-2);
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
 		text-decoration: none;
-		font-size: var(--fs-sm);
-		font-weight: 600;
+		white-space: nowrap;
 	}
 	.nav a:hover {
-		background: var(--surface-2);
+		background: var(--well);
 		color: var(--ink);
 	}
 	.nav a[aria-current='page'] {
+		background: var(--here-bg);
 		color: var(--ink);
-		background: var(--surface-2);
-		box-shadow: inset 0 -2px 0 var(--accent);
 	}
-	.short {
-		display: none;
+	.find {
+		flex: 1;
+		max-width: 340px;
+		margin-left: auto;
+		display: flex;
+		justify-content: flex-end;
 	}
 	.tools {
 		display: flex;
 		align-items: center;
-		gap: 2px;
+		gap: 4px;
+		flex: none;
 	}
 	.menu {
 		display: none;
 	}
-	@media (max-width: 960px) {
-		.full:has(+ .short) {
-			display: none;
-		}
-		.short {
-			display: inline;
-		}
+	.sheet-nav {
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
-	@media (max-width: 760px) {
-		.zh {
+	.sheet-nav a {
+		display: flex;
+		align-items: center;
+		min-height: 48px;
+		padding: 0 var(--s3);
+		border-radius: var(--r3);
+		color: var(--ink);
+		font-size: var(--t-lg);
+		font-weight: var(--w-ui);
+		text-decoration: none;
+	}
+	.sheet-nav a:hover {
+		background: var(--well);
+	}
+	.sheet-nav a[aria-current='page'] {
+		background: var(--here-bg);
+		box-shadow: inset 3px 0 0 var(--here);
+	}
+	@media (max-width: 1099px) {
+		.nav {
 			display: none;
 		}
 		.menu {
-			display: inline-flex;
+			display: inline-grid;
 		}
-		.nav {
-			position: absolute;
-			top: var(--header-h);
-			left: 0;
-			right: 0;
+		.find {
+			max-width: 300px;
+		}
+	}
+	@media (max-width: 759px) {
+		.inner {
+			gap: var(--s2);
+			padding: 0 6px 0 var(--gutter);
+		}
+		.brand .zh {
 			display: none;
-			background: var(--bg);
-			border-bottom: 1px solid var(--rule);
-			box-shadow: var(--shadow-2);
 		}
-		.nav.open {
-			display: block;
-		}
-		.nav ul {
-			flex-direction: column;
-			padding: 8px var(--gutter) 14px;
-		}
-		.nav a {
-			width: 100%;
-			min-height: 44px;
-			font-size: var(--fs-md);
-		}
-		.full:has(+ .short) {
-			display: inline;
-		}
-		.short {
-			display: none;
+		.find {
+			flex: 0 0 auto;
+			order: 1;
+			margin-left: 0;
 		}
 		.tools {
 			margin-left: auto;
+			gap: 0;
+		}
+		.menu {
+			order: 2;
+		}
+		.tools {
+			display: contents;
+		}
+		.brand {
+			margin-right: auto;
 		}
 	}
-	@media (max-width: 380px) {
-		.name {
-			font-size: 1rem;
-		}
-		.inner {
-			gap: 8px;
+	@media (max-width: 359px) {
+		.brand .nm {
+			font-size: var(--t-sm);
 		}
 	}
 </style>

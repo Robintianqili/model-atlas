@@ -110,7 +110,6 @@
 <div class="av">
 	<div class="top">
 		<p class="eyebrow">{t({ en: 'Every window of your sentence', zh: '你的句子的每一个窗口' })}</p>
-		<ProvenanceBadge mode="live" compact precision="fp32" tolerance={FACTS.tolerance} against="PyTorch fp32" />
 	</div>
 	{#if S.ids.length < 2}
 		<p class="muted">{t({ en: 'Type at least two tokens.', zh: '至少输入两个词元。' })}</p>
@@ -329,7 +328,7 @@
 	}
 	.tick {
 		font-family: var(--font-mono);
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 	}
 	.bar {
@@ -350,7 +349,7 @@
 		stroke-dasharray: 5 4;
 	}
 	.meanlbl {
-		font-size: 11.5px;
+		font-size: var(--t-xs);
 		font-weight: 700;
 		fill: var(--ink);
 		paint-order: stroke;

@@ -80,6 +80,7 @@
 	);
 </script>
 
+<div class="inpw">
 <div class="inp">
 	<div class="padcol">
 		<div
@@ -148,7 +149,7 @@
 			cols={28}
 			kind="sequential"
 			domain={[0, 1]}
-			maxCell={12}
+			maxCell={9}
 			label={t({ en: 'Model input, 28×28', zh: '模型输入，28×28' })}
 			highlights={rfHighlights}
 			masked={eraseMask}
@@ -212,23 +213,30 @@
 </div>
 
 <PresetGallery {S} />
+</div>
 
 <style>
+	/* the input sheet (a 720 px dialog, a bottom sheet on phones) or any other box: columns by its own width */
+	.inpw {
+		display: grid;
+		gap: 20px;
+		container-type: inline-size;
+	}
 	.inp {
 		display: grid;
 		grid-template-columns: minmax(0, 300px) minmax(0, 1fr) minmax(0, 1fr);
 		gap: 20px 28px;
 		align-items: start;
 	}
-	@media (max-width: 980px) {
+	@container (max-width: 900px) {
 		.inp {
-			grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
 		}
 		.quick {
 			grid-column: 1 / -1;
 		}
 	}
-	@media (max-width: 640px) {
+	@container (max-width: 520px) {
 		.inp {
 			grid-template-columns: minmax(0, 1fr);
 		}
@@ -362,7 +370,7 @@
 		justify-items: start;
 	}
 	.steps figcaption {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		max-width: 120px;
 	}

@@ -565,7 +565,7 @@
 		position: absolute;
 		bottom: -18px;
 		transform: translateX(-50%);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.mk {
@@ -591,7 +591,7 @@
 		position: absolute;
 		top: -2px;
 		left: 4px;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		white-space: nowrap;
 		color: var(--ink-2);
 		background: color-mix(in srgb, var(--surface-2) 85%, transparent);

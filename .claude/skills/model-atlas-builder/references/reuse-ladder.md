@@ -130,3 +130,21 @@ A local view (`npm run atlas -- new view <key> --local <slug>`) composes before 
 | a slow process on the main thread | leave `run` unset (the package worker) |
 | "step k" marks in another unit | `play.unit` (`{ en: 'episode', zh: '第 {n} 回合' }`), `by: 'sub'` |
 | typed glossary text in narration | `terms` with glossary ids, or `manifest.glossary` |
+
+## Promoted in K4 (rule of two)
+
+- `atlas/ui/views/kit.parts/Cells.svelte`: a vector as a row of cells on the diverging scale (two-tower, sasrec).
+- `atlas/ui/views/kit.parts/refocus.ts`: `use:refocus` + `rememberFocus(key)` keep a slider's focus across `setInput`
+  (kalman-filter, gaussian-process, hmm, ecg-autoencoder).
+- `class="atlas-answer"` on what a predict question asks: hidden while the stage is inert (two-tower, sasrec).
+- `lastParams(rt, source)` in `atlas/train/helpers.ts`: a train source's last weights for a process (score-2d,
+  realnvp-2d).
+- Narration formats `pct2` and `sci` (crnn-ocr, char-rnn).
+- Autograd `op.clamp`, `op.minimum`, `op.maximum` (PPO's clipped objective) and `TrainerDef.project` (TransE's unit
+  length).
+- View props: `tokens`/`keys` (cross-attention, bilingual names), `axisWords`/`axisItems` (an axis the kit cannot
+  name), `digits` (formula cards, train-step), `labels` (zoom.softmax), loss-curve `xLabel` and `lowest`;
+  `StepDef.predictAt` (live options, answer and explanation of a predict question).
+- Still local (one user so far): vq and pixel_shuffle (vq-vae), rfft/irfft (fno), greedy decoding and the date task
+  (tinyseq2seq, tiny-encdec: a second user exists, a kit version is the next candidate), the series adapter with page
+  state (fno, ecg-autoencoder), a kit cross-attention view with a player (tinyseq2seq, tiny-encdec).

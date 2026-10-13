@@ -38,7 +38,7 @@
 		align-items: center;
 		gap: 12px 24px;
 		padding: 12px 16px;
-		background: var(--surface);
+		background: var(--panel);
 		border: 1px solid var(--rule);
 		border-radius: var(--r3);
 	}
@@ -53,7 +53,7 @@
 		min-width: 0;
 	}
 	dt {
-		font-size: var(--fs-xs);
+		font-size: var(--t-xs);
 		color: var(--muted);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -61,7 +61,7 @@
 	}
 	dd {
 		margin: 0;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		font-weight: 600;
 	}
 	.prov {

@@ -1,5 +1,9 @@
 <!--
-  /train/next-token-prediction/ — Next-token prediction and the pre-training loss (concept page).
+  /train/next-token-prediction/ — Next-token prediction and the pre-training loss (concept page), as the lesson app
+  (redesign spec §5): the page is the 7-step lesson on the learner's own sentence (with its cover); Explore (the sentence,
+  the sliding window and the loss toy, loss and perplexity colored by surprise, the training replay and decoding),
+  Pitfalls and Sources are lazy panels one tab away (#explore, #pitfalls, #sources; the old #toy, #real, #compare, #post,
+  #links still work). The input chip in the stage header opens the sentence sheet.
   Every number on the page comes from TinyGPT: live in a Web Worker (final fp32 weights and the fp16
   training checkpoints, fetched lazily) or precomputed from the same files (replay.json, curve.json).
   Page code: src/lib/pages/next-token-prediction/. Notes: notes/page-next-token-prediction.md.
@@ -7,11 +11,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
-	import ConceptPageShell from '$lib/kit/ConceptPageShell.svelte';
-	import ModelCard from '$lib/kit/ModelCard.svelte';
-	import ConceptCard from '$lib/kit/ConceptCard.svelte';
-	import { MODEL_BY_SLUG } from '$lib/catalog/models';
-	import { CONCEPT_BY_SLUG } from '$lib/catalog/concepts';
+	import ConceptHost from '$lib/kit/lesson/ConceptHost.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import { takeHandoff } from '$lib/kit/handoff';
 	import type { PredictQuestion } from '$lib/kit/types';
@@ -19,16 +19,12 @@
 	import { keyOf } from '$lib/pages/next-token-prediction/protocol';
 	import { MAX_CHARS } from '$lib/pages/next-token-prediction/facts';
 	import type { NtpClient } from '$lib/pages/next-token-prediction/client';
-	import Part1Windows from '$lib/pages/next-token-prediction/Part1Windows.svelte';
-	import LossToy from '$lib/pages/next-token-prediction/LossToy.svelte';
-	import Surprisal from '$lib/pages/next-token-prediction/Surprisal.svelte';
-	import Learn from '$lib/pages/next-token-prediction/Learn.svelte';
-	import Decoding from '$lib/pages/next-token-prediction/Decoding.svelte';
-	import Pitfalls from '$lib/pages/next-token-prediction/Pitfalls.svelte';
-	import Quiz from '$lib/pages/next-token-prediction/Quiz.svelte';
-	import YourSentence from '$lib/pages/next-token-prediction/YourSentence.svelte';
 	import Lesson from '$lib/pages/next-token-prediction/Lesson.svelte';
+	import InputChip from '$lib/pages/next-token-prediction/InputChip.svelte';
+	import InputSheet from '$lib/pages/next-token-prediction/InputSheet.svelte';
+	import type { PageProps } from './$types';
 
+	let { data }: PageProps = $props();
 	const S = new NtpState();
 
 	onMount(() => {
@@ -121,8 +117,8 @@
 		],
 		answer: 0,
 		explain: {
-			en: 'At step 0 the largest probability is 0.26% (“ little”), barely above 1/1,024 = 0.098%, and the loss is 6.95 nats, almost exactly ln 1024 = 6.93: the cost of guessing blindly. Sampling gives “J jump color picture)u…”. Greedy decoding just repeats the last word (“ little little little…”), a side effect of sharing one matrix for reading and scoring tokens. Words appear around step 100 and simple stories by step 1,000. Replay it in “Watch it learn”.',
-			zh: '第 0 步时，最大的概率只有 0.26%（“ little”），比 1/1,024 = 0.098% 高不了多少；损失是 6.95 奈特，几乎正好是 ln 1024 = 6.93，也就是盲猜的代价。采样得到的是“J jump color picture)u…”。贪心解码只会重复最后一个词（“ little little little…”），这是读入和打分共用同一个矩阵带来的副作用。大约第 100 步开始出现单词，到第 1,000 步已能写简单的故事。可以在“看它学习”里回放。'
+			en: 'At step 0 the largest probability is 0.26% (“ little”), barely above 1/1,024 = 0.098%, and the loss is 6.95 nats, almost exactly ln 1024 = 6.93: the cost of guessing blindly. Sampling gives “J jump color picture)u…”. Greedy decoding just repeats the last word (“ little little little…”), a side effect of sharing one matrix for reading and scoring tokens. Words appear around step 100 and simple stories by step 1,000. Replay it in Explore, under “Watch it learn”.',
+			zh: '第 0 步时，最大的概率只有 0.26%（“ little”），比 1/1,024 = 0.098% 高不了多少；损失是 6.95 奈特，几乎正好是 ln 1024 = 6.93，也就是盲猜的代价。采样得到的是“J jump color picture)u…”。贪心解码只会重复最后一个词（“ little little little…”），这是读入和打分共用同一个矩阵带来的副作用。大约第 100 步开始出现单词，到第 1,000 步已能写简单的故事。可以在“探索”的“看它学习”里回放。'
 		}
 	};
 
@@ -141,15 +137,15 @@
 			],
 			answer: 0,
 			explain: {
-				en: '−ln 0.5 = 0.693 at every position, so the average is 0.693 nats (exactly 1 bit) and the perplexity is e^0.693 = 2: as unsure as a choice between two equally likely tokens. Check it with the toy: set p = 0.5.',
-				zh: '每个位置都是 −ln 0.5 = 0.693，所以平均是 0.693 奈特（正好 1 比特），困惑度 e^0.693 = 2：相当于在两个同样可能的词元之间犹豫。可以在玩具实验里把 p 设成 0.5 验证。'
+				en: '−ln 0.5 = 0.693 at every position, so the average is 0.693 nats (exactly 1 bit) and the perplexity is e^0.693 = 2: as unsure as a choice between two equally likely tokens. Check it in Explore with the loss toy: set p = 0.5.',
+				zh: '每个位置都是 −ln 0.5 = 0.693，所以平均是 0.693 奈特（正好 1 比特），困惑度 e^0.693 = 2：相当于在两个同样可能的词元之间犹豫。可以在“探索”的损失小实验里把 p 设成 0.5 验证。'
 			}
 		},
 		{
 			id: 'ntp-curve',
 			question: {
-				en: 'Find it in “Watch it learn”: what is the first saved checkpoint whose validation loss is below 3 nats per token?',
-				zh: '在“看它学习”里找一找：验证损失第一次低于每个词元 3 奈特的是哪个检查点？'
+				en: 'Find it in Explore, under “Watch it learn”: what is the first saved checkpoint whose validation loss is below 3 nats per token?',
+				zh: '在“探索”的“看它学习”里找一找：验证损失第一次低于每个词元 3 奈特的是哪个检查点？'
 			},
 			options: [
 				{ en: 'step 100', zh: '第 100 步' },
@@ -182,127 +178,69 @@
 		}
 	];
 
-	const linkModels = ['tinygpt', 'gpt-2', 'tinymamba'];
-	const linkConcepts = ['tokenization', 'decoding', 'scaling-laws', 'self-supervised-objectives', 'loss-gradient-descent', 'perplexity-vs-accuracy'];
+	/** the cover's reading time (spec §6.2, measured at the default inputs): 419 English narration words / 180 + 7 steps × 20 s, rounded */
+	const MINUTES = 5;
+
+	// Explore, Pitfalls and Sources are lazy chunks: the lesson shell carries none of them
+	const views = {
+		explore: () => import('$lib/pages/next-token-prediction/panels/Explore.svelte'),
+		pitfalls: () => import('$lib/pages/next-token-prediction/panels/Pitfalls.svelte'),
+		sources: () => import('$lib/pages/next-token-prediction/panels/Sources.svelte')
+	};
+	// the panels get the page's state, the cover question and checks (Pitfalls) and the related lessons (Sources)
+	const viewProps = {
+		S,
+		prequestion,
+		checks,
+		get related() {
+			return data.related;
+		}
+	};
 </script>
 
-<ConceptPageShell
-	slug="next-token-prediction"
+{#snippet inputChip(open: () => void)}<InputChip {S} {open} />{/snippet}
+{#snippet inputSheet()}<InputSheet {S} />{/snippet}
+{#snippet lesson()}<Lesson {S} />{/snippet}
+{#snippet about()}
+	<p class="about">
+		{t({
+			en: 'Every number in the lesson is computed in your browser by TinyGPT from your sentence: the final weights (fp32) in steps 3–5 and 7, the fp16 training checkpoints in step 6 (each 728 KB, downloaded only when you pick it). Only the validation losses (steps 5 and 6) were measured offline. The lesson follows its own window, so the Explore views stay where you left them.',
+			zh: '课程中的每个数都由 TinyGPT 在你的浏览器里根据你的句子算出：第 3–5 步和第 7 步用最终权重（fp32），第 6 步用 fp16 训练检查点（每个 728 KB，只在你选中时才下载）。只有验证损失（第 5、6 步）是离线测得的。课程跟随自己的窗口，所以“探索”里的视图会停在你离开时的位置。'
+		})}
+	</p>
+{/snippet}
+
+<ConceptHost
+	concept={data.conceptCatalog}
 	{goals}
 	{prequestion}
-	lede={{
-		en: 'A language model learns from plain text by guessing the next token, again and again. Turn your own sentence into training examples, measure TinyGPT’s loss on it, and replay its training from random noise to stories.',
-		zh: '语言模型从普通文本中学习的方法，就是一遍又一遍地猜下一个词元。把你自己的句子变成训练样本，测一测 TinyGPT 在上面的损失，再回放它从随机噪声学会写故事的训练过程。'
+	summary={{
+		en: 'A language model learns from plain text by guessing the next token. Turn your sentence into training examples, measure TinyGPT’s loss on it, and replay its training.',
+		zh: '语言模型靠猜下一个词元从普通文本中学习。把你的句子变成训练样本，测一测 TinyGPT 在上面的损失，再回放它的训练过程。'
 	}}
-	titles={{
-		hook: { en: 'Your sentence', zh: '你的句子' },
-		toy: { en: 'One sentence is many lessons', zh: '一句话，许多道练习题' },
-		real: { en: 'Your text through TinyGPT: loss and perplexity', zh: '用 TinyGPT 读你的文本：损失与困惑度' },
-		compare: { en: 'Watch it learn', zh: '看它学习' },
-		post: { en: 'Check yourself', zh: '检验一下' }
-	}}
-	intros={{
-		lesson: {
-			en: 'Follow your sentence through next-token prediction one step at a time. Press Next (or the → key), or Play to let the lesson run. Every view uses your sentence and the real TinyGPT.',
-			zh: '一步一步跟着你的句子走完下一个词元预测。点“下一步”（或按 → 键），或点“自动播放”让课程自己走。每个视图都用你的句子和真实的 TinyGPT。'
-		}
-	}}
-	lessonNote={{ en: '7 short steps on your own sentence, with TinyGPT running in your browser', zh: '7 个小步骤，用你自己的句子，TinyGPT 就在你的浏览器里运行' }}
+	minutes={MINUTES}
 	exploreIntro={{
-		en: 'Every part of the lesson at full size, with more to try: the sliding window, the loss curve you can drag, your text colored by surprise, the training replay with probe prompts, decoding controls, common misconceptions and a quiz.',
-		zh: '课程的每一部分都在这里完整展开，还有更多可以试：滑动窗口、可拖动的损失曲线、按意外程度着色的文本、带探针提示的训练回放、解码控件、常见误解和小测验。'
+		en: 'Every part of the lesson at full size, with more to try: the sliding window, the loss curve you can drag, your text colored by surprise, the training replay with probe prompts, and decoding controls.',
+		zh: '课程的每一部分都在这里完整展开，还有更多可以试：滑动窗口、可拖动的损失曲线、按意外程度着色的文本、带探针提示的训练回放，以及解码控件。'
 	}}
-	badges={{ lesson: 'live', real: 'live' }}
->
-	{#snippet hook()}<YourSentence {S} />{/snippet}
-	{#snippet lesson()}<Lesson {S} />{/snippet}
-	{#snippet toy()}
-		<Part1Windows {S} />
-		<div class="sub">
-			<h3>{t({ en: 'The loss: −log p', zh: '损失：−log p' })}</h3>
-			<LossToy {S} />
-		</div>
-	{/snippet}
-	{#snippet real()}<Surprisal {S} />{/snippet}
-	{#snippet compare()}
-		<Learn {S} />
-		<Decoding {S} />
-	{/snippet}
-	{#snippet pitfalls()}<Pitfalls {S} />{/snippet}
-	{#snippet post()}
-		<div class="checks">
-			{#each checks as q (q.id)}<Quiz {q} />{/each}
-		</div>
-	{/snippet}
-	{#snippet links()}
-		<h3 class="lh">{t({ en: 'Models', zh: '模型' })}</h3>
-		<div class="cards">
-			{#each linkModels as s (s)}{#if MODEL_BY_SLUG[s]}<ModelCard model={MODEL_BY_SLUG[s]} compact />{/if}{/each}
-		</div>
-		<h3 class="lh">{t({ en: 'Related concepts', zh: '相关概念' })}</h3>
-		<div class="cards">
-			{#each linkConcepts as s (s)}{#if CONCEPT_BY_SLUG[s]}<ConceptCard concept={CONCEPT_BY_SLUG[s]} compact />{/if}{/each}
-		</div>
-	{/snippet}
-	{#snippet further()}
-		<h3 class="lh">{t({ en: 'Further reading', zh: '延伸阅读' })}</h3>
-		<ul>
-			<li>
-				<a href="http://gltr.io/" rel="noopener">GLTR</a> —
-				{t({ en: 'Gehrmann, Strobelt and Rush (2019): coloring text by the rank a language model gives each token (the idea behind the rank view above).', zh: 'Gehrmann、Strobelt 与 Rush（2019）：按语言模型给每个词元的排名给文本上色（上面排名视图的思路来源）。' })}
-			</li>
-			<li>
-				<a href="https://arxiv.org/abs/2305.07759" rel="noopener">TinyStories</a> —
-				{t({ en: 'Eldan and Li (2023): the children’s-story dataset TinyGPT was trained on, and why small models can write coherent English.', zh: 'Eldan 与 Li（2023）：TinyGPT 所用的儿童故事数据集，以及为什么小模型也能写出连贯的英文。' })}
-			</li>
-			<li>
-				{t({ en: 'Dive into Deep Learning, “Language models”:', zh: '《动手学深度学习》“语言模型”一节：' })}
-				<a href="https://d2l.ai/chapter_recurrent-neural-networks/language-model.html" rel="noopener">English</a> ·
-				<a href="https://zh.d2l.ai/chapter_recurrent-neural-networks/language-models-and-dataset.html" rel="noopener">中文</a>
-			</li>
-			<li>
-				<a href="https://github.com/karpathy/nanoGPT" rel="noopener">nanoGPT</a> —
-				{t({ en: 'Andrej Karpathy’s minimal GPT training code; TinyGPT follows the same recipe at a much smaller size.', zh: 'Andrej Karpathy 的极简 GPT 训练代码；TinyGPT 用的是同样的做法，只是小得多。' })}
-			</li>
-			<li>
-				<a href="https://animatedllm.github.io/" rel="noopener">AnimatedLLM</a> —
-				{t({ en: 'animated walk-through of how a decoder language model predicts the next token.', zh: '用动画逐步展示解码器语言模型如何预测下一个词元。' })}
-			</li>
-		</ul>
-	{/snippet}
-</ConceptPageShell>
+	{views}
+	{viewProps}
+	{inputChip}
+	{inputSheet}
+	{about}
+	{lesson}
+/>
 
 <style>
-	.checks {
-		display: grid;
-		gap: var(--s4);
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-		align-items: start;
+	/* Kit issue (Walkthrough): the Look line's visually hidden "Look:" label is absolutely positioned with no positioned
+	   ancestor inside the scrolling narration pane, so when the pane scrolls the label escapes it and makes the page a few
+	   px taller than the window in app mode (measured: 688 px at 1280 x 680 on a long step). Anchor it to the pane. */
+	:global(section.wt .narr) {
+		position: relative;
 	}
-	.lh {
-		font-size: var(--fs-md);
-		margin: var(--s4) 0 var(--s2);
-	}
-	.sub {
-		display: grid;
-		gap: var(--s3);
-		margin-top: var(--s5);
-		padding-top: var(--s5);
-		border-top: 1px dashed var(--rule);
-	}
-	.sub h3 {
+	.about {
 		margin: 0;
-		font-size: var(--fs-lg);
-	}
-	.cards {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
-		gap: 10px;
-	}
-	ul {
-		padding-left: 1.2em;
-	}
-	li + li {
-		margin-top: 6px;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 </style>

@@ -1,0 +1,29 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "charRnnHidden": {
+   "value": 64,
+   "unit": "numbers in the LSTM's h (and as many in its cell c), per character",
+   "source": "static/models/char-rnn/spec.json: the outShape of layer 'lstm'",
+   "measured": "2026-10-12"
+  },
+  "charRnnParams": {
+   "value": 29626,
+   "unit": "parameters, learned by gradient descent",
+   "source": "static/models/char-rnn/facts.json: params (model.py)",
+   "measured": "2026-10-12"
+  },
+  "counterUnit": {
+   "value": 51,
+   "unit": "cell index (counting from 0)",
+   "source": "static/models/char-rnn/facts.json: counterUnit (units.py: largest correlation of c with the letters so far in the word)",
+   "measured": "2026-10-12"
+  },
+  "counterR": {
+   "value": 0.6336,
+   "unit": "Pearson r with the number of letters so far in the word",
+   "source": "static/models/char-rnn/facts.json: counterR (units.py)",
+   "measured": "2026-10-12"
+  }
+ }
+}

@@ -201,7 +201,7 @@
 {:else}
 	<p class="muted">
 		{S.model
-			? t({ en: 'Type some text above to run the model.', zh: '在上面输入一些文字来运行模型。' })
+			? t({ en: 'Type some text (Edit your text) to run the model.', zh: '输入一些文字（编辑你的文本）来运行模型。' })
 			: t({ en: 'Loading the model…', zh: '正在加载模型…' })}
 	</p>
 {/if}
@@ -297,12 +297,12 @@
 		line-height: 1.2;
 	}
 	.op {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		line-height: 1.25;
 	}
 	.shape {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 	}
 	.heads {
@@ -352,7 +352,7 @@
 		width: 100%;
 		min-height: 54px;
 		align-content: center;
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.ti {
 		display: grid;

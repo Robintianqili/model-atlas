@@ -4,55 +4,48 @@
   dot product, the logit lens, the sampling controls) or a small lesson view, all on the live run of
   the current text. The lesson has its own selection (LS: followed token, head, key, dimension), so
   it never moves the "Explore freely" views; the text itself is shared, so editing it here, or
-  generating tokens in step 12, updates the whole page.
+  generating tokens in step 12, updates the whole page. Laid out as the lesson app (redesign spec §5): the input chip in
+  the stage header opens the text sheet, the stage header's "Following" menu picks the token the lesson follows, every
+  stage carries one provenance label, and the steps are grouped in four chapters (Tokens 2 · Attention 6 · Blocks 2 ·
+  Next token 2). The cover (answer first) is Cover.svelte; the end card's recap names three real numbers of this run.
 -->
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 	import Walkthrough from '$lib/kit/Walkthrough.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
-	import AttentionMatrix from '$lib/kit/AttentionMatrix.svelte';
-	import TextInputBar from '$lib/kit/TextInputBar.svelte';
 	import TokenChips from '$lib/kit/TokenChips.svelte';
 	import { motion } from '$lib/kit/theme.svelte';
-	import { t } from '$lib/i18n/i18n.svelte';
-	import { fmt3, fmtPct } from '$lib/kit/format';
-	import type { TokenItem, WalkStep } from '$lib/kit/types';
-	import type { TGState } from './state.svelte';
+	import { t, type Text } from '$lib/i18n/i18n.svelte';
+	import { fmt3, fmtInt, fmtPct } from '$lib/kit/format';
+	import type { StageProv, WalkStep } from '$lib/kit/types';
+	import type { TGPage } from './page.svelte';
 	import { D, H, V } from './state.svelte';
 	import { argmax, pickToken, row, topIndices } from './analysis';
 	import { argmaxAbs, decidedAt, lensPointName, meanSd, prevTokenHead, slices, type GenEntry } from './lesson';
-	import { PRESETS } from './presets';
-	import BlockView from './BlockView.svelte';
-	import DotProduct from './DotProduct.svelte';
-	import AttnText from './AttnText.svelte';
-	import LogitLens from './LogitLens.svelte';
+	import Cover from './Cover.svelte';
 
-	type Fns = {
-		samplingDistribution: (l: ArrayLike<number>, temp: number, k?: number, p?: number) => Float64Array;
-		mulberry32: (seed: number) => () => number;
-	};
-	interface Props {
-		/** the page state (the run of the current text) */
-		S: TGState;
-		/** the lesson's own selection, linked to S (see TGState) */
-		LS: TGState;
-		text: string;
-		promptIds: number[];
-		genIds: number[];
-		/** a forward pass is running */
-		busy: boolean;
-		fns: Fns | null;
-		setPrompt: (v: string) => void;
-		/** append one token to the text and run the model on it */
-		append: (token: number) => Promise<void>;
-		/** wait until the run matches the current text */
-		settle: () => Promise<void>;
-		clearGenerated: () => void;
-	}
-	let { S, LS, text = $bindable(), promptIds, genIds, busy, fns, setPrompt, append, settle, clearGenerated }: Props = $props();
+	let { P }: { P: TGPage } = $props();
+	const S = untrack(() => P.S);
+	const LS = untrack(() => P.LS);
+	const text = $derived(P.text);
+	const promptIds = $derived(P.promptIds);
+	const genIds = $derived(P.genIds);
+	const busy = $derived(P.busy);
+	const fns = $derived(P.fns);
+	const settle = () => P.settle();
+	const append = (token: number) => P.appendToken(token);
+	const clearGenerated = () => P.removeGenerated();
+
+	/** the stage header's provenance label: every stage is computed live from the learner's text */
+	const live: StageProv = { mode: 'live', precision: 'fp32', tolerance: 1e-4, against: 'PyTorch fp32', short: { en: '· computed on your text', zh: '· 用你的文本现场计算' } };
+	const chapters: { title: Text; count: number }[] = [
+		{ title: { en: 'Tokens', zh: '词元' }, count: 2 },
+		{ title: { en: 'Attention', zh: '注意力' }, count: 6 },
+		{ title: { en: 'Blocks', zh: '块' }, count: 2 },
+		{ title: { en: 'Next token', zh: '下一个词元' }, count: 2 }
+	];
 
 	let index = $state(0);
-	// the lesson's own stage views are a separate chunk (the explore views above are already in the page)
+	// the lesson's own stage views are a separate chunk (they render only once the model has run)
 	let st = $state.raw<typeof import('./stages') | null>(null);
 	onMount(() => {
 		import('./stages').then((m) => (st = m));
@@ -219,6 +212,7 @@
 	const steps: WalkStep[] = [
 		{
 			id: 'tokens',
+			prov: live,
 			title: { en: 'Your text becomes tokens', zh: '你的文本变成词元' },
 			narration: () => {
 				const c = [...text].length;
@@ -236,6 +230,7 @@
 		},
 		{
 			id: 'embed',
+			prov: live,
 			title: { en: 'Each token becomes a vector', zh: '每个词元变成一个向量' },
 			narration: () => {
 				const id = f ? f.ids[pos] : 0;
@@ -255,6 +250,7 @@
 		},
 		{
 			id: 'ln',
+			prov: live,
 			title: { en: 'LayerNorm steadies each vector', zh: '层归一化让每个向量保持稳定' },
 			narration: () => ({
 				en: `Before attention, LayerNorm rescales each token’s vector on its own. The 76 numbers of ${qq} have mean ${fmt3(ln?.mean ?? 0)} and spread ${fmt3(ln?.sd ?? 0)} (the standard deviation: how far they typically lie from their mean). Subtract the mean and divide by the spread: now they have mean 0 and spread 1. A learned gain γ and shift β per dimension come last. However large or small a vector is, it leaves at a steady size.`,
@@ -268,6 +264,7 @@
 		},
 		{
 			id: 'qkv',
+			prov: live,
 			title: { en: 'Queries, keys and values', zh: '查询、键和值' },
 			narration: () => {
 				const h = LS.head + 1;
@@ -278,13 +275,14 @@
 				};
 			},
 			look: {
-				en: 'Top: the followed token’s normalized vector and its q, k and v in this head. Below: the same for every token, one row each, with one query number worked out. Switch heads above the stage.',
-				zh: '上方：跟踪的词元归一化后的向量，以及它在这个头里的 q、k、v。下方：每个词元一行，并算出查询中的一个数。可以在舞台上方切换注意力头。'
+				en: 'Top: the followed token’s normalized vector and its q, k and v in this head. Below: the same for every token, one row each, with one query number worked out. Switch heads with the head buttons at the top of the stage.',
+				zh: '上方：跟踪的词元归一化后的向量，以及它在这个头里的 q、k、v。下方：每个词元一行，并算出查询中的一个数。可以用演示区顶部的头按钮切换注意力头。'
 			},
 			onEnter: enterAttention
 		},
 		{
 			id: 'score',
+			prov: live,
 			title: { en: 'One attention score by hand', zh: '亲手算一个注意力分数' },
 			narration: () => {
 				const s = score?.s ?? 0;
@@ -294,8 +292,8 @@
 				};
 			},
 			look: {
-				en: 'Where q and k have the same sign the product is positive (orange) and raises the score. The lesson starts with the key this query attends to most; pick another key above the table.',
-				zh: 'q 和 k 符号相同时乘积为正（橙色），会让分数变大。课程先选这个查询最关注的键；可以在表格上方换一个键。'
+				en: 'Where q and k have the same sign the product is positive (orange) and raises the score. The lesson starts with the key this query attends to most; pick another key with the Key chips in the stage.',
+				zh: 'q 和 k 符号相同时乘积为正（橙色），会让分数变大。课程先选这个查询最关注的键；可以用演示区里的“键”色块换一个键。'
 			},
 			onEnter: () => {
 				enterAttention();
@@ -304,6 +302,7 @@
 		},
 		{
 			id: 'mask',
+			prov: live,
 			title: { en: 'The causal mask: no peeking ahead', zh: '因果掩码：不许偷看后面' },
 			narration: {
 				en: 'Scores are computed for every query and every key, including keys that come later in the text. But TinyGPT learns to predict the next token, so a token must never see the tokens after it. Those scores are replaced by −∞ (hatched). The first token may only look at itself; the last one sees every token.',
@@ -313,12 +312,14 @@
 				en: 'Watch the upper-right triangle turn into hatching. The framed cell is the score from step 5; click any cell to pick another query and key.',
 				zh: '看右上三角变成阴影。带框的格子就是第 5 步算出的分数；点击任意格子可以换一个查询和键。'
 			},
+			animated: true,
 			waitForDone: true,
 			linger: 6000,
 			onEnter: enterAttention
 		},
 		{
 			id: 'softmax',
+			prov: live,
 			title: { en: 'Softmax turns scores into weights', zh: 'Softmax 把分数变成权重' },
 			narration: () => ({
 				en: `For one query, softmax turns its row of scores into weights: subtract the largest score, raise e to each, and divide by their sum. Only differences within the row matter, so negative scores are fine. Every weight is between 0 and 1, the row adds up to 1, and masked keys get exactly 0. Here ${qq} gives ${fmtPct(score?.a ?? 0)} of its attention to ${kq}.`,
@@ -328,12 +329,14 @@
 				en: 'Under the table, the text is shaded by these weights (darker purple = more attention; hover or focus a word to see where it looks), and the full map shows every row, each with its own softmax. Each row adds up to 1.',
 				zh: '表格下方的文本按这些权重着色（紫色越深，注意力越多；把鼠标移到或聚焦一个词上，看它在看哪里），完整的图则显示每一行，每行各做一次 softmax，每行加起来都等于 1。'
 			},
+			animated: true,
 			waitForDone: true,
 			linger: 6000,
 			onEnter: enterAttention
 		},
 		{
 			id: 'mix',
+			prov: live,
 			title: { en: 'Mix the values, join the heads, add', zh: '混合值向量、拼接各头、相加' },
 			narration: {
 				en: 'With these weights, each head mixes the value vectors of the tokens it attends to: a weighted sum of 19 numbers. The 4 heads’ results are joined into 76 numbers, a 76 × 76 output projection mixes them, and the result is added to the vector that came in (x + attention). Attention adds to this residual stream; it never replaces it.',
@@ -343,12 +346,14 @@
 				en: 'The player walks through the four sub-steps; pause it or step through yourself. In the last one, compare the size of the update with the vector it is added to.',
 				zh: '播放器会依次走过四个小步骤；可以暂停，或自己一步步看。在最后一步，比较这次更新和被加的向量各有多大。'
 			},
+			animated: true,
 			waitForDone: true,
 			linger: 3500,
 			onEnter: enterAttention
 		},
 		{
 			id: 'mlp',
+			prov: live,
 			title: { en: 'The MLP: 76 → 304 → GELU → 76', zh: 'MLP：76 → 304 → GELU → 76' },
 			narration: {
 				en: 'Now every token is processed on its own, with no information from other tokens. LayerNorm again, then a linear layer widens the 76 numbers to 304, GELU bends them (negative values are squashed toward 0), and a second linear layer brings them back to 76. The result is added to the stream again. Just over half of TinyGPT’s 364,040 parameters sit in these MLPs.',
@@ -358,22 +363,35 @@
 				en: 'In the GELU sub-step every dot is one of the 304 numbers of your token: the blue ones (negative inputs) end up near 0.',
 				zh: '在 GELU 这一小步里，每个点都是你的词元的 304 个数之一：蓝色的点（负的输入）最后都接近 0。'
 			},
+			animated: true,
 			waitForDone: true,
 			linger: 3500,
 			onEnter: () => (LS.block = 0)
 		},
 		{
 			id: 'lens',
+			prov: live,
 			title: { en: 'Four blocks in a row: the guess takes shape', zh: '4 个块依次处理：猜测逐渐成形' },
 			narration: () => {
-				const L = lensInfo;
 				const intro = {
 					en: 'Blocks 2, 3 and 4 repeat the same recipe with their own weights, each adding to the stream. The logit lens peeks at the stream after every step, as if the model had to answer right there.',
 					zh: '第 2、3、4 块用各自的权重重复同样的步骤，每一步都往残差流里加东西。logit lens 在每一步之后偷看残差流，就好像模型必须当场回答。'
 				};
+				const L = lensInfo;
 				if (!L) return intro;
+				return {
+					en: `${intro.en} After ${qq}, the model finally answers “${L.fin}”. Predict when that answer takes the lead.`,
+					zh: `${intro.zh}在${qq}之后，模型最终的回答是“${L.fin}”。先预测：这个回答是从哪里开始领先的？`
+				};
+			},
+			// a gated predict (spec §5.7): the ladder in the stage stays hidden until the learner commits; the answer and its
+			// real numbers come from the logit lens of the current text
+			predict: () => {
+				const L = lensInfo;
+				if (!L) return undefined;
+				// lens points: 0 the embedding, then two per block (after attention, after the MLP)
+				const block = L.at === 0 ? 0 : Math.ceil(L.at / 2) - 1;
 				const fin = `“${L.fin}”`;
-				// the answer can lead early, lose the lead and win it back: say so instead of "only at the end"
 				const early = L.first < L.at;
 				const enEarly = early ? `is first on top at ${L.firstWhere.en}, then loses the lead, and ` : '';
 				const zhEarly = early ? `先在${L.firstWhere.zh}排到第一，随后又被超过，` : '';
@@ -391,15 +409,26 @@
 						: `After ${qq}, the final answer ${fin} becomes the top guess at ${L.where.en} and stays there.`;
 					zh = early ? `在${qq}之后，最终答案${fin}${zhEarly}从${L.where.zh}开始才稳定地排在第一。` : `在${qq}之后，最终答案${fin}从${L.where.zh}开始排第一，并一直保持。`;
 				}
-				return { en: `${intro.en} ${en}`, zh: `${intro.zh}${zh}` };
+				return {
+					question: { en: `From which block on is ${fin} the top guess for good?`, zh: `${fin}从哪一块开始稳定地排在第一？` },
+					options: [
+						{ en: 'Block 1, or already before it', zh: '第 1 块，或者更早' },
+						{ en: 'Block 2', zh: '第 2 块' },
+						{ en: 'Block 3', zh: '第 3 块' },
+						{ en: 'Only in block 4', zh: '直到第 4 块' }
+					],
+					answer: Math.max(0, Math.min(3, block)),
+					explain: { en, zh }
+				};
 			},
 			look: {
-				en: 'The thin bars: the probability of the final answer after each step, with its rank (#). Watch it climb, and the top guess change, as the blocks add to the stream. Pick another token in “Your text” to see its ladder.',
-				zh: '细条形：每一步之后最终答案的概率，以及它的排名（#）。随着各个块往残差流里加东西，看它如何上升，第一猜测又如何变化。在“你的文本”里选另一个词元，可以看它的这张表。'
+				en: 'The thin bars: the probability of the final answer after each step, with its rank (#). Watch it climb, and the top guess change, as the blocks add to the stream. Pick another token with Following at the top of the stage to see its ladder.',
+				zh: '细条形：每一步之后最终答案的概率，以及它的排名（#）。随着各个块往残差流里加东西，看它如何上升，第一猜测又如何变化。用演示区顶部的“跟踪”菜单选另一个词元，可以看它的这张表。'
 			}
 		},
 		{
 			id: 'probs',
+			prov: live,
 			title: { en: 'Logits become probabilities', zh: 'Logits 变成概率' },
 			narration: () => ({
 				en: `After block 4 and a final LayerNorm, the output head gives each of the 1,024 tokens a score, its logit. Softmax turns the logits into probabilities: at temperature 1, “${topNext >= 0 ? S.idLabel(topNext) : '…'}” gets ${fmtPct(modelProbs && topNext >= 0 ? modelProbs[topNext] : 0)}. Temperature divides the logits first (below 1 sharper, above 1 flatter), and top-k keeps only the k most likely tokens.`,
@@ -412,209 +441,173 @@
 		},
 		{
 			id: 'generate',
+			prov: live,
 			title: { en: 'Pick a token, append it, repeat', zh: '选一个词元，接上去，再来一遍' },
 			narration: {
 				en: 'To write, the model draws one token at random from these probabilities, appends it to the text, and runs everything again on the longer text, from step 1. Repeat, and a story appears one token at a time. The random numbers come from a seed (here 42), a starting value that fixes the whole sequence: the same text, seed and settings always give the same story.',
 				zh: '写作时，模型按这些概率随机抽出一个词元，把它接到文本末尾，然后在更长的文本上从第 1 步开始把一切重新算一遍。不断重复，故事就一个词元一个词元地出现。随机数来自一个种子（这里是 42），种子固定了整串随机数：相同的文本、种子和设置，总会得到相同的故事。'
 			},
 			look: {
-				en: 'Press “Pick the next token”. The new token appears in magenta here and in your input above, and every step of this lesson now shows the longer text.',
-				zh: '点“选出下一个词元”。新词元会以品红色出现在这里和上方的输入中，课程的每一步现在都显示更长的文本。'
+				en: 'Press “Pick the next token”. The new token appears in magenta here and in your text, and every step of this lesson now shows the longer text.',
+				zh: '点“选出下一个词元”。新词元会以品红色出现在这里和你的文本中，课程的每一步现在都显示更长的文本。'
 			}
 		}
 	];
 	const stepIndex = (id: string) => steps.findIndex((s) => s.id === id);
 
-	// ------------------------------------------------------------ the aside: your text, the followed token
-	let editOpen = $state(false);
-	const genInWindow = $derived(Math.min(genIds.length, T));
-	const chips = $derived<TokenItem[]>(
-		f && S.tok ? f.ids.map((id, i) => ({ text: S.tok!.tokenToDisplay(id), id, tone: i >= T - genInWindow ? 'generated' : undefined })) : []
-	);
-	let chipSel = $state<number | null>(null);
-	$effect(() => {
-		chipSel = T ? pos : null;
-	});
-	// keep the followed token visible in the small (scrolling) token box
-	let miniEl: HTMLElement | undefined = $state();
-	$effect(() => {
-		void pos;
-		void T;
-		const box = miniEl;
-		if (!box) return;
-		requestAnimationFrame(() => {
-			const c = box.querySelector('[aria-selected="true"]');
-			if (!c) return;
-			const d = c.getBoundingClientRect().top - box.getBoundingClientRect().top;
-			if (d < 0 || d > box.clientHeight - 30) box.scrollTop += d - box.clientHeight / 2;
-		});
-	});
+	// ------------------------------------------------------------ the followed token (the stage header's menu)
+	function follow(e: Event) {
+		LS.selectPos(Number((e.currentTarget as HTMLSelectElement).value));
+		keyTouched = false;
+	}
+	const FOLLOWS = ['embed', 'ln', 'qkv', 'score', 'mask', 'softmax', 'mix', 'mlp', 'lens'];
 </script>
 
-<Walkthrough {steps} bind:index ready={!!S.run} label={{ en: 'TinyGPT, step by step', zh: 'TinyGPT 分步课程' }} stageMinHeight={420} narrationFirst>
+<Walkthrough {steps} bind:index ready={!!S.run} label={{ en: 'Follow your text through a real GPT', zh: '跟着你的文本走过一个真实的 GPT' }} {chapters} stageMinHeight={420}>
+	{#snippet cover(ctx)}<Cover {P} compact={ctx.density === 'compact'} />{/snippet}
+
 	{#snippet stage(step, ctx)}
 		{#if !S.run || !st}
-			<p class="muted">{t({ en: 'Loading the model… (type some text above if the input is empty)', zh: '正在加载模型……（如果输入为空，请先在上方输入一些文字）' })}</p>
+			<p class="muted">{t({ en: 'Loading the model… If your text is empty, press Edit in the stage header and type some.', zh: '正在加载模型……如果你的文本是空的，请点演示区顶部的“编辑”输入一些文字。' })}</p>
 		{:else}
-			<div class="sh">
-				<span class="ctx">
-					{#if step.id === 'tokens'}
-						{t({ en: 'Tokenizer', zh: '分词器' })}
-					{:else if step.id === 'probs' || step.id === 'generate'}
-						{t({ en: 'Output, after the last token', zh: '输出，在最后一个词元之后' })} <span class="tok">{S.label(T - 1)}</span>
-					{:else}
-						{t({ en: 'Following', zh: '跟踪' })} <span class="tok">{q}</span>
-						{#if IN_BLOCK.includes(step.id)}<span class="muted">· {t({ en: 'block 1', zh: '第 1 块' })}</span>{/if}
-					{/if}
-					{#if ATTN.includes(step.id)}
-						<span class="heads">
-							<span class="muted">· {t({ en: 'head', zh: '头' })}</span>
-							<span class="segmented" role="group" aria-label={t({ en: 'Attention head', zh: '注意力头' })}>
-								{#each Array.from({ length: H }, (_, i) => i) as i (i)}
-									<button type="button" aria-pressed={LS.head === i} onclick={() => setHead(i)}>{i + 1}</button>
-								{/each}
+			<div class="tg">
+				<div class="sh">
+					<span class="ctx">
+						{#if step.id === 'tokens'}
+							{t({ en: 'Tokenizer', zh: '分词器' })}
+						{:else if step.id === 'probs' || step.id === 'generate'}
+							{t({ en: 'Output, after the last token', zh: '输出，在最后一个词元之后' })} <span class="tok">{S.label(T - 1)}</span>
+						{:else}
+							<label class="follow">
+								<span>{t({ en: 'Following', zh: '跟踪' })}</span>
+								<select class="tok" value={pos} onchange={follow} disabled={!FOLLOWS.includes(step.id)}>
+									{#each S.labels as lab, i (i)}<option value={i}>{lab}{i === T - 1 ? t({ en: ' (last)', zh: '（最后一个）' }) : ''}</option>{/each}
+								</select>
+							</label>
+							{#if IN_BLOCK.includes(step.id)}<span class="muted">· {t({ en: 'block 1', zh: '第 1 块' })}</span>{/if}
+						{/if}
+						{#if ATTN.includes(step.id)}
+							<span class="heads">
+								<span class="muted">· {t({ en: 'head', zh: '头' })}</span>
+								<span class="segmented" role="group" aria-label={t({ en: 'Attention head', zh: '注意力头' })}>
+									{#each Array.from({ length: H }, (_, i) => i) as i (i)}
+										<button type="button" aria-pressed={LS.head === i} onclick={() => setHead(i)}>{i + 1}</button>
+									{/each}
+								</span>
 							</span>
-						</span>
-					{/if}
-				</span>
-				<ProvenanceBadge mode="live" compact precision="fp32" />
-			</div>
-			{#if step.id === 'tokens'}
-				<st.LessonTokens {LS} {text} {promptIds} {genIds} />
-			{:else if step.id === 'embed'}
-				<st.EmbedStage {LS} />
-			{:else if step.id === 'ln'}
-				<st.LnStage {LS} />
-			{:else if step.id === 'qkv'}
-				<BlockView S={LS} focus only={[1]} />
-			{:else if step.id === 'score'}
-				<div class="keypick">
-					<span class="lbl">{t({ en: 'Key', zh: '键' })}</span>
-					<TokenChips
-						tokens={S.labels.slice(0, pos + 1).map((lab, j) => ({ text: lab, id: f?.ids[j] }))}
-						selected={Math.min(LS.key, pos)}
-						onselect={(j) => {
-							keyTouched = true;
-							LS.selectKey(j);
+						{/if}
+					</span>
+				</div>
+				{#if step.id === 'tokens'}
+					<st.LessonTokens {LS} {text} {promptIds} {genIds} />
+				{:else if step.id === 'embed'}
+					<st.EmbedStage {LS} />
+				{:else if step.id === 'ln'}
+					<st.LnStage {LS} />
+				{:else if step.id === 'qkv'}
+					<st.BlockView S={LS} focus only={[1]} />
+				{:else if step.id === 'score'}
+					<div class="keypick">
+						<span class="lbl">{t({ en: 'Key', zh: '键' })}</span>
+						<TokenChips
+							tokens={S.labels.slice(0, pos + 1).map((lab, j) => ({ text: lab, id: f?.ids[j] }))}
+							selected={Math.min(LS.key, pos)}
+							onselect={(j) => {
+								keyTouched = true;
+								LS.selectKey(j);
+							}}
+							label={{ en: 'Pick the key (only tokens up to the query)', zh: '选择键（只能是查询及之前的词元）' }}
+						/>
+					</div>
+					<st.DotProduct S={LS} parts={['table', 'score', 'check']} />
+				{:else if step.id === 'mask'}
+					<st.BlockView S={LS} focus only={[2, 3]} interval={4000} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+				{:else if step.id === 'softmax'}
+					<st.SoftmaxRow {LS} interval={3000} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+					<div class="attn">
+						<st.AttnText S={LS} />
+						{#if f}
+							<div class="amap">
+								<st.AttentionMatrix
+									weights={f.t[`L${LS.block}.attn.weights`].data.subarray(LS.head * T * T, (LS.head + 1) * T * T)}
+									queries={S.labels}
+									causal
+									row={pos}
+									col={Math.min(LS.key, pos)}
+									maxCell={22}
+									label={{ en: `Every row gets its own softmax: all weights of block 1, head ${LS.head + 1}`, zh: `每一行各做一次 softmax：第 1 块第 ${LS.head + 1} 头的全部权重` }}
+								/>
+							</div>
+						{/if}
+					</div>
+				{:else if step.id === 'mix'}
+					<st.BlockView S={LS} focus only={[5, 6, 7, 8]} interval={3600} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+				{:else if step.id === 'mlp'}
+					<st.BlockView S={LS} focus only={[9, 10, 11, 12, 13]} interval={3600} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+				{:else if step.id === 'lens'}
+					<st.LogitLens S={LS} parts={['ladder']} />
+				{:else if step.id === 'probs'}
+					<st.LogitsStage {LS} {dist} bind:temperature bind:topK />
+				{:else if step.id === 'generate'}
+					<st.GenStage
+						{LS}
+						{dist}
+						{temperature}
+						{topK}
+						{seed}
+						promptText={text}
+						{genIds}
+						{history}
+						{busy}
+						{generating}
+						{lastMs}
+						onpick={() => void pickSingle()}
+						onpickN={(n) => void pickN(n)}
+						onstop={() => (generating = false)}
+						onclear={() => {
+							generating = false;
+							clearGenerated();
 						}}
-						label={{ en: 'Pick the key (only tokens up to the query)', zh: '选择键（只能是查询及之前的词元）' }}
+						onsettings={() => (index = stepIndex('probs'))}
 					/>
-				</div>
-				<DotProduct S={LS} parts={['table', 'score', 'check']} />
-			{:else if step.id === 'mask'}
-				<BlockView S={LS} focus only={[2, 3]} interval={4000} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if step.id === 'softmax'}
-				<st.SoftmaxRow {LS} interval={3000} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-				<div class="attn">
-					<AttnText S={LS} />
-					{#if f}
-						<div class="amap">
-							<AttentionMatrix
-								weights={f.t[`L${LS.block}.attn.weights`].data.subarray(LS.head * T * T, (LS.head + 1) * T * T)}
-								queries={S.labels}
-								causal
-								row={pos}
-								col={Math.min(LS.key, pos)}
-								maxCell={22}
-								label={{ en: `Every row gets its own softmax: all weights of block 1, head ${LS.head + 1}`, zh: `每一行各做一次 softmax：第 1 块第 ${LS.head + 1} 头的全部权重` }}
-							/>
-						</div>
-					{/if}
-				</div>
-			{:else if step.id === 'mix'}
-				<BlockView S={LS} focus only={[5, 6, 7, 8]} interval={3600} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if step.id === 'mlp'}
-				<BlockView S={LS} focus only={[9, 10, 11, 12, 13]} interval={3600} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if step.id === 'lens'}
-				<LogitLens S={LS} parts={['ladder']} />
-			{:else if step.id === 'probs'}
-				<st.LogitsStage {LS} {dist} bind:temperature bind:topK />
-			{:else if step.id === 'generate'}
-				<st.GenStage
-					{LS}
-					{dist}
-					{temperature}
-					{topK}
-					{seed}
-					promptText={text}
-					{genIds}
-					{history}
-					{busy}
-					{generating}
-					{lastMs}
-					onpick={() => void pickSingle()}
-					onpickN={(n) => void pickN(n)}
-					onstop={() => (generating = false)}
-					onclear={() => {
-						generating = false;
-						clearGenerated();
-					}}
-					onsettings={() => (index = stepIndex('probs'))}
-				/>
-			{/if}
+				{/if}
+			</div>
 		{/if}
 	{/snippet}
 
-	{#snippet aside()}
-		<div class="you">
-			<div class="you-h">
-				<h4>{t({ en: 'Your text', zh: '你的文本' })}</h4>
-				{#if modelProbs && topNext >= 0}
-					<span class="ans">{t({ en: 'next:', zh: '下一个：' })} <span class="tok">{S.idLabel(topNext)}</span> <span class="num">{fmtPct(modelProbs[topNext])}</span></span>
-				{/if}
-			</div>
-			{#if chips.length}
-				<div class="mini" bind:this={miniEl}>
-					<TokenChips tokens={chips} bind:selected={chipSel} onselect={(i) => LS.selectPos(i)} label={{ en: 'Tokens in the context window (click one to follow it)', zh: '上下文窗口中的词元（点击一个来跟踪它）' }} />
-				</div>
-				<p class="hint">
-					{t({ en: `Following token ${pos + 1} of ${T} (position ${pos}).`, zh: `正在跟踪第 ${pos + 1} 个词元（共 ${T} 个，位置 ${pos}）。` })}
-					{#if LS.posSel !== null}
-						<button type="button" class="link" onclick={() => LS.selectPos(T - 1)}>{t({ en: 'Follow the last token', zh: '改为跟踪最后一个词元' })}</button>
-					{/if}
-					{t({ en: 'Edit the text at any time: the step you are on updates at once.', zh: '随时可以修改文本：你所在的这一步会立刻更新。' })}
-				</p>
-			{/if}
-			{#if editOpen}
-				<TextInputBar
-					bind:value={text}
-					maxLength={400}
-					multiline
-					rows={2}
-					presets={PRESETS}
-					label={{ en: 'Lesson text', zh: '课程文本' }}
-					placeholder={{ en: 'Type the start of a story…', zh: '输入一个故事的开头（英文）…' }}
-					oninput={(v) => setPrompt(v)}
-				/>
-			{/if}
-			<button type="button" class="btn small" aria-expanded={editOpen} onclick={() => (editOpen = !editOpen)}>
-				<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-				{editOpen ? t({ en: 'Hide the text box', zh: '收起文本框' }) : t({ en: 'Edit the text here', zh: '在这里修改文本' })}
-			</button>
-		</div>
-	{/snippet}
-
-	{#snippet end()}
-		<div class="fin">
-			<p>
-				<strong>{t({ en: 'That is the whole model.', zh: '这就是整个模型。' })}</strong>
+	{#snippet recap()}
+		<ul class="recap">
+			<li>
 				{t({
-					en: 'Tokens → vectors → 4 blocks of attention and MLP → probabilities → one new token, again and again. Try another text and play the lesson again, or see every tensor at once below.',
-					zh: '词元 → 向量 → 4 个由注意力和 MLP 组成的块 → 概率 → 一个新词元，如此反复。换一段文本再播放一遍课程，或者在下面同时查看所有张量。'
+					en: `Your ${fmtInt([...text].length)} characters became ${fmtInt(promptIds.length)} tokens; the model read the last ${T}${genIds.length ? `, ${genIds.length} of them written by itself` : ''}.`,
+					zh: `你的 ${fmtInt([...text].length)} 个字符变成了 ${fmtInt(promptIds.length)} 个词元；模型读的是最后 ${T} 个${genIds.length ? `，其中 ${genIds.length} 个是它自己写的` : ''}。`
 				})}
-			</p>
-			<a class="btn primary" href="#explore">{t({ en: 'Explore freely', zh: '自由探索' })} ↓</a>
-		</div>
+			</li>
+			{#if score}
+				<li>
+					{t({
+						en: `In block 1, head ${LS.head + 1}, ${qq} gave ${fmtPct(score.a)} of its attention to ${kq} (score ${fmt3(score.s)}).`,
+						zh: `在第 1 块第 ${LS.head + 1} 个头里，${qq}把 ${fmtPct(score.a)} 的注意力给了${kq}（分数 ${fmt3(score.s)}）。`
+					})}
+				</li>
+			{/if}
+			{#if topNext >= 0 && modelProbs}
+				<li>
+					{t({
+						en: `After “${S.label(T - 1)}”, it gave “${S.idLabel(topNext)}” ${fmtPct(modelProbs[topNext])} of the probability, out of ${fmtInt(V)} tokens.`,
+						zh: `在“${S.label(T - 1)}”之后，它在 ${fmtInt(V)} 个词元里给了“${S.idLabel(topNext)}” ${fmtPct(modelProbs[topNext])} 的概率。`
+					})}
+				</li>
+			{/if}
+		</ul>
 	{/snippet}
 </Walkthrough>
-<p class="foot muted">
-	{t({
-		en: 'Every number in the lesson is computed in your browser from your text and the trained weights. The lesson keeps its own choices (followed token, head, key, dimension, sampling settings), so the views below stay where you left them; the text is shared, so tokens generated in step 12 appear everywhere.',
-		zh: '课程中的每个数都由你的文本和训练好的权重在浏览器中实时算出。课程有自己的选择（跟踪的词元、注意力头、键、维度、采样设置），所以下面的视图会停在你离开时的位置；文本是共用的，所以第 12 步生成的词元会出现在页面各处。'
-	})}
-</p>
 
 <style>
+	/* token text: no programming ligatures ("<|" would turn into a triangle in JetBrains Mono) */
+	.tg {
+		font-variant-ligatures: none;
+	}
 	.sh {
 		display: flex;
 		flex-wrap: wrap;
@@ -630,7 +623,26 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 4px 6px;
-		font-size: var(--fs-sm);
+		color: var(--ink-2);
+		font-size: var(--t-sm);
+	}
+	.follow {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.follow select {
+		max-width: 14em;
+		min-height: 32px;
+		padding: 0 6px;
+		border: 1px solid var(--line-control);
+		border-radius: var(--r2);
+		background: var(--panel);
+		color: var(--ink);
+		font-size: var(--t-sm);
+	}
+	.follow select:disabled {
+		border-style: dashed;
 		color: var(--ink-2);
 	}
 	.heads {
@@ -643,14 +655,14 @@
 		min-height: 32px;
 	}
 	.tok {
-		font-family: var(--font-mono);
-		background: var(--surface-2);
-		border-radius: 3px;
 		padding: 0 4px;
-		white-space: pre;
-		color: var(--ink);
+		border-radius: 3px;
+		background: var(--surface-2);
 		box-shadow: inset 0 0 0 1.5px var(--q);
+		color: var(--ink);
+		font-family: var(--font-mono);
 		font-variant-ligatures: none;
+		white-space: pre;
 	}
 	.keypick {
 		display: flex;
@@ -660,8 +672,8 @@
 		margin-bottom: 10px;
 	}
 	.keypick .lbl {
-		font-size: var(--fs-sm);
-		font-weight: 650;
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
 	}
 	.keypick :global(.chips) {
 		flex: 1 1 200px;
@@ -675,79 +687,14 @@
 		max-width: 460px;
 		min-width: 0;
 	}
-	.you {
+	.recap {
 		display: grid;
-		gap: 8px;
-		padding: 10px 12px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
-		min-width: 0;
-	}
-	.you-h {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 4px 12px;
-	}
-	h4 {
-		margin: 0;
-		font-size: var(--fs-md);
-	}
-	.ans {
-		display: inline-flex;
-		align-items: baseline;
 		gap: 6px;
-		font-size: var(--fs-sm);
-	}
-	.ans .tok {
-		box-shadow: none;
-	}
-	.mini {
-		max-height: 150px;
-		overflow-y: auto;
-	}
-	.hint {
 		margin: 0;
-		font-size: var(--fs-xs);
+		padding-left: 1.2em;
 		color: var(--ink-2);
-	}
-	.link {
-		border: 0;
-		background: none;
-		padding: 0;
-		color: var(--accent-strong);
-		text-decoration: underline;
-		cursor: pointer;
-		font: inherit;
-	}
-	.small {
-		justify-self: start;
-		gap: 6px;
-		min-height: 32px;
-		padding: 0 12px;
-		font-size: var(--fs-sm);
-	}
-	.you :global(.presets .btn),
-	.you :global(.presets button) {
-		min-height: 30px;
-		font-size: var(--fs-xs);
-	}
-	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
-		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
+		font-variant-ligatures: none;
 	}
 </style>

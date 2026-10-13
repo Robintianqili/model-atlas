@@ -1,0 +1,125 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 2144,
+   "unit": "count",
+   "source": "spec",
+   "measured": "2026-10-12"
+  },
+  "trainSessions": {
+   "value": 8000,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "trainTargets": {
+   "value": 55954,
+   "unit": "next clicks",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "trainClicks": {
+   "value": 63954,
+   "unit": "clicks",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "valSessions": {
+   "value": 1000,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "testSessions": {
+   "value": 1000,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "epochs": {
+   "value": 60,
+   "unit": "epochs",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "bestEpoch": {
+   "value": 30,
+   "unit": "epoch",
+   "source": "pipeline/sasrec/train.py (CPU float32), best validation hit rate @5",
+   "measured": "2026-10-12"
+  },
+  "batch": {
+   "value": 128,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "hit5": {
+   "value": 0.835,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "hit5Pop": {
+   "value": 0.307,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "hit5Markov": {
+   "value": 0.822,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "hit5Shuffled": {
+   "value": 0.647,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "hit5LastOnly": {
+   "value": 0.754,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "popShareRec": {
+   "value": 0.2554,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "popShareTarget": {
+   "value": 0.201,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "newItemInTop5": {
+   "value": 0,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "newItemPlaceMean": {
+   "value": 23.771,
+   "unit": "place",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  },
+  "attLastIsMax": {
+   "value": 0.992,
+   "unit": "share",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out, histories of 2 clicks or more",
+   "measured": "2026-10-12"
+  },
+  "attSessions": {
+   "value": 1000,
+   "unit": "sessions",
+   "source": "pipeline/sasrec/train.py (CPU float32), 1,000 test sessions, last click held out",
+   "measured": "2026-10-12"
+  }
+ }
+}

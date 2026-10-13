@@ -1,0 +1,46 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "transe",
+ "checked": "2026-10-12",
+ "sources": {
+  "run": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 8.38e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "one": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 8.38e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "base": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 8.38e-16,
+   "bar": 1e-10,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "rank": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 35,
+   "fixtures": 0,
+   "checked": "2026-10-12"
+  }
+ }
+}

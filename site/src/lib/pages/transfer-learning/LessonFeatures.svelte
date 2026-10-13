@@ -6,7 +6,6 @@
 	import TensorGrid from '$lib/kit/TensorGrid.svelte';
 	import ColorLegend from '$lib/kit/ColorLegend.svelte';
 	import RoleChip from '$lib/kit/RoleChip.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import Num from '$lib/kit/Num.svelte';
 	import { domainOf } from '$lib/kit/color';
 	import { fmtInt } from '$lib/kit/format';
@@ -86,7 +85,6 @@
 			<div class="grid">
 				<div class="hd">
 					<h4>{t({ en: 'The 256 features of this drawing', zh: '这张画的 256 个特征' })}</h4>
-					<ProvenanceBadge mode="live" precision="fp32" {tolerance} against="PyTorch fp32" compact />
 				</div>
 				<TensorGrid
 					data={f}
@@ -182,7 +180,7 @@
 		white-space: nowrap;
 	}
 	.bs {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		white-space: nowrap;
 	}

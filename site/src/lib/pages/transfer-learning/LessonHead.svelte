@@ -9,7 +9,6 @@
 	import RoleFrame from '$lib/kit/RoleFrame.svelte';
 	import RoleChip from '$lib/kit/RoleChip.svelte';
 	import ProbBars from '$lib/kit/ProbBars.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import Num from '$lib/kit/Num.svelte';
 	import { domainOf } from '$lib/kit/color';
 	import { sym } from '$lib/kit/tex';
@@ -69,7 +68,6 @@
 			<div class="mine">
 				<div class="hd">
 					<h4>{t({ en: 'This drawing, before training', zh: '这张画（训练前）' })}</h4>
-					<ProvenanceBadge mode="live" compact note={{ en: 'The new head is created right here in your browser (seeded); the features come from the shipped TinyCNN.', zh: '新输出头就在你的浏览器里创建（固定种子）；特征来自发布的 TinyCNN。' }} />
 				</div>
 				{#if mine}
 					<ProbBars

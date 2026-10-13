@@ -1,0 +1,43 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "hmm",
+ "checked": "2026-10-13",
+ "sources": {
+  "fwd": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 18,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "vit": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 26,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "sample": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 13,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  },
+  "spells": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 2,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  }
+ }
+}

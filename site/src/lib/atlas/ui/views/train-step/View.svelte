@@ -7,15 +7,16 @@
 	import { keyScroll } from '$lib/kit/keyscroll';
 	import type { Tensor } from '../../../types/core.ts';
 	import { t } from '$lib/i18n/i18n.svelte';
-	import { fmt3, paren } from '../../../core/format.ts';
+	import { fmt3, fmtSetting, paren } from '../../../core/format.ts';
 	import Value from '../../train/Value.svelte';
 	import MiniGrid from '../../train/MiniGrid.svelte';
-	import meta, { PHASES, phaseName, stepData } from './meta.ts';
+	import meta, { PHASES, phaseName, stepData, updateDigits } from './meta.ts';
 
 	// props one by one (no rest/spread props: they would grow the Svelte runtime chunk every page preloads)
 	let { rt, source, at, focus, sel, ctx, provenance, autoplay, onend, props }: StageProps = $props();
 	const p: StageProps = $derived({ rt, source, at, focus, sel, ctx, provenance, autoplay, onend, props });
 	const d = $derived(stepData(p));
+	const nd = $derived(updateDigits(d, p.props?.digits));
 	const rows = $derived(Math.max(1, Math.min(8, Math.floor(Number(p.props?.rows ?? 4)) || 4)));
 
 	const cols = (x: Tensor | undefined) => (x && x.shape.length === 2 ? x.shape[1] : 1);
@@ -85,7 +86,7 @@
 			<p>{t({ en: `The weight ${where}:`, zh: `权重 ${where}：` })}</p>
 			{#if d.sgd}
 				<p class="eq num">
-					<span title={t({ en: 'old value', zh: '原来的值' })}>{fmt3(d.old)}</span> − <span title={t({ en: 'learning rate', zh: '学习率' })}>{fmt3(d.lr)}</span> × <span title={t({ en: 'gradient', zh: '梯度' })}>{paren(d.g)}</span> = <strong>{fmt3(d.now)}</strong>
+					<span title={t({ en: 'old value', zh: '原来的值' })}>{fmt3(d.old, nd)}</span> − <span title={t({ en: 'learning rate', zh: '学习率' })}>{fmtSetting(d.lr)}</span> × <span title={t({ en: 'gradient', zh: '梯度' })}>{paren(d.g)}</span> = <strong>{fmt3(d.now, nd)}</strong>
 				</p>
 				<p class="small muted">{t({ en: 'old − learning rate × gradient = new (plain gradient descent).', zh: '旧值 − 学习率 × 梯度 = 新值（普通梯度下降）。' })}</p>
 			{:else}

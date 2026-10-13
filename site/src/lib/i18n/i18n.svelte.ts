@@ -5,6 +5,7 @@
  *   t({ en: 'Layer', zh: '层' })     // reactive: re-renders when the language changes
  *   ui('navAtlas')                   // from the UI dictionary (strings.ts)
  *   ui('stepOf', { i: 2, n: 9 })     // placeholders
+ *   lui('nextStep', { k: 3 })        // the lesson app's strings (LESSON_UI); cui('allN', { n: 6 }) the catalog's
  *   setLang('zh')                    // persists (try/catch) and updates <html lang>
  *
  * Prerendered HTML is English. The saved language is applied after hydration by initLang()
@@ -14,9 +15,9 @@
  */
 import { tick } from 'svelte';
 import { pick, type I18n, type Lang, type Text } from './types.ts';
-import { UI, type UIKey } from './strings.ts';
+import { CATALOG_UI, LESSON_UI, UI, type CatalogUIKey, type LessonUIKey, type UIKey } from './strings.ts';
 
-export type { I18n, Lang, Text, UIKey };
+export type { I18n, Lang, Text, UIKey, LessonUIKey, CatalogUIKey };
 
 const KEY = 'atlas.lang';
 
@@ -34,7 +35,21 @@ export function colon(): string {
 
 /** Look up a UI string and fill `{placeholders}`. */
 export function ui(key: UIKey, vars?: Record<string, string | number>): string {
-	let s = pick(UI[key] as I18n, i18n.lang);
+	return fill(UI[key] as I18n, vars);
+}
+
+/** A lesson-app string (LESSON_UI: views, Next, Start, Skip, feedback, cover, end card). Bundled only where used. */
+export function lui(key: LessonUIKey, vars?: Record<string, string | number>): string {
+	return fill(LESSON_UI[key] as I18n, vars);
+}
+
+/** A catalog string (CATALOG_UI: cards, filters, paths, areas). Bundled only where used. */
+export function cui(key: CatalogUIKey, vars?: Record<string, string | number>): string {
+	return fill(CATALOG_UI[key] as I18n, vars);
+}
+
+function fill(text: I18n, vars?: Record<string, string | number>): string {
+	let s = pick(text, i18n.lang);
 	if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
 	return s;
 }

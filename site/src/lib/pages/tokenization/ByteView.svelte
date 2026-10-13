@@ -89,7 +89,7 @@
 		gap: 1px;
 	}
 	.b {
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		padding: 1px 2px;
 		border-radius: 3px;
 		cursor: default;

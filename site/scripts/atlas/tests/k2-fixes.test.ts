@@ -53,7 +53,7 @@ function gitRepo() {
 	// machine-local, git-ignored: copied from main into a --from-git lane
 	put('site/scripts/atlas/atlas.config.local.json', '{ "python": "py" }\n');
 	const read = (rel: string) => readFileSync(join(repo, ...rel.split('/')), 'utf8');
-	return { base, repo, site, put, git, read, env: { ATLAS_ROOT: repo, ATLAS_SITE: site }, cleanup: () => rmSync(base, { recursive: true, force: true }) };
+	return { base, repo, site, put, git, read, env: { ATLAS_ROOT: repo, ATLAS_SITE: site, ATLAS_LANES_DIR: '' }, cleanup: () => rmSync(base, { recursive: true, force: true }) };
 }
 
 test('untar reads ustar entries, pax long paths and skips folders', () => {

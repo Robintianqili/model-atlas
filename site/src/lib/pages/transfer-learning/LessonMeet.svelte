@@ -42,7 +42,6 @@
 		<div class="out">
 			<div class="hd">
 				<h4>{t({ en: 'The 10-class model’s answer', zh: '10 类模型的回答' })}</h4>
-				<ProvenanceBadge mode="live" precision="fp32" {tolerance} against="PyTorch fp32" compact />
 			</div>
 			{#if L.old}
 				<ProbBars {items} k={10} chosen={L.old.top} label={{ en: 'Probability per known class', zh: '每个已知类别的概率' }} />

@@ -1,7 +1,7 @@
 /**
  * Shared view state of the TinyGPT page: the latest run (trace + logit lens) and what the learner
  * has selected (block, head, token position, key, dimension, inspector layer). One instance per page,
- * created in +page.svelte and passed to the page components as `S`.
+ * made by TGPage (page.svelte.ts) and passed to the page components as `S`.
  *
  * `new TGState(S)` makes a linked view (used by the guided lesson): it reads and writes the same
  * model, tokenizer, run and labels as `S`, but keeps its own selection, so the lesson and the

@@ -8,9 +8,11 @@
  *     budget per sample page (including /m/tinycnn/ and /m/tinygpt/) and a tighter budget for planned model pages:
  *     their wave-0 shell baseline + 5 KB (DevKit design §5.1), so the auto-page code never leaks into them.
  *  4. Catalog modules in the shells (prep for wave 2b): each sample page prints which catalog modules (models, concepts,
- *     tech-zh, areas) its preloaded JS carries. /m/tinycnn/ and /m/tinygpt/ must carry none: a model page gets its slice
- *     of the catalog from the root layout's server load (src/lib/catalog/slices.ts), so entries going live or new
- *     catalog text never grow the flagship shells.
+ *     tech-zh, areas, glossary) its preloaded JS carries. /m/tinycnn/ and /m/tinygpt/ must carry none: a model page gets
+ *     its slice of the catalog from the root layout's server load (src/lib/catalog/slices.ts), so entries going live or
+ *     new catalog text never grow the flagship shells. Redesign wave F: no page but /glossary/ may carry the glossary's
+ *     definitions (glossary.ts; <Term> shows names from glossary-names.ts and loads them on first use), and a flagship
+ *     shell over 250 KB warns (the gate stays 300 KB; the redesign's target is 230 KB).
  * ATLAS_BUILD_DIR selects the build folder (default build/), as in svelte.config.js.
  * ATLAS_ONLY=<slug>[,<slug>...] (a package-only build, DevKit K2; svelte.config.js): check 1 expects the home page and at
  * least one page per package (/m/<slug>/, /train/<slug>/ or /dev/atlas/lab/<slug>/); check 3 measures the shells of the
@@ -25,6 +27,7 @@ import { MODELS } from '../src/lib/catalog/models.ts';
 import { CONCEPTS } from '../src/lib/catalog/concepts.ts';
 import { AREAS } from '../src/lib/catalog/areas.ts';
 import { TECH_ZH } from '../src/lib/catalog/tech-zh.ts';
+import { GLOSSARY } from '../src/lib/catalog/glossary.ts';
 import { candidatePages, onlyEntries, onlySlugs } from './atlas/lib/only.ts';
 
 const BUILD = process.env.ATLAS_BUILD_DIR || 'build';
@@ -173,7 +176,8 @@ const CATALOG_TEXT: Record<string, string[]> = {
 	models: spread(MODELS.filter((m) => m.status !== 'live')).map((m) => lettersRun(m.shows.en)),
 	concepts: spread(CONCEPTS.filter((c) => c.status !== 'live')).map((c) => lettersRun(c.interaction.en)),
 	'tech-zh': spread(Object.values(TECH_ZH).filter((z) => z.length >= 8 && !/["'`]/.test(z))),
-	areas: spread(AREAS).map((a) => lettersRun(a.blurb.en))
+	areas: spread(AREAS).map((a) => lettersRun(a.blurb.en)),
+	glossary: spread(GLOSSARY).map((g) => lettersRun(g.def.en))
 };
 function catalogIn(keys: string[]): string[] {
 	const code = keys.map((k) => readFileSync(join(BUILD, k), 'utf8')).join('\n');
@@ -184,6 +188,8 @@ function catalogIn(keys: string[]): string[] {
 
 console.log('\npage shell JS preloaded per page (gzip; budget 300 KB) and the catalog modules in it:');
 const FLAGSHIPS = ['m/tinycnn/index.html', 'm/tinygpt/index.html'];
+/** redesign wave F: a flagship shell over this warns (target 230 KB; the gate stays 300 KB) */
+const FLAGSHIP_WARN = 250 * 1024;
 const SAMPLES = ['index.html', 'atlas/index.html', 'atlas/vision/index.html', 'm/resnet-18/index.html', 'm/tinycnn/index.html', 'm/tinygpt/index.html', 'train/lora/index.html', 'glossary/index.html', 'about/index.html', 'dev/kit/index.html'];
 for (const p of [...new Set([...SAMPLES, ...[...onlyPages.values()].flat()])]) {
 	if (!have.has(p)) continue;
@@ -192,8 +198,11 @@ for (const p of [...new Set([...SAMPLES, ...[...onlyPages.values()].flat()])]) {
 	const room = FLAGSHIPS.includes(p) ? `; ${kb(300 * 1024 - r.gz)} left` : '';
 	console.log(`  ${kb(r.gz).padStart(9)}  (${r.files} files${room})  /${p.replace('index.html', '')}  catalog: ${cat.join(', ') || 'none'}`);
 	if (r.gz > 300 * 1024) fail(`/${p} preloads ${kb(r.gz)} of JS (budget 300 KB gzip)`);
+	else if (FLAGSHIPS.includes(p) && r.gz > FLAGSHIP_WARN) console.warn(`WARN /${p} preloads ${kb(r.gz)} of JS: over the 250 KB warning line (the redesign's target is 230 KB; move panels and views out of the shell)`);
+	if (cat.includes('glossary') && p !== 'glossary/index.html')
+		fail(`/${p} preloads the glossary definitions (glossary.ts): only /glossary/ imports it; <Term> shows names from glossary-names.ts and loads the definitions on first use`);
 	// a flagship page reads its catalog slice from page.data, so catalog changes never grow it (prep for wave 2b)
-	if (FLAGSHIPS.includes(p) && cat.length)
+	if (FLAGSHIPS.includes(p) && cat.filter((c) => c !== 'glossary').length)
 		fail(`/${p} preloads catalog modules (${cat.join(', ')}): a model page reads its catalog slice from page.data (src/lib/catalog/slices.ts) and imports no catalog table`);
 }
 

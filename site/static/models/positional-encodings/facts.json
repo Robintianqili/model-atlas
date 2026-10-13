@@ -1,0 +1,125 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "trainCtx": {
+   "value": 64,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "tokens per training window",
+   "measured": "2026-10-13"
+  },
+  "evalCtx": {
+   "value": 256,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "tokens per scoring window",
+   "measured": "2026-10-13"
+  },
+  "steps": {
+   "value": 3000,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "training steps per model",
+   "measured": "2026-10-13"
+  },
+  "batch": {
+   "value": 128,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "windows per training step",
+   "measured": "2026-10-13"
+  },
+  "windows": {
+   "value": 500,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "validation windows scored per model",
+   "measured": "2026-10-13"
+  },
+  "inNone": {
+   "value": 2.2963,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "none: mean loss over positions 0-63, nats",
+   "measured": "2026-10-13"
+  },
+  "midNone": {
+   "value": 2.4731,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "none: mean loss over positions 64-127, nats",
+   "measured": "2026-10-13"
+  },
+  "farNone": {
+   "value": 3.7766,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "none: mean loss over positions 192-255, nats",
+   "measured": "2026-10-13"
+  },
+  "inLearned": {
+   "value": 2.2013,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "learned: mean loss over positions 0-63, nats",
+   "measured": "2026-10-13"
+  },
+  "inSin": {
+   "value": 2.2275,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "sinusoidal: mean loss over positions 0-63, nats",
+   "measured": "2026-10-13"
+  },
+  "midSin": {
+   "value": 4.6703,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "sinusoidal: mean loss over positions 64-127, nats",
+   "measured": "2026-10-13"
+  },
+  "farSin": {
+   "value": 5.4599,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "sinusoidal: mean loss over positions 192-255, nats",
+   "measured": "2026-10-13"
+  },
+  "inRope": {
+   "value": 2.1427,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "rope: mean loss over positions 0-63, nats",
+   "measured": "2026-10-13"
+  },
+  "midRope": {
+   "value": 2.8989,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "rope: mean loss over positions 64-127, nats",
+   "measured": "2026-10-13"
+  },
+  "farRope": {
+   "value": 4.1662,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "rope: mean loss over positions 192-255, nats",
+   "measured": "2026-10-13"
+  },
+  "inAlibi": {
+   "value": 2.2022,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "alibi: mean loss over positions 0-63, nats",
+   "measured": "2026-10-13"
+  },
+  "midAlibi": {
+   "value": 2.0675,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "alibi: mean loss over positions 64-127, nats",
+   "measured": "2026-10-13"
+  },
+  "farAlibi": {
+   "value": 2.0951,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "alibi: mean loss over positions 192-255, nats",
+   "measured": "2026-10-13"
+  },
+  "chkSin": {
+   "value": 0.006382,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "sinusoidal PE[p = 10, dim 3] for d = 76",
+   "measured": "2026-10-13"
+  },
+  "chkRope": {
+   "value": 35.938137,
+   "source": "pipeline/positional-encodings/extrap.py",
+   "unit": "RoPE angle of pair 1 at position 100 (radians, head of 19 dims)",
+   "measured": "2026-10-13"
+  }
+ }
+}

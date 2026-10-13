@@ -1,0 +1,12 @@
+// masked-lm: the concept page's own lint (atlas/ui/concept/lint.ts): the stage panels of concept.ts run like lesson steps
+// on every fixture in en and zh, and the hook, pitfalls and further reading are checked. `atlas check` runs it with the
+// package's other tests. Scaffolded by `atlas new concept masked-lm` on 2026-10-08.
+import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { assertConceptClean, lintConceptPackage } from '../../atlas/ui/concept/node.ts';
+
+const SITE = fileURLToPath(new URL('../../../../', import.meta.url));
+
+test('concept page: panels, hook, pitfalls and links lint clean on every fixture in en and zh', async () => {
+	assertConceptClean(await lintConceptPackage('masked-lm', SITE));
+});

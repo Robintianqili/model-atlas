@@ -163,8 +163,8 @@ export const TUTORIAL: TutorialStepDef[] = [
 		id: 'check',
 		title: { en: 'Check, then write it up', zh: '检查，然后写笔记' },
 		narration: {
-			en: 'While you iterate, check --quick runs every gate except the build and the browser test, and e2e runs the browser test: two passes, an accessibility scan and a sheet of every step. The full check runs once, at the end. A draft is done when check is green and the notes file has its five sections. Then the teaching review, and the maintainers promote it.',
-			zh: '反复修改时，check --quick 运行除构建和浏览器测试以外的所有关卡，e2e 运行浏览器测试：两轮检查、一次无障碍扫描，外加一张列出每一步的总览图。完整的 check 只在最后运行一次。check 全部通过、笔记的五个部分写好，草稿就完成了。接下来是教学评审，然后由维护者让它上线。'
+			en: 'While you iterate, check --quick runs every gate except the build and the browser test. The full check runs once, at the end: it adds a build of your pages and the one browser test, two passes with an accessibility scan and a sheet of every step. A draft is done when check is green and the notes file has its five sections. Then the teaching review, which reads those sheets, and the maintainers promote it.',
+			zh: '反复修改时，check --quick 运行除构建和浏览器测试以外的所有关卡。完整的 check 只在最后运行一次：它再构建本包的页面，并运行唯一一次浏览器测试，即两轮检查、一次无障碍扫描，外加一张列出每一步的总览图。check 全部通过、笔记的五个部分写好，草稿就完成了。接下来是教学评审（评审者直接读这些总览图），然后由维护者让它上线。'
 		},
 		command: { section4: '4.7', re: '^check ', block: true },
 		produces: 'gates'

@@ -1,0 +1,149 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testN": {
+   "value": 7500,
+   "unit": "drawings",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "classesN": {
+   "value": 5,
+   "unit": "classes",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "testPatches": {
+   "value": 120000,
+   "unit": "patches",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "testRecPx": {
+   "value": 0.187,
+   "unit": "nats per pixel",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "testRec": {
+   "value": 146.6,
+   "unit": "nats per drawing",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "nearMedian": {
+   "value": 0.659,
+   "unit": "squared distance",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "secondMedian": {
+   "value": 2.36,
+   "unit": "squared distance",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "blankShare": {
+   "value": 0.3072,
+   "unit": "share of test patches",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "rareN": {
+   "value": 2,
+   "unit": "codes used by fewer than 1 in 100 test patches",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "rareMin": {
+   "value": 0.0089,
+   "unit": "share of test patches (the rarest code)",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "usedN": {
+   "value": 32,
+   "unit": "codes used at least once",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "distinctMedian": {
+   "value": 10.0,
+   "unit": "distinct codes per drawing",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "edgePx": {
+   "value": 0.4898,
+   "unit": "share of pixels on the edge of a 7x7 block",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "edgeErr": {
+   "value": 0.4939,
+   "unit": "share of the redrawing error on those pixels",
+   "source": "pipeline/vq-vae/stats.py (CPU float32, the 7,500 test drawings)",
+   "measured": "2026-10-12"
+  },
+  "k128Used": {
+   "value": 128,
+   "unit": "codes used at least once on the test drawings",
+   "source": "pipeline/vq-vae/stats.py on model_k128.pt (train.py --codes 128; not shipped)",
+   "measured": "2026-10-12"
+  },
+  "k128RecPx": {
+   "value": 0.1664,
+   "unit": "nats per pixel",
+   "source": "pipeline/vq-vae/stats.py on model_k128.pt (train.py --codes 128; not shipped)",
+   "measured": "2026-10-12"
+  },
+  "plainK128Used": {
+   "value": 37,
+   "unit": "codes used at least once on the test drawings",
+   "source": "pipeline/vq-vae/stats.py on model_plain_k128.pt (train.py --plain --codes 128; not shipped)",
+   "measured": "2026-10-12"
+  },
+  "plainK128RecPx": {
+   "value": 0.1867,
+   "unit": "nats per pixel",
+   "source": "pipeline/vq-vae/stats.py on model_plain_k128.pt (train.py --plain --codes 128; not shipped)",
+   "measured": "2026-10-12"
+  },
+  "k128Codes": {
+   "value": 128,
+   "unit": "codes",
+   "source": "pipeline/vq-vae/stats.py on model_k128.pt (train.py --codes 128; not shipped)",
+   "measured": "2026-10-12"
+  },
+  "params": {
+   "value": 15993,
+   "unit": "numbers",
+   "source": "pipeline/vq-vae/model.py",
+   "measured": "2026-10-12"
+  },
+  "epochs": {
+   "value": 30,
+   "unit": "epochs",
+   "source": "pipeline/vq-vae/train.py",
+   "measured": "2026-10-12"
+  },
+  "trainN": {
+   "value": 60000,
+   "unit": "drawings",
+   "source": "ak.data.quickdraw (TinyCNN split)",
+   "measured": "2026-10-12"
+  },
+  "beta": {
+   "value": 0.25,
+   "unit": "weight",
+   "source": "pipeline/vq-vae/model.py",
+   "measured": "2026-10-12"
+  },
+  "emaStep": {
+   "value": 0.01,
+   "unit": "share",
+   "source": "pipeline/vq-vae/model.py (EMA decay 0.99)",
+   "measured": "2026-10-12"
+  }
+ }
+}

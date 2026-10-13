@@ -129,11 +129,34 @@ Additive: nothing above changes, and every v1 asset stays valid. The full specif
 
 ### Lanes, paths and builds
 
-- **Lanes:** packages work in `site/.work/<name>/site` copies: no symlinks; skip `node_modules`, `.svelte-kit`, `build`, `.work` and `.atlas`; patch the copy's `vite.config.ts` `fs.allow` and **never merge that line back**. A lane changes only its owned paths (design §8).
-- **`ATLAS_SITE`** is the site folder a command runs in (a lane's copy inside a lane). **`ATLAS_ROOT`** is the nearest ancestor of `ATLAS_SITE` that contains `CONTRACTS.md` and `pipeline/`. The CLI passes both to Python. New scripts never use a `../../site` relative path. Node test fixtures live in `site/tests/atlas/`. Python writes assets into `$ATLAS_SITE`.
+- **Lanes:** packages work in `<lanes>/<name>/site` copies (`<lanes>` is `site/.work` unless moved: "Lanes outside the repo" below): no symlinks; skip `node_modules`, `.svelte-kit`, `build`, `.work` and `.atlas`; patch the copy's `vite.config.ts` `fs.allow` and **never merge that line back**. A lane changes only its owned paths (design §8).
+- **`ATLAS_SITE`** is the site folder a command runs in (a lane's copy inside a lane). **`ATLAS_ROOT`** is the `ATLAS_ROOT` environment variable, else the `root` the lane's `lane.json` records, else the nearest ancestor of `ATLAS_SITE` that contains `CONTRACTS.md` and `pipeline/`. The CLI passes both to Python. New scripts never use a `../../site` relative path. Node test fixtures live in `site/tests/atlas/`. Python writes assets into `$ATLAS_SITE`.
 - **`ATLAS_BUILD_DIR`** (read by `svelte.config.js` and `scripts/check-build.ts`; default `build`): lanes and `atlas check` build into `site/.atlas/build-<name>/`. In Git Bash: `MSYS_NO_PATHCONV=1 ATLAS_BUILD_DIR=.atlas/build-x npm run build`, then the same variable for `npm run check:build`. Stop dev servers before a build (on some file systems a running dev server locks files).
 - **Shell budgets in `check:build`:** the sample pages include `/m/tinycnn/` and `/m/tinygpt/` (300 KB gzip each; 298.9 and 298.2 KB at wave 0; 254.8 and 255.3 KB since the prep for wave 2b, "Catalog in page data" below). Every planned `/m/<slug>/` page must stay within its wave-0 shell baseline (110,912 B) + 5 KB. `m/resnet-18` always gates; under `ATLAS_INCLUDE_DRAFTS` the other planned pages only warn.
 - **Git-ignored:** `site/.atlas/` and `site/scripts/atlas/atlas.config.local.json`.
+
+### Lanes outside the repo (2026-10-12)
+
+The repo's drive (exFAT, 1 MiB clusters) filled up with lanes, so lanes may live elsewhere. Additive: a lane in
+`site/.work` works as before, and lanes made there earlier are still found.
+
+- **The lanes folder:** `ATLAS_LANES_DIR` (set but empty: the default), else `"lanesDir"` in the main site's
+  `scripts/atlas/atlas.config.local.json`, else in its `atlas.config.json`, else `site/.work`. A relative path is
+  relative to the main site (`config.ts lanesChoice`). A lane is `<lanes>/<name>/site` with `<lanes>/<name>/lane.json`.
+  `--sync`, `merge` and `lanes --rm` look a lane up in the lanes folder, then in `site/.work`.
+- **`lane.json` (`atlas-lane/1`, additive keys):** `root` (the repo root) and `main` (the main site), absolute POSIX
+  paths, written by `worktree` and added by `worktree --sync` to older lanes. `scripts/atlas/root.ts` and
+  `pipeline/atlas_kit/paths.py` read them: `Roots` adds `laneDir`, `main` and `rootFrom: 'lane'`. The CLI sets
+  `ATLAS_ROOT` for every child of such a lane (node tests, Vite, svelte-check, Python). Git always runs on the main repo.
+- **Packages:** a lane outside the main site resolves `<lanes>/node_modules` by walking up. `atlas lanes --deps` installs
+  it with `npm ci` from copies of the main site's `package.json` (without its scripts) and `package-lock.json` kept in
+  `<lanes>`; it is stale when that lock differs from the main site's (`doctor` and `worktree` warn). Such a lane's
+  `vite.config.ts` gets `server.fs.allow: ['.', '../../node_modules']` (`['.', '../../..']` in `site/.work`).
+- **`atlas lanes`** lists the lanes; `--rm <name>` deletes one and refuses (AK702) while it holds owned changes main
+  does not have.
+- K4: the kit's own test helpers (`src/lib/atlas/process/fixtures/paths.ts` `findRepoRoot` and `repoFile`,
+  `legacy.parity.test.ts`, `scripts/atlas/tests/helpers.ts`) read `ATLAS_ROOT`, else the lane's `lane.json` `root`,
+  else walk up, so plain `node --test` works in a lane outside the repo too.
 
 ### Legacy parity and scripts
 
@@ -311,3 +334,66 @@ renamed or removed. The behaviour that came with it is in DEVKIT.md sections 5-1
 - Not changed (open): the concept types above; the slug `logit-lens` is both a planned model (`models.ts`) and a planned
   concept (`concepts.ts`), so one of them needs a new slug before either becomes a package; `UnitQuery.sub` for local
   ops; `TrainOpt.optimizer` `'adamw'`; assets for `InputAdapter.preprocess`.
+
+### Types revision K4 (DevKit K4, 2026-10-13)
+
+Additive, like revisions 1b, K0, K1 and K2: every object written for the earlier types still type-checks and nothing was
+renamed or removed. The behaviour that came with it is in DEVKIT.md sections 6, 8, 9, 10 and 11, and LOG.md ("K4").
+
+- `explainer.ts`: `manifest.catalog` adds `name?`, `family?` (I18n), `inputs?` (catalog InputKinds) and `mode?`
+  (`'live' | 'precomputed' | 'both'`), so the whole catalog entry comes from the package; `promote --verify` applies it to
+  a copy of the catalog and `--apply` (main tree only) to the catalog files. A concept package's loosely read catalog
+  block adds `title`. The block is not counted as page code.
+- `lesson.ts`: `StepDef.predictAt?(rt, at)` returns the live `options`, `answer` and `explain` of the step's predict
+  question, merged over `predict` (StageHost; lint checks it on every fixture); `CompiledStep.predictAt?` carries it.
+  `StepDef.lint?: { same?: string[] }`: placeholders AK410 stays quiet about.
+- `runtime.ts`: `Preprocessed.names?: I18n[]` (bilingual names of the input positions, preferred to `tokens` by the kit
+  views in the page language); `ExplainerRuntime.presets?` (the runtime always filled it).
+- `train.ts`: `TrainerDef.project?(m, opt)`: a constraint after every optimizer step; fine `update` frames carry
+  `metrics.projected = 1`; the Python twin may define `project(model, cfg)` (`atlas_kit.train_reference`).
+- Kit code, not types: autograd `clamp`, `minimum`, `maximum`; `lastParams(rt, source)` in `train/helpers.ts`; the
+  narration formats `pct2` and `sci`; view props `tokens`/`keys` (strings or I18n), `axisWords`, `axisItems`, `digits`,
+  `labels` (zoom.softmax), loss-curve `xLabel` and `lowest`; the kit part `kit.parts/Cells.svelte`, the
+  `kit.parts/refocus.ts` action and the `atlas-answer` class.
+- Lanes: a model lane owns `notes/review-<slug>.md` (`worktree --sync` adds it to an older `lane.json`); e2e shots of a
+  lane outside the repo go to `<lane folder>/shots/<slug>/`.
+- Not changed (open): `UnitQuery.sub` for local ops; several optimizer updates per batch (`TrainerDef.round`); a second
+  source for narration vars; links in narration; `TrainOpt.optimizer` `'adamw'`; assets for `InputAdapter.preprocess`.
+
+### Types revision R1, wave F (the redesign's foundation, 2026-10-13)
+
+Additive, like the earlier revisions: every package compiles unchanged and nothing was renamed or removed from the types.
+The rest of R1 (the lesson app: `WalkStep` chapters, why, provenance and refs, the Walkthrough's new props,
+`LessonDef.chapters`/`recap`, `StepDef.why`/`refs`, `StageProps.density`, the page shells as view hosts) comes with wave
+W2. The design is the redesign spec (LOG.md "Redesign F" names where it lives).
+
+- `explainer.ts`: `manifest.page.poster?: { step }` (the step whose stage is the catalog thumbnail; default: the first
+  step with a figure) and `manifest.page.cover?: { view; source? }` (the cover's stage). `manifest.catalog` adds
+  `short?` (a station name of at most 24 characters) and `lesson?: { minutes? }`; `catalog.hook` is now copied for
+  concepts too (`promote` copies `short` for both kinds and `hook` for concepts).
+- `catalog/types.ts`: `ModelEntry.short?`, `ConceptEntry.hook?` and `short?`, `LessonInfo.minutes?`. `check:catalog`
+  warns on hooks over 100 English or 50 Chinese characters, live concepts without a hook and short names over 24
+  characters (gates after the content wave).
+- Glossary: `src/lib/catalog/glossary-names.ts` is generated from `glossary.ts` by `scripts/gen-glossary-names.ts`
+  (`promote --apply` regenerates it, `check:catalog` fails when it is stale). `<Term>` renders names from it and imports
+  `glossary.ts` on the first hover, focus or tap. `catalog/index.ts` no longer re-exports `GLOSSARY` and
+  `GLOSSARY_BY_ID`; only `/glossary/`, scripts and tests import `glossary.ts` (`check:build` fails a shell that carries
+  the definitions).
+- View registry (`atlas/ui/registry.ts`): kit metas stay eager; package metas load per package with
+  `prepareViews(slug)` (and `viewsPrepared(slug)`), which `loadPackage(slug)` awaits, so `hasView`, `viewMeta` and
+  `loadView` stay synchronous for every caller that has its package. A package view key is registered only once its
+  package is loaded. AK507 (a check gate and a `check:atlas` test): a view's `meta.ts` imports no Svelte module and no
+  other package's code.
+- i18n: `strings.ts` exports `LESSON_UI` and `CATALOG_UI` beside `UI`; `lui(key)` and `cui(key)` read them
+  (tree-shaken where unused). Every key the lesson app and the catalog pages name is there, so lanes need not edit
+  `strings.ts`; 16 `UI` keys nothing used were removed.
+- Root layout: a page whose load returns `{ chrome: 'lesson' }` renders without the site header and footer; it brings
+  its own skip link, top bar, `<main id="main">` and controls.
+- The lesson app's layout contract for e2e: its root element carries `data-lesson-mode="app"` (960 x 600 and up: the
+  document is one window tall) or `"flow"` (AK605). e2e takes exact windows (`1280x680-en-light`), the `layout` preset,
+  and `--build <dir>` (a static server on a built site, where AK606 measures the JS a lesson loads: a warning over
+  400 KB gzip now, a gate after wave M).
+- Kit components: `Tooltip` gets `onopen`; new `Icon` + `icons.ts` (named exports), `Mark`, `Sheet`, `Popover`,
+  `catalog/SearchPalette` (a stub until W1); `LangToggle` gets `variant`. `ProvenanceBadge` keeps its API and the
+  `badge` class (AK502 looks for `.stage .badge`) in its new label look.
+- New CLI: `atlas thumbs` (4 webp sprites and `static/thumbs/index.json`).

@@ -90,9 +90,10 @@ export async function portFree(port: number): Promise<boolean> {
 
 /** A free port: `preferred` when it is free, else the first port from 5210 up that is free right now and that no table
  *  row or other package's notes claim. */
-export async function pickPort(o: { preferred?: number | null; slug?: string; root?: string | null } = {}): Promise<number> {
-	if (o.preferred && (await portFree(o.preferred))) return o.preferred;
+export async function pickPort(o: { preferred?: number | null; slug?: string; root?: string | null; exclude?: number[] } = {}): Promise<number> {
+	if (o.preferred && !o.exclude?.includes(o.preferred) && (await portFree(o.preferred))) return o.preferred;
 	const used = claimedPorts(o.root ?? null, o.slug);
+	for (const p of o.exclude ?? []) used.add(p);
 	if (o.preferred) used.add(o.preferred);
 	for (let p = FIRST_FREE_PORT; p < FIRST_FREE_PORT + 400; p++) if (!used.has(p) && (await portFree(p))) return p;
 	throw new Error(`no free port from ${FIRST_FREE_PORT} to ${FIRST_FREE_PORT + 399}`);

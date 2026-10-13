@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "sasrec",
+ "checked": "2026-10-07",
+ "sources": {
+  "inbatch": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 1.11e-16,
+   "frames": 3,
+   "fixtures": 0,
+   "checked": "2026-10-07"
+  }
+ }
+}

@@ -299,7 +299,7 @@
 		stroke: var(--rule);
 	}
 	.ax {
-		font-size: 8.5px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		font-family: var(--font-mono);
 	}
@@ -369,7 +369,7 @@
 	.cm table {
 		border-collapse: separate;
 		border-spacing: 2px;
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.cm th {
 		font-family: var(--font-body);
@@ -472,7 +472,7 @@
 	@media (max-width: 560px) {
 		.ptable th:nth-child(2),
 		.ptable td:nth-child(2) {
-			font-size: 11px;
+			font-size: var(--t-xs);
 		}
 		.share {
 			display: none !important;

@@ -1,0 +1,25 @@
+{
+ "params": 43435,
+ "epochs": 40,
+ "best_epoch": 32,
+ "batch": 256,
+ "lr": 0.003,
+ "optimizer": "AdamW (weight decay 1e-4), cosine decay, clip 1.0",
+ "train_words": 80000,
+ "val_acc": 0.9765,
+ "val_ctc": 0.019002421759068966,
+ "test_acc": 0.9985714285714286,
+ "test_ctc": 0.000876067002536729,
+ "test_words": 7000,
+ "wild_acc": 0.8775714285714286,
+ "test_acc_by_length": {
+  "1": 1.0,
+  "2": 1.0,
+  "3": 1.0,
+  "4": 0.998,
+  "5": 0.999,
+  "6": 0.995,
+  "7": 0.998
+ },
+ "seconds": 97
+}

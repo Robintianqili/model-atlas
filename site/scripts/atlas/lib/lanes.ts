@@ -1,7 +1,12 @@
-// Lanes (design §6.4): parallel copies of the site at site/.work/<name>/site, each owning a set of paths.
+// Lanes (design §6.4): parallel copies of the site at <lanes>/<name>/site, each owning a set of paths. The lanes folder is
+// site/.work by default; ATLAS_LANES_DIR or "lanesDir" in atlas.config(.local).json moves it, for example to another
+// drive (config.ts lanesChoice).
 //
-// site/.work/<name>/lane.json (atlas-lane/1, written by `atlas worktree`, never inside the lane's site folder):
-//   { format, name, created, synced, owns: [root-relative globs], snapshot: { <site-relative path>: sha256 } }
+// <lanes>/<name>/lane.json (atlas-lane/1, written by `atlas worktree`, never inside the lane's site folder):
+//   { format, name, created, synced, merged, root, main, rev, owns: [root-relative globs],
+//     snapshot: { <site-relative path>: sha256 } }
+// root and main: the repo root (ATLAS_ROOT) and the main site the lane merges into, as absolute POSIX paths, so a lane
+// outside the repo finds them (root.ts). rev: the commit a --from-git lane was made or last synced from.
 // The snapshot holds the main tree's content hash of every file at the moment it was copied (or last synced/merged),
 // so `merge` and `--sync` can tell what the LANE changed from what MAIN changed since.
 // Globs are root-relative ('site/src/lib/explainers/tinyvit/**', 'pipeline/tinyvit/**', 'notes/tinyvit.md'):
@@ -12,6 +17,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import type { LanesChoice } from '../config.ts';
 
 export const LANE_FORMAT = 'atlas-lane/1';
 
@@ -29,6 +35,10 @@ export interface LaneFile {
 	created: string;
 	synced?: string;
 	merged?: string;
+	/** the repo root, absolute POSIX (since lanes may live outside the repo; older lanes have none) */
+	root?: string;
+	/** the main site the lane merges into, absolute POSIX */
+	main?: string;
 	owns: string[];
 	snapshot: Record<string, string>;
 }
@@ -81,9 +91,17 @@ export const KNOWN_LANES: Record<string, string[]> = {
 	k0: ['site/src/lib/atlas/**', 'site/scripts/atlas/**', 'pipeline/atlas_kit/**', 'notes/devkit-k0.md']
 };
 
-/** The common ownership of a model package (design §8.3). */
+/** The common ownership of a model package (design §8.3). K4: with the reviewer's packet notes/review-<slug>.md, which
+ *  `atlas review` writes in the main tree (merge --dry-run lists it with the other paths edited in place). */
 export function modelOwns(slug: string): string[] {
-	return [`pipeline/${slug}/**`, `site/src/lib/explainers/${slug}/**`, `site/static/models/${slug}/**`, `notes/${slug}.md`, `notes/shots/${slug}/**`];
+	return [`pipeline/${slug}/**`, `site/src/lib/explainers/${slug}/**`, `site/static/models/${slug}/**`, `notes/${slug}.md`, `notes/review-${slug}.md`, `notes/shots/${slug}/**`];
+}
+
+/** K4: a lane.json written before K4 owns notes/<slug>.md but not the review packet: the owned paths with it added
+ *  (worktree --sync writes them back; merge and ownership read them). Other lists are returned as they are. */
+export function withReview(owns: string[], name: string): string[] {
+	const review = `notes/review-${name}.md`;
+	return owns.includes(`notes/${name}.md`) && !owns.includes(review) ? [...owns.slice(0, owns.indexOf(`notes/${name}.md`) + 1), review, ...owns.slice(owns.indexOf(`notes/${name}.md`) + 1)] : owns;
 }
 
 function expandBraces(p: string): string[] {
@@ -141,22 +159,31 @@ export function siteFiles(site: string, rel = ''): string[] {
 	return out;
 }
 
-// The lane's vite.config.ts (idempotent): the lane-only `allow: ['.', '../../..']` in server.fs, and no .work pattern in
-// server.watch.ignored. A lane lives under site/.work/<name>/site, so main's pattern matched every file of the lane and its
-// dev server never saw an edit (K0); a lane has no .work folder of its own.
-export function patchViteConfig(text: string): { text: string; patched: boolean } {
-	const r = patchFsAllow(text);
+/** server.fs.allow of a lane in site/.work/<name>/site: the lane and the main site (its node_modules). */
+export const ALLOW_IN_MAIN = ['.', '../../..'];
+/** server.fs.allow of a lane outside the main site (<lanes>/<name>/site): the lane and the node_modules the lanes share
+ *  (<lanes>/node_modules, `atlas lanes --deps`). Nothing else of the repo is served to the browser. */
+export const ALLOW_OUTSIDE = ['.', '../../node_modules'];
+
+// The lane's vite.config.ts (idempotent): the lane-only `allow` in server.fs (ALLOW_IN_MAIN, or ALLOW_OUTSIDE for a lane
+// outside the main site), and no .work pattern in server.watch.ignored. A lane in site/.work/<name>/site matched main's
+// pattern with every file, so its dev server never saw an edit (K0); a lane has no .work folder of its own.
+export function patchViteConfig(text: string, allow: string[] = ALLOW_IN_MAIN): { text: string; patched: boolean } {
+	const r = patchFsAllow(text, allow);
 	const t = r.text.replace(/(['"])\*\*\/\.work\/\*\*\1\s*,\s*/g, '').replace(/,\s*(['"])\*\*\/\.work\/\*\*\1/g, '');
 	return { text: t, patched: r.patched };
 }
 
-function patchFsAllow(text: string): { text: string; patched: boolean } {
-	if (/allow:\s*\[\s*'\.'\s*,\s*'\.\.\/\.\.\/\.\.'\s*\]/.test(text)) return { text, patched: true };
+function patchFsAllow(text: string, allow: string[]): { text: string; patched: boolean } {
+	const list = '[' + allow.map((a) => `'${a}'`).join(', ') + ']';
+	const esc = (s: string) => s.replace(/[.*+?^$(){}|[\]\\/]/g, '\\$&');
+	const done = new RegExp('allow:\\s*\\[\\s*' + allow.map((a) => esc(`'${a}'`)).join('\\s*,\\s*') + '\\s*\\]');
+	if (done.test(text)) return { text, patched: true };
 	const strict = /(\n([ \t]*)strict:\s*true)(\s*\n)/;
 	let m = strict.exec(text);
-	if (m) return { text: text.replace(strict, `$1,\n$2allow: ['.', '../../..']$3`), patched: true };
+	if (m) return { text: text.replace(strict, (_all, a: string, ind: string, b: string) => `${a},\n${ind}allow: ${list}${b}`), patched: true };
 	m = /(\n([ \t]*)fs:\s*\{)/.exec(text);
-	if (m) return { text: text.replace(/(\n([ \t]*)fs:\s*\{)/, `$1\n$2\tallow: ['.', '../../..'],`), patched: true };
+	if (m) return { text: text.replace(/(\n([ \t]*)fs:\s*\{)/, (_all, a: string, ind: string) => `${a}\n${ind}\tallow: ${list},`), patched: true };
 	return { text, patched: false };
 }
 
@@ -216,7 +243,7 @@ export interface LaneScan {
  *  lane.json. */
 export async function scanLane(main: string, lane: string, laneJson: string, fallbackOwns: string[]): Promise<LaneScan> {
 	const lf = existsSync(laneJson) ? (JSON.parse(readFileSync(laneJson, 'utf8').replace(/^﻿/, '')) as LaneFile) : null;
-	const ownsList = lf?.owns ?? fallbackOwns;
+	const ownsList = lf ? withReview(lf.owns, lf.name) : fallbackOwns;
 	const owns = matcher(ownsList);
 	const [mf, lfiles] = await Promise.all([filesAsync(main), filesAsync(lane)]);
 	const [hm, hl] = await Promise.all([hashAll(main, mf), hashAll(lane, lfiles)]);
@@ -233,4 +260,31 @@ export async function scanLane(main: string, lane: string, laneJson: string, fal
 		else res.copy.push(rel);
 	}
 	return res;
+}
+
+// ------------------------------------------------------------------ the node_modules that lanes outside the main site share
+export interface DepsState {
+	/** false: the lanes live inside the main site and resolve its node_modules */
+	shared: boolean;
+	/** the node_modules folder the lanes resolve */
+	dir: string;
+	ok: boolean;
+	/** 'up to date', 'not installed', 'stale (...)' */
+	why: string;
+}
+
+/** The state of the lanes' packages. Lanes outside the main site share <lanes>/node_modules, installed by
+ *  `atlas lanes --deps` with `npm ci` from a copy of the main site's package.json and package-lock.json kept next to it:
+ *  it is up to date while that copy of the lock equals the main site's lock. */
+export function depsState(lanes: LanesChoice, main: string): DepsState {
+	if (!lanes.outside) {
+		const ok = existsSync(join(lanes.deps, 'vite', 'package.json'));
+		return { shared: false, dir: lanes.deps, ok, why: ok ? "the main site's node_modules" : 'not installed (npm ci in the main site)' };
+	}
+	if (!existsSync(join(lanes.deps, '.package-lock.json'))) return { shared: true, dir: lanes.deps, ok: false, why: 'not installed' };
+	const mine = join(lanes.dir, 'package-lock.json');
+	const want = join(main, 'package-lock.json');
+	if (!existsSync(want)) return { shared: true, dir: lanes.deps, ok: true, why: 'installed (the main site has no package-lock.json to compare)' };
+	if (!existsSync(mine) || sha256(mine) !== sha256(want)) return { shared: true, dir: lanes.deps, ok: false, why: "stale (the main site's package-lock.json changed since the install)" };
+	return { shared: true, dir: lanes.deps, ok: true, why: "up to date with the main site's package-lock.json" };
 }

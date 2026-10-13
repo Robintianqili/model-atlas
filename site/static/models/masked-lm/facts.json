@@ -1,0 +1,101 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "maskRate": {
+   "value": 0.15,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "maskShare": {
+   "value": 0.8,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "randomShare": {
+   "value": 0.1,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "keepShare": {
+   "value": 0.1,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "valLoss": {
+   "value": 1.140282517572959,
+   "unit": "nats",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "valN": {
+   "value": 325140,
+   "unit": "tokens",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "valAcc": {
+   "value": 0.7241003875253736,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "valAccMasked": {
+   "value": 0.7043296320370463,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "accBoth": {
+   "value": 0.7536,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "accLeft": {
+   "value": 0.3785,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "accGpt": {
+   "value": 0.4982,
+   "unit": "share",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "cmpN": {
+   "value": 20000,
+   "unit": "tokens",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/stats.py (TinyStories validation split, GPU float32, TF32 off))",
+   "measured": "2026-10-06"
+  },
+  "steps": {
+   "value": 40000,
+   "unit": "steps",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "batch": {
+   "value": 512,
+   "unit": "examples",
+   "source": "static/models/tinybert/facts.json (pipeline/tinybert/train.py + data.py)",
+   "measured": "2026-10-06"
+  },
+  "gptValLoss": {
+   "value": 1.9189,
+   "unit": "nats",
+   "source": "static/models/tinygpt/spec.json training.metrics (pipeline/tinygpt; TinyStories validation split)",
+   "measured": "2026-10-06"
+  },
+  "context": {
+   "value": 61,
+   "unit": "tokens",
+   "source": "pipeline/tinybert/data.py N_MAX (64 positions minus [CLS] and two [SEP])",
+   "measured": "2026-10-13"
+  }
+ }
+}

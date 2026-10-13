@@ -1,16 +1,20 @@
 // atlas review <slug> [--fixtures a,b,c]   (design §4.12, §6.4)
 // Writes notes/review-<slug>.md, the teaching reviewer's packet:
 //   - the 10-item checklist of design §6.4 (ticks and the "Reviewer notes" section survive a re-run)
-//   - the gate summary from the last `atlas check` (.atlas/<slug>/check.json), or a fresh `check --fast`
-//   - the e2e contact sheets, lesson print and axe summary (notes/shots/<slug>/contact/, K2), then the screenshot list
+//   - the gate summary from the last `atlas check` (.atlas/<slug>/check.json), or a fresh `check --fast`; K4: it says
+//     which mode that check ran in and which gates it did not run (a --quick or --fast check skips site and e2e)
+//   - K4: the catalog patch `promote --dry-run` prints (the entry's fields from manifest.catalog, the tech-zh and glossary
+//     rows, the checks by hand): the reviewer edits manifest.catalog, not the packet, and `promote --verify` checks it
+//   - the e2e contact sheets, lesson print and axe summary (shotsDir: notes/shots/<slug>/, or the lane folder's shots/ for
+//     a lane outside the repo, K4), then the screenshot list
 //   - every step's narration resolved on 3 inputs (presets first, then lesson and edge fixtures), in en and zh
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import type { Narration } from '../../../src/lib/atlas/types/index.ts';
 import { AtlasError } from '../errors.ts';
 import { posix, readJson, writeText } from '../lib/io.ts';
 import { openPackage, today } from '../lib/pkg.ts';
-import { roots } from '../root.ts';
+import { roots, shotsDir as shotsFolder } from '../root.ts';
 import type { Gate } from './check.ts';
 
 export const CHECKLIST = [
@@ -50,9 +54,10 @@ export async function main(args: string[]): Promise<number> {
 	let checked = '';
 	const cj = join(r.site, '.atlas', slug, 'check.json');
 	if (existsSync(cj)) {
-		const j = readJson<{ gates: Gate[]; checked?: string }>(cj);
+		const j = readJson<{ gates: Gate[]; checked?: string; mode?: string }>(cj);
 		gates = j.gates;
-		checked = j.checked ?? '';
+		const skipped = j.gates.filter((g) => g.status === 'skip').map((g) => g.name);
+		checked = `the ${j.mode ? `${j.mode} ` : ''}check of ${(j.checked ?? '').slice(0, 16).replace('T', ' ')}${skipped.length ? ` (not run: ${skipped.join(', ')}; the full check runs every gate)` : ''}`;
 	} else {
 		const { checkPackage } = await import('./check.ts');
 		const res = await checkPackage(slug, { fast: true });
@@ -83,7 +88,24 @@ export async function main(args: string[]): Promise<number> {
 		rt.close?.();
 	}
 
-	const shotsDir = join(r.root, 'notes', 'shots', slug);
+	const shotsDir = shotsFolder(slug, r);
+	const shotsRel = posix(relative(r.root, shotsDir));
+	// K4: the catalog patch, as promote --dry-run prints it (nothing is written)
+	let catalog = '';
+	try {
+		const { planPromote } = await import('./promote.ts');
+		const plan = await planPromote(slug);
+		catalog = [
+			`What \`npm run atlas -- promote ${slug} --dry-run\` prints today. The entry's fields come from \`manifest.catalog\` in explainer.ts (name, family, inputs, mode, hook, shows, runtime, params, size; a concept: title, interaction, engine, mode, links): change them there, then \`promote ${slug} --verify\` applies the patch to a copy of the catalog and runs check:catalog.`,
+			'',
+			'```ts',
+			plan.patch.trimEnd(),
+			'```',
+			...(plan.notes.length ? ['', 'Check by hand:', ...plan.notes.map((n) => `- ${cell(n)}`)] : [])
+		].join('\n');
+	} catch (e) {
+		catalog = `No patch: ${(e as Error).message.split('\n')[0]}`;
+	}
 	const shots = existsSync(shotsDir) ? readdirSync(shotsDir).filter((f) => /\.(png|jpe?g|webp)$/i.test(f)).sort() : [];
 	// K2: the e2e contact sheets, the lesson print and the axe summary come first in the packet
 	const contactDir = join(shotsDir, 'contact');
@@ -116,20 +138,24 @@ export async function main(args: string[]): Promise<number> {
 		'',
 		...(gates ?? []).flatMap((g) => g.issues.map((i) => `- ${i.code} (${i.level}) [${g.name}] ${cell(i.message)}`)),
 		'',
+		'## Catalog patch',
+		'',
+		catalog,
+		'',
 		'## Contact sheets',
 		'',
 		contact.length
 			? [
 					"From the last `atlas e2e` (or full check): one sheet per pass with every step, the lesson print (each step's title, narration and numbers per language) and the accessibility scans. Read these first; then click only where they raise a question.",
 					'',
-					...contact.map((s) => `- notes/shots/${slug}/contact/${s}`),
+					...contact.map((s) => `- ${shotsRel}/contact/${s}`),
 					...(axeSummary.length ? ['', 'axe (contact/axe.txt):', ...axeSummary.map((l) => `- ${cell(l)}`)] : [])
 				].join('\n')
-			: `None yet: run \`npm run atlas -- e2e ${slug}\` (it writes notes/shots/${slug}/contact/).`,
+			: `None yet: run \`npm run atlas -- e2e ${slug}\` (it writes ${shotsRel}/contact/).`,
 		'',
 		'## Screenshots',
 		'',
-		shots.length ? shots.map((s) => `- notes/shots/${slug}/${s}`).join('\n') : `None yet: run \`npm run atlas -- e2e ${slug}\`.`,
+		shots.length ? shots.map((s) => `- ${shotsRel}/${s}`).join('\n') : `None yet: run \`npm run atlas -- e2e ${slug}\`.`,
 		'',
 		`## Narration on ${Math.min(3, pick.length || 1)} inputs`,
 		'',

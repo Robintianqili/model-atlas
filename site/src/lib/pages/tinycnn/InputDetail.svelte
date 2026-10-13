@@ -58,7 +58,7 @@
 			<Num value={v} />
 		</p>
 		{#if compact}
-			<NumGrid values={patch} rows={5} cols={5} kind="sequential" domain={[0, 1]} {mark} cell={40} label={t({ en: 'The 5×5 block around it (dashed box)', zh: '它周围的 5×5 区块（虚线框）' })} />
+			<NumGrid values={patch} rows={5} cols={5} kind="sequential" domain={[0, 1]} {mark} cell={48} label={t({ en: 'The 5×5 block around it (dashed box)', zh: '它周围的 5×5 区块（虚线框）' })} />
 			<p class="muted">
 				{t({
 					en: `${inked} of the 784 numbers are above 0 (ink); the other ${784 - inked} are exactly 0 (blank paper).`,

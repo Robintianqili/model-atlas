@@ -1,607 +1,366 @@
+<!--
+  Home (redesign spec §6.3; mockup final/home.html): the hero with the answer-first preview of a real TinyCNN run, four
+  lessons to start with, the learning paths as route lines (id="paths": the header's Paths link), the areas with their
+  live/planned meters and the training methods. Everything shown comes from the build-time index (+page.server.ts).
+-->
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
-	import DrawPad from '$lib/kit/DrawPad.svelte';
-	import TextInputBar from '$lib/kit/TextInputBar.svelte';
-	import ModelCard from '$lib/kit/ModelCard.svelte';
-	import ConceptCard from '$lib/kit/ConceptCard.svelte';
-	import StatusBadge from '$lib/kit/StatusBadge.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
-	import InputIcon from '$lib/kit/InputIcon.svelte';
-	import { saveHandoff } from '$lib/kit/handoff';
-	import { makeScale } from '$lib/kit/color';
-	import { themeState } from '$lib/kit/theme.svelte';
-	import { fmtShape } from '$lib/kit/format';
-	import type { Stroke } from '$lib/kit/draw';
-	import { AREAS } from '$lib/catalog/areas';
-	import { MODELS, MODEL_BY_SLUG } from '$lib/catalog/models';
-	import { CONCEPTS, CONCEPT_BY_SLUG } from '$lib/catalog/concepts';
-	import { PATHS } from '$lib/catalog/paths';
-	import { modelsAccepting } from '$lib/catalog';
-	import type { InputKind, ModelEntry } from '$lib/catalog/types';
-	import { defaultInput, demoForward } from '$lib/demo/cnn-demo';
-	import { t, ui } from '$lib/i18n/i18n.svelte';
+	import Icon from '$lib/kit/Icon.svelte';
+	import HeroPreview from '$lib/kit/catalog/HeroPreview.svelte';
+	import LessonCard from '$lib/kit/catalog/LessonCard.svelte';
+	import PathLine from '$lib/kit/catalog/PathLine.svelte';
+	import AreaTile from '$lib/kit/catalog/AreaTile.svelte';
+	import SectionChip from '$lib/kit/catalog/SectionChip.svelte';
+	import { arrow, right, draw, type, points, game, graph } from '$lib/kit/catalog/glyphs';
+	import { t, ui, i18n } from '$lib/i18n/i18n.svelte';
+	import { ct } from '$lib/kit/catalog/text';
+	import type { I18n } from '$lib/i18n/types';
+	import type { InputBucket } from '$lib/kit/catalog/types';
+	import type { PageProps } from './$types';
 
-	const liveModels = MODELS.filter((m) => m.status === 'live');
-	const liveConcepts = CONCEPTS.filter((c) => c.status === 'live');
-	const plannedModels = MODELS.length - liveModels.length;
-	const plannedConcepts = CONCEPTS.length - liveConcepts.length;
-	// the first call to action: the guided lessons of the live pages (catalog `lesson`; pages without one
-	// yet link to their top)
-	const lessons = [
-		...liveModels.map((m) => ({ slug: m.slug, name: m.name, href: `/m/${m.slug}/`, lesson: m.lesson })),
-		...liveConcepts.map((c) => ({ slug: c.slug, name: c.title, href: `/train/${c.slug}/`, lesson: c.lesson }))
-	];
-	const liveSpecs = $derived(
-		(page.data as { liveSpecs?: Record<string, { input?: { shape: number[] } }> }).liveSpecs ?? {}
-	);
+	let { data }: PageProps = $props();
 
-	// ---------------------------------------------------------------- input launcher
-	let mode = $state<'drawing' | 'text'>('drawing');
-	let strokes = $state<Stroke[]>([]);
-	let text = $state('');
-	const accepting = $derived(modelsAccepting(mode as InputKind));
-	const hasInput = $derived(mode === 'drawing' ? strokes.length > 0 : text.trim().length > 0);
+	const c = $derived(data.counts);
+	const nameOf = (slug: string) => data.groups.find((g) => g.slug === slug)?.name;
+	const areas = $derived(data.groups.filter((g) => g.kind === 'model'));
+	const sections = $derived(data.groups.filter((g) => g.kind === 'concept'));
+	const quiet = $derived(sections.filter((g) => !g.live));
+	const first = $derived(data.start[0]);
+	const under10 = $derived(data.start.length > 0 && data.start.every((l) => l.minutes < 10));
+	const WORDS = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+	const ZH = ['', '一', '两', '三', '四', '五', '六'];
+	const nStart = $derived(data.start.length);
 
-	function sees(m: ModelEntry): string {
-		const shape = liveSpecs[m.slug]?.input?.shape;
-		return shape ? fmtShape(shape) : '';
-	}
-	function open(m: ModelEntry) {
-		if (hasInput) saveHandoff(mode === 'drawing' ? { kind: 'drawing', strokes } : { kind: 'text', text });
-		goto(`${base}/m/${m.slug}/`);
-	}
-
-	// ---------------------------------------------------------------- hero art (decorative)
-	const art = demoForward(defaultInput());
-	const seq = $derived(makeScale('sequential', [0, 1], themeState.resolved));
-	const div = $derived(makeScale('diverging', [-2, 2], themeState.resolved));
-	const relu = art.t.relu.data;
-	const pool = art.t.pool.data;
-	const probs = art.t.probs.data;
-	const maxP = Math.max(...probs);
-
-	const counts = (slug: string) => {
-		const ms = MODELS.filter((m) => m.area === slug);
-		return { total: ms.length, live: ms.filter((m) => m.status === 'live').length };
+	const BUCKET: Record<InputBucket, { d: string; label: I18n }> = {
+		draw: { d: draw, label: { en: 'Draw', zh: '画' } },
+		type: { d: type, label: { en: 'Type', zh: '打字' } },
+		points: { d: points, label: { en: 'Points and series', zh: '点与序列' } },
+		play: { d: game, label: { en: 'Play', zh: '游戏' } },
+		graphs: { d: graph, label: { en: 'Graphs and ratings', zh: '图与评分' } }
 	};
 </script>
 
 <svelte:head>
-	<title>Model Atlas · {t({ en: 'see every layer work', zh: '模型图鉴' })}</title>
+	<title>Model Atlas · {t({ en: 'Follow every number', zh: '模型图鉴' })}</title>
 </svelte:head>
 
-<!-- ================================================================== hero -->
-<section class="hero">
-	<div class="container hero-inner">
+<div class="container home">
+	<section class="hero" aria-labelledby="hero-h">
 		<div class="copy">
-			<p class="eyebrow">Model Atlas · <span lang="zh-CN">模型图鉴</span></p>
-			<h1>{t({ en: 'Give a model your own input. Watch every layer work.', zh: '给模型你自己的输入，看每一层如何工作。' })}</h1>
+			<p class="kick">
+				<span><b>{c.lessons}</b> {t({ en: 'step-by-step lessons', zh: '节分步课程' })}</span>
+				<span><b>{c.models}</b> {t({ en: 'models', zh: '个模型' })}</span>
+				<span><b>{c.methods}</b> {t({ en: 'training methods', zh: '种训练方法' })}</span>
+			</p>
+			<h1 id="hero-h">
+				{#if i18n.lang === 'zh'}给模型你的输入，<span class="band">跟着每一个数走。</span>{:else}Give a model your input. <span class="band">Follow every number.</span>{/if}
+			</h1>
 			<p class="lede">
 				{t({
-					en: 'Draw a picture or type a sentence, then follow it through a real neural network, one layer at a time, with the actual numbers. Everything runs in your browser; nothing you draw or type leaves your device.',
-					zh: '画一幅画或输入一句话，然后跟着它一层一层穿过真实的神经网络，看到真实的数字。一切都在你的浏览器中运行；你画的和写的都不会离开你的设备。'
+					en: 'Short, guided lessons on how neural networks and their training work. The numbers on the screen come from real models, most of them computed in your browser from what you draw or type.',
+					zh: '短小的分步课程，讲神经网络和它们的训练怎样工作。屏幕上的数都来自真实的模型，大多数就在你的浏览器里，由你画的、写的内容算出。'
 				})}
 			</p>
-			<p class="stats">
-				<span class="big num">{liveModels.length + liveConcepts.length}</span>
-				{t({ en: 'pages live now', zh: '个页面已上线' })}
-				<span class="sep">·</span>
-				<span class="big num">{plannedModels}</span>
-				{t({ en: 'more models planned across', zh: '个模型在计划中，覆盖' })}
-				<span class="big num">{AREAS.length}</span>
-				{t({ en: 'areas', zh: '个领域' })}
-				<span class="sep">·</span>
-				<span class="big num">{plannedConcepts}</span>
-				{t({ en: 'training concepts planned', zh: '个训练概念在计划中' })}
-			</p>
-			<nav class="lessons" aria-labelledby="lessons-h">
-				<h2 id="lessons-h" class="lt">{ui('lessonHomeTitle')}</h2>
-				<ul>
-					{#each lessons as l, i (l.slug)}
-						<li>
-							<a class="btn" class:primary={i === 0} href="{base}{l.href}{l.lesson ? '#lesson' : ''}">
-								{#if l.lesson}<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4.5 2.8v10.4L13 8z" fill="currentColor" /></svg>{/if}
-								{t(l.name)}{#if l.lesson}<span class="ls num">{ui('lessonSteps', { n: l.lesson.steps })}</span>{/if}
-							</a>
-						</li>
-					{/each}
-				</ul>
-				<a class="more" href="{base}/atlas/">{ui('browseAtlas')} →</a>
-			</nav>
-		</div>
-		<figure class="art">
-			<!-- the picture is decoration; the caption (badge + text) stays readable (its badge is focusable) -->
-			<svg viewBox="0 0 360 250" width="100%" aria-hidden="true">
-				<defs>
-					<pattern id="dash" width="8" height="2" patternUnits="userSpaceOnUse"><rect width="5" height="2" fill="var(--ink-2)" /></pattern>
-				</defs>
-				<!-- input 12×12 -->
-				{#each Array.from({ length: 144 }, (_, i) => i) as i (i)}
-					<rect x={10 + (i % 12) * 8} y={40 + Math.floor(i / 12) * 8} width="7" height="7" rx="1" fill={seq.css(art.t.input.data[i])} />
-				{/each}
-				<!-- relu tiles 4×10×10 -->
-				{#each [0, 1, 2, 3] as c (c)}
-					{#each Array.from({ length: 100 }, (_, i) => i) as i (i)}
-						<rect x={136 + (c % 2) * 52 + (i % 10) * 5} y={22 + Math.floor(c / 2) * 62 + Math.floor(i / 10) * 5} width="4.4" height="4.4" fill={div.css(relu[c * 100 + i])} />
-					{/each}
-				{/each}
-				<!-- pooled 4×5×5 -->
-				{#each [0, 1, 2, 3] as c (c)}
-					{#each Array.from({ length: 25 }, (_, i) => i) as i (i)}
-						<rect x={258 + (i % 5) * 7} y={30 + c * 44 + Math.floor(i / 5) * 7} width="6" height="6" rx="1" fill={div.css(pool[c * 25 + i])} />
-					{/each}
-				{/each}
-				<!-- output bars -->
-				{#each Array.from(probs) as p, i (i)}
-					<rect x="310" y={30 + i * 17} width={Math.max(2, (p / maxP) * 44)} height="11" rx="2" fill={seq.css(0.25 + (0.75 * p) / maxP)} />
-				{/each}
-				<rect class="flow" x="110" y="87" width="22" height="2" fill="url(#dash)" />
-				<rect class="flow" x="240" y="87" width="14" height="2" fill="url(#dash)" />
-				<rect class="flow" x="296" y="87" width="10" height="2" fill="url(#dash)" />
-				<text x="10" y="236" class="lbl">input</text>
-				<text x="136" y="236" class="lbl">conv · relu</text>
-				<text x="258" y="236" class="lbl">pool</text>
-				<text x="310" y="236" class="lbl">p</text>
-			</svg>
-			<figcaption>
-				<ProvenanceBadge mode="illustrative" compact />
-				<span>{t({ en: 'A hand-made filter bank, not a trained model', zh: '手工设计的滤波器组，并非训练好的模型' })}</span>
-			</figcaption>
-		</figure>
-	</div>
-</section>
-
-<!-- ================================================================== launcher -->
-<section class="container block" aria-labelledby="launcher-h">
-	<h2 id="launcher-h">{ui('launcherTitle')}</h2>
-	<p class="muted">{ui('launcherNothingLoaded')}</p>
-	<div class="launcher">
-		<div class="input-side">
-			<div class="segmented" role="tablist" aria-label={ui('input')}>
-				<button type="button" role="tab" aria-selected={mode === 'drawing'} onclick={() => (mode = 'drawing')}>
-					<InputIcon kind="drawing" /> {ui('launcherDraw')}
-				</button>
-				<button type="button" role="tab" aria-selected={mode === 'text'} onclick={() => (mode = 'text')}>
-					<InputIcon kind="text" /> {ui('launcherType')}
-				</button>
-			</div>
-			<div class="pane" role="tabpanel">
-				{#if mode === 'drawing'}
-					<DrawPad bind:strokes size={240} showBrush={false} />
-				{:else}
-					<TextInputBar
-						bind:value={text}
-						maxLength={64}
-						multiline
-						rows={3}
-						presets={[
-							{ text: 'Once upon a time, there was a', label: { en: 'Story opening', zh: '故事开头' } },
-							{ text: '我爱自然语言处理', label: { en: 'Chinese', zh: '中文' } },
-							{ text: 'unbelievable!' }
-						]}
-					/>
+			<div class="cta">
+				{#if first}
+					<a class="btn btn-act" href="{base}{first.href}">
+						{ct('startWith', { name: t(first.title) })}<small>· {ui('lessonSteps', { n: first.steps })}</small><Icon d={arrow} size={18} />
+					</a>
 				{/if}
+				<a class="btn" href="{base}/atlas/">{ct('browseAll', { n: c.lessons })}</a>
 			</div>
-		</div>
-		<div class="results">
-			<h3>{ui('launcherAccepts')} <span class="muted num">({accepting.length})</span></h3>
-			<ul class="acc">
-				{#each accepting as m (m.slug)}
-					<li class:planned={m.status !== 'live'}>
-						<button type="button" class="acc-row" onclick={() => open(m)}>
-							<span class="nm">{t(m.name)}</span>
-							<StatusBadge status={m.status} tier={m.tier} />
-							<span class="sees num">{sees(m) ? `${t({ en: 'sees', zh: '输入' })} ${sees(m)}` : ''}</span>
-							<span class="hk">{t(m.hook)}</span>
-						</button>
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
-</section>
-
-<!-- ================================================================== live now -->
-<section class="container block" aria-labelledby="live-h">
-	<h2 id="live-h">{ui('livePages')}</h2>
-	<div class="cards">
-		{#each liveModels as m (m.slug)}<ModelCard model={m} />{/each}
-		{#each liveConcepts as c (c.slug)}<ConceptCard concept={c} showSection />{/each}
-	</div>
-</section>
-
-<!-- ================================================================== areas -->
-<section class="container block" aria-labelledby="areas-h">
-	<div class="h-row">
-		<h2 id="areas-h">{t({ en: 'Eleven areas', zh: '十一个领域' })}</h2>
-		<a href="{base}/atlas/">{ui('browseAtlas')} →</a>
-	</div>
-	<p class="muted">
-		{t({
-			en: 'The atlas is built to grow: every area has a planned flagship and a backlog of models. Planned pages already exist and say what they will show.',
-			zh: '图鉴为持续扩展而设计：每个领域都有计划中的旗舰模型和后续模型。计划中的页面已经存在，并说明将展示什么。'
-		})}
-	</p>
-	<ol class="areas">
-		{#each AREAS as a (a.slug)}
-			{@const c = counts(a.slug)}
-			<li>
-				<a class="area" href="{base}/atlas/{a.slug}/">
-					<span class="n num">{String(a.n).padStart(2, '0')}</span>
-					<span class="an">{t(a.name)}</span>
-					<span class="ab">{t(a.blurb)}</span>
-					<span class="ac num">
-						{ui('countModels', { n: c.total })}{#if c.live}{' · '}<span class="live">{ui('countLive', { n: c.live })}</span>{/if}
-					</span>
-				</a>
-			</li>
-		{/each}
-	</ol>
-</section>
-
-<!-- ================================================================== paths -->
-<section class="container block" aria-labelledby="paths-h">
-	<h2 id="paths-h">{t({ en: 'Learning paths', zh: '学习路径' })}</h2>
-	<div class="paths">
-		{#each PATHS as p (p.id)}
-			<article class="path">
-				<h3>{t(p.title)}</h3>
-				<p class="muted">{t(p.blurb)}</p>
-				<ol class="steps">
-					{#each p.steps as s, i (i)}
-						{@const entry = s.kind === 'model' ? MODEL_BY_SLUG[s.slug] : CONCEPT_BY_SLUG[s.slug]}
-						{#if entry}
-							<li class:live={entry.status === 'live'}>
-								<a href="{base}/{s.kind === 'model' ? 'm' : 'train'}/{s.slug}/">
-									<span class="k">{s.kind === 'model' ? ui('model') : ui('concept')}</span>
-									{t('title' in entry ? entry.title : entry.name)}
-								</a>
+			<div class="inputs">
+				<p id="by-input">{ct('byInput')}</p>
+				<ul class="chips" aria-labelledby="by-input">
+					{#each data.inputs as b (b.bucket)}
+						{#if b.n}
+							<li>
+								<a class="chip" href="{base}/atlas/?input={b.bucket}"><Icon d={BUCKET[b.bucket].d} size={16} />{t(BUCKET[b.bucket].label)} <span class="c num">{b.n}</span></a>
 							</li>
 						{/if}
 					{/each}
-				</ol>
-			</article>
-		{/each}
-	</div>
-</section>
+				</ul>
+			</div>
+		</div>
+		<HeroPreview data={data.hero} />
+	</section>
 
-<!-- ================================================================== honesty -->
-<section class="container block" aria-labelledby="honest-h">
-	<h2 id="honest-h">{t({ en: 'Every number says where it came from', zh: '每个数字都标明来源' })}</h2>
-	<div class="prov3">
-		<div><ProvenanceBadge mode="live" /><p>{ui('provLiveHelp')}</p></div>
-		<div><ProvenanceBadge mode="precomputed" /><p>{ui('provPrecomputedHelp')}</p></div>
-		<div><ProvenanceBadge mode="illustrative" /><p>{ui('provIllustrativeHelp')}</p></div>
-	</div>
-	<p><a href="{base}/about/">{ui('footerHowNumbers')} →</a></p>
-</section>
+	<section class="block" aria-labelledby="start-h">
+		<div class="sec-h">
+			<h2 id="start-h">{ct('startHere')}</h2>
+			<p>
+				{t({ en: `${WORDS[nStart] ?? nStart} lessons, ${(WORDS[nStart] ?? String(nStart)).toLowerCase()} kinds of input.`, zh: `${ZH[nStart] ?? nStart}节课，${ZH[nStart] ?? nStart}种输入。` })}{#if under10}{' '}{t({ en: 'Each takes under ten minutes.', zh: '每节不到十分钟。' })}{/if}
+			</p>
+		</div>
+		<ul class="start">
+			{#each data.start as l (l.slug)}
+				<li><LessonCard lesson={l} group={nameOf(l.group)} sprites={data.sprites} /></li>
+			{/each}
+		</ul>
+	</section>
+
+	<section class="block" id="paths" aria-labelledby="paths-h">
+		<div class="sec-h">
+			<h2 id="paths-h">{ct('paths')}</h2>
+			<p>{t({ en: 'Lessons in a good order. Every lesson also stands on its own.', zh: '按合适的顺序排好的课程。每节课也都可以单独学。' })}</p>
+		</div>
+		<ol class="paths">
+			{#each data.paths as p (p.id)}
+				<li><PathLine path={p} /></li>
+			{/each}
+		</ol>
+	</section>
+
+	<section class="block" aria-labelledby="areas-h">
+		<div class="sec-h">
+			<h2 id="areas-h">{ct('byArea')}</h2>
+			<a class="all" href="{base}/atlas/">{t({ en: `All ${c.lessons} lessons`, zh: `全部 ${c.lessons} 节课` })}<Icon d={right} size={16} /></a>
+		</div>
+		<ul class="areas">
+			{#each areas as g (g.slug)}
+				<li><AreaTile group={g} href="/atlas/{g.slug}/" /></li>
+			{/each}
+		</ul>
+		<h3 class="sec-sub">{ct('methods')}</h3>
+		<ul class="secs">
+			{#each sections as g (g.slug)}
+				<li class:quiet={!g.live}><SectionChip group={g} /></li>
+			{/each}
+		</ul>
+		{#if quiet.length}
+			<p class="more">{ct('planned')}{i18n.lang === 'zh' ? '：' : ': '}{quiet.map((g) => t(g.name)).join(' · ')}</p>
+		{/if}
+	</section>
+</div>
 
 <style>
-	.hero {
-		background:
-			radial-gradient(1200px 400px at 85% -10%, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 70%),
-			var(--bg);
-		border-bottom: 1px solid var(--rule);
-	}
-	.hero-inner {
-		display: grid;
-		grid-template-columns: 1.15fr 1fr;
-		gap: var(--s6);
-		align-items: center;
-		padding-top: var(--s7);
-		padding-bottom: var(--s7);
-	}
-	@media (max-width: 860px) {
-		.hero-inner {
-			grid-template-columns: 1fr;
-			padding-top: var(--s6);
-			padding-bottom: var(--s6);
-		}
-	}
-	.copy {
-		display: grid;
-		gap: var(--s3);
-	}
-	.copy h1,
-	.copy p {
-		margin: 0;
-	}
-	.stats {
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
-		line-height: 1.9;
-	}
-	.big {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--ink);
-	}
-	.sep {
-		margin: 0 4px;
-		color: var(--muted);
-	}
-	.lessons {
-		display: grid;
-		gap: 8px;
-		margin-top: 4px;
-		padding: 12px 14px;
-		border: 1px solid var(--rule-strong);
-		border-radius: var(--r3);
-		background: var(--surface);
-	}
-	.lt {
-		margin: 0;
-		font-size: var(--fs-md);
-		font-family: var(--font-body);
-		font-weight: 700;
-	}
-	.lessons ul {
-		list-style: none;
+	.home ul,
+	.home ol {
 		margin: 0;
 		padding: 0;
+		list-style: none;
+	}
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+		gap: 48px;
+		align-items: center;
+		padding: 48px 0 40px;
+	}
+	.kick {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 6px;
-	}
-	.lessons .btn {
-		gap: 6px;
-		min-height: 36px;
-		font-size: var(--fs-sm);
-	}
-	.ls {
-		font-size: var(--fs-xs);
-		opacity: 0.8;
-	}
-	.ls::before {
-		content: '· ';
-	}
-	.more {
-		font-size: var(--fs-sm);
-	}
-	.art {
-		margin: 0;
-		padding: 14px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r3);
-		background: var(--surface);
-		box-shadow: var(--shadow-1);
-	}
-	.art figcaption {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: var(--fs-xs);
+		gap: 4px 16px;
+		margin: 0 0 16px;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		font-weight: var(--w-ui);
 		color: var(--muted);
-		margin-top: 6px;
 	}
-	.art .lbl {
-		font-family: var(--font-mono);
-		font-size: 10px;
-		fill: var(--muted);
+	.kick b {
+		color: var(--ink);
+		font-weight: var(--w-title);
+		font-variant-numeric: tabular-nums;
 	}
-	.flow {
-		animation: flow 1s linear infinite;
+	h1 {
+		margin: 0;
+		font-size: var(--t-3xl);
+		line-height: var(--lh-3xl);
+		font-weight: var(--w-display);
+		letter-spacing: -0.025em;
 	}
-	@keyframes flow {
-		from {
-			transform: translateX(0);
-		}
-		to {
-			transform: translateX(3px);
-		}
+	:global(:root:lang(zh-CN)) h1 {
+		letter-spacing: 0;
+		line-height: 1.3;
+	}
+	.band {
+		padding: 0 4px;
+		margin: 0 -2px;
+		background: linear-gradient(transparent 12%, var(--mark-band) 12%, var(--mark-band) 92%, transparent 92%);
+		color: var(--mark-band-ink);
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
+	}
+	.lede {
+		margin: 18px 0 0;
+		max-width: 34em;
+	}
+	:global(:root:lang(zh-CN)) .lede {
+		line-height: 1.8;
+	}
+	.cta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		align-items: center;
+		margin-top: 28px;
+	}
+	.cta .btn {
+		min-height: 52px;
+		padding: 0 22px;
+		border-radius: 14px;
+	}
+	.cta small {
+		margin-left: -2px;
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
+		opacity: 0.78;
+	}
+	.inputs {
+		margin-top: 28px;
+	}
+	.inputs p {
+		margin: 0 0 10px;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
+		color: var(--muted);
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.chip {
+		min-height: 36px;
 	}
 	.block {
-		padding-top: var(--s7);
+		padding-top: 48px;
 	}
-	.block h2 {
-		margin-bottom: var(--s2);
-	}
-	.h-row {
+	.sec-h {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: space-between;
 		align-items: baseline;
-		gap: 8px;
+		justify-content: space-between;
+		gap: 4px 16px;
+		margin-bottom: 18px;
 	}
-	.launcher {
-		display: grid;
-		grid-template-columns: minmax(260px, 340px) 1fr;
-		gap: var(--s5);
-		margin-top: var(--s4);
-		align-items: start;
+	.sec-h h2 {
+		margin: 0;
+		font-size: var(--t-2xl);
+		line-height: var(--lh-2xl);
 	}
-	@media (max-width: 760px) {
-		.launcher {
-			grid-template-columns: 1fr;
-		}
+	.sec-h p {
+		margin: 0;
+		color: var(--muted);
 	}
-	.input-side {
-		display: grid;
-		gap: 10px;
-	}
-	.segmented button {
+	.all {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-	}
-	.results h3 {
-		font-size: var(--fs-md);
-		font-family: var(--font-body);
-		margin-bottom: 8px;
-	}
-	.acc {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		gap: 6px;
-		max-height: 420px;
-		overflow-y: auto;
-		padding-right: 4px;
-	}
-	.acc-row {
-		width: 100%;
-		display: grid;
-		grid-template-columns: 1fr auto;
-		gap: 2px 10px;
-		padding: 10px 12px;
-		text-align: left;
-		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface);
-	}
-	.acc-row:hover {
-		border-color: var(--rule-strong);
-		background: var(--surface-2);
-	}
-	.planned .acc-row {
-		border-style: dashed;
-		background: transparent;
-	}
-	.nm {
-		font-weight: 700;
-	}
-	.sees {
-		grid-column: 1 / -1;
-		font-size: var(--fs-xs);
-		color: var(--accent);
-	}
-	.sees:empty {
-		display: none;
-	}
-	.hk {
-		grid-column: 1 / -1;
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
-	}
-	.cards {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-		gap: 12px;
-		margin-top: var(--s3);
-	}
-	.areas {
-		list-style: none;
-		margin: var(--s4) 0 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-		gap: 10px;
-	}
-	.area {
-		display: grid;
 		gap: 4px;
-		height: 100%;
-		padding: 14px 16px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r3);
-		background: var(--surface);
-		color: var(--ink);
-		text-decoration: none;
-	}
-	.area:hover {
-		color: var(--ink);
-		border-color: var(--accent);
-	}
-	.area .n {
-		font-size: var(--fs-xs);
-		color: var(--accent);
-	}
-	.an {
-		font-family: var(--font-display);
-		font-size: 1.2rem;
-		font-weight: 600;
-	}
-	.ab {
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
 		color: var(--ink-2);
 	}
-	.ac {
-		font-size: var(--fs-xs);
-		color: var(--muted);
-		margin-top: 4px;
+	.start {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 16px;
 	}
-	.ac .live {
-		color: var(--live);
-		font-weight: 700;
+	.start li {
+		display: flex;
+		min-width: 0;
+	}
+	.start li > :global(*) {
+		flex: 1;
 	}
 	.paths {
+		border-top: 1px solid var(--rule);
+	}
+	.areas {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 12px;
-		margin-top: var(--s3);
 	}
-	.path {
-		padding: 16px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r3);
-		background: var(--surface);
-	}
-	.path h3 {
-		font-size: var(--fs-lg);
-		margin-bottom: 4px;
-	}
-	.path p {
-		font-size: var(--fs-sm);
-		margin-bottom: 10px;
-	}
-	.steps {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		counter-reset: st;
-		display: grid;
-		gap: 4px;
-	}
-	.steps li {
-		counter-increment: st;
+	.areas li {
 		display: flex;
-		align-items: baseline;
-		gap: 8px;
 	}
-	.steps li::before {
-		content: counter(st);
-		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
-		color: var(--muted);
-		min-width: 1.2em;
-		text-align: right;
+	.areas li > :global(*) {
+		flex: 1;
 	}
-	.steps a {
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
-		text-decoration-style: dashed;
+	.sec-sub {
+		margin: 28px 0 12px;
+		font-size: var(--t-lg);
+		line-height: var(--lh-lg);
 	}
-	.steps li.live a {
-		color: var(--accent);
-		font-weight: 700;
-		text-decoration-style: solid;
-	}
-	.steps .k {
-		font-family: var(--font-mono);
-		font-size: 10px;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--muted);
-		margin-right: 4px;
-	}
-	.prov3 {
+	.secs {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-		gap: 12px;
-		margin: var(--s3) 0;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 8px 12px;
 	}
-	.prov3 > div {
-		padding: 14px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r3);
-		background: var(--surface);
+	.secs li {
+		display: flex;
 	}
-	.prov3 p {
-		margin: 8px 0 0;
-		font-size: var(--fs-sm);
-		color: var(--ink-2);
+	.secs li > :global(*) {
+		flex: 1;
+	}
+	.more {
+		display: none;
+	}
+	@media (max-width: 1099px) {
+		.hero {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 32px;
+		}
+		.start {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.areas {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+		.secs {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 759px) {
+		.hero {
+			padding: 24px 0 8px;
+			gap: 24px;
+		}
+		.cta .btn {
+			flex: 1 1 100%;
+		}
+		.chips {
+			gap: 6px;
+		}
+		.block {
+			padding-top: 40px;
+		}
+		.sec-h h2 {
+			font-size: var(--t-xl);
+			line-height: var(--lh-xl);
+		}
+		.start {
+			display: flex;
+			gap: 12px;
+			margin: 0 calc(-1 * var(--gutter));
+			padding: 2px var(--gutter) 8px;
+			overflow-x: auto;
+			scroll-snap-type: x mandatory;
+			scroll-padding-inline: var(--gutter);
+		}
+		.start li {
+			flex: 0 0 78%;
+			scroll-snap-align: start;
+		}
+		.areas {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0;
+			border-top: 1px solid var(--rule);
+		}
+		.secs {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+		.secs .quiet {
+			display: none;
+		}
+		.more {
+			display: block;
+			margin: 10px 0 0;
+			font-size: var(--t-sm);
+			line-height: var(--lh-sm);
+			color: var(--muted);
+		}
 	}
 </style>

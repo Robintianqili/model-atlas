@@ -1,8 +1,10 @@
 <!--
   Rendered Markdown of the DevKit pages (made at build time by md.ts from the repository's own files). Swaps the site-path
   token for the page's relative way to the site root (base.ts relBase: the same string on the server and in the browser),
-  labels the code blocks' copy buttons in the current language and copies on click (one listener for the whole block).
-  The styles below are the reading styles of every generated text on /devkit/.
+  labels the code blocks' copy buttons and the heading anchors in the current language and copies on click (one
+  listener for the whole block). The styles below are the reading styles of every generated text on /devkit/ (redesign
+  spec §6.8): text 16/26, code blocks mono 14/22 on --well with a copy button, API tables at 14 px.
+  class="compact": 14/22 text, for notes and the error-code explanations.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -19,16 +21,18 @@
 	let { html, lang = 'en', class: cls = '' }: Props = $props();
 	const out = $derived(withBase(html, relBase(page.url.pathname)));
 	let el: HTMLDivElement | undefined = $state();
+	const copyLabel = () => (i18n.lang === 'zh' ? '复制' : 'Copy');
 
-	// copy buttons: label them in the current language, copy the block's text on click
+	// copy buttons and heading anchors: label them in the current language
 	$effect(() => {
 		if (!el) return;
 		void out;
-		const label = i18n.lang === 'zh' ? '复制' : 'Copy';
+		const label = copyLabel();
 		for (const b of el.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
 			b.textContent = label;
 			b.setAttribute('aria-label', t({ en: 'Copy this code', zh: '复制这段代码' }));
 		}
+		for (const a of el.querySelectorAll<HTMLAnchorElement>('a.anchor')) a.setAttribute('aria-label', t({ en: 'Link to this heading', zh: '链接到这个标题' }));
 	});
 	$effect(() => {
 		const node = el;
@@ -39,8 +43,8 @@
 			const code = b.closest('.code')?.querySelector('pre')?.textContent ?? '';
 			try {
 				await navigator.clipboard.writeText(code);
-				b.textContent = '✓';
-				setTimeout(() => (b.textContent = i18n.lang === 'zh' ? '复制' : 'Copy'), 1400);
+				b.textContent = i18n.lang === 'zh' ? '已复制' : 'Copied';
+				setTimeout(() => (b.textContent = copyLabel()), 1400);
 			} catch {
 				/* clipboard blocked */
 			}
@@ -57,14 +61,26 @@
 	.dk-md {
 		min-width: 0;
 		max-width: 100%;
+		font-size: var(--t-md);
+		line-height: 26px;
 		overflow-wrap: break-word;
+	}
+	.dk-md.compact {
+		font-size: var(--t-sm);
+		line-height: 22px;
 	}
 	.dk-md :global(> :first-child) {
 		margin-top: 0;
 	}
+	.dk-md :global(> :last-child) {
+		margin-bottom: 0;
+	}
+	.dk-md :global(p) {
+		margin: 0 0 var(--s4);
+	}
 	.dk-md :global(p),
 	.dk-md :global(li) {
-		max-width: var(--measure);
+		max-width: 75ch;
 	}
 	.dk-md :global(ul),
 	.dk-md :global(ol) {
@@ -74,34 +90,50 @@
 	.dk-md :global(li + li) {
 		margin-top: 6px;
 	}
+	.dk-md :global(li::marker) {
+		color: var(--muted);
+	}
 	.dk-md :global(li > ul),
 	.dk-md :global(li > ol) {
-		margin: 6px 0 0;
+		margin: var(--s2) 0 0;
 	}
 	.dk-md :global(li > p) {
-		margin: 0 0 8px;
+		margin: 0 0 var(--s2);
 	}
+
+	/* headings: the page's h1 is the section title; ### of DEVKIT.md is h2 here */
 	.dk-md :global(h2),
 	.dk-md :global(h3),
 	.dk-md :global(h4) {
 		position: relative;
-		margin: var(--s6) 0 var(--s3);
 		scroll-margin-top: calc(var(--header-h) + 16px);
 	}
 	.dk-md :global(h2) {
-		font-size: var(--fs-xl);
+		margin: var(--s5) 0 var(--s3);
+		padding-top: var(--s4);
+		border-top: 1px solid var(--rule);
+		font-size: var(--t-xl);
+		line-height: var(--lh-xl);
 	}
 	.dk-md :global(h3) {
-		font-size: var(--fs-lg);
+		margin: var(--s5) 0 var(--s2);
+		font-size: var(--t-lg);
+		line-height: var(--lh-lg);
 	}
 	.dk-md :global(h4) {
-		font-size: var(--fs-md);
+		margin: var(--s5) 0 var(--s2);
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
+	}
+	.dk-md :global(> h2:first-child) {
+		padding-top: 0;
+		border-top: 0;
 	}
 	.dk-md :global(.anchor) {
 		margin-left: 0.35em;
 		color: var(--muted);
+		font-weight: var(--w-body);
 		text-decoration: none;
-		font-weight: 400;
 		opacity: 0;
 		transition: opacity var(--dur-1) var(--ease);
 	}
@@ -109,27 +141,37 @@
 	.dk-md :global(.anchor:focus-visible) {
 		opacity: 1;
 	}
-	.dk-md :global(:target) {
-		background: linear-gradient(transparent 60%, var(--accent-soft) 60%);
+	/* the heading a link opened: the "here" bar beside it */
+	.dk-md :global(:is(h2, h3, h4):target) {
+		padding-left: var(--s3);
+		border-left: 3px solid var(--here);
 	}
+
+	/* inline code: the mono at the text's size (font-size-adjust matches the x-height, base.css) */
 	.dk-md :global(code) {
-		padding: 0.05em 0.3em;
-		border-radius: 4px;
-		background: var(--surface-2);
-		font-size: 0.86em;
+		padding: 1px 5px;
+		border-radius: var(--r1);
+		background: color-mix(in srgb, var(--sunken) 75%, transparent);
 		overflow-wrap: anywhere;
+	}
+	/* code reads as typed: no ligatures (=> stays two characters) */
+	.dk-md :global(code),
+	.dk-md :global(pre) {
+		font-variant-ligatures: none;
 	}
 	.dk-md :global(pre code) {
 		padding: 0;
+		border: 0;
 		background: none;
-		font-size: inherit;
 		overflow-wrap: normal;
 	}
+
+	/* code blocks: mono 14/22 on --well, a head with the language or file and the copy button */
 	.dk-md :global(.code) {
 		margin: 0 0 var(--s4);
 		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
+		border-radius: var(--r3);
+		background: var(--well);
 		overflow: hidden;
 		min-width: 0;
 	}
@@ -137,11 +179,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 30px;
-		padding: 0 4px 0 12px;
+		gap: var(--s3);
+		min-height: 36px;
+		padding: 0 4px 0 var(--s4);
 		border-bottom: 1px solid var(--rule);
-		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
+		background: color-mix(in srgb, var(--sunken) 45%, var(--well));
+		font: var(--w-body) var(--t-xs) / var(--lh-xs) var(--font-mono);
+		font-size-adjust: none;
 		color: var(--muted);
 	}
 	.dk-md :global(.code-lang) {
@@ -152,24 +196,26 @@
 	}
 	.dk-md :global(.code-copy) {
 		flex: none;
-		min-height: 28px;
-		padding: 0 10px;
-		border: 0;
-		border-radius: var(--r1);
+		min-height: 30px;
+		padding: 0 var(--s3);
+		border: 1px solid transparent;
+		border-radius: var(--r2);
 		background: transparent;
 		color: var(--ink-2);
-		font-size: var(--fs-xs);
+		font: var(--w-ui) var(--t-xs) / var(--lh-xs) var(--font-sans);
 	}
 	.dk-md :global(.code-copy:hover) {
-		background: var(--surface-3);
+		border-color: var(--line-control);
+		background: var(--panel);
+		color: var(--ink);
 	}
 	.dk-md :global(pre) {
 		margin: 0;
-		padding: 10px 12px;
+		padding: var(--s3) var(--s4);
 		border-radius: 0;
 		background: none;
-		font-size: 0.8rem;
-		line-height: 1.55;
+		font-size: var(--t-sm);
+		line-height: 22px;
 		tab-size: 2;
 	}
 	.dk-md :global(.tc) {
@@ -181,7 +227,7 @@
 	}
 	.dk-md :global(.tk) {
 		color: var(--dk-kw);
-		font-weight: 600;
+		font-weight: var(--w-ui);
 	}
 	.dk-md :global(.tn) {
 		color: var(--dk-num);
@@ -189,29 +235,32 @@
 	.dk-md :global(.tp) {
 		color: var(--dk-key);
 	}
+
+	/* API tables: 14 px on the panel, a well header row */
 	.dk-md :global(.table-wrap) {
 		margin: 0 0 var(--s4);
 		overflow-x: auto;
 		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface);
+		border-radius: var(--r3);
+		background: var(--panel);
 	}
 	.dk-md :global(table) {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: var(--fs-sm);
-		line-height: 1.45;
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 	.dk-md :global(th),
 	.dk-md :global(td) {
-		padding: 7px 10px;
+		padding: var(--s2) var(--s3);
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid var(--rule);
 	}
 	.dk-md :global(th) {
-		background: var(--surface-2);
-		font-weight: 600;
+		background: var(--well);
+		color: var(--ink);
+		font-weight: var(--w-ui);
 		white-space: nowrap;
 	}
 	.dk-md :global(tr:last-child td) {
@@ -225,16 +274,26 @@
 	}
 	.dk-md :global(blockquote) {
 		margin: 0 0 var(--s4);
-		padding: 8px 14px;
-		border-left: 3px solid var(--accent);
-		background: var(--surface-2);
-		border-radius: 0 var(--r2) var(--r2) 0;
+		padding: var(--s3) var(--s4);
+		border: 1px solid var(--rule);
+		border-left: 3px solid var(--line-control);
+		border-radius: 0 var(--r3) var(--r3) 0;
+		background: var(--panel);
 		color: var(--ink-2);
 	}
 	.dk-md :global(blockquote p:last-child) {
 		margin-bottom: 0;
 	}
 	.dk-md :global(hr) {
-		margin: var(--s5) 0;
+		margin: var(--s6) 0;
+	}
+	@media (max-width: 759px) {
+		.dk-md :global(pre) {
+			padding-inline: var(--s3);
+		}
+		.dk-md :global(th),
+		.dk-md :global(td) {
+			padding: var(--s2);
+		}
 	}
 </style>

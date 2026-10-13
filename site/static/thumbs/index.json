@@ -1,0 +1,305 @@
+{
+ "format": "atlas-thumbs/1",
+ "made": "2026-10-13",
+ "rows": {
+  "tile": {
+   "w": 224,
+   "h": 140
+  },
+  "cols": 8,
+  "light": "rows.light.webp",
+  "dark": "rows.dark.webp",
+  "bytes": {
+   "light": 134902,
+   "dark": 129428
+  }
+ },
+ "cards": {
+  "tile": {
+   "w": 480,
+   "h": 300
+  },
+  "cols": 2,
+  "light": "cards.light.webp",
+  "dark": "cards.dark.webp",
+  "bytes": {
+   "light": 21834,
+   "dark": 21160
+  }
+ },
+ "tiles": {
+  "tinycnn": {
+   "row": 0,
+   "step": 1,
+   "card": 0
+  },
+  "adversarial-tinycnn": {
+   "row": 1,
+   "step": 3
+  },
+  "tinyvit": {
+   "row": 2,
+   "step": 1
+  },
+  "tiny-unet-seg": {
+   "row": 3,
+   "step": 1
+  },
+  "crnn-ocr": {
+   "row": 4,
+   "step": 3
+  },
+  "pointnet": {
+   "row": 5,
+   "step": 1
+  },
+  "tinygpt": {
+   "row": 6,
+   "step": 4,
+   "card": 1
+  },
+  "tinybert": {
+   "row": 7,
+   "step": 4
+  },
+  "word2vec": {
+   "row": 8,
+   "step": 1
+  },
+  "char-rnn": {
+   "row": 9,
+   "step": 2
+  },
+  "tinyseq2seq": {
+   "row": 10,
+   "step": 1
+  },
+  "tiny-encdec": {
+   "row": 11,
+   "step": 2
+  },
+  "tinymamba": {
+   "row": 12,
+   "step": 3
+  },
+  "tinymoe": {
+   "row": 13,
+   "step": 1
+  },
+  "tinyforecaster": {
+   "row": 14,
+   "step": 1
+  },
+  "ecg-autoencoder": {
+   "row": 15,
+   "step": 1
+  },
+  "kalman-filter": {
+   "row": 16,
+   "step": 1
+  },
+  "tiny-tcn": {
+   "row": 17,
+   "step": 1
+  },
+  "matrix-factorization": {
+   "row": 18,
+   "step": 1
+  },
+  "two-tower": {
+   "row": 19,
+   "step": 1
+  },
+  "sasrec": {
+   "row": 20,
+   "step": 4
+  },
+  "mlp-playground": {
+   "row": 21,
+   "step": 1,
+   "card": 3
+  },
+  "classic-ml": {
+   "row": 22,
+   "step": 1
+  },
+  "gaussian-process": {
+   "row": 23,
+   "step": 1
+  },
+  "hmm": {
+   "row": 24,
+   "step": 1
+  },
+  "gridworld": {
+   "row": 25,
+   "step": 6
+  },
+  "cart-pole": {
+   "row": 26,
+   "step": 1
+  },
+  "snake-dqn": {
+   "row": 27,
+   "step": 1
+  },
+  "alphazero-ttt": {
+   "row": 28,
+   "step": 3
+  },
+  "ppo-reacher": {
+   "row": 29,
+   "step": 1
+  },
+  "behavior-cloning": {
+   "row": 30,
+   "step": 1
+  },
+  "gcn": {
+   "row": 31,
+   "step": 1
+  },
+  "gnn-variants": {
+   "row": 32,
+   "step": 1
+  },
+  "node2vec": {
+   "row": 33,
+   "step": 1
+  },
+  "egnn": {
+   "row": 34,
+   "step": 1
+  },
+  "transe": {
+   "row": 35,
+   "step": 1
+  },
+  "flow-2d": {
+   "row": 36,
+   "step": 1
+  },
+  "gan-2d": {
+   "row": 37,
+   "step": 1
+  },
+  "vae-2d": {
+   "row": 38,
+   "step": 1
+  },
+  "score-2d": {
+   "row": 39,
+   "step": 1
+  },
+  "vq-vae": {
+   "row": 40,
+   "step": 1
+  },
+  "realnvp-2d": {
+   "row": 41,
+   "step": 1
+  },
+  "ddpm-unet": {
+   "row": 42,
+   "step": 1
+  },
+  "tinyclip": {
+   "row": 43,
+   "step": 1
+  },
+  "llava-toy": {
+   "row": 44,
+   "step": 1
+  },
+  "pinn": {
+   "row": 45,
+   "step": 1
+  },
+  "fno": {
+   "row": 46,
+   "step": 1
+  },
+  "loss-gradient-descent": {
+   "row": 47,
+   "step": 1,
+   "card": 2
+  },
+  "backprop": {
+   "row": 48,
+   "step": 1
+  },
+  "optimizers": {
+   "row": 49,
+   "step": 1
+  },
+  "regularization": {
+   "row": 50,
+   "step": 1
+  },
+  "init-normalization": {
+   "row": 51,
+   "step": 1
+  },
+  "residual-connections": {
+   "row": 52,
+   "step": 8
+  },
+  "tokenization": {
+   "row": 53,
+   "step": 5
+  },
+  "next-token-prediction": {
+   "row": 54,
+   "step": 2
+  },
+  "decoding": {
+   "row": 55,
+   "step": 1
+  },
+  "self-supervised-objectives": {
+   "row": 56,
+   "step": 1
+  },
+  "masked-lm": {
+   "row": 57,
+   "step": 1
+  },
+  "contrastive-learning": {
+   "row": 58,
+   "step": 4
+  },
+  "transfer-learning": {
+   "row": 59,
+   "step": 2
+  },
+  "catastrophic-forgetting": {
+   "row": 60,
+   "step": 1
+  },
+  "lora": {
+   "row": 61,
+   "step": 1
+  },
+  "number-formats": {
+   "row": 62,
+   "step": 8
+  },
+  "quantization": {
+   "row": 63,
+   "step": 3
+  },
+  "kv-cache": {
+   "row": 64,
+   "step": 1
+  },
+  "attention-variants": {
+   "row": 65,
+   "step": 7
+  },
+  "positional-encodings": {
+   "row": 66,
+   "step": 3
+  }
+ },
+ "missing": []
+}

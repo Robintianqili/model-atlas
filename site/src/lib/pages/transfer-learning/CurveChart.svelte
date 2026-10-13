@@ -100,7 +100,7 @@
 		<div class="opts">
 			<label><input type="checkbox" bind:checked={sel.part2Zoom} /> {t({ en: 'Zoom to 90–100%', zh: '放大到 90–100%' })}</label>
 			<label><input type="checkbox" bind:checked={sel.part2Seeds} /> {t({ en: 'Show each seed', zh: '显示每个种子' })}</label>
-			<ProvenanceBadge mode="precomputed" compact />
+			{#if !compact}<ProvenanceBadge mode="precomputed" compact />{/if}
 		</div>
 	</div>
 
@@ -303,7 +303,7 @@
 		stroke-dasharray: 4 4;
 	}
 	.tick {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		fill: var(--muted);
 		font-family: var(--font-mono);
 	}

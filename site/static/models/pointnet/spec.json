@@ -1,0 +1,482 @@
+{
+ "slug": "pointnet",
+ "name": {
+  "en": "Tiny PointNet",
+  "zh": "微型 PointNet"
+ },
+ "version": "2026-10-12",
+ "params": 2373,
+ "precision": "fp32",
+ "input": {
+  "kind": "points2d",
+  "shape": [
+   "N",
+   2
+  ]
+ },
+ "tensors": [
+  {
+   "name": "fc1.weight",
+   "shape": [
+    32,
+    2
+   ],
+   "offset": 0,
+   "length": 64
+  },
+  {
+   "name": "fc1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 64,
+   "length": 32
+  },
+  {
+   "name": "fc2.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 96,
+   "length": 1024
+  },
+  {
+   "name": "fc2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 1120,
+   "length": 32
+  },
+  {
+   "name": "fc3.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 1152,
+   "length": 1024
+  },
+  {
+   "name": "fc3.bias",
+   "shape": [
+    32
+   ],
+   "offset": 2176,
+   "length": 32
+  },
+  {
+   "name": "fc4.weight",
+   "shape": [
+    5,
+    32
+   ],
+   "offset": 2208,
+   "length": 160
+  },
+  {
+   "name": "fc4.bias",
+   "shape": [
+    5
+   ],
+   "offset": 2368,
+   "length": 5
+  }
+ ],
+ "layers": [
+  {
+   "id": "input",
+   "op": "input",
+   "label": {
+    "en": "Your points",
+    "zh": "你的点"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "N",
+    2
+   ],
+   "desc": {
+    "en": "x and y of every point, centred and scaled so the farthest point is at distance 1.",
+    "zh": "每个点的 x 和 y，已经居中并缩放，最远的点距离为 1。"
+   },
+   "axes": [
+    "k",
+    "xy"
+   ]
+  },
+  {
+   "id": "fc1",
+   "op": "linear",
+   "label": {
+    "en": "Shared layer 1",
+    "zh": "共享层 1"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "params": {
+    "inFeatures": 2,
+    "outFeatures": 32
+   },
+   "desc": {
+    "en": "The same 2 -> 32 weighted sums for every point.",
+    "zh": "每个点都用同一组 2 -> 32 的加权和。"
+   },
+   "axes": [
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 27
+   }
+  },
+  {
+   "id": "relu1",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 1",
+    "zh": "ReLU 1"
+   },
+   "in": [
+    "fc1"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "axes": [
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "fc2",
+   "op": "linear",
+   "label": {
+    "en": "Shared layer 2",
+    "zh": "共享层 2"
+   },
+   "in": [
+    "relu1"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "desc": {
+    "en": "The same 32 -> 32 weighted sums for every point.",
+    "zh": "每个点都用同一组 32 -> 32 的加权和。"
+   },
+   "axes": [
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 28
+   }
+  },
+  {
+   "id": "relu2",
+   "op": "relu",
+   "label": {
+    "en": "Point features",
+    "zh": "点特征"
+   },
+   "in": [
+    "fc2"
+   ],
+   "outShape": [
+    "N",
+    32
+   ],
+   "axes": [
+    "k",
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "pool",
+   "op": "max_points",
+   "label": {
+    "en": "Max over the points",
+    "zh": "对所有点取最大值"
+   },
+   "in": [
+    "relu2"
+   ],
+   "outShape": [
+    32
+   ],
+   "axes": [
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 38
+   }
+  },
+  {
+   "id": "fc3",
+   "op": "linear",
+   "label": {
+    "en": "Classifier layer",
+    "zh": "分类层"
+   },
+   "in": [
+    "pool"
+   ],
+   "outShape": [
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "axes": [
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 29
+   }
+  },
+  {
+   "id": "relu3",
+   "op": "relu",
+   "label": {
+    "en": "ReLU 3",
+    "zh": "ReLU 3"
+   },
+   "in": [
+    "fc3"
+   ],
+   "outShape": [
+    32
+   ],
+   "axes": [
+    "f"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 39
+   }
+  },
+  {
+   "id": "fc4",
+   "op": "linear",
+   "label": {
+    "en": "Class scores",
+    "zh": "类别分数"
+   },
+   "in": [
+    "relu3"
+   ],
+   "outShape": [
+    5
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 5
+   },
+   "axes": [
+    "class"
+   ],
+   "code": {
+    "file": "pipeline/pointnet/model.py",
+    "line": 30
+   }
+  },
+  {
+   "id": "softmax",
+   "op": "softmax",
+   "label": {
+    "en": "Probabilities",
+    "zh": "概率"
+   },
+   "in": [
+    "fc4"
+   ],
+   "outShape": [
+    5
+   ],
+   "axes": [
+    "class"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "synthetic 2-D point clouds (pipeline/pointnet/make_data.ts with the page's shapes.ts): 5 shapes, 16-200 points, any rotation, stretch 0.85-1.15, jitter, uneven spacing, small gaps",
+  "steps": 7080,
+  "batchSize": 256,
+  "epochs": 60,
+  "bestEpoch": 41,
+  "optimizer": "Adam lr 0.003 (cosine to 0), cross-entropy; clouds padded to 256 points by repeating their own points",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32 (evaluation, export)",
+  "metrics": {
+   "test_acc": 0.9983999729156494,
+   "val_acc": 0.996999979019165,
+   "test_n": 5000,
+   "per_class_test_acc": {
+    "circle": 1,
+    "square": 0.996,
+    "triangle": 0.999,
+    "star": 1,
+    "ring": 0.997
+   },
+   "confusion": [
+    [
+     1000,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     996,
+     0,
+     3,
+     0
+    ],
+    [
+     0,
+     0,
+     999,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1000,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     3,
+     997
+    ]
+   ]
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000117,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 8,
+  "edgeCases": [
+   "one-point",
+   "line",
+   "max-points"
+  ],
+  "perLayer": {
+   "fc1": 2.38e-7,
+   "relu1": 2.38e-7,
+   "fc2": 0.00000191,
+   "relu2": 9.54e-7,
+   "pool": 9.54e-7,
+   "fc3": 0.00000191,
+   "relu3": 0.00000191,
+   "fc4": 0.0000117,
+   "softmax": 1.19e-7
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/pointnet/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "points2d",
+   "kind": "points2d",
+   "shape": [
+    "N",
+    2
+   ],
+   "dtype": "f32",
+   "axes": [
+    "k",
+    "xy"
+   ]
+  }
+ ],
+ "outputs": [
+  "softmax"
+ ],
+ "dims": {
+  "N": {
+   "min": 1,
+   "max": 1024,
+   "label": {
+    "en": "points",
+    "zh": "点"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json"
+ },
+ "classes": [
+  {
+   "id": "circle",
+   "en": "circle",
+   "zh": "圆"
+  },
+  {
+   "id": "square",
+   "en": "square",
+   "zh": "正方形"
+  },
+  {
+   "id": "triangle",
+   "en": "triangle",
+   "zh": "三角形"
+  },
+  {
+   "id": "star",
+   "en": "star",
+   "zh": "五角星"
+  },
+  {
+   "id": "ring",
+   "en": "ring",
+   "zh": "圆环"
+  }
+ ]
+}

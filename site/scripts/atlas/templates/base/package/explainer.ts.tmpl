@@ -48,7 +48,11 @@ const manifest: ExplainerManifest = {
 		lessonNote: { en: 'TODO: one line on what the lesson walks through', zh: 'TODO：一句话说明这节课讲什么' }
 	},
 	// Every dataset, ported code or idea-with-code (AK704). promote appends these to static/licenses.json.
-	credits: []
+	credits: [],
+	// What the catalog entry says once the page is live: name, family, inputs, mode, hook, shows, runtime, params, size
+	// ({ en, zh } texts). promote {%slug%} --dry-run prints the whole patch from it and --verify checks it (K4). Data only
+	// the CLI reads: not counted as page code.
+	catalog: {}
 };
 
 export default manifest;

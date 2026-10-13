@@ -42,16 +42,16 @@
 		gap: 8px;
 		padding: 16px 18px;
 		border-radius: var(--r3);
-		background: var(--surface);
+		background: var(--panel);
 		border: 1px solid var(--rule);
 	}
 	.pr p {
 		margin: 0;
 	}
 	.q {
-		font-family: var(--font-display);
-		font-size: var(--fs-lg);
-		font-weight: 600;
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
+		font-weight: var(--w-ui);
 	}
 	.btn {
 		justify-self: start;
@@ -62,17 +62,18 @@
 		padding-top: 6px;
 		border-top: 1px solid var(--rule);
 	}
+	/* feedback colours (spec §2.3): ok / no, with the word */
 	.verdict {
 		justify-self: start;
 		font-weight: 700;
-		font-size: var(--fs-sm);
+		font-size: var(--t-sm);
 		padding: 1px 10px;
 		border-radius: var(--r-pill);
-		background: var(--illus-soft);
-		color: var(--illus);
+		background: var(--no-soft);
+		color: var(--no);
 	}
 	.verdict.ok {
-		background: var(--live-soft);
-		color: var(--live);
+		background: var(--ok-soft);
+		color: var(--ok);
 	}
 </style>

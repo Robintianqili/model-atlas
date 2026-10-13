@@ -1,0 +1,16 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "masked-lm",
+ "checked": "2026-10-13",
+ "sources": {
+  "batch": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 70,
+   "fixtures": 0,
+   "checked": "2026-10-13"
+  }
+ }
+}

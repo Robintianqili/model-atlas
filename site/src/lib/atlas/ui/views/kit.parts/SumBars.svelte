@@ -84,7 +84,7 @@
 		border-radius: 3px;
 		background: none;
 		font: inherit;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		text-align: left;
 		color: var(--ink);
 		min-height: 20px;

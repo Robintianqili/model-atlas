@@ -1,0 +1,89 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testN": {
+   "value": 5000,
+   "unit": "molecules",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "energyMAE": {
+   "value": 0.045233,
+   "unit": "energy units (mean |error| per molecule)",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "forceMAE": {
+   "value": 0.128743,
+   "unit": "force units (mean |error| per coordinate)",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "energyMAD": {
+   "value": 3.023919,
+   "unit": "energy units (always answering the mean energy)",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "forceMAD": {
+   "value": 0.693597,
+   "unit": "force units (always answering 0)",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "turnE": {
+   "value": 3.814697265625e-06,
+   "unit": "largest |E(turned) - E|",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "turnF": {
+   "value": 4.500150680541992e-06,
+   "unit": "largest |f(turned) - turned f|",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "mirrorE": {
+   "value": 1.9073486328125e-06,
+   "unit": "largest |E(mirrored) - E|",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "mirrorF": {
+   "value": 4.172325134277344e-06,
+   "unit": "largest |f(mirrored) - mirrored f|",
+   "source": "pipeline/egnn/stats.py (CPU float32, the 5,000 test molecules of make_data.ts)",
+   "measured": "2026-10-12"
+  },
+  "trainN": {
+   "value": 40000,
+   "unit": "molecules",
+   "source": "pipeline/egnn/train.py",
+   "measured": "2026-10-12"
+  },
+  "epochs": {
+   "value": 60,
+   "unit": "epochs",
+   "source": "pipeline/egnn/train.py",
+   "measured": "2026-10-12"
+  },
+  "bestEpoch": {
+   "value": 59,
+   "unit": "epoch",
+   "source": "pipeline/egnn/train.py",
+   "measured": "2026-10-12"
+  },
+  "nMin": {
+   "value": 2,
+   "unit": "atoms",
+   "source": "pipeline/egnn/make_data.ts (fewest atoms of a training molecule)",
+   "measured": "2026-10-12"
+  },
+  "nMax": {
+   "value": 10,
+   "unit": "atoms",
+   "source": "pipeline/egnn/make_data.ts (most atoms of a training molecule)",
+   "measured": "2026-10-12"
+  }
+ }
+}

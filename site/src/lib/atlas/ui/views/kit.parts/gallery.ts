@@ -23,8 +23,27 @@ export type MetaMod = { default: ViewMeta; variants?: () => Promise<{ label: I18
 
 const kitMetas = import.meta.glob<MetaMod>('../*/meta.ts', { eager: true });
 const kitViews = import.meta.glob<Component<StageProps>>('../*/View.svelte', { eager: true, import: 'default' });
-const pkgMetas = import.meta.glob<MetaMod>('../../../../explainers/*/views/*/meta.ts', { eager: true });
-const pkgViews = import.meta.glob<Component<StageProps>>('../../../../explainers/*/views/*/View.svelte', { eager: true, import: 'default' });
+// Redesign wave F: the package views are lazy here too. Eager globs put every package's metas and views into this
+// module's chunk, and the registry's per-package loader (prepareViews) then pulled that whole chunk (389 KB gzip) into
+// every lesson page. preparePackageViews() loads them for the gallery and the DevKit demos.
+const pkgMetaLoaders = import.meta.glob<MetaMod>('../../../../explainers/*/views/*/meta.ts');
+const pkgViewLoaders = import.meta.glob<Component<StageProps>>('../../../../explainers/*/views/*/View.svelte', { import: 'default' });
+let pkgLoaded: { path: string; mod: MetaMod; comp: Component<StageProps> | null }[] = [];
+let pkgPromise: Promise<void> | null = null;
+
+/** Load every package view (meta and component) for allViews(); the gallery and the DevKit demos await it once. */
+export function preparePackageViews(): Promise<void> {
+	pkgPromise ??= Promise.all(
+		Object.entries(pkgMetaLoaders).map(async ([path, load]) => {
+			const vl = pkgViewLoaders[path.replace(/meta\.ts$/, 'View.svelte')];
+			const [mod, comp] = await Promise.all([load(), vl ? vl() : Promise.resolve(null)]);
+			return { path, mod, comp };
+		})
+	).then((xs) => {
+		pkgLoaded = xs;
+	});
+	return pkgPromise;
+}
 
 export interface ViewEntry {
 	key: string;
@@ -32,16 +51,16 @@ export interface ViewEntry {
 	comp: Component<StageProps> | null;
 }
 
-/** Every kit view ('<key>') and package view ('<slug>/<key>'), sorted by key. */
+/** Every kit view ('<key>') and package view ('<slug>/<key>'; after preparePackageViews()), sorted by key. */
 export function allViews(): ViewEntry[] {
 	const out: ViewEntry[] = [];
 	for (const [path, mod] of Object.entries(kitMetas)) {
 		const key = /\/([^/]+)\/meta\.ts$/.exec(path)?.[1] ?? path;
 		out.push({ key, mod, comp: kitViews[path.replace(/meta\.ts$/, 'View.svelte')] ?? null });
 	}
-	for (const [path, mod] of Object.entries(pkgMetas)) {
+	for (const { path, mod, comp } of pkgLoaded) {
 		const m = /explainers\/([^/]+)\/views\/([^/]+)\/meta\.ts$/.exec(path);
-		out.push({ key: m ? `${m[1]}/${m[2]}` : path, mod, comp: pkgViews[path.replace(/meta\.ts$/, 'View.svelte')] ?? null });
+		out.push({ key: m ? `${m[1]}/${m[2]}` : path, mod, comp });
 	}
 	return out.sort((a, b) => a.key.localeCompare(b.key));
 }

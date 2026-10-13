@@ -7,7 +7,6 @@
 	import { untrack } from 'svelte';
 	import StepPlayer from '$lib/kit/StepPlayer.svelte';
 	import { motion } from '$lib/kit/theme.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import TrainCharts from './TrainCharts.svelte';
 	import { LESSON_N, LESSON_STEPS, clsName, type LessonState } from './lessonState.svelte';
@@ -37,7 +36,6 @@
 			<p class="muted small">
 				{t({ en: `${LESSON_N} ladders + ${LESSON_N} envelopes · 514 trainable parameters · ${LESSON_STEPS} steps of full-batch gradient descent`, zh: `${LESSON_N} 张梯子 + ${LESSON_N} 张信封 · 514 个可训练参数 · ${LESSON_STEPS} 步全批量梯度下降` })}
 			</p>
-			<ProvenanceBadge mode="live" compact note={{ en: 'Trained in your browser when the lesson loaded (seed 0); the replay shows every step.', zh: '课程加载时在你的浏览器里训练（种子 0）；回放展示每一步。' }} />
 		</div>
 		<div class="tl-player">
 			<StepPlayer count={run.snaps.length} bind:step={L.replay} interval={28} {autoplay} onend={ondone} label={{ en: 'Replay the training, one step at a time', zh: '逐步回放训练过程' }}>

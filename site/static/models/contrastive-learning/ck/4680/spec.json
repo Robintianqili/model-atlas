@@ -1,0 +1,546 @@
+{
+ "slug": "contrastive-learning",
+ "name": {
+  "en": "TinyCLIP after 4680 updates",
+  "zh": "训练 4680 次更新后的 TinyCLIP"
+ },
+ "version": "2026-10-08",
+ "params": 15905,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "img.conv1.weight",
+   "shape": [
+    8,
+    1,
+    3,
+    3
+   ],
+   "offset": 0,
+   "length": 72
+  },
+  {
+   "name": "img.conv1.bias",
+   "shape": [
+    8
+   ],
+   "offset": 72,
+   "length": 8
+  },
+  {
+   "name": "img.conv2.weight",
+   "shape": [
+    16,
+    8,
+    3,
+    3
+   ],
+   "offset": 80,
+   "length": 1152
+  },
+  {
+   "name": "img.conv2.bias",
+   "shape": [
+    16
+   ],
+   "offset": 1232,
+   "length": 16
+  },
+  {
+   "name": "img.proj.weight",
+   "shape": [
+    32,
+    400
+   ],
+   "offset": 1248,
+   "length": 12800
+  },
+  {
+   "name": "img.proj.bias",
+   "shape": [
+    32
+   ],
+   "offset": 14048,
+   "length": 32
+  },
+  {
+   "name": "txt.emb.weight",
+   "shape": [
+    24,
+    32
+   ],
+   "offset": 14080,
+   "length": 768
+  },
+  {
+   "name": "txt.proj.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 14848,
+   "length": 1024
+  },
+  {
+   "name": "txt.proj.bias",
+   "shape": [
+    32
+   ],
+   "offset": 15872,
+   "length": 32
+  },
+  {
+   "name": "sim.logit_scale",
+   "shape": [
+    1
+   ],
+   "offset": 15904,
+   "length": 1
+  }
+ ],
+ "layers": [
+  {
+   "id": "image",
+   "op": "input",
+   "label": {
+    "en": "Your drawing",
+    "zh": "你的画"
+   },
+   "in": [
+    "image"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28×28 numbers: the frame and your strokes, 0 paper to 1 ink.",
+    "zh": "28×28 个数：画框和你的笔画，0 是纸，1 是墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "img.conv1",
+   "op": "conv2d",
+   "label": {
+    "en": "Image: convolution 1",
+    "zh": "图像：卷积 1"
+   },
+   "in": [
+    "image"
+   ],
+   "outShape": [
+    8,
+    26,
+    26
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 1,
+    "outChannels": 8
+   },
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 43
+   }
+  },
+  {
+   "id": "img.relu1",
+   "op": "relu",
+   "label": {
+    "en": "Image: ReLU 1",
+    "zh": "图像：ReLU 1"
+   },
+   "in": [
+    "img.conv1"
+   ],
+   "outShape": [
+    8,
+    26,
+    26
+   ]
+  },
+  {
+   "id": "img.pool1",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Image: max pooling 1",
+    "zh": "图像：最大池化 1"
+   },
+   "in": [
+    "img.relu1"
+   ],
+   "outShape": [
+    8,
+    13,
+    13
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   }
+  },
+  {
+   "id": "img.conv2",
+   "op": "conv2d",
+   "label": {
+    "en": "Image: convolution 2",
+    "zh": "图像：卷积 2"
+   },
+   "in": [
+    "img.pool1"
+   ],
+   "outShape": [
+    16,
+    11,
+    11
+   ],
+   "params": {
+    "kernel": 3,
+    "stride": 1,
+    "padding": 0,
+    "inChannels": 8,
+    "outChannels": 16
+   },
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 44
+   }
+  },
+  {
+   "id": "img.relu2",
+   "op": "relu",
+   "label": {
+    "en": "Image: ReLU 2",
+    "zh": "图像：ReLU 2"
+   },
+   "in": [
+    "img.conv2"
+   ],
+   "outShape": [
+    16,
+    11,
+    11
+   ]
+  },
+  {
+   "id": "img.pool2",
+   "op": "maxpool2d",
+   "label": {
+    "en": "Image: max pooling 2",
+    "zh": "图像：最大池化 2"
+   },
+   "in": [
+    "img.relu2"
+   ],
+   "outShape": [
+    16,
+    5,
+    5
+   ],
+   "params": {
+    "kernel": 2,
+    "stride": 2
+   }
+  },
+  {
+   "id": "img.flat",
+   "op": "flatten",
+   "label": {
+    "en": "Image: flatten",
+    "zh": "图像：展平"
+   },
+   "in": [
+    "img.pool2"
+   ],
+   "outShape": [
+    400
+   ]
+  },
+  {
+   "id": "img.proj",
+   "op": "linear",
+   "label": {
+    "en": "Image vector",
+    "zh": "图像向量"
+   },
+   "in": [
+    "img.flat"
+   ],
+   "outShape": [
+    32
+   ],
+   "params": {
+    "inFeatures": 400,
+    "outFeatures": 32
+   },
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 45
+   }
+  },
+  {
+   "id": "img.norm",
+   "op": "l2norm",
+   "label": {
+    "en": "Image vector, length 1",
+    "zh": "图像向量，长度 1"
+   },
+   "in": [
+    "img.proj"
+   ],
+   "outShape": [
+    32
+   ],
+   "axes": [
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "txt.emb",
+   "op": "embedding",
+   "label": {
+    "en": "Text: word rows",
+    "zh": "文本：词行"
+   },
+   "in": [
+    "text"
+   ],
+   "outShape": [
+    "K",
+    "L",
+    32
+   ],
+   "axes": [
+    "k",
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "txt.pool",
+   "op": "mean_pool",
+   "label": {
+    "en": "Text: average of the words",
+    "zh": "文本：词的平均"
+   },
+   "in": [
+    "txt.emb",
+    "text"
+   ],
+   "outShape": [
+    "K",
+    32
+   ],
+   "axes": [
+    "k",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 34
+   }
+  },
+  {
+   "id": "txt.proj",
+   "op": "linear",
+   "label": {
+    "en": "Caption vectors",
+    "zh": "描述向量"
+   },
+   "in": [
+    "txt.pool"
+   ],
+   "outShape": [
+    "K",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "axes": [
+    "k",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "txt.norm",
+   "op": "l2norm",
+   "label": {
+    "en": "Caption vectors, length 1",
+    "zh": "描述向量，长度 1"
+   },
+   "in": [
+    "txt.proj"
+   ],
+   "outShape": [
+    "K",
+    32
+   ],
+   "axes": [
+    "k",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 56
+   }
+  },
+  {
+   "id": "sim",
+   "op": "similarity",
+   "label": {
+    "en": "Scores: drawing vs each caption",
+    "zh": "分数：画对每句描述"
+   },
+   "in": [
+    "img.norm",
+    "txt.norm"
+   ],
+   "outShape": [
+    "K"
+   ],
+   "axes": [
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/contrastive-learning/model.py",
+    "line": 65
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Shares over your captions",
+    "zh": "在你的描述之间的份额"
+   },
+   "in": [
+    "sim"
+   ],
+   "outShape": [
+    "K"
+   ],
+   "axes": [
+    "k"
+   ]
+  }
+ ],
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": null,
+  "checked": null,
+  "bar": 0.0001,
+  "scope": "forward"
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/contrastive-learning/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "image",
+   "adapter": "shapes-captions",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "name": "text",
+   "adapter": "shapes-captions",
+   "kind": "text",
+   "shape": [
+    "K",
+    "L"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "k",
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "K": {
+   "min": 1,
+   "max": 3,
+   "label": {
+    "en": "captions",
+    "zh": "句描述"
+   }
+  },
+  "L": {
+   "min": 1,
+   "max": 8,
+   "label": {
+    "en": "words",
+    "zh": "个词"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json"
+ },
+ "vocab": [
+  "<pad>",
+  "a",
+  "the",
+  "small",
+  "big",
+  "large",
+  "circle",
+  "square",
+  "triangle",
+  "cross",
+  "star",
+  "on",
+  "at",
+  "in",
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "middle",
+  "center",
+  "above",
+  "below",
+  "of",
+  "and"
+ ]
+}

@@ -1,0 +1,25 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "lora",
+ "checked": "2026-10-08",
+ "sources": {
+  "fit": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 2.22e-16,
+   "frames": 101,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "ranks": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 101,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  }
+ }
+}

@@ -1,6 +1,8 @@
 // Number and shape formatting for narration and views (design §3.1 core/format.ts). Pure functions.
 // Same output as kit/format.ts (atlas never imports the kit), plus the narration formats of design §4.6:
 //   n3 (3 significant digits; default) | n2 n4 n5 n6 (that many significant digits) | int | pct | signed | shape | label | tok
+//   K4: pct2 (a share with 2 decimals: 0.99983 -> "99.98%", where pct says "100.0%") | sci (scientific notation as the
+//   formula cards print it: 1.71 × 10⁻⁴, not the calculator's 1.71e−4; char-rnn and crnn-ocr each wrote their own)
 // Every minus sign is the typographic minus U+2212, in the mantissa and in the exponent ("−7.70e−4"); kit/format.ts
 // (the legacy pages) still replaces only the first '-' (integration "kit fixes before wave 2a").
 import type { Dim } from '../types/index.ts';
@@ -74,6 +76,18 @@ export function fmtPct(p: number, digits = 1): string {
 	return `${minus(v.toFixed(digits))}%`;
 }
 
+/** K4: scientific notation as a person writes it: 0.000171 -> "1.71 × 10⁻⁴", 123456 -> "1.23 × 10⁵"; numbers from 0.001 to
+ *  99,999 print as fmt3 does ("0.0123", "457"). `digits` significant digits (default 3). */
+export function fmtSci(v: number | null | undefined, digits = 3): string {
+	if (!(Number.isInteger(digits) && digits >= 1 && digits <= 21)) digits = 3;
+	if (v == null || !Number.isFinite(v) || v === 0) return fmt3(v, digits);
+	const a = Math.abs(v);
+	if (a >= 1e-3 && a < 1e5) return fmt3(v, digits);
+	const [m, e] = v.toExponential(digits - 1).split('e');
+	const sup = (s: string) => s.replace(/^\+/, '').replace(/[-0-9]/g, (c) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(c)]);
+	return `${minus(m)} × 10${sup(e)}`;
+}
+
 /** 3 significant digits with an explicit sign: "+0.250", "−1.20". */
 export function fmtSigned(v: number): string {
 	const s = fmt3(v);
@@ -114,7 +128,7 @@ export function visibleToken(s: string): string {
 	return out;
 }
 
-export type NarrationFmt = 'n2' | 'n3' | 'n4' | 'n5' | 'n6' | 'int' | 'pct' | 'signed' | 'shape' | 'label' | 'tok';
+export type NarrationFmt = 'n2' | 'n3' | 'n4' | 'n5' | 'n6' | 'int' | 'pct' | 'pct2' | 'sci' | 'signed' | 'shape' | 'label' | 'tok';
 
 /** The significant digits of an `nK` format (n2..n6), else null. */
 export function sigDigits(fmt: string | undefined): number | null {
@@ -132,6 +146,10 @@ export function fmtValue(v: number | string, fmt: string | undefined): string {
 			return fmtInt(v);
 		case 'pct':
 			return fmtPct(v);
+		case 'pct2':
+			return fmtPct(v, 2);
+		case 'sci':
+			return fmtSci(v);
 		case 'signed':
 			return fmtSigned(v);
 		case undefined:

@@ -235,17 +235,60 @@ export function tokenIds(trace: Trace | null, model: GraphModel | null): ArrayLi
 	return tensorOf(trace, decl.name)?.data ?? null;
 }
 
-/** Display texts of the T tokens: props.tokens, then rt.pre.tokens (an adapter extra), then the spec's rowNames (an export
- *  extra for models without text: a ViT's [CLS], p0 … p15; K0), else '#id' (or 0..T-1). */
-export function tokenTexts(p: Props, T: number, ids?: ArrayLike<number> | null): string[] {
-	const pick = (v: unknown): string[] | null => {
-		if (!Array.isArray(v)) return null;
-		const s = v.map((x) => (typeof x === 'string' ? x : x && typeof x === 'object' && typeof (x as { text?: unknown }).text === 'string' ? (x as { text: string }).text : null));
-		return s.every((x) => x !== null) ? (s as string[]) : null;
-	};
-	const list = pick(p.props.tokens) ?? pick((p.rt.pre as { tokens?: unknown } | null)?.tokens) ?? pick((p.rt.spec as { rowNames?: unknown } | null)?.rowNames);
-	if (list && list.length >= T) return list.slice(0, T).map(visibleToken);
+/** The text of one display name: a string, an I18n (in `lang`) or a { text } token. null for anything else. */
+export function nameText(x: unknown, lang: 'en' | 'zh' = 'en'): string | null {
+	if (typeof x === 'string') return x;
+	if (x && typeof x === 'object') {
+		const o = x as { text?: unknown; en?: unknown; zh?: unknown };
+		if (typeof o.text === 'string') return o.text;
+		if (typeof o.en === 'string') return lang === 'zh' && typeof o.zh === 'string' ? o.zh : o.en;
+	}
+	return null;
+}
+
+function nameList(v: unknown, lang: 'en' | 'zh'): string[] | null {
+	if (!Array.isArray(v)) return null;
+	const s = v.map((x) => nameText(x, lang));
+	return s.every((x) => x !== null) ? (s as string[]) : null;
+}
+
+/** Display texts of the T tokens: props.tokens (strings, I18n or { text }; at least T of them), then rt.pre.names
+ *  (bilingual names of the input positions, K4) or rt.pre.tokens (an adapter extra), then the spec's rowNames (an export
+ *  extra for models without text: a ViT's [CLS], p0 … p15; K0), else '#id' (or 0..T-1). K4: the runtime's lists name the
+ *  rows only of a layer just as long (TinyViT's 17 rows no longer took the text's tokens; a decoder layer no longer takes
+ *  the encoder input's characters); `lang` picks the language of I18n names (views pass the page's language). */
+export function tokenTexts(p: Props, T: number, ids?: ArrayLike<number> | null, lang: 'en' | 'zh' = 'en'): string[] {
+	const pre = p.rt.pre as { tokens?: unknown; names?: unknown } | null;
+	const own = nameList(p.props.tokens, lang);
+	const list = own && own.length >= T ? own : [nameList(pre?.names, lang), nameList(pre?.tokens, lang), nameList((p.rt.spec as { rowNames?: unknown } | null)?.rowNames, lang)].find((l) => l && l.length === T);
+	if (list) return list.slice(0, T).map(visibleToken);
 	return Array.from({ length: T }, (_, i) => (ids && i < ids.length ? `#${ids[i]}` : `${i}`));
+}
+
+/** K4: the names of an attention layer's keys: props.keys (a second sequence: an encoder-decoder's cross-attention reads
+ *  the encoder's positions), else the tokens (tokenTexts). */
+export function keyTexts(p: Props, Tk: number, ids?: ArrayLike<number> | null, lang: 'en' | 'zh' = 'en'): string[] {
+	const own = nameList(p.props.keys, lang);
+	if (own && own.length >= Tk) return own.slice(0, Tk).map(visibleToken);
+	return tokenTexts(p, Tk, ids, lang);
+}
+
+/** K4: words for axes the kit has no name for, from the step's props: axisWords ({ k: { en: 'mode', zh: '模式' } }),
+ *  axisItems (a name per index: { xy: [{ en: 'real part', zh: '实部' }, { en: 'imaginary part', zh: '虚部' }] }) and keys
+ *  (the key names of a cross-attention layer). unitWhere and the zoom headers read them. */
+export interface AxisNames {
+	words?: Record<string, I18n>;
+	items?: Record<string, readonly (string | I18n)[]>;
+	keys?: readonly (string | I18n)[];
+}
+export function axisNames(p: Pick<Props, 'props'>): AxisNames {
+	const o: AxisNames = {};
+	const w = p.props.axisWords;
+	if (w && typeof w === 'object') o.words = w as Record<string, I18n>;
+	const it = p.props.axisItems;
+	if (it && typeof it === 'object') o.items = it as Record<string, (string | I18n)[]>;
+	if (Array.isArray(p.props.keys)) o.keys = p.props.keys as (string | I18n)[];
+	return o;
 }
 
 /** Text for a vocabulary id: props.vocab, else rt.pre.vocab (an adapter extra; string[] or (id) => string), else '#id'. */
@@ -279,14 +322,30 @@ export function outLabels(p: Props, model: GraphModel | null): ((i: number) => I
 
 /** The unit's position in words. One index base everywhere (R0): channels, heads, rows, columns, positions, queries,
  *  keys and features count from 0, as PyTorch, the kit TensorGrid readout ("Row 3, column 4") and the TileStack labels
- *  do, and the phrase ends with "(counting from 0)" when it shows an index. */
-export function unitWhere(unit: readonly number[], axes: readonly Axis[], tokens?: readonly string[], labels?: (i: number) => I18n | string): I18n {
+ *  do, and the phrase ends with "(counting from 0)" when it shows an index. K4: `names` (axisNames(props)) gives words for
+ *  axes the kit cannot name (`k`: a mode, an expert, a point), a name per index (`xy`: the real and the imaginary part)
+ *  and the key names of a cross-attention layer (an `xy` axis means coordinates in egnn and a real/imaginary pair in fno,
+ *  so it has no default names). */
+export function unitWhere(unit: readonly number[], axes: readonly Axis[], tokens?: readonly string[], labels?: (i: number) => I18n | string, names: AxisNames = {}): I18n {
 	const en: string[] = [];
 	const zh: string[] = [];
 	let indexed = false;
 	axes.forEach((a, i) => {
 		const v = unit[i];
 		if (v === undefined) return;
+		const item = names.items?.[a]?.[v];
+		if (item !== undefined) {
+			en.push(nameText(item, 'en') ?? String(v));
+			zh.push(nameText(item, 'zh') ?? String(v));
+			return;
+		}
+		const word = names.words?.[a];
+		if (word) {
+			en.push(`${word.en} ${v}`);
+			zh.push(`${word.zh ?? word.en} ${v}`);
+			indexed = true;
+			return;
+		}
 		switch (a) {
 			case 'c':
 				en.push(`channel ${v}`);
@@ -313,9 +372,10 @@ export function unitWhere(unit: readonly number[], axes: readonly Axis[], tokens
 				break;
 			}
 			case 'tk': {
-				const tok = tokens?.[v];
-				en.push(`key ${v}${tok ? ` “${tok}”` : ''}`);
-				zh.push(`键 ${v}${tok ? `“${tok}”` : ''}`);
+				const ke = names.keys ? nameText(names.keys[v], 'en') : tokens?.[v];
+				const kz = names.keys ? nameText(names.keys[v], 'zh') : tokens?.[v];
+				en.push(`key ${v}${ke ? ` “${ke}”` : ''}`);
+				zh.push(`键 ${v}${kz ? `“${kz}”` : ''}`);
 				break;
 			}
 			case 'd':
@@ -354,6 +414,13 @@ export function unitWhere(unit: readonly number[], axes: readonly Axis[], tokens
 	});
 	const note = indexed ? L(' (counting from 0)', '（从 0 数起）') : L('', '');
 	return en.length ? L(en.join(', ') + note.en, zh.join('，') + note.zh!) : L(`unit [${unit.join(', ')}] (counting from 0)`, `单元 [${unit.join(', ')}]（从 0 数起）`);
+}
+
+/** K4: rows of the most square grid that holds exactly n cells (12 -> 3 x 4, 3 -> 1 x 3, 7 -> 1 x 7): no empty cell. */
+export function gridRows(n: number): number {
+	if (!(n > 0)) return 0;
+	for (let r = Math.floor(Math.sqrt(n)); r > 1; r--) if (n % r === 0) return r;
+	return 1;
 }
 
 /** "Recomputed here … stored by the forward pass …": the self-check every zoom view prints. */

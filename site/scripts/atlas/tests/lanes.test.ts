@@ -41,7 +41,7 @@ function scratchRepo() {
 	put('site/.atlas/x/report.json', '{}\n');
 	put('site/package-lock.json', '{}\n');
 	const read = (rel: string) => readFileSync(join(repo, ...rel.split('/')), 'utf8');
-	return { base, repo, site, put, read, env: { ATLAS_ROOT: repo, ATLAS_SITE: site }, cleanup: () => rmSync(base, { recursive: true, force: true }) };
+	return { base, repo, site, put, read, env: { ATLAS_ROOT: repo, ATLAS_SITE: site, ATLAS_LANES_DIR: '' }, cleanup: () => rmSync(base, { recursive: true, force: true }) };
 }
 
 test('lanes: globs and the vite.config.ts patch', () => {
@@ -72,7 +72,8 @@ test('acceptance 4: worktree, merge --dry-run, merge and --sync on a scratch lan
 		assert.match(readFileSync(L('vite.config.ts'), 'utf8'), /allow: \['\.', '\.\.\/\.\.\/\.\.'\]/);
 		const lj = JSON.parse(readFileSync(join(t.site, '.work', 'scratch', 'lane.json'), 'utf8'));
 		assert.equal(lj.format, 'atlas-lane/1');
-		assert.deepEqual(lj.owns, ['pipeline/scratch/**', 'site/src/lib/explainers/scratch/**', 'site/static/models/scratch/**', 'notes/scratch.md', 'notes/shots/scratch/**']);
+		// K4: the review packet notes/review-<slug>.md is owned too
+		assert.deepEqual(lj.owns, ['pipeline/scratch/**', 'site/src/lib/explainers/scratch/**', 'site/static/models/scratch/**', 'notes/scratch.md', 'notes/review-scratch.md', 'notes/shots/scratch/**']);
 		assert.equal(Object.keys(lj.snapshot).length, 7);
 		assert.equal(cli(['worktree', 'scratch'], t.env).status, 1, 'an existing lane is never overwritten');
 

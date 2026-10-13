@@ -1,0 +1,209 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "valLoss": {
+   "value": 1.08914,
+   "unit": "nats per character",
+   "source": "pipeline/tinymoe/train.py: 256,000 held-out characters (TinyStoriesV2-GPT4-valid.txt), windows of 64, CPU fp32",
+   "measured": "2026-10-12"
+  },
+  "valLossDense": {
+   "value": 1.1682,
+   "unit": "nats per character",
+   "source": "pipeline/tinymoe/train.py --variant dense",
+   "measured": "2026-10-12"
+  },
+  "valLossNoaux": {
+   "value": 1.09456,
+   "unit": "nats per character",
+   "source": "pipeline/tinymoe/train.py --variant noaux",
+   "measured": "2026-10-12"
+  },
+  "params": {
+   "value": 49418,
+   "unit": "parameters",
+   "source": "model.py",
+   "measured": "2026-10-12"
+  },
+  "active": {
+   "value": 32650,
+   "unit": "parameters one character uses",
+   "source": "model.py active_params",
+   "measured": "2026-10-12"
+  },
+  "denseParams": {
+   "value": 32330,
+   "unit": "parameters",
+   "source": "model.py (dense twin)",
+   "measured": "2026-10-12"
+  },
+  "trainSteps": {
+   "value": 12000,
+   "unit": "steps of 256 windows of 64 characters",
+   "source": "pipeline/tinymoe/train.py",
+   "measured": "2026-10-12"
+  },
+  "trainChars": {
+   "value": 39347112,
+   "unit": "characters",
+   "source": "pipeline/tinymoe/train.py",
+   "measured": "2026-10-12"
+  },
+  "alpha": {
+   "value": 0.01,
+   "unit": "weight of the balancing loss",
+   "source": "pipeline/tinymoe/train.py",
+   "measured": "2026-10-12"
+  },
+  "vocab": {
+   "value": 74,
+   "unit": "characters in the alphabet",
+   "source": "model.py",
+   "measured": "2026-10-12"
+  },
+  "b1Busiest": {
+   "value": 0.33393,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1Quietest": {
+   "value": 0.18774,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1Balance": {
+   "value": 0.99162,
+   "unit": "balancing loss (1 = balanced)",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1Drop1_0": {
+   "value": 0.11861,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.0",
+   "measured": "2026-10-12"
+  },
+  "b1Drop1_25": {
+   "value": 0.02618,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.25",
+   "measured": "2026-10-12"
+  },
+  "b1Drop2_0": {
+   "value": 0.0,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 2.0",
+   "measured": "2026-10-12"
+  },
+  "b2Busiest": {
+   "value": 0.28516,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2Quietest": {
+   "value": 0.20634,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2Balance": {
+   "value": 0.98863,
+   "unit": "balancing loss (1 = balanced)",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2Drop1_0": {
+   "value": 0.07225,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.0",
+   "measured": "2026-10-12"
+  },
+  "b2Drop1_25": {
+   "value": 0.00514,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.25",
+   "measured": "2026-10-12"
+  },
+  "b2Drop2_0": {
+   "value": 0.0,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 2.0",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxBusiest": {
+   "value": 0.32856,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxQuietest": {
+   "value": 0.17333,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxBalance": {
+   "value": 1.0267,
+   "unit": "balancing loss (1 = balanced)",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxDrop1_0": {
+   "value": 0.12865,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.0",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxDrop1_25": {
+   "value": 0.02652,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.25",
+   "measured": "2026-10-12"
+  },
+  "b1NoauxDrop2_0": {
+   "value": 0.0,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 2.0",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxBusiest": {
+   "value": 0.3459,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxQuietest": {
+   "value": 0.19284,
+   "unit": "share of slots",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxBalance": {
+   "value": 1.05086,
+   "unit": "balancing loss (1 = balanced)",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32)",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxDrop1_0": {
+   "value": 0.11285,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.0",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxDrop1_25": {
+   "value": 0.03542,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 1.25",
+   "measured": "2026-10-12"
+  },
+  "b2NoauxDrop2_0": {
+   "value": 0.0,
+   "unit": "share of slots dropped",
+   "source": "pipeline/tinymoe/stats.py (256,000 held-out characters, CPU float32), capacity factor 2.0",
+   "measured": "2026-10-12"
+  }
+ }
+}

@@ -186,7 +186,7 @@
 	}
 	.wlbl {
 		fill: var(--ink-2);
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.obs {
 		fill: var(--surface);

@@ -61,7 +61,7 @@
 		</div>
 
 		<div class="detail">
-			<NumGrid values={w.subarray(sel * 9, sel * 9 + 9)} rows={3} cols={3} domain={kDom} role="param" cell={44} label={t({ en: `kernel ${sel}: its 9 weights`, zh: `卷积核 ${sel}：它的 9 个权重` })} />
+			<NumGrid values={w.subarray(sel * 9, sel * 9 + 9)} rows={3} cols={3} domain={kDom} role="param" cell={54} label={t({ en: `kernel ${sel}: its 9 weights`, zh: `卷积核 ${sel}：它的 9 个权重` })} />
 			<figure>
 				<figcaption>{t({ en: `its map on your drawing`, zh: `它在你的画上得到的特征图` })} <span class="num muted">[26×26]</span></figcaption>
 				<TensorGrid
@@ -126,7 +126,7 @@
 		box-shadow: 0 0 0 2px var(--accent);
 	}
 	.hd {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--ink-2);
 	}
 	.pair {
@@ -168,7 +168,7 @@
 	}
 	.pg {
 		font-family: var(--font-mono);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		line-height: 1;
 		color: var(--muted);
 	}

@@ -1,0 +1,2157 @@
+{
+ "slug": "tinymoe",
+ "name": {
+  "en": "Tiny mixture of experts",
+  "zh": "小型混合专家模型"
+ },
+ "version": "2026-10-12",
+ "params": 49418,
+ "precision": "fp32",
+ "input": {
+  "kind": "text",
+  "shape": [
+   "T"
+  ]
+ },
+ "tensors": [
+  {
+   "name": "tok.weight",
+   "shape": [
+    74,
+    32
+   ],
+   "offset": 0,
+   "length": 2368
+  },
+  {
+   "name": "pos.weight",
+   "shape": [
+    64,
+    32
+   ],
+   "offset": 2368,
+   "length": 2048
+  },
+  {
+   "name": "B1.ln1.weight",
+   "shape": [
+    32
+   ],
+   "offset": 4416,
+   "length": 32
+  },
+  {
+   "name": "B1.ln1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 4448,
+   "length": 32
+  },
+  {
+   "name": "B1.q.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 4480,
+   "length": 1024
+  },
+  {
+   "name": "B1.q.bias",
+   "shape": [
+    32
+   ],
+   "offset": 5504,
+   "length": 32
+  },
+  {
+   "name": "B1.k.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 5536,
+   "length": 1024
+  },
+  {
+   "name": "B1.k.bias",
+   "shape": [
+    32
+   ],
+   "offset": 6560,
+   "length": 32
+  },
+  {
+   "name": "B1.v.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 6592,
+   "length": 1024
+  },
+  {
+   "name": "B1.v.bias",
+   "shape": [
+    32
+   ],
+   "offset": 7616,
+   "length": 32
+  },
+  {
+   "name": "B1.proj.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 7648,
+   "length": 1024
+  },
+  {
+   "name": "B1.proj.bias",
+   "shape": [
+    32
+   ],
+   "offset": 8672,
+   "length": 32
+  },
+  {
+   "name": "B1.ln2.weight",
+   "shape": [
+    32
+   ],
+   "offset": 8704,
+   "length": 32
+  },
+  {
+   "name": "B1.ln2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 8736,
+   "length": 32
+  },
+  {
+   "name": "B1.router.weight",
+   "shape": [
+    4,
+    32
+   ],
+   "offset": 8768,
+   "length": 128
+  },
+  {
+   "name": "B1.moe.fc",
+   "shape": [
+    4,
+    64,
+    32
+   ],
+   "offset": 8896,
+   "length": 8192
+  },
+  {
+   "name": "B1.moe.fc_b",
+   "shape": [
+    4,
+    64
+   ],
+   "offset": 17088,
+   "length": 256
+  },
+  {
+   "name": "B1.moe.out",
+   "shape": [
+    4,
+    32,
+    64
+   ],
+   "offset": 17344,
+   "length": 8192
+  },
+  {
+   "name": "B1.moe.out_b",
+   "shape": [
+    4,
+    32
+   ],
+   "offset": 25536,
+   "length": 128
+  },
+  {
+   "name": "B2.ln1.weight",
+   "shape": [
+    32
+   ],
+   "offset": 25664,
+   "length": 32
+  },
+  {
+   "name": "B2.ln1.bias",
+   "shape": [
+    32
+   ],
+   "offset": 25696,
+   "length": 32
+  },
+  {
+   "name": "B2.q.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 25728,
+   "length": 1024
+  },
+  {
+   "name": "B2.q.bias",
+   "shape": [
+    32
+   ],
+   "offset": 26752,
+   "length": 32
+  },
+  {
+   "name": "B2.k.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 26784,
+   "length": 1024
+  },
+  {
+   "name": "B2.k.bias",
+   "shape": [
+    32
+   ],
+   "offset": 27808,
+   "length": 32
+  },
+  {
+   "name": "B2.v.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 27840,
+   "length": 1024
+  },
+  {
+   "name": "B2.v.bias",
+   "shape": [
+    32
+   ],
+   "offset": 28864,
+   "length": 32
+  },
+  {
+   "name": "B2.proj.weight",
+   "shape": [
+    32,
+    32
+   ],
+   "offset": 28896,
+   "length": 1024
+  },
+  {
+   "name": "B2.proj.bias",
+   "shape": [
+    32
+   ],
+   "offset": 29920,
+   "length": 32
+  },
+  {
+   "name": "B2.ln2.weight",
+   "shape": [
+    32
+   ],
+   "offset": 29952,
+   "length": 32
+  },
+  {
+   "name": "B2.ln2.bias",
+   "shape": [
+    32
+   ],
+   "offset": 29984,
+   "length": 32
+  },
+  {
+   "name": "B2.router.weight",
+   "shape": [
+    4,
+    32
+   ],
+   "offset": 30016,
+   "length": 128
+  },
+  {
+   "name": "B2.moe.fc",
+   "shape": [
+    4,
+    64,
+    32
+   ],
+   "offset": 30144,
+   "length": 8192
+  },
+  {
+   "name": "B2.moe.fc_b",
+   "shape": [
+    4,
+    64
+   ],
+   "offset": 38336,
+   "length": 256
+  },
+  {
+   "name": "B2.moe.out",
+   "shape": [
+    4,
+    32,
+    64
+   ],
+   "offset": 38592,
+   "length": 8192
+  },
+  {
+   "name": "B2.moe.out_b",
+   "shape": [
+    4,
+    32
+   ],
+   "offset": 46784,
+   "length": 128
+  },
+  {
+   "name": "ln.weight",
+   "shape": [
+    32
+   ],
+   "offset": 46912,
+   "length": 32
+  },
+  {
+   "name": "ln.bias",
+   "shape": [
+    32
+   ],
+   "offset": 46944,
+   "length": 32
+  },
+  {
+   "name": "head.weight",
+   "shape": [
+    74,
+    32
+   ],
+   "offset": 46976,
+   "length": 2368
+  },
+  {
+   "name": "head.bias",
+   "shape": [
+    74
+   ],
+   "offset": 49344,
+   "length": 74
+  }
+ ],
+ "layers": [
+  {
+   "id": "tok",
+   "op": "embedding",
+   "label": {
+    "en": "Character rows",
+    "zh": "字符行"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "Position rows",
+    "zh": "位置行"
+   },
+   "in": [
+    "input"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 124
+   }
+  },
+  {
+   "id": "embed",
+   "op": "add",
+   "label": {
+    "en": "Character + position",
+    "zh": "字符 + 位置"
+   },
+   "in": [
+    "tok",
+    "pos"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 131
+   }
+  },
+  {
+   "id": "B1.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 1",
+    "zh": "第 1 块 · 层归一化 1"
+   },
+   "in": [
+    "embed"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 108
+   }
+  },
+  {
+   "id": "B1.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Queries Q",
+    "zh": "第 1 块 · 查询 Q"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 98
+   }
+  },
+  {
+   "id": "B1.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Keys K",
+    "zh": "第 1 块 · 键 K"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 99
+   }
+  },
+  {
+   "id": "B1.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Values V",
+    "zh": "第 1 块 · 值 V"
+   },
+   "in": [
+    "B1.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 100
+   }
+  },
+  {
+   "id": "B1.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 1 · Attention scores",
+    "zh": "第 1 块 · 注意力分数"
+   },
+   "in": [
+    "B1.q",
+    "B1.k"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 110
+   }
+  },
+  {
+   "id": "B1.mask",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 1 · Causal mask",
+    "zh": "第 1 块 · 因果掩码"
+   },
+   "in": [
+    "B1.scores"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 111
+   }
+  },
+  {
+   "id": "B1.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 1 · Attention weights",
+    "zh": "第 1 块 · 注意力权重"
+   },
+   "in": [
+    "B1.mask"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "B1.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 1 · Mix of values",
+    "zh": "第 1 块 · 值的混合"
+   },
+   "in": [
+    "B1.attn",
+    "B1.v"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "B1.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Attention output",
+    "zh": "第 1 块 · 注意力输出"
+   },
+   "in": [
+    "B1.mix"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 101
+   }
+  },
+  {
+   "id": "B1.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Add attention",
+    "zh": "第 1 块 · 加上注意力"
+   },
+   "in": [
+    "embed",
+    "B1.proj"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 113
+   }
+  },
+  {
+   "id": "B1.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 1 · LayerNorm 2",
+    "zh": "第 1 块 · 层归一化 2"
+   },
+   "in": [
+    "B1.add1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 102
+   }
+  },
+  {
+   "id": "B1.router",
+   "op": "linear",
+   "label": {
+    "en": "Block 1 · Router scores",
+    "zh": "第 1 块 · 路由分数"
+   },
+   "in": [
+    "B1.ln2"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 4
+   },
+   "desc": {
+    "en": "One score per expert for each character: a linear layer with no bias.",
+    "zh": "每个字符对每个专家打一个分：一个没有偏置的线性层。"
+   },
+   "axes": [
+    "t",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 81
+   }
+  },
+  {
+   "id": "B1.route",
+   "op": "softmax",
+   "label": {
+    "en": "Block 1 · Router chances",
+    "zh": "第 1 块 · 路由概率"
+   },
+   "in": [
+    "B1.router"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "axes": [
+    "t",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "B1.moe",
+   "op": "moe",
+   "label": {
+    "en": "Block 1 · Top-2 experts",
+    "zh": "第 1 块 · 前 2 个专家"
+   },
+   "in": [
+    "B1.ln2",
+    "B1.route"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "k": 2
+   },
+   "desc": {
+    "en": "The two experts with the largest chances run; their outputs are added, weighted by the gates.",
+    "zh": "概率最大的两个专家运行；它们的输出按门控加权相加。"
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 78
+   },
+   "sub": [
+    "gate",
+    "e"
+   ]
+  },
+  {
+   "id": "B1.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 1 · Add experts",
+    "zh": "第 1 块 · 加上专家输出"
+   },
+   "in": [
+    "B1.add1",
+    "B1.moe"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "B2.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 1",
+    "zh": "第 2 块 · 层归一化 1"
+   },
+   "in": [
+    "B1.add2"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 108
+   }
+  },
+  {
+   "id": "B2.q",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Queries Q",
+    "zh": "第 2 块 · 查询 Q"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 98
+   }
+  },
+  {
+   "id": "B2.k",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Keys K",
+    "zh": "第 2 块 · 键 K"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 99
+   }
+  },
+  {
+   "id": "B2.v",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Values V",
+    "zh": "第 2 块 · 值 V"
+   },
+   "in": [
+    "B2.ln1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32,
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 100
+   }
+  },
+  {
+   "id": "B2.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "Block 2 · Attention scores",
+    "zh": "第 2 块 · 注意力分数"
+   },
+   "in": [
+    "B2.q",
+    "B2.k"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 110
+   }
+  },
+  {
+   "id": "B2.mask",
+   "op": "causal_mask",
+   "label": {
+    "en": "Block 2 · Causal mask",
+    "zh": "第 2 块 · 因果掩码"
+   },
+   "in": [
+    "B2.scores"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 111
+   }
+  },
+  {
+   "id": "B2.attn",
+   "op": "softmax",
+   "label": {
+    "en": "Block 2 · Attention weights",
+    "zh": "第 2 块 · 注意力权重"
+   },
+   "in": [
+    "B2.mask"
+   ],
+   "outShape": [
+    2,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "B2.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "Block 2 · Mix of values",
+    "zh": "第 2 块 · 值的混合"
+   },
+   "in": [
+    "B2.attn",
+    "B2.v"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "nHead": 2,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "B2.proj",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Attention output",
+    "zh": "第 2 块 · 注意力输出"
+   },
+   "in": [
+    "B2.mix"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 32
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 101
+   }
+  },
+  {
+   "id": "B2.add1",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Add attention",
+    "zh": "第 2 块 · 加上注意力"
+   },
+   "in": [
+    "B1.add2",
+    "B2.proj"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 113
+   }
+  },
+  {
+   "id": "B2.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "Block 2 · LayerNorm 2",
+    "zh": "第 2 块 · 层归一化 2"
+   },
+   "in": [
+    "B2.add1"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 102
+   }
+  },
+  {
+   "id": "B2.router",
+   "op": "linear",
+   "label": {
+    "en": "Block 2 · Router scores",
+    "zh": "第 2 块 · 路由分数"
+   },
+   "in": [
+    "B2.ln2"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 4
+   },
+   "desc": {
+    "en": "One score per expert for each character: a linear layer with no bias.",
+    "zh": "每个字符对每个专家打一个分：一个没有偏置的线性层。"
+   },
+   "axes": [
+    "t",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 81
+   }
+  },
+  {
+   "id": "B2.route",
+   "op": "softmax",
+   "label": {
+    "en": "Block 2 · Router chances",
+    "zh": "第 2 块 · 路由概率"
+   },
+   "in": [
+    "B2.router"
+   ],
+   "outShape": [
+    "T",
+    4
+   ],
+   "axes": [
+    "t",
+    "k"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 64
+   }
+  },
+  {
+   "id": "B2.moe",
+   "op": "moe",
+   "label": {
+    "en": "Block 2 · Top-2 experts",
+    "zh": "第 2 块 · 前 2 个专家"
+   },
+   "in": [
+    "B2.ln2",
+    "B2.route"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "k": 2
+   },
+   "desc": {
+    "en": "The two experts with the largest chances run; their outputs are added, weighted by the gates.",
+    "zh": "概率最大的两个专家运行；它们的输出按门控加权相加。"
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 78
+   },
+   "sub": [
+    "gate",
+    "e"
+   ]
+  },
+  {
+   "id": "B2.add2",
+   "op": "add",
+   "label": {
+    "en": "Block 2 · Add experts",
+    "zh": "第 2 块 · 加上专家输出"
+   },
+   "in": [
+    "B2.add1",
+    "B2.moe"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "ln",
+   "op": "layernorm",
+   "label": {
+    "en": "Final LayerNorm",
+    "zh": "最后的层归一化"
+   },
+   "in": [
+    "B2.add2"
+   ],
+   "outShape": [
+    "T",
+    32
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 126
+   }
+  },
+  {
+   "id": "head",
+   "op": "linear",
+   "label": {
+    "en": "Next-character scores",
+    "zh": "下一个字符的分数"
+   },
+   "in": [
+    "ln"
+   ],
+   "outShape": [
+    "T",
+    74
+   ],
+   "params": {
+    "inFeatures": 32,
+    "outFeatures": 74
+   },
+   "axes": [
+    "t",
+    "vocab"
+   ],
+   "code": {
+    "file": "pipeline/tinymoe/model.py",
+    "line": 127
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Next-character chances",
+    "zh": "下一个字符的概率"
+   },
+   "in": [
+    "head"
+   ],
+   "outShape": [
+    "T",
+    74
+   ],
+   "axes": [
+    "t",
+    "vocab"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "TinyStories (TinyStoriesV2-GPT4): 39,347,112 characters from the start of the train split",
+  "chars": 39347112,
+  "steps": 12000,
+  "metrics": {
+   "val_loss": 1.08914,
+   "val_loss_dense": 1.1682,
+   "val_loss_noaux": 1.09456
+  },
+  "recipe": "AdamW (weight decay 0.01), warm-up 300, cosine to 0, clip 1.0, lr 0.003, batch 256 x 64 characters, balancing loss x 0.01"
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.0000341,
+  "checked": "2026-10-12",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 5,
+  "edgeCases": [
+   "one",
+   "max"
+  ],
+  "perLayer": {
+   "B1.ln1": 4.77e-7,
+   "B1.q": 0.00000143,
+   "B1.k": 0.00000143,
+   "B1.v": 9.54e-7,
+   "B1.scores": 0.00000954,
+   "B1.mask": 0.00000954,
+   "B1.mix": 0.00000262,
+   "B1.proj": 0.00000346,
+   "B1.add1": 0.00000346,
+   "B1.ln2": 0.00000358,
+   "B1.router": 0.00000143,
+   "B1.route": 4.17e-7,
+   "B1.moe": 0.00000346,
+   "B1.moe#gate": 3.87e-7,
+   "B1.moe#e": 0.00000566,
+   "B1.add2": 0.00000322,
+   "B2.ln1": 0.00000226,
+   "B2.q": 0.00000525,
+   "B2.k": 0.0000025,
+   "B2.v": 0.00000238,
+   "B2.scores": 0.0000114,
+   "B2.mask": 0.0000114,
+   "B2.mix": 0.00000477,
+   "B2.proj": 0.00000488,
+   "B2.add1": 0.00000525,
+   "B2.ln2": 0.00000477,
+   "B2.router": 0.00000858,
+   "B2.route": 8.94e-7,
+   "B2.moe": 0.000015,
+   "B2.moe#gate": 9.54e-7,
+   "B2.moe#e": 0.000015,
+   "B2.add2": 0.0000126,
+   "ln": 0.0000125,
+   "head": 0.0000341,
+   "probs": 0.00000165,
+   "B1.attn": 9.83e-7,
+   "B2.attn": 0.00000137
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace",
+   "process"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/tinymoe/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "input",
+   "adapter": "text-presets",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 1,
+   "max": 64,
+   "label": {
+    "en": "characters",
+    "zh": "字符"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "alphabet": [
+  "�",
+  " ",
+  "\n",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  ".",
+  ",",
+  "\"",
+  "'",
+  "!",
+  "?",
+  "-",
+  ":",
+  ";",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+ ],
+ "unk": "�",
+ "context": 64,
+ "labels": [
+  "�",
+  "␣",
+  "↵",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  ".",
+  ",",
+  "\"",
+  "'",
+  "!",
+  "?",
+  "-",
+  ":",
+  ";",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+ ],
+ "config": {
+  "d": 32,
+  "heads": 2,
+  "layers": 2,
+  "experts": 4,
+  "k": 2,
+  "hidden": 64,
+  "denseHidden": 128,
+  "vocab": 74
+ },
+ "routing": {
+  "moe": [
+   {
+    "share": [
+     0.33393,
+     0.28346,
+     0.19486,
+     0.18774
+    ],
+    "top": [
+     [
+      {
+       "char": "b",
+       "share": 1,
+       "count": 3160
+      },
+      {
+       "char": "c",
+       "share": 1,
+       "count": 3589
+      },
+      {
+       "char": "f",
+       "share": 1,
+       "count": 2921
+      },
+      {
+       "char": "o",
+       "share": 1,
+       "count": 13465
+      },
+      {
+       "char": "p",
+       "share": 1,
+       "count": 3973
+      },
+      {
+       "char": "x",
+       "share": 1,
+       "count": 362
+      }
+     ],
+     [
+      {
+       "char": " ",
+       "share": 1,
+       "count": 49855
+      },
+      {
+       "char": "a",
+       "share": 1,
+       "count": 17307
+      },
+      {
+       "char": "O",
+       "share": 1,
+       "count": 539
+      },
+      {
+       "char": "T",
+       "share": 1,
+       "count": 2384
+      },
+      {
+       "char": "n",
+       "share": 0.9968,
+       "count": 11505
+      },
+      {
+       "char": ",",
+       "share": 0.9907,
+       "count": 2790
+      }
+     ],
+     [
+      {
+       "char": "d",
+       "share": 1,
+       "count": 11023
+      },
+      {
+       "char": "f",
+       "share": 1,
+       "count": 2921
+      },
+      {
+       "char": "g",
+       "share": 1,
+       "count": 3721
+      },
+      {
+       "char": "l",
+       "share": 1,
+       "count": 7869
+      },
+      {
+       "char": "m",
+       "share": 1,
+       "count": 5197
+      },
+      {
+       "char": "s",
+       "share": 1,
+       "count": 9772
+      }
+     ],
+     [
+      {
+       "char": "\n",
+       "share": 1,
+       "count": 1736
+      },
+      {
+       "char": "e",
+       "share": 1,
+       "count": 23657
+      },
+      {
+       "char": "h",
+       "share": 1,
+       "count": 12301
+      },
+      {
+       "char": "i",
+       "share": 1,
+       "count": 10971
+      },
+      {
+       "char": "k",
+       "share": 1,
+       "count": 2485
+      },
+      {
+       "char": "v",
+       "share": 1,
+       "count": 1305
+      }
+     ]
+    ]
+   },
+   {
+    "share": [
+     0.20634,
+     0.28516,
+     0.22777,
+     0.28073
+    ],
+    "top": [
+     [
+      {
+       "char": " ",
+       "share": 1,
+       "count": 49855
+      },
+      {
+       "char": ".",
+       "share": 1,
+       "count": 5202
+      },
+      {
+       "char": ",",
+       "share": 1,
+       "count": 2790
+      },
+      {
+       "char": "!",
+       "share": 1,
+       "count": 471
+      },
+      {
+       "char": "\n",
+       "share": 0.9919,
+       "count": 1736
+      },
+      {
+       "char": "s",
+       "share": 0.8985,
+       "count": 9772
+      }
+     ],
+     [
+      {
+       "char": "p",
+       "share": 1,
+       "count": 3973
+      },
+      {
+       "char": "v",
+       "share": 1,
+       "count": 1305
+      },
+      {
+       "char": "w",
+       "share": 1,
+       "count": 5126
+      },
+      {
+       "char": "B",
+       "share": 1,
+       "count": 362
+      },
+      {
+       "char": "H",
+       "share": 1,
+       "count": 717
+      },
+      {
+       "char": "L",
+       "share": 1,
+       "count": 521
+      }
+     ],
+     [
+      {
+       "char": "I",
+       "share": 1,
+       "count": 652
+      },
+      {
+       "char": "O",
+       "share": 1,
+       "count": 539
+      },
+      {
+       "char": "T",
+       "share": 1,
+       "count": 2384
+      },
+      {
+       "char": "a",
+       "share": 0.9999,
+       "count": 17307
+      },
+      {
+       "char": "e",
+       "share": 0.9999,
+       "count": 23657
+      },
+      {
+       "char": "o",
+       "share": 0.9999,
+       "count": 13465
+      }
+     ],
+     [
+      {
+       "char": "h",
+       "share": 0.9972,
+       "count": 12301
+      },
+      {
+       "char": "i",
+       "share": 0.9946,
+       "count": 10971
+      },
+      {
+       "char": "k",
+       "share": 0.9879,
+       "count": 2485
+      },
+      {
+       "char": "'",
+       "share": 0.9836,
+       "count": 548
+      },
+      {
+       "char": "d",
+       "share": 0.8829,
+       "count": 11023
+      },
+      {
+       "char": ",",
+       "share": 0.8806,
+       "count": 2790
+      }
+     ]
+    ]
+   }
+  ],
+  "noaux": [
+   {
+    "share": [
+     0.29924,
+     0.32856,
+     0.17333,
+     0.19887
+    ],
+    "top": [
+     [
+      {
+       "char": "b",
+       "share": 1,
+       "count": 3160
+      },
+      {
+       "char": "c",
+       "share": 1,
+       "count": 3589
+      },
+      {
+       "char": "f",
+       "share": 1,
+       "count": 2921
+      },
+      {
+       "char": "h",
+       "share": 1,
+       "count": 12301
+      },
+      {
+       "char": "B",
+       "share": 1,
+       "count": 362
+      },
+      {
+       "char": "S",
+       "share": 1,
+       "count": 1085
+      }
+     ],
+     [
+      {
+       "char": "n",
+       "share": 1,
+       "count": 11505
+      },
+      {
+       "char": "u",
+       "share": 1,
+       "count": 4783
+      },
+      {
+       "char": "O",
+       "share": 1,
+       "count": 539
+      },
+      {
+       "char": "T",
+       "share": 1,
+       "count": 2384
+      },
+      {
+       "char": "b",
+       "share": 0.9994,
+       "count": 3160
+      },
+      {
+       "char": "L",
+       "share": 0.9866,
+       "count": 521
+      }
+     ],
+     [
+      {
+       "char": "d",
+       "share": 1,
+       "count": 11023
+      },
+      {
+       "char": "g",
+       "share": 1,
+       "count": 3721
+      },
+      {
+       "char": "k",
+       "share": 1,
+       "count": 2485
+      },
+      {
+       "char": "l",
+       "share": 1,
+       "count": 7869
+      },
+      {
+       "char": "m",
+       "share": 1,
+       "count": 5197
+      },
+      {
+       "char": "s",
+       "share": 1,
+       "count": 9772
+      }
+     ],
+     [
+      {
+       "char": "\n",
+       "share": 1,
+       "count": 1736
+      },
+      {
+       "char": "e",
+       "share": 1,
+       "count": 23657
+      },
+      {
+       "char": "i",
+       "share": 1,
+       "count": 10971
+      },
+      {
+       "char": "v",
+       "share": 1,
+       "count": 1305
+      },
+      {
+       "char": "I",
+       "share": 1,
+       "count": 652
+      },
+      {
+       "char": "w",
+       "share": 0.9887,
+       "count": 5126
+      }
+     ]
+    ]
+   },
+   {
+    "share": [
+     0.25856,
+     0.19284,
+     0.20271,
+     0.3459
+    ],
+    "top": [
+     [
+      {
+       "char": " ",
+       "share": 1,
+       "count": 49855
+      },
+      {
+       "char": "\n",
+       "share": 1,
+       "count": 1736
+      },
+      {
+       "char": "p",
+       "share": 1,
+       "count": 3973
+      },
+      {
+       "char": "\"",
+       "share": 1,
+       "count": 1539
+      },
+      {
+       "char": "s",
+       "share": 0.9879,
+       "count": 9772
+      },
+      {
+       "char": "!",
+       "share": 0.9873,
+       "count": 471
+      }
+     ],
+     [
+      {
+       "char": "B",
+       "share": 1,
+       "count": 362
+      },
+      {
+       "char": "S",
+       "share": 1,
+       "count": 1085
+      },
+      {
+       "char": "T",
+       "share": 1,
+       "count": 2384
+      },
+      {
+       "char": "I",
+       "share": 0.9785,
+       "count": 652
+      },
+      {
+       "char": "h",
+       "share": 0.9415,
+       "count": 12301
+      },
+      {
+       "char": "n",
+       "share": 0.925,
+       "count": 11505
+      }
+     ],
+     [
+      {
+       "char": "o",
+       "share": 1,
+       "count": 13465
+      },
+      {
+       "char": ".",
+       "share": 1,
+       "count": 5202
+      },
+      {
+       "char": ",",
+       "share": 1,
+       "count": 2790
+      },
+      {
+       "char": "!",
+       "share": 1,
+       "count": 471
+      },
+      {
+       "char": "a",
+       "share": 0.9999,
+       "count": 17307
+      },
+      {
+       "char": "e",
+       "share": 0.9957,
+       "count": 23657
+      }
+     ],
+     [
+      {
+       "char": "c",
+       "share": 1,
+       "count": 3589
+      },
+      {
+       "char": "f",
+       "share": 1,
+       "count": 2921
+      },
+      {
+       "char": "h",
+       "share": 1,
+       "count": 12301
+      },
+      {
+       "char": "m",
+       "share": 1,
+       "count": 5197
+      },
+      {
+       "char": "B",
+       "share": 1,
+       "count": 362
+      },
+      {
+       "char": "L",
+       "share": 1,
+       "count": 521
+      }
+     ]
+    ]
+   }
+  ]
+ }
+}

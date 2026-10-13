@@ -1,0 +1,191 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "testExact": {
+   "value": 1.0,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "testN": {
+   "value": 5000,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "testUnseenExact": {
+   "value": 1.0,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "testUnseenN": {
+   "value": 4724,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "trainPairs": {
+   "value": 60000,
+   "source": "pipeline/tiny-encdec/make_data.ts",
+   "unit": "pairs",
+   "measured": "2026-10-12"
+  },
+  "trainSteps": {
+   "value": 6000,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "steps",
+   "measured": "2026-10-12"
+  },
+  "params": {
+   "value": 25344,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "measured": "2026-10-12"
+  },
+  "d": {
+   "value": 32,
+   "source": "model.py",
+   "measured": "2026-10-12"
+  },
+  "heads": {
+   "value": 2,
+   "source": "model.py",
+   "measured": "2026-10-12"
+  },
+  "ff": {
+   "value": 64,
+   "source": "model.py",
+   "measured": "2026-10-12"
+  },
+  "val500": {
+   "value": 0.989,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruVal500": {
+   "value": 0.9975,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offYearFirst": {
+   "value": 0.0,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offDashes": {
+   "value": 0.122,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offNoComma": {
+   "value": 0.594,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offSpelled": {
+   "value": 0.074,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offImpossible": {
+   "value": 0.98,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "offN": {
+   "value": 1000,
+   "source": "pipeline/tiny-encdec/make_data.ts",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "gruParams": {
+   "value": 16941,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "measured": "2026-10-12"
+  },
+  "gruTestExact": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruOffYearFirst": {
+   "value": 0.171,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruOffDashes": {
+   "value": 0.085,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruOffNoComma": {
+   "value": 1.0,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruOffSpelled": {
+   "value": 0.045,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "gruOffImpossible": {
+   "value": 0.356,
+   "source": "pipeline/tinyseq2seq/train.py (its train_metrics.json)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "yearInside": {
+   "value": 0.9959999918937683,
+   "source": "pipeline/tiny-encdec/train.py (train_metrics.json) year_look (both heads added)",
+   "unit": "share",
+   "measured": "2026-10-12"
+  },
+  "namedN": {
+   "value": 3719,
+   "source": "export.py looks() on the test dates (both heads averaged)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "monthGapN": {
+   "value": 1822,
+   "source": "export.py looks() on the test dates (both heads averaged)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "monthLetterN": {
+   "value": 1897,
+   "source": "export.py looks() on the test dates (both heads averaged)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "year2CopyN": {
+   "value": 4999,
+   "source": "export.py looks() on the test dates (both heads averaged)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "year3CopyN": {
+   "value": 5000,
+   "source": "export.py looks() on the test dates (both heads averaged)",
+   "unit": "dates",
+   "measured": "2026-10-12"
+  },
+  "dataSha": {
+   "value": "c84b0a576baa40660c4b2e08a28f04b14b9c2109b054da921151e380eec59ef2",
+   "source": "pipeline/tiny-encdec/make_data.ts (sha256 of the training pairs)",
+   "measured": "2026-10-12"
+  }
+ }
+}

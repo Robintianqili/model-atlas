@@ -592,7 +592,7 @@
 	}
 	.sn {
 		color: var(--muted);
-		font-size: 10px;
+		font-size: var(--t-xs);
 	}
 	.crumbs {
 		font-size: var(--fs-xs);

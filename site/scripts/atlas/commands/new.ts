@@ -540,7 +540,8 @@ export function newOp(name: string, o: Opts, r: Roots = roots()): string[] {
 		like: o.like ?? '',
 		typesPath: typesPath.startsWith('.') ? typesPath : `./${typesPath}`,
 		mirrorPath: posix(relative(r.root, pyFile)),
-		tsPath: posix(relative(r.root, tsFile))
+		// K4: repo-relative through the site (a lane outside the repo gave an absolute D:/... path here)
+		tsPath: `site/${posix(relative(r.site, tsFile))}`
 	};
 	let ts = render(readFileSync(join(TEMPLATES, 'op', 'op.ts.tmpl'), 'utf8'), v, 'op.ts.tmpl');
 	let test = render(readFileSync(join(TEMPLATES, 'op', 'op.test.ts.tmpl'), 'utf8'), v, 'op.test.ts.tmpl');

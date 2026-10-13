@@ -193,7 +193,7 @@
 	}
 	.colh,
 	.rowh {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		text-align: center;
 	}
@@ -223,7 +223,7 @@
 		color: var(--accent-strong);
 	}
 	.val {
-		font-size: 11px;
+		font-size: var(--t-xs);
 	}
 	.note {
 		font-size: var(--fs-xs);

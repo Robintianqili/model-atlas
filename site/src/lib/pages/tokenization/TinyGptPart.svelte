@@ -349,7 +349,7 @@
 		gap: 2px;
 	}
 	.pmeta {
-		font-size: 10.5px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.stage {
@@ -371,7 +371,7 @@
 		align-items: center;
 	}
 	.tid {
-		font-size: 10px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 	}
 	.cands {

@@ -1,0 +1,71 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "params": {
+   "value": 1077,
+   "unit": "numbers",
+   "source": "pipeline/fno/model.py",
+   "measured": "2026-10-12"
+  },
+  "width": {
+   "value": 4,
+   "unit": "channels",
+   "source": "pipeline/fno/model.py",
+   "measured": "2026-10-12"
+  },
+  "modes": {
+   "value": 16,
+   "unit": "modes",
+   "source": "pipeline/fno/model.py",
+   "measured": "2026-10-12"
+  },
+  "trainN": {
+   "value": 4000,
+   "unit": "pairs",
+   "source": "heat.ts via the TS process data (train.py read them)",
+   "measured": "2026-10-12"
+  },
+  "testN": {
+   "value": 400,
+   "unit": "pairs",
+   "source": "heat.ts via the TS process data",
+   "measured": "2026-10-12"
+  },
+  "trainSteps": {
+   "value": 6000,
+   "unit": "steps",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  },
+  "testRel": {
+   "value": 0.0018489286303520203,
+   "unit": "mean relative error on the test pairs",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  },
+  "testMax": {
+   "value": 0.001623340416699648,
+   "unit": "mean largest |error| per test curve",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  },
+  "test3xRel": {
+   "value": 0.014051901176571846,
+   "unit": "mean relative error on the test pairs made 3 times taller",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  },
+  "testMaxKeep4": {
+   "value": 0.05277910828590393,
+   "unit": "mean largest |error| per test curve, 4 modes kept",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  },
+  "testMaxKeep8": {
+   "value": 0.004380783531814814,
+   "unit": "mean largest |error| per test curve, 8 modes kept",
+   "source": "pipeline/fno/train.py",
+   "measured": "2026-10-12"
+  }
+ }
+}

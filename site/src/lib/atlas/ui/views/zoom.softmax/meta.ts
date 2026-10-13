@@ -1,6 +1,6 @@
 // zoom.softmax (W1-D2): one share of a softmax row (classes, next tokens, or the keys of an attention row).
 import type { ViewMeta } from '../../../types/view.ts';
-import { axesOfId, fmt3, layerLabel, outLabels, resolveUnit, tokenIds, tokenTexts, unitWhere, type Props } from '../kit.parts/stage.ts';
+import { axesOfId, axisNames, fmt3, layerLabel, outLabels, type Props, resolveUnit, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 import { demoStage, type DemoVariant } from '../kit.parts/demo.ts';
 import { fmtPct } from '../../../core/format.ts';
 
@@ -11,7 +11,7 @@ export function describeSoftmax(p: Props) {
 	const out = r.trace?.t[e.layer];
 	const axes = out ? axesOfId(r.model, e.layer, out.shape) : [];
 	const T = out ? (axes[0] === 't' ? out.shape[0] : axes[1] === 'tq' ? out.shape[1] : 0) : 0;
-	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined, outLabels(p, r.model));
+	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined, outLabels(p, r.model), axisNames(p));
 	const name = layerLabel(r.model, e.layer);
 	const v = e.values;
 	return {

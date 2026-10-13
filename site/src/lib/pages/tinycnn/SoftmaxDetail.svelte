@@ -128,6 +128,10 @@
 {/if}
 
 <style>
+	/* a superscript in the table head stays at the 12 px floor */
+	th sup {
+		font-size: var(--t-xs);
+	}
 	.bars {
 		display: grid;
 		gap: 2px;

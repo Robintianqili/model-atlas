@@ -27,7 +27,7 @@
 	vectors. A second table <Tex tex="P" /> (64 × 76) holds one learned vector per position, and the two are added:
 	<Tex tex={'x_t = E[\\text{id}_t] + P[t]'} />. The position vector is needed because attention, on its own, does not know
 	which token came first (<Term id="positional-encoding" />). For a text of <Tex tex="T" /> tokens, the result is a
-	<Tex tex={'T \\times 76'} /> matrix: one row per token. You can follow these rows through the whole model above.
+	<Tex tex={'T \\times 76'} /> matrix: one row per token. You can follow these rows through the whole model in the lesson and in Explore.
 </p>
 
 <h3 id="a-attn">3. Attention: queries, keys and values</h3>

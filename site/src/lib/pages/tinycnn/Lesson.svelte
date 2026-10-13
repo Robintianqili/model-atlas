@@ -1,42 +1,89 @@
 <!--
   The TinyCNN guided lesson: ten steps from the learner's drawing to the answer, one focused view at
-  a time (kit Walkthrough). Every stage reuses the page's own zoom components with the lesson's own
-  selection (LessonView), so the lesson and the "Explore freely" views never move each other. All
-  numbers come from the live forward pass of the current input; redrawing updates the current step.
+  a time (kit Walkthrough, laid out as the lesson app: redesign spec §5). Every stage reuses the page's
+  own zoom components with the lesson's own selection (LessonView), so the lesson and the Explore view
+  never move each other. All numbers come from the live forward pass of the current input; redrawing
+  (the input chip in the stage header opens the input sheet) updates the current step. Chapters:
+  Pixels 1 · Convolution 4 · Going deeper 2 · Decision 3. The cover (answer first) is Cover.svelte; the
+  end card's recap names three real numbers of this run.
 -->
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import Walkthrough from '$lib/kit/Walkthrough.svelte';
-	import DrawPad from '$lib/kit/DrawPad.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
-	import MapCanvas from './MapCanvas.svelte';
-	import InputDetail from './InputDetail.svelte';
-	import ConvDetail from './ConvDetail.svelte';
-	import KernelMaps from './KernelMaps.svelte';
-	import ReluDetail from './ReluDetail.svelte';
-	import PoolDetail from './PoolDetail.svelte';
-	import GrowStage from './GrowStage.svelte';
-	import FlattenDetail from './FlattenDetail.svelte';
-	import DenseDetail from './DenseDetail.svelte';
-	import SoftmaxDetail from './SoftmaxDetail.svelte';
-	import { categorical } from '$lib/kit/color';
-	import { themeState } from '$lib/kit/theme.svelte';
-	import { fmt3, fmtPct } from '$lib/kit/format';
-	import { t } from '$lib/i18n/i18n.svelte';
-	import type { WalkContext, WalkStep } from '$lib/kit/types';
+	import Cover from './Cover.svelte';
+	import { fmt3, fmtInt, fmtPct } from '$lib/kit/format';
+	import { t, type Text } from '$lib/i18n/i18n.svelte';
+	import type { StageProv, WalkContext, WalkPredict, WalkStep } from '$lib/kit/types';
 	import { argmaxCell } from './data';
 	import { PART_CHANNELS, argminCell, negativeShare } from './lesson';
-	import { FISH, HOUSE, SUN, cloneStrokes } from './sketches';
 	import { LessonView, type CnnStore } from './store.svelte';
 
 	let { S }: { S: CnnStore } = $props();
 	const LV = new LessonView(untrack(() => S));
 
 	let index = $state(0);
+	// the stage views are a separate chunk (stages.ts): they render only once the model has run
+	let st = $state.raw<typeof import('./stages') | null>(null);
+	onMount(() => {
+		import('./stages').then((m) => (st = m));
+	});
 	/** the Conv 1-1 channel followed through steps 2–4: fixed when step 2 begins (until then, the strongest one) */
 	let c11fixed = $state(-1);
 	const c11 = $derived(c11fixed >= 0 ? c11fixed : S.strongestChannel('conv1_1'));
-	let padOpen = $state(false);
+
+	/** the stage header's provenance label: every stage is computed live from the learner's input */
+	const live: StageProv = { mode: 'live', precision: untrack(() => S.spec.precision), short: { en: '· computed on your drawing', zh: '· 用你的画现场计算' } };
+	const chapters: { title: Text; count: number }[] = [
+		{ title: { en: 'Pixels', zh: '像素' }, count: 1 },
+		{ title: { en: 'Convolution', zh: '卷积' }, count: 4 },
+		{ title: { en: 'Going deeper', zh: '更深的层' }, count: 2 },
+		{ title: { en: 'Decision', zh: '做出判断' }, count: 3 }
+	];
+
+	/** step 2: the strongest cell of the followed Conv 1-1 map, its arithmetic, and the cell next to it */
+	const peak = $derived.by(() => {
+		const tr = S.trace;
+		const m = S.model;
+		if (!tr || !m) return null;
+		const [, H, W] = S.layer('conv1_1').outShape;
+		const p = argmaxCell(tr.t.conv1_1.data, c11, H, W);
+		const d = m.convDetail(tr, 'conv1_1', c11, p.y, p.x);
+		const nx = p.x + 1 < W ? p.x + 1 : p.x - 1;
+		const nv = tr.t.conv1_1.data[c11 * H * W + p.y * W + nx];
+		return { y: p.y, x: p.x, sum: d.total - d.bias, bias: d.bias, out: d.traced, nx, nv, right: nx > p.x };
+	});
+	/** a number chip in a Look line (spec §3.4): a bound number that moves the stage's ring to its cell (kit ChipText marks) */
+	const chip = (ref: string, text: string) => `\uE000${ref}\uE001${text}\uE002`;
+
+	/** step 2's "Your turn": does the output go up or down when the window moves one cell? (answered from the real map) */
+	const slideTurn = (): WalkPredict | undefined => {
+		const p = peak;
+		if (!p) return undefined;
+		const answer = p.nv > p.out ? 0 : p.nv < p.out ? 1 : 2;
+		const dir = p.right ? { en: 'right', zh: '右' } : { en: 'left', zh: '左' };
+		const word = [
+			{ en: 'Up', zh: '变大' },
+			{ en: 'Down', zh: '变小' },
+			{ en: 'It stays the same', zh: '不变' }
+		][answer];
+		return {
+			gate: false,
+			question: {
+				en: `The window moves one cell ${dir.en}, from (${p.y}, ${p.x}) to (${p.y}, ${p.nx}). Will the output go up or down?`,
+				zh: `窗口向${dir.zh}移动一格，从 (${p.y}, ${p.x}) 到 (${p.y}, ${p.nx})。输出会变大还是变小？`
+			},
+			options: [
+				{ en: 'Up', zh: '变大' },
+				{ en: 'Down', zh: '变小' },
+				{ en: 'It stays the same', zh: '不变' }
+			],
+			answer,
+			explain: {
+				en: `${word.en}: (${p.y}, ${p.nx}) gives ${fmt3(p.nv)}, against ${fmt3(p.out)} at (${p.y}, ${p.x}). (${p.y}, ${p.x}) is the strongest cell of the whole map, the window that matches kernel ${c11} best, so no other cell can be higher. Hover or tap (${p.y}, ${p.nx}) on the output map to see its 9 products.`,
+				zh: `${word.zh}：(${p.y}, ${p.nx}) 得到 ${fmt3(p.nv)}，而 (${p.y}, ${p.x}) 是 ${fmt3(p.out)}。(${p.y}, ${p.x}) 是整张图里最强的格子，也就是与卷积核 ${c11} 最匹配的窗口，所以别的格子都不可能更高。在输出图上悬停或点按 (${p.y}, ${p.nx})，可以看它的 9 个乘积。`
+			}
+		};
+	};
 
 	/** the layer each step's stage needs in the lesson selection (set by its onEnter hook) */
 	const NEEDS: Record<string, string> = {
@@ -58,6 +105,8 @@
 	const topName = $derived(S.top >= 0 ? cls(S.top) : '');
 	const topP = $derived(S.probs && S.top >= 0 ? pct(S.probs[S.top]) : '');
 	const topPzh = $derived(topP.startsWith('>') ? `占比超过 ${topP.slice(1)}` : `占 ${topP}`);
+	/** inked pixels of the model input (for the end card's recap) */
+	const inked = $derived(S.input.reduce((n, v) => n + (v > 0 ? 1 : 0), 0));
 
 	/** move the lesson's cell to the strongest cell of its current map */
 	function toPeak() {
@@ -78,6 +127,7 @@
 	const steps: WalkStep[] = [
 		{
 			id: 'pixels',
+			prov: live,
 			title: { en: 'Your drawing becomes 784 numbers', zh: '你的画变成 784 个数' },
 			narration: {
 				en: 'The model never sees your strokes, only this grid. Your drawing is cropped, scaled so its long side spans 26 pixels, centered, and redrawn as 28 × 28 = 784 numbers: 0 is blank paper, 1 is full ink. Everything that follows is arithmetic on these numbers.',
@@ -91,15 +141,47 @@
 		},
 		{
 			id: 'slide',
+			prov: live,
 			title: { en: 'One 3×3 kernel slides over it', zh: '一个 3×3 卷积核在上面滑动' },
 			narration: {
-				en: 'A kernel is 9 learned numbers (weights). The first layer, Conv 1-1, slides it over your drawing one cell at a time. At each stop the 3×3 window is multiplied by the kernel cell by cell, and the 9 products plus one more learned number, the bias, are added up: that is one cell of the 26×26 output map.',
-				zh: '卷积核就是 9 个学来的数（权重）。第一层“卷积 1-1”把它在你的画上一格一格地滑动。每停一次，把 3×3 窗口和卷积核逐格相乘，再把 9 个乘积和另一个学来的数（偏置）加起来，就得到 26×26 输出图里的一个格子。'
+				en: 'A kernel is 9 learned numbers, its weights. The first layer, Conv 1-1, slides it over your drawing one cell at a time. At each stop the 3×3 window is multiplied by the kernel cell by cell, and the 9 products plus one more learned number, the bias, add up to one cell of the 26×26 map.',
+				zh: '卷积核就是 9 个学来的数，也就是它的权重。第一层“卷积 1-1”把它在你的画上一格一格地滑动。每停一次，3×3 窗口和卷积核逐格相乘，9 个乘积再加上另一个学来的数（偏置），就得到 26×26 特征图里的一个格子。'
 			},
-			look: () => ({
-				en: `Kernel ${c11} reacts most to your drawing. Hatched cells are not computed yet. A new cell turns orange where the window covers ink in the kernel’s pattern, blue where it covers the opposite. Afterwards the numbers below show the strongest cell; hover or tap the output map for any other.`,
-				zh: `卷积核 ${c11} 对你的画反应最强。带斜线的格子还没算到。窗口盖住的墨迹符合卷积核的模式时，新格子变成橙色；正好相反时变成蓝色。滑完后，下方的数字显示最强的格子；悬停或点按输出图可以查看别的格子。`
-			}),
+			look: () => {
+				const p = peak;
+				if (!p)
+					return {
+						en: `Kernel ${c11} reacts most to your drawing. Hatched cells are not computed yet; orange cells match the kernel’s pattern, blue cells the opposite.`,
+						zh: `卷积核 ${c11} 对你的画反应最强。带斜线的格子还没算到；橙色格子符合卷积核的模式，蓝色格子正好相反。`
+					};
+				return {
+					en: `Kernel ${c11} reacts most at (${p.y}, ${p.x}): 9 products ${fmt3(p.sum)} + bias ${fmt3(p.bias)} = ${fmt3(p.out)}. Hatched cells are not computed yet; orange cells match the kernel’s pattern, blue cells the opposite.`,
+					zh: `卷积核 ${c11} 在 (${p.y}, ${p.x}) 反应最强：9 个乘积之和 ${fmt3(p.sum)} + 偏置 ${fmt3(p.bias)} = ${fmt3(p.out)}。带斜线的格子还没算到；橙色格子符合卷积核的模式，蓝色格子正好相反。`
+				};
+			},
+			chips: {
+				look: () => {
+					const p = peak;
+					if (!p) return { en: `Kernel ${c11} reacts most to your drawing.`, zh: `卷积核 ${c11} 对你的画反应最强。` };
+					return {
+						en: `Kernel ${c11} reacts most at ${chip('peak', `(${p.y}, ${p.x})`)}: 9 products ${fmt3(p.sum)} + bias ${fmt3(p.bias)} = ${chip('peak', fmt3(p.out))}. Hatched cells are not computed yet; orange cells match the kernel’s pattern, blue cells the opposite.`,
+						zh: `卷积核 ${c11} 在 ${chip('peak', `(${p.y}, ${p.x})`)} 反应最强：9 个乘积之和 ${fmt3(p.sum)} + 偏置 ${fmt3(p.bias)} = ${chip('peak', fmt3(p.out))}。带斜线的格子还没算到；橙色格子符合卷积核的模式，蓝色格子正好相反。`
+					};
+				}
+			},
+			// a chip moves the lesson's window to the strongest cell (the output map rings it, the arithmetic shows it)
+			onref: (ref) => {
+				if (ref === 'peak' && peak) LV.setCell(peak.y, peak.x);
+			},
+			predict: slideTurn,
+			why: {
+				q: { en: 'Why is the map 26 × 26, not 28 × 28?', zh: '为什么特征图是 26 × 26，而不是 28 × 28？' },
+				a: {
+					en: 'The 3×3 window has to fit inside the 28 × 28 drawing, so its top-left corner can sit at 26 places across (columns 0 to 25) and 26 down: 28 − 3 + 1 = 26. TinyCNN adds no padding around the drawing, so every convolution trims one pixel from each border.',
+					zh: '3×3 窗口必须完整地落在 28 × 28 的画里，所以它的左上角横向只有 26 个位置（第 0 到 25 列），纵向也是 26 个：28 − 3 + 1 = 26。TinyCNN 不在画的四周补零（不做填充），所以每做一次卷积，四边各少一个像素。'
+				}
+			},
+			animated: true,
 			waitForDone: true,
 			linger: 3500,
 			onEnter: () => {
@@ -109,6 +191,7 @@
 		},
 		{
 			id: 'kernels',
+			prov: live,
 			title: { en: 'Eight kernels make eight feature maps', zh: '8 个卷积核得到 8 张特征图' },
 			narration: () => ({
 				en: `Conv 1-1 has 8 different kernels, so your one drawing becomes 8 feature maps, also called channels: kernel ${c11} makes channel ${c11}. Orange weights reward ink and blue weights punish it, so each kernel lights up where strokes run in the direction it prefers. Nobody designed these kernels: training found them.`,
@@ -122,6 +205,7 @@
 		},
 		{
 			id: 'relu',
+			prov: live,
 			title: { en: 'ReLU keeps the positive evidence', zh: 'ReLU 只保留正的证据' },
 			narration: () => {
 				const d = S.trace?.t.conv1_1.data;
@@ -142,6 +226,7 @@
 		},
 		{
 			id: 'combine',
+			prov: live,
 			title: { en: 'Conv 1-2 combines all eight maps', zh: '卷积 1-2 把 8 张图合在一起' },
 			narration: {
 				en: 'Conv 1-2 works on the 8 maps that came out of ReLU. It also has 8 kernels, but each one is 8 slices deep: one 3×3 slice for each input map. For one output cell it takes the same 3×3 window in all 8 maps, multiplies each by its slice, and adds everything plus one bias: 8 × 9 = 72 products for one number.',
@@ -160,6 +245,7 @@
 		},
 		{
 			id: 'pool',
+			prov: live,
 			title: { en: 'Max pooling keeps the strongest response', zh: '最大池化保留最强的响应' },
 			narration: {
 				en: 'First, Conv 1-2’s maps go through ReLU again (ReLU 1-2). Then max pooling cuts each map into 2×2 blocks and keeps only the largest number of each block, so the 24×24 map becomes 12×12. The network keeps “this pattern was here, roughly” and forgets the exact pixel, so a stroke drawn one pixel to the side changes little.',
@@ -169,12 +255,14 @@
 				en: 'Hatched output cells are not filled yet. The dashed cell inside the window is the largest of its 4 numbers: that one is copied to the output.',
 				zh: '带斜线的输出格还没填上。窗口里的虚线格子是 4 个数中最大的那个，它被复制到输出。'
 			},
+			animated: true,
 			waitForDone: true,
 			linger: 3000,
 			onEnter: () => LV.set('pool1', S.strongestChannel('pool1'), { y: 0, x: 0 })
 		},
 		{
 			id: 'grow',
+			prov: { ...live, note: { en: 'The sizes, the map and the box are computed live; the top test drawings (marked precomputed) were computed offline with the same weights.', zh: '尺寸、特征图和方框都是实时算出的；标着“预计算”的最强激活测试画是用同一组权重离线算出的。' } },
 			title: { en: 'Block 2 sees bigger parts', zh: '第二组看到更大的部件' },
 			narration: {
 				en: 'Block 2 repeats the recipe on the pooled maps: conv, ReLU, conv, ReLU, pool. The maps are now half as wide, so every 3×3 window covers more of the drawing: one Conv 2-2 cell sees a 14×14 patch (its receptive field), half the width of the drawing. Its channels respond to parts, not single strokes.',
@@ -201,6 +289,7 @@
 		},
 		{
 			id: 'flatten',
+			prov: live,
 			title: { en: 'Flatten: 16 × 4 × 4 becomes 256 numbers', zh: '展平：16 × 4 × 4 变成 256 个数' },
 			narration: {
 				en: 'After the second pooling, 16 maps of 4×4 are left: 256 numbers. Flatten lays them in one row, map by map and row by row, so number i comes from map c, row y, column x with i = 16c + 4y + x. Nothing is computed here; only the order changes.',
@@ -210,6 +299,7 @@
 		},
 		{
 			id: 'dense',
+			prov: live,
 			title: { en: 'Dense: 256 numbers vote for each class', zh: '全连接层：256 个数为每个类别投票' },
 			narration: {
 				en: 'Each class has its own 256 weights. Every input is multiplied by its weight: orange products are votes for the class, blue products are votes against. All 256 votes plus a bias give the class its score, called a logit.',
@@ -223,12 +313,14 @@
 		},
 		{
 			id: 'softmax',
+			prov: live,
 			title: { en: 'Softmax turns 10 scores into the answer', zh: 'Softmax 把 10 个分数变成答案' },
 			narration: () => ({
 				en: `The 10 logits (z in the table) can be any size. Softmax subtracts the largest one (m), raises e ≈ 2.718 to the power of each result, and divides by the total, so all 10 become positive and add up to 100% (p). The model answers “${topName}” with ${topP}: a share among the 10 classes it knows, not a guarantee that it is right.`,
 				zh: `10 个 logit（表中的 z）可以是任意大小。Softmax 先减去其中最大的一个（m），再以 e ≈ 2.718 为底对每个结果取幂，最后除以总和，于是 10 个数都变成正数，加起来正好 100%（p）。模型的回答是“${topName}”，${topPzh}：这是它认识的 10 个类别之间的份额，并不保证答对。`
 			}),
 			look: { en: 'Watch the bars change in three steps: raw scores, then e to the power, then shares of 100%.', zh: '看条形分三步变化：原始分数，取 e 的幂，再变成 100% 的份额。' },
+			animated: true,
 			waitForDone: true,
 			linger: 4000,
 			onEnter: () => LV.set('softmax', Math.max(0, S.top))
@@ -243,174 +335,73 @@
 	}
 </script>
 
-<Walkthrough {steps} bind:index ready={!!S.trace} label={{ en: 'TinyCNN, step by step', zh: 'TinyCNN 分步课程' }} stageMinHeight={380}>
+<Walkthrough {steps} bind:index ready={!!S.trace} label={{ en: 'Follow your drawing through a real CNN', zh: '跟着你的画走过一个真实的 CNN' }} {chapters} stageMinHeight={380}>
+	{#snippet cover(ctx)}<Cover {S} compact={ctx.density === 'compact'} />{/snippet}
+
 	{#snippet stage(step, ctx)}
-		{#if !S.trace}
+		{#if !S.trace || !st}
 			<p class="muted">{t({ en: 'Loading the model…', zh: '正在加载模型…' })}</p>
 		{:else if stageReady(step.id)}
-			<!-- step 7 mixes live views with the precomputed top test drawings, which carry their own badge -->
-			<div class="badge"><ProvenanceBadge mode="live" compact precision={S.spec.precision} note={step.id === 'grow' ? { en: 'The sizes, the map and the box are computed live; the top test drawings (marked precomputed) were computed offline with the same weights.', zh: '尺寸、特征图和方框都是实时算出的；标着“预计算”的最强激活测试画是用同一组权重离线算出的。' } : undefined} /></div>
 			{#if step.id === 'pixels'}
-				<InputDetail {S} view={LV} compact />
+				<st.InputDetail {S} view={LV} compact />
 			{:else if step.id === 'slide'}
-				<ConvDetail {S} view={LV} parts={['slide', 'arith']} autoplay={ctx.shown && !ctx.reduced} interval={14} fill pair onend={peakThenDone(ctx)} title={{ en: 'Watch the kernel slide over your drawing', zh: '看卷积核在你的画上滑动' }} />
+				<st.ConvDetail {S} view={LV} parts={['slide', 'arith']} compact={ctx.density === 'compact'} autoplay={ctx.shown && !ctx.reduced} interval={14} fill pair onend={peakThenDone(ctx)} title={{ en: 'Watch the kernel slide over your drawing', zh: '看卷积核在你的画上滑动' }} />
 			{:else if step.id === 'kernels'}
-				<KernelMaps {S} view={LV} />
+				<st.KernelMaps {S} view={LV} />
 			{:else if step.id === 'relu'}
-				<ReluDetail {S} view={LV} parts={['maps', 'formula']} />
+				<st.ReluDetail {S} view={LV} parts={['maps', 'formula']} />
 			{:else if step.id === 'combine'}
-				<ConvDetail {S} view={LV} parts={['channels', 'arith']} />
+				<st.ConvDetail {S} view={LV} parts={['channels', 'arith']} compact={ctx.density === 'compact'} />
 			{:else if step.id === 'pool'}
-				<PoolDetail {S} view={LV} parts={['slide', 'formula']} autoplay={ctx.shown && !ctx.reduced} interval={70} fill pair onend={peakThenDone(ctx)} title={{ en: 'Watch the 2×2 window slide', zh: '看 2×2 窗口滑动' }} />
+				<st.PoolDetail {S} view={LV} parts={['slide', 'formula']} autoplay={ctx.shown && !ctx.reduced} interval={70} fill pair onend={peakThenDone(ctx)} title={{ en: 'Watch the 2×2 window slide', zh: '看 2×2 窗口滑动' }} />
 			{:else if step.id === 'grow'}
-				<GrowStage {S} view={LV} />
+				<st.GrowStage {S} view={LV} />
 			{:else if step.id === 'flatten'}
-				<FlattenDetail {S} parts={['maps', 'formula']} />
+				<st.FlattenDetail {S} parts={['maps', 'formula']} />
 			{:else if step.id === 'dense'}
-				<DenseDetail {S} view={LV} parts={['picker', 'grids', 'formula']} />
+				<st.DenseDetail {S} view={LV} parts={['picker', 'grids', 'formula']} />
 			{:else if step.id === 'softmax'}
-				<SoftmaxDetail {S} view={LV} parts={['player', 'table']} autoplay={ctx.shown && !ctx.reduced} interval={1600} onend={ctx.done} />
+				<st.SoftmaxDetail {S} view={LV} parts={['player', 'table']} autoplay={ctx.shown && !ctx.reduced} interval={1600} onend={ctx.done} />
 			{/if}
 		{/if}
 	{/snippet}
 
-	{#snippet aside()}
-		<div class="you">
-			<div class="you-h">
-				<h4>{t({ en: 'Your drawing', zh: '你的画' })}</h4>
-				{#if S.trace}
-					<span class="ans"
-						><span class="sw" style="background: {categorical(S.top, themeState.resolved)}"></span><strong>{topName}</strong>
-						<span class="num">{topP}</span></span
-					>
-				{/if}
-			</div>
-			<div class="you-row">
-				<MapCanvas data={S.input} rows={28} cols={28} kind="sequential" domain={[0, 1]} size={56} alt={t({ en: 'What the model sees', zh: '模型看到的' })} />
-				<p class="hint">
-					{#if S.source.kind === 'preset'}
-						{t({ en: 'A preset drawing is loaded.', zh: '当前是一幅预设画。' })}
-					{:else if S.source.kind === 'photo'}
-						{t({ en: 'Your photo is loaded.', zh: '当前是你上传的照片。' })}
-					{/if}
-					{t({ en: 'Redraw at any time: the step you are on updates at once.', zh: '随时可以重画：你所在的这一步会立刻更新。' })}
-				</p>
-			</div>
-			{#if padOpen}
-				<DrawPad
-					bind:strokes={S.strokes}
-					brush={0.055}
-					size={190}
-					showBrush={false}
-					presets={[
-						{ name: { en: 'House', zh: '房子' }, strokes: cloneStrokes(HOUSE) },
-						{ name: { en: 'Fish', zh: '鱼' }, strokes: cloneStrokes(FISH) },
-						{ name: { en: 'Sun', zh: '太阳' }, strokes: cloneStrokes(SUN) }
-					]}
-					onchange={(s) => S.setStrokes(s)}
-					ondraw={(s) => S.drawing(s)}
-					label={t({ en: 'Lesson drawing pad', zh: '课程画板' })}
-				/>
+	{#snippet recap()}
+		<ul class="recap">
+			<li>
+				{t({
+					en: `Your drawing became ${fmtInt(S.input.length)} numbers; ${fmtInt(inked)} of them carry ink.`,
+					zh: `你的画变成了 ${fmtInt(S.input.length)} 个数，其中 ${fmtInt(inked)} 个带墨迹。`
+				})}
+			</li>
+			{#if peak}
+				<li>
+					{t({
+						en: `Kernel ${c11} reacted most at (${peak.y}, ${peak.x}): 9 products ${fmt3(peak.sum)} + bias ${fmt3(peak.bias)} = ${fmt3(peak.out)}.`,
+						zh: `卷积核 ${c11} 在 (${peak.y}, ${peak.x}) 反应最强：9 个乘积之和 ${fmt3(peak.sum)} + 偏置 ${fmt3(peak.bias)} = ${fmt3(peak.out)}。`
+					})}
+				</li>
 			{/if}
-			<button type="button" class="btn small" aria-expanded={padOpen} onclick={() => (padOpen = !padOpen)}>
-				<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-				{padOpen ? t({ en: 'Hide the pad', zh: '收起画板' }) : t({ en: 'Redraw here', zh: '在这里重画' })}
-			</button>
-		</div>
-	{/snippet}
-
-	{#snippet end()}
-		<div class="fin">
-			<p>
-				<strong>{t({ en: 'That is the whole forward pass.', zh: '这就是完整的前向传播。' })}</strong>
-				{t({ en: 'Draw something else and play the lesson again, or explore every layer at once below.', zh: '画点别的再播放一遍，或者在下面同时查看每一层。' })}
-			</p>
-			<a class="btn primary" href="#explore">{t({ en: 'Explore freely', zh: '自由探索' })} ↓</a>
-		</div>
+			{#if S.top >= 0}
+				<li>
+					{t({
+						en: `Of the ${S.spec.classes.length} scores, “${topName}” won with ${topP}: a share among the classes it knows, not a guarantee.`,
+						zh: `在 ${S.spec.classes.length} 个分数里，“${topName}”以 ${topP} 胜出：这是它认识的类别之间的份额，不是答对的保证。`
+					})}
+				</li>
+			{/if}
+		</ul>
 	{/snippet}
 </Walkthrough>
-<p class="foot muted">
-	{t({
-		en: 'Every number in the lesson is computed in your browser from your drawing, except the top test drawings in step 7, which were computed offline with the same weights. The lesson keeps its own selection, so the views below stay where you left them.',
-		zh: '课程中的每个数都由你的画在浏览器中实时算出，只有第 7 步里最强激活的测试画是用同一组权重离线算好的。课程使用自己的选中状态，所以下面的视图会停在你离开时的位置。'
-	})}
-</p>
 
 <style>
-	.badge {
-		display: flex;
-		justify-content: flex-end;
-		margin: -4px 0 6px;
-	}
-	.you {
+	.recap {
 		display: grid;
-		gap: 8px;
-		padding: 10px 12px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
-	}
-	.you :global(.pad) {
-		margin-top: 2px;
-	}
-	.you-h {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 4px 12px;
-	}
-	h4 {
-		margin: 0;
-		font-size: var(--fs-md);
-	}
-	.ans {
-		display: inline-flex;
-		align-items: center;
 		gap: 6px;
-		font-size: var(--fs-sm);
-	}
-	.sw {
-		width: 9px;
-		height: 9px;
-		border-radius: 2px;
-	}
-	.you-row {
-		display: flex;
-		gap: 10px;
-		align-items: center;
-	}
-	.hint {
 		margin: 0;
-		font-size: var(--fs-xs);
+		padding-left: 1.2em;
 		color: var(--ink-2);
-	}
-	.small {
-		justify-self: start;
-		gap: 6px;
-		min-height: 32px;
-		padding: 0 12px;
-		font-size: var(--fs-sm);
-	}
-	.you :global(.tools .btn) {
-		min-height: 30px;
-		padding: 0 8px;
-		font-size: var(--fs-xs);
-	}
-	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
-		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-md);
+		line-height: var(--lh-md);
 	}
 </style>

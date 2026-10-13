@@ -7,7 +7,7 @@
 // Props: key?: string; index?: number[]; rows?: number (examples listed in 'forward', default 4).
 import type { I18n, Tensor } from '../../../types/core.ts';
 import type { StageProps, ViewMeta } from '../../../types/view.ts';
-import { fmt3, fmtInt, paren } from '../../../core/format.ts';
+import { fmt3, fmtInt, fmtSetting, paren } from '../../../core/format.ts';
 import { updateOf } from '../../../train/helpers.ts';
 
 export const PHASES = ['forward', 'loss', 'backward', 'update'] as const;
@@ -43,6 +43,14 @@ function argmaxAbs(d: ArrayLike<number>): number {
 	let b = 0;
 	for (let i = 1; i < d.length; i++) if (Math.abs(d[i]) > Math.abs(d[b])) b = i;
 	return b;
+}
+
+/** K4: the significant digits of an update's old and new value: props.digits (2-6), else the fewest from 3 to 6 that
+ *  print old and new differently (with 3, a small step printed "0.512 − 0.05 × 0.0123 = 0.512"). */
+export function updateDigits(d: { old: number; now: number }, digits?: unknown): number {
+	if (Number.isInteger(digits) && (digits as number) >= 2 && (digits as number) <= 6) return digits as number;
+	for (let k = 3; k <= 6; k++) if (fmt3(d.old, k) !== fmt3(d.now, k)) return k;
+	return 3;
 }
 
 /** Everything the view shows (pure). */
@@ -138,9 +146,11 @@ const meta = {
 		} else if (d.phase === 'loss') body = { en: `the loss on this batch is ${fmt3(d.loss)}.`, zh: `这一批的损失是 ${fmt3(d.loss)}。` };
 		else if (d.phase === 'backward')
 			body = { en: `every weight gets a gradient; for ${where} it is ${fmt3(d.g)} (size of all gradients together: ${fmt3(d.gradNorm)}).`, zh: `每个权重都得到一个梯度；${where} 的梯度是 ${fmt3(d.g)}（全部梯度合起来的大小：${fmt3(d.gradNorm)}）。` };
-		else if (d.sgd)
-			body = { en: `${where} was ${fmt3(d.old)}; with gradient ${fmt3(d.g)} and learning rate ${fmt3(d.lr)} it becomes ${fmt3(d.old)} − ${fmt3(d.lr)} × ${paren(d.g)} = ${fmt3(d.now)}.`, zh: `${where} 原来是 ${fmt3(d.old)}；梯度是 ${fmt3(d.g)}，学习率是 ${fmt3(d.lr)}，所以它变成 ${fmt3(d.old)} − ${fmt3(d.lr)} × ${paren(d.g)} = ${fmt3(d.now)}。` };
-		else
+		else if (d.sgd) {
+			const k = updateDigits(d, p.props?.digits);
+			const v = (x: number) => fmt3(x, k);
+			body = { en: `${where} was ${v(d.old)}; with gradient ${fmt3(d.g)} and learning rate ${fmtSetting(d.lr)} it becomes ${v(d.old)} − ${fmtSetting(d.lr)} × ${paren(d.g)} = ${v(d.now)}.`, zh: `${where} 原来是 ${v(d.old)}；梯度是 ${fmt3(d.g)}，学习率是 ${fmtSetting(d.lr)}，所以它变成 ${v(d.old)} − ${fmtSetting(d.lr)} × ${paren(d.g)} = ${v(d.now)}。` };
+		} else
 			body = { en: `${where} went from ${fmt3(d.old)} to ${fmt3(d.now)} (optimizer ${d.optimizer || 'unknown'}, learning rate ${fmt3(d.lr)}, gradient ${fmt3(d.g)}).`, zh: `${where} 从 ${fmt3(d.old)} 变成 ${fmt3(d.now)}（优化器 ${d.optimizer || '未知'}，学习率 ${fmt3(d.lr)}，梯度 ${fmt3(d.g)}）。` };
 		return { en: head.en + body.en, zh: head.zh + body.zh };
 	},

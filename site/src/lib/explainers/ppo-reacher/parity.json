@@ -1,0 +1,36 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "ppo-reacher",
+ "checked": "2026-10-12",
+ "sources": {
+  "iter": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.26e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "train": {
+   "scope": "train",
+   "against": "pytorch-fp64-cpu",
+   "pass": true,
+   "max": 1.26e-15,
+   "bar": 1e-7,
+   "relative": true,
+   "steps": 50,
+   "checked": "2026-10-12"
+  },
+  "episode": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 9.05e-16,
+   "frames": 122,
+   "fixtures": 6,
+   "checked": "2026-10-12"
+  }
+ }
+}

@@ -1,19 +1,17 @@
 <!--
-  The tokenization guided lesson: byte-pair encoding in seven steps on the learner's own text, one
-  focused view at a time (kit Walkthrough). Steps 1–5 use the training text (shared with Part 1),
-  steps 6–7 the sentence (shared with the hook and Parts 2–3). The lesson keeps its own merge
-  counts and selections, so the "Explore freely" views below never move. Every number is computed
-  in the browser: training in the page's Web Worker (BpeToy), encoding with bpe.ts, the real
+  The tokenization guided lesson: byte-pair encoding in seven steps on the learner's own text, one focused view at a
+  time (kit Walkthrough, the page's Lesson view). Steps 1–5 use the training text (shared with Explore's Part 1), steps
+  6–7 and the cover the sentence (shared with Explore's Parts 2–3); both are edited in the input sheet the stage
+  header's chip opens. The lesson keeps its own merge counts and selections, so the Explore views never move. Every
+  number is computed in the browser: training in the page's Web Worker (TokPage.train), encoding with bpe.ts, the real
   tokenizers in the worker; only TinyGPT's training pair counts (step 6) are precomputed.
 -->
 <script lang="ts">
 	import Walkthrough from '$lib/kit/Walkthrough.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
-	import TextInputBar from '$lib/kit/TextInputBar.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import { fmtInt, visibleToken } from '$lib/kit/format';
 	import { BPETokenizer, bytesToDisplay } from '$lib/models/bpe';
-	import type { WalkStep } from '$lib/kit/types';
+	import type { StageProv, WalkStep } from '$lib/kit/types';
 	import BytesStage from './lesson/BytesStage.svelte';
 	import PretokStage from './lesson/PretokStage.svelte';
 	import PairsStage from './lesson/PairsStage.svelte';
@@ -21,28 +19,21 @@
 	import RepeatStage from './lesson/RepeatStage.svelte';
 	import ApplyStage from './lesson/ApplyStage.svelte';
 	import RealStage from './lesson/RealStage.svelte';
-	import { PRESETS } from './presets';
-	import { segment, type TrainTrace } from './train';
+	import CoverStage from './CoverStage.svelte';
+	import { segment } from './train';
 	import { charSummary, firstSingleton, pairSources, plainToken, pretokenStats, tokensAt } from './lesson';
 	import { loadAll } from './state.svelte';
 	import { motion } from '$lib/kit/theme.svelte';
-	import type { RowId } from './tokenizers';
+	import { PARITY, type RowId } from './tokenizers';
+	import type { TokPage } from './page.svelte';
 
-	interface Props {
-		/** training text (shared with Part 1) */
-		trainText: string;
-		/** the learner's sentence (shared with the hook and Parts 2–3) */
-		sentence: string;
-		/** trace of the training text (trained by BpeToy in the worker) */
-		trace: TrainTrace | null;
-		/** the text `trace` was trained on (trainText may already be newer while the worker trains) */
-		trained: string;
-		tiny: BPETokenizer | null;
-		/** TinyGPT's pair counts at training time (tokenizer.json mergeCounts) */
-		mergeCounts: number[];
-		maxSentence?: number;
-	}
-	let { trainText = $bindable(), sentence = $bindable(), trace, trained, tiny, mergeCounts, maxSentence = 400 }: Props = $props();
+	let { P }: { P: TokPage } = $props();
+	const trainText = $derived(P.trainText);
+	const sentence = $derived(P.sentence);
+	const trace = $derived(P.trace);
+	const trained = $derived(P.trained);
+	const tiny = $derived(P.tiny);
+	const mergeCounts = $derived(P.mergeCounts);
 
 	// ------------------------------------------------------------ the lesson's own state
 	let index = $state(0);
@@ -51,7 +42,6 @@
 	let lk = $state(1);
 	let src = $state<'yours' | 'tiny'>('yours');
 	let counts = $state<Partial<Record<RowId, number>>>({});
-	let editOpen = $state(false);
 
 	// a new training text starts the merge views from the beginning
 	let lastTrained = '';
@@ -95,7 +85,7 @@
 			look: () =>
 				cs.cjk > 0
 					? { en: 'Characters on a grey card take more than one byte; each Chinese character has three. Hover over or tap a character to light up its bytes.', zh: '灰色底的字符占不止一个字节，每个汉字占三个。把鼠标移到字符上（或点按它），它的字节会亮起来。' }
-					: { en: 'Every character here is one byte. Under “Your text”, pick “Same story in Chinese” and watch each character become three bytes.', zh: '这里每个字符都是 1 个字节。在“你的文本”里选“同一个故事（中文）”，看看每个字符怎样变成 3 个字节。' },
+					: { en: 'Every character here is one byte. Open “Your text” at the top of the stage, pick “Same story in Chinese” and watch each character become three bytes.', zh: '这里每个字符都是 1 个字节。打开演示区顶部的“你的文本”，选“同一个故事（中文）”，看看每个字符怎样变成 3 个字节。' },
 			// longer narration than the kit's reading-time default allows (16 s)
 			duration: 22000
 		},
@@ -226,8 +216,8 @@
 				};
 			},
 			look: {
-				en: 'Each pair shows its merge number (— = never learned); the outlined one has the lowest number and is merged next. Switch to TinyGPT’s merges, or under “Your new text” try a sentence made of words from your training text.',
-				zh: '每一对都标着合并编号（— 表示从没学过）；带框的编号最小，下一步就合并它。可以切换到 TinyGPT 的合并规则，或在“你的新文本”里试一个由训练文本中的词组成的句子。'
+				en: 'Each pair shows its merge number (— = never learned); the outlined one has the lowest number and is merged next. Switch to TinyGPT’s merges, or open “Your sentence” at the top of the stage and try one made of words from your training text.',
+				zh: '每一对都标着合并编号（— 表示从没学过）；带框的编号最小，下一步就合并它。可以切换到 TinyGPT 的合并规则，或打开演示区顶部的“你的句子”，试一个由训练文本中的词组成的句子。'
 			},
 			waitForDone: true,
 			// the player inside one pre-token takes a few seconds; leave time to read the narration under Play
@@ -254,198 +244,81 @@
 		}
 	];
 
-	/** steps 1–5 work on the training text, steps 6–7 on the sentence */
-	const onSentence = (i: number) => i >= 5;
-	const trainBytes = $derived(cs.bytes);
-	const isZh = (s: string) => /[一-鿿]/.test(s);
+	/** the stage header's one provenance label: every step is live (step 7: the real tokenizer files, parity-checked);
+	 *  step 6's TinyGPT pair counts are the exception and carry their own small label */
+	const LIVE: StageProv = {
+		mode: 'live',
+		note: { en: 'Computed in your browser from your text right now (training runs in a Web Worker).', zh: '此刻在你的浏览器里由你的文本算出（训练在 Web Worker 中运行）。' },
+		short: { en: '· computed on your text', zh: '· 用你的文本现场计算' }
+	};
+	const REAL_PROV: StageProv = { mode: 'live', note: PARITY.note, short: { en: '· real tokenizer files, on your sentence', zh: '· 真实分词器文件，处理你的句子' } };
+	for (const s of steps) s.prov = s.id === 'real' ? REAL_PROV : LIVE;
+
+	/** the end card's recap: three things the learner saw, with their numbers (spec §5.8) */
+	const first = $derived(trace?.steps[0]);
+
+	const chapters = [
+		{ title: { en: 'Bytes', zh: '字节' }, count: 2 },
+		{ title: { en: 'Training', zh: '训练' }, count: 3 },
+		{ title: { en: 'Using it', zh: '投入使用' }, count: 2 }
+	];
 </script>
 
-<Walkthrough {steps} bind:index {ready} label={{ en: 'Tokenization, step by step', zh: '分词：分步课程' }} stageMinHeight={420}>
+<Walkthrough {steps} bind:index {ready} {chapters} label={{ en: 'How text becomes the numbers a model reads', zh: '文本怎样变成模型读到的数' }}>
+	{#snippet cover()}<CoverStage {P} />{/snippet}
 	{#snippet stage(step, ctx)}
 		{#if !tiny || (!trace && step.id !== 'bytes' && step.id !== 'pretokens')}
-			<p class="muted">{t(LOADING)}</p>
-		{:else}
-			{#if step.id !== 'real'}
-				<div class="badge">
-					<ProvenanceBadge mode="live" compact note={{ en: 'Computed in your browser from your text right now (training runs in a Web Worker).', zh: '此刻在你的浏览器里由你的文本算出（训练在 Web Worker 中运行）。' }} />
-				</div>
-			{/if}
-			{#if step.id === 'bytes'}
-				<BytesStage text={trainText} />
-			{:else if step.id === 'pretokens'}
-				<PretokStage text={trainText} {pattern} />
-			{:else if trace && step.id === 'pairs'}
-				<PairsStage {trace} text={trained} {pattern} bind:sel={pairSel} />
-			{:else if trace && step.id === 'merge'}
-				<MergeStage {trace} text={trained} {pattern} bind:m={mergeN} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if trace && step.id === 'repeat'}
-				<RepeatStage {trace} text={trained} {pattern} bind:k={lk} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if step.id === 'apply'}
-				<ApplyStage {yours} {tiny} bind:src {sentence} {yourCounts} tinyCounts={mergeCounts} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
-			{:else if step.id === 'real'}
-				<RealStage {sentence} {tiny} {yours} bind:counts />
-			{/if}
+			<p class="muted">{P.loadError || P.trainError || t(LOADING)}</p>
+		{:else if step.id === 'bytes'}
+			<BytesStage text={trainText} />
+		{:else if step.id === 'pretokens'}
+			<PretokStage text={trainText} {pattern} />
+		{:else if trace && step.id === 'pairs'}
+			<PairsStage {trace} text={trained} {pattern} bind:sel={pairSel} />
+		{:else if trace && step.id === 'merge'}
+			<MergeStage {trace} text={trained} {pattern} bind:m={mergeN} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+		{:else if trace && step.id === 'repeat'}
+			<RepeatStage {trace} text={trained} {pattern} bind:k={lk} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+		{:else if step.id === 'apply'}
+			<ApplyStage {yours} {tiny} bind:src {sentence} {yourCounts} tinyCounts={mergeCounts} autoplay={ctx.shown && !ctx.reduced} onend={ctx.done} />
+		{:else if step.id === 'real'}
+			<RealStage {sentence} {tiny} {yours} bind:counts />
 		{/if}
 	{/snippet}
 
-	{#snippet aside(ctx)}
-		<div class="you">
-			{#if !onSentence(ctx.index)}
-				<div class="you-h">
-					<h4>{t({ en: 'Your text', zh: '你的文本' })}</h4>
-					<span class="muted num small">{fmtInt(trainBytes)} {t({ en: 'bytes', zh: '字节' })}{#if trace && trained === trainText}{' · '}{fmtInt(K)} {t({ en: 'merges learned', zh: '次合并' })}{/if}</span>
-				</div>
-				<p class="pv" lang={isZh(trainText) ? 'zh-CN' : undefined}>{trainText || t({ en: '(empty)', zh: '（空）' })}</p>
-				<div class="pres" role="group" aria-label={t({ en: 'Training texts', zh: '训练文本' })}>
-					{#each PRESETS.train as p (p.id)}
-						<button type="button" class="pre" aria-pressed={trainText === p.text} onclick={() => (trainText = p.text)}>{t(p.label)}</button>
-					{/each}
-				</div>
-				{#if editOpen}
-					<TextInputBar bind:value={trainText} multiline rows={4} maxLength={2000} label={{ en: 'Training text', zh: '训练文本' }} />
-				{/if}
-				<button type="button" class="btn small" aria-expanded={editOpen} onclick={() => (editOpen = !editOpen)}>
-					<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-					{editOpen ? t({ en: 'Hide the editor', zh: '收起编辑框' }) : t({ en: 'Type your own text', zh: '输入你自己的文本' })}
-				</button>
-				<p class="hint">{t({ en: 'The same text trains Part 1 below. The step you are on updates as you type.', zh: '下面第 1 部分也用这段文本训练。你一边输入，当前这一步就一边更新。' })}</p>
-			{:else}
-				<div class="you-h">
-					<h4>{t({ en: 'Your new text', zh: '你的新文本' })}</h4>
-					<span class="muted num small">{fmtInt(Array.from(sentence).length)} {t({ en: 'characters', zh: '个字符' })}</span>
-				</div>
-				<p class="pv" lang={isZh(sentence) ? 'zh-CN' : undefined}>{sentence || t({ en: '(empty)', zh: '（空）' })}</p>
-				<div class="pres" role="group" aria-label={t({ en: 'Sentences', zh: '句子' })}>
-					{#each PRESETS.sentence.slice(0, 5) as p (p.text)}
-						<button type="button" class="pre" aria-pressed={sentence === p.text} onclick={() => (sentence = p.text)} lang={isZh(p.text) && !p.label ? 'zh-CN' : undefined}>{p.label ? t(p.label) : p.text}</button>
-					{/each}
-				</div>
-				{#if editOpen}
-					<TextInputBar bind:value={sentence} maxLength={maxSentence} label={{ en: 'Your sentence', zh: '你的句子' }} />
-				{/if}
-				<button type="button" class="btn small" aria-expanded={editOpen} onclick={() => (editOpen = !editOpen)}>
-					<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-					{editOpen ? t({ en: 'Hide the editor', zh: '收起编辑框' }) : t({ en: 'Type your own sentence', zh: '输入你自己的句子' })}
-				</button>
-				<p class="hint">{t({ en: 'This is the sentence from the top of the page; it is new to your tokenizer.', zh: '这就是页面顶部的那个句子；对你的分词器来说，它是新文本。' })}</p>
+	{#snippet recap()}
+		<ul class="recap">
+			<li>{t({ en: `Your text: ${fmtInt(cs.chars)} characters, ${fmtInt(cs.bytes)} UTF-8 bytes, one token per byte before any merge.`, zh: `你的文本：${fmtInt(cs.chars)} 个字符、${fmtInt(cs.bytes)} 个 UTF-8 字节，合并之前每个字节是一个词元。` })}</li>
+			{#if trace && first}
+				<li>{t({ en: `${K} merges, the first ${q(plainToken(disp(first.pair[0])))} + ${q(plainToken(disp(first.pair[1])))} (${first.count} times), took it from ${fmtInt(trace.initialTokenCount)} to ${fmtInt(tokensAt(trace, K))} tokens.`, zh: `${K} 次合并（第一次是${q(plainToken(disp(first.pair[0])))} + ${q(plainToken(disp(first.pair[1])))}，出现 ${first.count} 次）把它从 ${fmtInt(trace.initialTokenCount)} 个词元缩到 ${fmtInt(tokensAt(trace, K))} 个。` })}</li>
 			{/if}
-		</div>
+			{#if counts.gpt2 !== undefined && counts.qwen !== undefined}
+				<li>{t({ en: `Your sentence costs ${counts.gpt2} tokens in GPT-2 and ${counts.qwen} in Qwen2.5.`, zh: `你的句子在 GPT-2 里要 ${counts.gpt2} 个词元，在 Qwen2.5 里要 ${counts.qwen} 个。` })}</li>
+			{/if}
+		</ul>
 	{/snippet}
 
 	{#snippet end()}
-		<div class="fin">
-			<p>
-				<strong>{t({ en: 'That is all of BPE:', zh: '这就是 BPE 的全部：' })}</strong>
-				{t({
-					en: 'bytes, pre-tokens, count, merge, repeat; then replay the merges in order on new text. Try another training text and run the lesson again, or explore every part at full size below.',
-					zh: '字节、预分词、统计、合并、重复；然后在新文本上按顺序重放这些合并。换一段训练文本再走一遍课程，或者在下面完整地探索每个部分。'
-				})}
-			</p>
-			<a class="btn primary" href="#explore">{t({ en: 'Explore freely', zh: '自由探索' })} ↓</a>
-		</div>
+		<p class="fin">
+			<strong>{t({ en: 'That is all of BPE:', zh: '这就是 BPE 的全部：' })}</strong>
+			{t({
+				en: 'bytes, pre-tokens, count, merge, repeat; then replay the merges in order on new text. Try another training text and run the lesson again, or open Explore to see every part at full size.',
+				zh: '字节、预分词、统计、合并、重复；然后在新文本上按顺序重放这些合并。换一段训练文本再走一遍课程，或者打开“探索”，完整地看每个部分。'
+			})}
+		</p>
 	{/snippet}
 </Walkthrough>
-<p class="foot muted">
-	{t({
-		en: 'Every number in the lesson is computed in your browser from your texts; only TinyGPT’s training pair counts in step 6 were recorded when its tokenizer was trained (marked “precomputed”). The texts are shared with the rest of the page, but the lesson keeps its own merge count, so Part 1 below stays where you left it.',
-		zh: '课程中的每个数都由你的文本在浏览器中实时算出；只有第 6 步里 TinyGPT 的训练计数是在训练它的分词器时记录下来的（标为“预先计算”）。文本与页面其他部分共用，但课程有自己的合并次数，所以下面第 1 部分会停在你离开时的位置。'
-	})}
-</p>
 
 <style>
-	.badge {
-		display: flex;
-		justify-content: flex-end;
-		margin: -4px 0 6px;
-	}
-	.you {
+	.recap {
+		margin: 0;
+		padding-left: 1.2em;
 		display: grid;
-		gap: 8px;
-		padding: 10px 12px;
-		border: 1px solid var(--rule);
-		border-radius: var(--r2);
-		background: var(--surface-2);
-		min-width: 0;
-	}
-	.you-h {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 4px 12px;
-	}
-	h4 {
-		margin: 0;
-		font-size: var(--fs-md);
-	}
-	.small {
-		font-size: var(--fs-xs);
-	}
-	.pv {
-		margin: 0;
-		font-family: var(--font-mono);
-		font-size: var(--fs-xs);
-		color: var(--ink-2);
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		overflow-wrap: anywhere;
-	}
-	.pres {
-		display: flex;
-		flex-wrap: wrap;
 		gap: 4px;
 	}
-	.pre {
-		min-height: 32px;
-		padding: 0 10px;
-		border-radius: var(--r-pill);
-		border: 1px solid var(--rule-strong);
-		background: var(--surface);
-		color: inherit;
-		font-size: var(--fs-sm);
-		max-width: 100%;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		cursor: pointer;
-	}
-	.pre:hover {
-		border-color: var(--accent);
-	}
-	.pre[aria-pressed='true'] {
-		border-color: var(--accent);
-		background: var(--accent-soft);
-		font-weight: 650;
-	}
-	.btn.small {
-		justify-self: start;
-		gap: 6px;
-		min-height: 32px;
-		padding: 0 12px;
-		font-size: var(--fs-sm);
-	}
-	.hint {
-		margin: 0;
-		font-size: var(--fs-xs);
-		color: var(--ink-2);
-	}
 	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
 		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 </style>

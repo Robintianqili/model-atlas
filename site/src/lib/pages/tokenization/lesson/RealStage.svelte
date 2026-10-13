@@ -5,14 +5,13 @@
   shown; served by this site). One row per tokenizer: token count bar and the tokens themselves.
 -->
 <script lang="ts">
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { t, i18n } from '$lib/i18n/i18n.svelte';
 	import { fmtBytes, fmtInt } from '$lib/kit/format';
 	import type { BPETokenizer } from '$lib/models/bpe';
 	import Chips from '../Chips.svelte';
 	import type { ChipItem } from '../types';
 	import type { RealResult } from '../realtok';
-	import { REAL, REAL_BY_ID, REAL_TOTAL_BYTES, ROW_COLOR, ROW_NAME, PARITY, type RealId, type RowId } from '../tokenizers';
+	import { REAL, REAL_BY_ID, REAL_TOTAL_BYTES, ROW_COLOR, ROW_NAME, type RealId, type RowId } from '../tokenizers';
 	import { real, conn, loadAll, loadReal, readyIds } from '../state.svelte';
 
 	interface Props {
@@ -100,7 +99,6 @@
 	<div class="loadbar">
 		{#if i18n.lang === 'zh'}<span>四个真实分词器的文件由本站提供，到这一步才加载，总计 <b class="num">{fmtBytes(REAL_TOTAL_BYTES)}</b>。你的文本不会离开你的设备。</span>{:else}<span>The four real tokenizer files come from this site and load only now: <b class="num">{fmtBytes(REAL_TOTAL_BYTES)}</b> in total. Your text never leaves your device.</span>{/if}
 		{#if anyIdle}<button type="button" class="btn small" onclick={loadAll}>{t({ en: 'Load all', zh: '全部加载' })} ({fmtBytes(REAL_TOTAL_BYTES)})</button>{/if}
-		<ProvenanceBadge mode="live" compact note={PARITY.note} />
 	</div>
 	<ul class="rows">
 		{#each rows as r (r.id)}

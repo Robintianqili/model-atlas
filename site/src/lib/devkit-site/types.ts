@@ -31,7 +31,7 @@ export interface GuideIndexData {
 	kind: 'guide';
 	title: string;
 	introHtml: string;
-	sections: (SectionRef & { summary: string; subs: number })[];
+	sections: (SectionRef & { subs: number })[];
 }
 
 export interface SectionData {
@@ -73,6 +73,8 @@ export interface ViewData {
 	minHeight: number | null;
 	describe: T2 | null;
 	pkg: string | null;
+	/** the package's live lesson (BASE-prefixed href), where the view is seen at work; null for kit views */
+	lesson: { href: string; name: T2 } | null;
 	ops: string[];
 }
 

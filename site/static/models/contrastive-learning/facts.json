@@ -1,0 +1,95 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "updates": {
+   "value": 4680,
+   "unit": "updates",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  },
+  "epochs": {
+   "value": 60,
+   "unit": "epochs",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  },
+  "batch": {
+   "value": 256,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  },
+  "trainN": {
+   "value": 20000,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  },
+  "testN": {
+   "value": 2000,
+   "unit": "pairs",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  },
+  "batches6": {
+   "value": 333,
+   "unit": "batches",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "checkpoints": {
+   "value": 8,
+   "unit": "checkpoints",
+   "source": "export.py PAGE",
+   "measured": "2026-10-08"
+  },
+  "loss6First": {
+   "value": 3.0340613896424347,
+   "unit": "nats",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "loss6Last": {
+   "value": 0.11514872151270175,
+   "unit": "nats",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "acc6First": {
+   "value": 0.15715715715715717,
+   "unit": "share",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "acc6Last": {
+   "value": 0.9524524524524525,
+   "unit": "share",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "tauFirst": {
+   "value": 0.07000000066757203,
+   "unit": "τ = 1/s",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "tauLast": {
+   "value": 0.03924612185844185,
+   "unit": "τ = 1/s",
+   "source": "pipeline/contrastive-learning/train.py --run v1 (CPU, seed 0), 2,000 test pairs in batches of 6",
+   "measured": "2026-10-08"
+  },
+  "tauClip": {
+   "value": 0.047380634983722754,
+   "unit": "τ = 1/s",
+   "source": "static/models/tinyclip/facts.json scale (the shipped TinyCLIP)",
+   "measured": "2026-10-08"
+  },
+  "params": {
+   "value": 15905,
+   "unit": "count",
+   "source": "train.py",
+   "measured": "2026-10-08"
+  }
+ }
+}

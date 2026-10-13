@@ -1,0 +1,161 @@
+{
+ "format": "atlas-facts/1",
+ "facts": {
+  "whatAcc": {
+   "value": 0.9638,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "vitAcc": {
+   "value": 0.9715,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "agreeVit": {
+   "value": 0.9743,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "testN": {
+   "value": 15000,
+   "unit": "drawings",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "yesTrue": {
+   "value": 0.9793,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "noOther": {
+   "value": 0.9868,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "yesnoAcc": {
+   "value": 0.9831,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "answerWords": {
+   "value": 1.0,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "imgShare1": {
+   "value": 0.9347,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "inkLean1": {
+   "value": 2.025,
+   "unit": "ratio",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "topInked1": {
+   "value": 0.9987,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "imgShare2": {
+   "value": 0.9177,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "inkLean2": {
+   "value": 1.864,
+   "unit": "ratio",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "topInked2": {
+   "value": 0.9379,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "inkedShare": {
+   "value": 0.7268,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "heldOutN": {
+   "value": 3000,
+   "unit": "drawings",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "heldOutClassWord": {
+   "value": 1.0,
+   "unit": "share",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "trainable": {
+   "value": 78484,
+   "unit": "count",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "vitRead": {
+   "value": 88080,
+   "unit": "count",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "vitParams": {
+   "value": 116938,
+   "unit": "count",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "vitBlocksAll": {
+   "value": 4,
+   "unit": "count",
+   "source": "pipeline/llava-toy/stats.py (CPU float32, 15,000 test drawings)",
+   "measured": "2026-10-13"
+  },
+  "ladderAnswer": {
+   "value": 16,
+   "unit": "vocab id",
+   "source": "pipeline/llava-toy/export.py (the ladder preset, \"what is this ?\", CPU float32)",
+   "measured": "2026-10-13"
+  },
+  "ladderP": {
+   "value": 0.9787,
+   "unit": "share",
+   "source": "pipeline/llava-toy/export.py (the ladder preset, \"what is this ?\", CPU float32)",
+   "measured": "2026-10-13"
+  },
+  "bestEpoch": {
+   "value": 29,
+   "unit": "epoch",
+   "source": "pipeline/llava-toy/train.py",
+   "measured": "2026-10-13"
+  },
+  "epochs": {
+   "value": 30,
+   "unit": "epoch",
+   "source": "pipeline/llava-toy/train.py",
+   "measured": "2026-10-13"
+  },
+  "steps": {
+   "value": 7050,
+   "unit": "count",
+   "source": "pipeline/llava-toy/train.py",
+   "measured": "2026-10-13"
+  }
+ }
+}

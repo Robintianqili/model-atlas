@@ -1,6 +1,7 @@
 <!--
-  Page status badge for catalog cards and page headers: Live / Precomputed / Planned,
-  optionally with the tier. <StatusBadge status="planned" tier="P1" />
+  Page status for catalog cards and page headers: Live / Precomputed / Planned, optionally with the tier. Redesign look
+  (spec §6.2): live is the rule, so it is a dot and the word, not a pill; planned is the exception and reads as text with
+  a dashed underline. Same API as before. <StatusBadge status="planned" tier="P1" />
 -->
 <script lang="ts">
 	import Tooltip from './Tooltip.svelte';
@@ -17,7 +18,7 @@
 
 {#snippet badge()}
 	<span class="sb {status}">
-		{#if status === 'live'}<span class="dot" aria-hidden="true"></span>{/if}
+		{#if status !== 'planned'}<span class="dot" aria-hidden="true"></span>{/if}
 		{label}{#if tier && status !== 'live'}<span class="tier num" aria-label="{ui('tier')} {tier}">{tier}</span>{/if}
 	</span>
 {/snippet}
@@ -32,37 +33,29 @@
 	.sb {
 		display: inline-flex;
 		align-items: center;
-		gap: 5px;
-		padding: 1px 8px;
-		border-radius: var(--r-pill);
-		font-size: var(--fs-xs);
-		font-weight: 700;
-		line-height: 1.6;
+		gap: 6px;
+		font-size: var(--t-xs);
+		line-height: var(--lh-xs);
+		font-weight: var(--w-ui);
+		color: var(--ink-2);
 		white-space: nowrap;
-		border: 1px solid currentColor;
-	}
-	.live {
-		color: var(--live);
-		background: var(--live-soft);
-	}
-	.precomputed {
-		color: var(--pre);
-		background: var(--pre-soft);
-	}
-	.planned {
-		color: var(--planned);
-		background: var(--planned-soft);
-		border-style: dashed;
 	}
 	.dot {
 		width: 7px;
 		height: 7px;
 		border-radius: 50%;
-		background: currentColor;
+		background: var(--live);
+	}
+	.precomputed .dot {
+		background: var(--pre);
+	}
+	.planned {
+		color: var(--muted);
+		text-decoration: underline dashed var(--line-control) 1px;
+		text-underline-offset: 3px;
 	}
 	.tier {
-		padding-left: 5px;
-		border-left: 1px solid currentColor;
-		font-weight: 600;
+		font-weight: var(--w-body);
+		color: var(--muted);
 	}
 </style>

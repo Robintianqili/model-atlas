@@ -10,7 +10,7 @@
 <script lang="ts">
 	import Num from '../kit.parts/Num.svelte';
 	import { fmt3 } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
@@ -19,7 +19,7 @@
 	import RowBars from '../kit.parts/RowBars.svelte';
 	import SumBars from '../kit.parts/SumBars.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, domainOf, layerLabel, maxAbs, opCurve, outLabels, resolveUnit, tensorOf, tokenIds, tokenTexts, unitSlice, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, domainOf, layerLabel, maxAbs, opCurve, outLabels, resolveUnit, tensorOf, tokenIds, tokenTexts, unitSlice, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -34,8 +34,8 @@
 	const out = $derived(R.trace && id ? R.trace.t[id] : null);
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
 	const T = $derived(out && axes[0] === 't' ? out.shape[0] : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model)) : []);
-	const where = $derived(e ? unitWhere(e.unit, axes, tokens, outLabels(P, R.model)) : null);
+	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model), i18n.lang) : []);
+	const where = $derived(e ? unitWhere(e.unit, axes, tokens, outLabels(P, R.model), axisNames(P)) : null);
 	const isAdd = $derived(!!e && !e.curve && (e.terms?.length ?? 0) === 2);
 	const xT = $derived(e && R.trace ? tensorOf(R.trace, e.reads[0]?.tensor ?? '') : null);
 	const bT = $derived(e && isAdd && R.trace ? tensorOf(R.trace, e.reads[1]?.tensor ?? '') : null);
@@ -157,7 +157,7 @@
 			<p class="muted small">{t({ en: `${sliceName.en}: input and output on one scale; ${fmt3(rowMax)} is the top of the bars.`, zh: `${sliceName.zh ?? sliceName.en}：输入和输出使用同一个刻度；柱子顶端是 ${fmt3(rowMax)}。` })}</p>
 		{/if}
 
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 

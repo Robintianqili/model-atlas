@@ -12,7 +12,7 @@
 	import { makeScale } from '$lib/kit/color';
 	import { themeState } from '$lib/kit/theme.svelte';
 	import { fmt3, fmtPct } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
@@ -35,7 +35,7 @@
 	const Hn = $derived(out ? out.shape[1] : 0);
 	const tt = $derived(e ? (e.values.t ?? e.unit[0]) : 0);
 	const j = $derived(e ? (e.values.j ?? e.unit[1]) : 0);
-	const tokens = $derived(Tn ? tokenTexts(P, Tn, tokenIds(R.trace, R.model)) : []);
+	const tokens = $derived(Tn ? tokenTexts(P, Tn, tokenIds(R.trace, R.model), i18n.lang) : []);
 	const v = $derived(e?.values ?? {});
 	const gates = $derived([
 		{ k: 'f', name: { en: 'forget gate', zh: '遗忘门' }, z: v.zf, val: v.f, seq: true },
@@ -159,7 +159,7 @@
 				{/each}
 			</div>
 		{/if}
-		<OpFormula tex={R.op?.def.formula} {e} caption={{ en: `${layerLabel(R.model, id).en}, time step ${tt}, unit ${j}`, zh: `${layerLabel(R.model, id).zh ?? id}，时间步 ${tt}、单元 ${j}` }} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={{ en: `${layerLabel(R.model, id).en}, time step ${tt}, unit ${j}`, zh: `${layerLabel(R.model, id).zh ?? id}，时间步 ${tt}、单元 ${j}` }} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 
@@ -258,7 +258,7 @@
 		box-shadow: 0 0 0 1px var(--accent);
 	}
 	.lbl {
-		font-size: 11px;
+		font-size: var(--t-xs);
 		color: var(--muted);
 		font-family: var(--font-mono);
 	}
@@ -318,7 +318,7 @@
 	}
 	.tick {
 		fill: var(--muted);
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 	}
 	.units {

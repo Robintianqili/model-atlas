@@ -1,6 +1,6 @@
 // zoom.lookup (W1-D2): one output number of a table lookup (embedding, position_embedding, local cls_token).
 import type { ViewMeta } from '../../../types/view.ts';
-import { axesOfId, fmt3, layerLabel, resolveUnit, tokenIds, tokenTexts, unitWhere, type Props } from '../kit.parts/stage.ts';
+import { axesOfId, axisNames, fmt3, layerLabel, type Props, resolveUnit, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 import { demoStage, type DemoVariant } from '../kit.parts/demo.ts';
 
 export function describeLookup(p: Props) {
@@ -10,7 +10,7 @@ export function describeLookup(p: Props) {
 	const out = r.trace?.t[e.layer];
 	const axes = out ? axesOfId(r.model, e.layer, out.shape) : [];
 	const T = out && axes[0] === 't' ? out.shape[0] : 0;
-	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined);
+	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined, undefined, axisNames(p));
 	const name = layerLabel(r.model, e.layer);
 	const v = e.values;
 	if (v.id !== undefined) {

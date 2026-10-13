@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { lanesChoice } from '../config.ts';
 import { findRoot, laneName, resolveRoots } from '../root.ts';
 import { PYTHON, ROOT, SITE, python, tempRepo } from './helpers.ts';
 
@@ -17,15 +18,15 @@ test('main tree: ATLAS_SITE = site/, ATLAS_ROOT = the repo root', () => {
 	assert.ok(existsSync(join(r.root, 'CONTRACTS.md')) && existsSync(join(r.root, 'pipeline')));
 });
 
-test('lane: site/.work/<name>/site resolves to the same repo root (site/.work/<name> and site/ have no pipeline/)', () => {
-	const lanes = existsSync(join(MAIN_SITE, '.work'))
-		? readdirSync(join(MAIN_SITE, '.work')).filter((n) => existsSync(join(MAIN_SITE, '.work', n, 'site', 'svelte.config.js')))
-		: [];
+test('lane: <lanes>/<name>/site resolves to the same repo root (in site/.work by walking up, elsewhere through lane.json)', () => {
+	const dirs = [...new Set([join(MAIN_SITE, '.work'), lanesChoice(MAIN_SITE).dir])];
+	const lanes = dirs.flatMap((d) => (existsSync(d) ? readdirSync(d).filter((n) => existsSync(join(d, n, 'site', 'svelte.config.js'))).map((n) => [d, n] as const) : []));
 	if (!lanes.length) return; // no lane on this machine
-	for (const name of lanes) {
-		const r = resolveRoots({ ATLAS_SITE: join(MAIN_SITE, '.work', name, 'site') });
+	for (const [dir, name] of lanes) {
+		const r = resolveRoots({ ATLAS_SITE: join(dir, name, 'site') });
 		assert.equal(resolve(r.root), resolve(ROOT), name);
 		assert.equal(r.lane, name);
+		assert.equal(resolve(r.main), resolve(MAIN_SITE), name);
 	}
 });
 

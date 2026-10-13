@@ -40,8 +40,10 @@
 		title?: Text;
 		/** keep the input and output maps side by side on phones (the guided lesson: watch both while it slides) */
 		pair?: boolean;
+		/** a compact stage (phones): the arithmetic as one line of sums, its numbers behind a disclosure (spec §5.4) */
+		compact?: boolean;
 	}
-	let { S, view, parts = ['slide', 'channels', 'arith', 'formula'], autoplay = false, interval = 150, fill = false, onend, title, pair = false }: Props = $props();
+	let { S, view, parts = ['slide', 'channels', 'arith', 'formula'], autoplay = false, interval = 150, fill = false, onend, title, pair = false, compact = false }: Props = $props();
 	const V = $derived(view ?? S);
 	const show = (p: Part) => parts.includes(p);
 	let playing = $state(false);
@@ -231,7 +233,15 @@
 	{/if}
 
 	{#if show('arith')}
-	<div class="arith-wrap">
+	{#if compact}
+		<p class="sumline">
+			<span>{t({ en: `${C * 9} products`, zh: `${C * 9} 个乘积` })}</span> <b class="num">{fmt3(sumAll)}</b>
+			<span>+ b</span> <b class="num">{fmt3(d.bias)}</b>
+			<span>= y</span> <b class="num y">{fmt3(d.total)}</b>
+		</p>
+	{/if}
+	<svelte:element this={compact ? 'details' : 'div'} class="arith-wrap" class:fold={compact}>
+	{#if compact}<summary>{C === 1 ? t({ en: `Show the ${3 * 9} numbers`, zh: `展开这 ${3 * 9} 个数` }) : t({ en: `Show the numbers of channel ${inCh} and the ${C} sums`, zh: `展开通道 ${inCh} 的数和 ${C} 个和` })}</summary>{/if}
 	<div class="arith">
 		<div class="mul">
 			<NumGrid values={d.windows[inCh]} rows={3} cols={3} kind={inKind} domain={inDomain} label={labels.win} bind:hover={hoverK} />
@@ -284,7 +294,7 @@
 			</div>
 		</div>
 	</div>
-	</div>
+	</svelte:element>
 	{/if}
 
 	{#if show('formula')}
@@ -322,6 +332,11 @@
 		flex: 1 1 220px;
 		max-width: 400px;
 	}
+	/* the lesson (pair): inside the lesson app's stage pane (a size container) the maps leave room for the arithmetic
+	   under them; elsewhere 100cqh is the viewport height */
+	.maps.pair .m {
+		max-width: clamp(190px, calc(100cqh - 420px), 400px);
+	}
 	figcaption {
 		font-size: var(--fs-xs);
 		color: var(--ink-2);
@@ -330,7 +345,7 @@
 		display: grid;
 		justify-items: center;
 		color: var(--muted);
-		font-size: 11px;
+		font-size: var(--t-xs);
 		font-family: var(--font-mono);
 	}
 	@media (max-width: 560px) {
@@ -392,7 +407,7 @@
 	}
 	.cs {
 		grid-area: cs;
-		font-size: 10px;
+		font-size: var(--t-xs);
 	}
 	.th.on {
 		border-color: var(--accent);
@@ -405,6 +420,32 @@
 	/* the arithmetic stacks by its own width (it also sits in the narrower lesson stage) */
 	.arith-wrap {
 		container-type: inline-size;
+	}
+	/* compact: one line of sums ("9 products 1.42 + b 0.0762 = y 1.50"), the numbers behind a disclosure */
+	.sumline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 6px;
+		margin: 12px 0 6px;
+		color: var(--ink-2);
+		font-size: var(--t-sm);
+	}
+	.sumline b {
+		color: var(--ink);
+		font-weight: var(--w-ui);
+	}
+	.sumline .y {
+		padding: 0 6px;
+		border: 1.5px solid var(--ink);
+		border-radius: var(--r1);
+	}
+	.fold > summary {
+		min-height: 32px;
+		color: var(--ink-2);
+		font-size: var(--t-sm);
+		font-weight: var(--w-ui);
+		cursor: pointer;
 	}
 	.arith {
 		display: grid;
@@ -467,7 +508,7 @@
 		border: 0;
 		border-radius: 3px;
 		background: none;
-		font-size: 11px;
+		font-size: var(--t-xs);
 		text-align: left;
 		min-height: 18px;
 	}

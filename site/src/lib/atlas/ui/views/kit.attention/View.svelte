@@ -2,14 +2,16 @@
   kit.attention: the kit's AttentionMatrix on an [H, Tq, Tk] layer of attention weights, one head at a time, with the
   tokens as row and column labels, the causal mask hatched, and the query row of the stage's unit (or props.query)
   outlined. Under it, the query's row as words: where this token looks, largest weight first. props: layer, head, query.
+  K4: props.tokens names the queries and props.keys the keys (cross-attention: an encoder-decoder's decoder positions
+  look at the encoder's), each a list of strings or { en, zh } names.
 -->
 <script lang="ts">
 	import AttentionMatrix from '$lib/kit/AttentionMatrix.svelte';
 	import { fmtPct } from '../../../core/format.ts';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { stageModel, stageTrace, tokenIds, tokenTexts } from '../kit.parts/stage.ts';
+	import { keyTexts, stageModel, stageTrace, tokenIds, tokenTexts } from '../kit.parts/stage.ts';
 	import { attnOf } from './attn.ts';
 
 	let P: StageProps = $props();
@@ -21,8 +23,8 @@
 	let col = $state<number | null>(null);
 	const A = $derived(attnOf(P, headPick));
 	const ids = $derived(tokenIds(stageTrace(P), stageModel(P)));
-	const tokens = $derived(A ? tokenTexts(P, A.tq, ids) : []);
-	const keys = $derived(A ? tokenTexts(P, A.tk, ids) : []);
+	const tokens = $derived(A ? tokenTexts(P, A.tq, ids, i18n.lang) : []);
+	const keys = $derived(A ? keyTexts(P, A.tk, ids, i18n.lang) : []);
 	const q = $derived(A ? Math.max(0, Math.min(A.tq - 1, row ?? A.query)) : 0);
 	const shownRow = $derived(A ? q : null);
 	const ranked = $derived.by(() => {

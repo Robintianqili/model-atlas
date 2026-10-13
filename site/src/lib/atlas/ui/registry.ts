@@ -1,61 +1,60 @@
-// The view registry (design §4.8). Metas are read with import.meta.glob (eager: they are small and pure, and lint needs a
-// synchronous "is this view registered?"); components are lazy, one chunk per view. Kit views live in
-// atlas/ui/views/<key>/{meta.ts, View.svelte}; package views in explainers/<slug>/views/<key>/ and register as '<slug>/<key>'.
-// Only lazy code imports this module (AutoModelPage, LessonPlayer, StageHost, the Lesson Lab), so planned pages and the
-// hand-built model pages never carry the metas (design §5.1, page-shell budget).
+// The view registry (design §4.8; redesign wave F: per package). Kit metas are read eagerly with import.meta.glob (they
+// are few and every lesson uses them); package metas are lazy, and prepareViews(slug) loads one package's metas, so a page
+// carries the metas of its own package only (before, every package's metas were in two shared 316-338 KB chunks).
+// loadPackage(slug) (packages.ts) awaits prepareViews(slug), so every caller that has its package (AutoModelPage,
+// AutoConceptPage, the Lesson Lab) keeps the synchronous hasView / viewMeta / loadView with no API change. Components are
+// lazy, one chunk per view. Kit views live in atlas/ui/views/<key>/{meta.ts, View.svelte}; package views in
+// explainers/<slug>/views/<key>/ and register as '<slug>/<key>'. Only lazy code imports this module (AutoModelPage,
+// LessonPlayer, StageHost, the Lesson Lab), so planned pages and the hand-built model pages never carry the metas.
 import type { Component } from 'svelte';
 import type { ViewMeta } from '../types/view.ts';
+import { kitEntry, packageMetaPaths, pkgEntry, type ViewEntry } from './registry-entries.ts';
 
 const kitMetas = import.meta.glob<ViewMeta>('./views/*/meta.ts', { eager: true, import: 'default' });
-const pkgMetas = import.meta.glob<ViewMeta>('../../explainers/*/views/*/meta.ts', { eager: true, import: 'default' });
+const pkgMetas = import.meta.glob<ViewMeta>('../../explainers/*/views/*/meta.ts', { import: 'default' });
 const kitViews = import.meta.glob<Component<any>>('./views/*/View.svelte', { import: 'default' });
 const pkgViews = import.meta.glob<Component<any>>('../../explainers/*/views/*/View.svelte', { import: 'default' });
 
-interface Entry {
-	key: string;
-	meta: ViewMeta;
-	load: (() => Promise<Component<any>>) | null;
-	/** registry problems (key differs from its folder, no View.svelte) */
-	problem?: string;
+const REG = new Map<string, ViewEntry>();
+for (const [path, meta] of Object.entries(kitMetas)) {
+	const e = kitEntry(path, meta, kitViews);
+	if (e) REG.set(e.key, e);
 }
 
-const KIT_RE = /^\.\/views\/([^/]+)\/meta\.ts$/;
-const PKG_RE = /^\.\.\/\.\.\/explainers\/([^/]+)\/views\/([^/]+)\/meta\.ts$/;
-
-function build(): Map<string, Entry> {
-	const out = new Map<string, Entry>();
-	for (const [path, meta] of Object.entries(kitMetas)) {
-		const m = KIT_RE.exec(path);
-		if (!m || !meta) continue;
-		const key = m[1];
-		const view = `./views/${key}/View.svelte`;
-		const e: Entry = { key, meta, load: kitViews[view] ?? null };
-		if (meta.key !== key) e.problem = `meta.key '${meta.key}' differs from its folder '${key}'`;
-		if (!e.load) e.problem = `${view} is missing`;
-		out.set(key, e);
-	}
-	for (const [path, meta] of Object.entries(pkgMetas)) {
-		const m = PKG_RE.exec(path);
-		if (!m || !meta) continue;
-		const key = `${m[1]}/${m[2]}`;
-		const view = `../../explainers/${m[1]}/views/${m[2]}/View.svelte`;
-		const e: Entry = { key, meta, load: pkgViews[view] ?? null };
-		if (meta.key !== key && meta.key !== m[2]) e.problem = `meta.key '${meta.key}' should be '${key}'`;
-		if (!e.load) e.problem = `${view} is missing`;
-		out.set(key, e);
-	}
-	return out;
-}
-
-const REG = build();
+const prepared = new Map<string, Promise<void>>();
+const done = new Set<string>();
 const loaded = new Map<string, Promise<Component<any> | null>>();
 
-/** Every registered view key (kit views first, then package views). */
+/** Load one package's view metas into the registry (once; later calls share the promise). Throws when a meta fails to
+ *  load, like any other package file (loadPackage). */
+export function prepareViews(slug: string): Promise<void> {
+	let p = prepared.get(slug);
+	if (!p) {
+		const paths = packageMetaPaths(Object.keys(pkgMetas), slug);
+		p = Promise.all(paths.map(async (path) => [path, await pkgMetas[path]()] as const)).then((metas) => {
+			for (const [path, meta] of metas) {
+				const e = pkgEntry(path, meta, pkgViews);
+				if (e) REG.set(e.key, e);
+			}
+			done.add(slug);
+		});
+		p.catch(() => prepared.delete(slug));
+		prepared.set(slug, p);
+	}
+	return p;
+}
+
+/** Has prepareViews(slug) finished? */
+export function viewsPrepared(slug: string): boolean {
+	return done.has(slug);
+}
+
+/** Every registered view key: the kit views, then the package views prepared so far. */
 export function viewKeys(): string[] {
 	return [...REG.keys()];
 }
 
-/** Is `key` a registered view with a component? (lint AK405 in the browser) */
+/** Is `key` a registered view with a component? (lint AK405 in the browser; a package view once its package is prepared) */
 export function hasView(key: string): boolean {
 	const e = REG.get(key);
 	return !!e && !!e.load;
@@ -74,7 +73,8 @@ export function loadView(key: string): Promise<Component<any> | null> {
 	let p = loaded.get(key);
 	if (!p) {
 		const e = REG.get(key);
-		p = e?.load
+		if (!e) return Promise.resolve(null); // not cached: the key may register once its package is prepared
+		p = e.load
 			? e.load().catch((err) => {
 					console.error(`atlas view '${key}' failed to load`, err);
 					return null;

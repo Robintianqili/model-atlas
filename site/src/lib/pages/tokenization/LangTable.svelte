@@ -10,12 +10,13 @@
 	import { themeState } from '$lib/kit/theme.svelte';
 	import { bytesToDisplay, type BPETokenizer } from '$lib/models/bpe';
 	import Chips from './Chips.svelte';
-	import type { ChipItem, LangSummary } from './types';
+	import type { ChipItem } from './types';
 	import type { RealResult } from './realtok';
 	import { segment, type TrainTrace } from './train';
+	import { LangCounts, LANG_COLS } from './langcounts.svelte';
 	import { PRESETS } from './presets';
 	import { REAL, ROW_COLOR, ROW_NAME, type RealId, type RowId } from './tokenizers';
-	import { real, conn, readyIds, loadAll } from './state.svelte';
+	import { real, conn, loadAll } from './state.svelte';
 
 	interface Props {
 		tiny: BPETokenizer;
@@ -23,50 +24,17 @@
 		k: number;
 		/** called with a sentence to copy it into the page's sentence input */
 		onuse?: (text: string) => void;
-		/** per tokenizer: English, cheapest and most expensive language (for the pitfalls section) */
-		summary?: LangSummary[];
 	}
-	let { tiny, trace, k, onuse, summary = $bindable([]) }: Props = $props();
+	let { tiny, trace, k, onuse }: Props = $props();
 
 	const langs = PRESETS.languages;
-	const cols: RowId[] = ['yours', 'tinygpt', 'gpt2', 'bert', 'cl100k', 'qwen'];
-	let realCounts = $state.raw<Record<string, [number, number]>[]>([]);
+	const cols = LANG_COLS;
 	let mode = $state<'count' | 'ratio'>('count');
 	let sel = $state<{ li: number; col: RowId } | null>({ li: 1, col: 'gpt2' });
 	let selRes = $state.raw<RealResult | null>(null);
 
-	$effect(() => {
-		void real.version;
-		const c = conn.client;
-		const ids = readyIds();
-		if (!c || !ids.length) return;
-		c.counts(
-			langs.map((l) => l.text),
-			ids
-		)
-			.then((r) => (realCounts = r))
-			.catch(() => {});
-	});
-
-	const enc = new TextEncoder();
-	const yoursCount = (text: string) =>
-		trace ? segment(text, tiny.pattern, trace.merges, Math.min(k, trace.merges.length)).reduce((s, p) => s + p.ids.length, 0) : undefined;
-
-	const table = $derived(
-		langs.map((l, li) => {
-			const row: Partial<Record<RowId, number>> = {
-				yours: yoursCount(l.text),
-				tinygpt: tiny.encode(l.text, { allowSpecial: false }).length
-			};
-			const unk: Partial<Record<RowId, number>> = {};
-			for (const r of REAL)
-				if (real.status[r.id] === 'ready' && realCounts[li]?.[r.id] !== undefined) {
-					row[r.id] = realCounts[li][r.id][0];
-					unk[r.id] = realCounts[li][r.id][1];
-				}
-			return { l, row, unk, chars: Array.from(l.text).length, bytes: enc.encode(l.text).length };
-		})
-	);
+	const counts = new LangCounts(() => ({ tiny, trace, k }));
+	const table = $derived(counts.table);
 	const ratio = (li: number, col: RowId) => {
 		const v = table[li].row[col];
 		const en = table[0].row[col];
@@ -86,24 +54,6 @@
 			})
 			.filter((w) => w.li >= 0)
 	);
-
-	$effect(() => {
-		const out: LangSummary[] = [];
-		for (const c of cols) {
-			const en = table[0].row[c];
-			if (en === undefined) continue;
-			let min = { li: 0, v: en };
-			let max = { li: 0, v: en };
-			table.forEach((r, li) => {
-				const v = r.row[c];
-				if (v === undefined || r.unk[c]) return; // skip counts that contain [UNK]
-				if (v < min.v) min = { li, v };
-				if (v > max.v) max = { li, v };
-			});
-			out.push({ col: c, en, min, max });
-		}
-		summary = out;
-	});
 
 	// tokens of the selected cell
 	$effect(() => {
@@ -341,7 +291,7 @@
 		margin-left: 3px;
 		padding: 0 3px;
 		border-radius: 3px;
-		font-size: 10px;
+		font-size: var(--t-xs);
 		font-weight: 700;
 		color: var(--surface);
 		background: var(--k-text);

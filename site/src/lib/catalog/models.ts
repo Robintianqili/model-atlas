@@ -256,15 +256,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('OCR with CRNN + CTC', 'CRNN + CTC 文字识别'),
 		family: f('CNN + RNN + CTC', 'CNN + RNN + CTC'),
 		tier: 'P2',
-		status: 'planned',
-		inputs: ['drawing', 'image'],
+		status: 'live',
+		inputs: ['drawing'],
 		own: true,
-		size: '≤5 MB (design)',
-		runtime: 'Own JS',
+		params: '43,435',
+		size: '170 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('Write a word and watch letters emerge from a row of column features.', '写一个单词，看字母如何从一列列特征中浮现。'),
-		shows: f('Conv features per column, RNN states and the CTC collapse from frame labels to text.', '每列的卷积特征、RNN 状态，以及 CTC 把逐帧标签合并成文字。'),
-		prereqs: ['tinycnn', 'char-rnn']
+		hook: f('Write a number and watch digits emerge from a row of column features.', '写一个数，看数字怎样从一列列特征里浮现出来。'),
+		shows: f(
+			'Your writing as a strip of pixels, convolution features cut into 32 columns, two LSTMs reading them both ways, 11 symbol chances per column, greedy CTC decoding (merge repeats, drop blanks), the many paths that spell one text and the CTC loss summed over them, and letters it can only read as digits.',
+			'你写的字变成的像素长条、切成 32 列的卷积特征、从两头读这些列的两个 LSTM、每一列 11 个符号的概率、CTC 贪心解码（合并重复、去掉空白）、拼出同一段文字的许多条路径和把它们加起来的 CTC 损失，以及它只能读成数字的字母。'
+		),
+		prereqs: ['tinycnn', 'char-rnn'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Follow a tiny CRNN as it reads your handwritten number: the strip of pixels, convolution features cut into columns, two LSTMs reading them both ways, a symbol for every column, and CTC turning the columns into text.',
+				'跟着一个微型 CRNN 读你手写的数：像素长条、切成一列列的卷积特征、从两头读这些列的两个 LSTM、每一列的符号，以及 CTC 怎样把这些列变成文字。'
+			)
+		}
 	},
 	{
 		slug: 'style-transfer',
@@ -334,15 +345,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('PointNet on drawn point clouds', '手绘点云上的 PointNet'),
 		family: f('Point-set network', '点集网络'),
 		tier: 'P2',
-		status: 'planned',
-		inputs: ['pointcloud', 'points2d'],
+		status: 'live',
+		inputs: ['points2d'],
 		own: true,
-		size: '≤5 MB (design)',
-		runtime: 'Own JS',
+		params: '2,373',
+		size: '9.3 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('Classify a shape made of loose points, given in any order.', '对一组无序散点组成的形状进行分类。'),
-		shows: f('The shared per-point MLP, max-pooling as an order-independent step, and the critical points.', '逐点共享的 MLP、与顺序无关的最大池化，以及关键点。'),
-		prereqs: ['mlp-playground']
+		hook: f('Draw a shape as loose points, in any order, and see which of five shapes a tiny PointNet reads in it.', '用散点画一个形状，先画哪个点都行，看一个微型 PointNet 把它认作五种形状中的哪一种。'),
+		shows: f(
+			'Your points centred and scaled into a table of x and y; a shuffled copy of the table that gets exactly the same answer; the shared per-point MLP worked out for one point; the table of 32 features per point; the max over the points for each feature; the critical points, which alone give the same probabilities, and a task that removes them until the answer changes; the classifier’s score and the softmax; and one stray point that can change the answer, with rates measured on 5,000 test shapes.',
+			'你的点经过平移和缩放，变成一张 x、y 数表；把表的行打乱，答案完全不变；逐点共享的 MLP，以一个点为例写出计算；每个点 32 个特征的数表；每个特征在所有点上的最大值；只靠它们就给出相同概率的关键点，以及一个不断删掉关键点、直到答案改变的任务；分类器的分数和 softmax；还有一个就可能改变答案的离群点，以及在 5,000 个测试形状上实测的比例。'
+		),
+		prereqs: ['mlp-playground'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Your points become a table, every point goes alone through the same small network, a max keeps the strongest value of each feature, a few critical points decide the answer, and one stray point can change it.',
+				'你的点变成一张数表，每个点单独经过同一个小网络，取最大值只保留每个特征最强的值，少数几个关键点决定答案，而一个离群点就可能改变它。'
+			)
+		}
 	},
 	{
 		slug: 'nerf-toy',
@@ -608,15 +630,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Tiny encoder–decoder Transformer (T5-style)', '小型编码器–解码器 Transformer（T5 风格）'),
 		family: f('Transformer encoder–decoder', 'Transformer 编码器–解码器'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['text'],
 		own: true,
-		params: '≈0.2M (design)',
-		runtime: 'Own JS / ORT Web',
+		params: '25,344',
+		size: '99 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('The same task with cross-attention instead of an RNN.', '同一个任务，用交叉注意力代替 RNN。'),
-		shows: f('Encoder self-attention, decoder causal attention and cross-attention for every output token.', '编码器自注意力、解码器因果注意力，以及每个输出词元的交叉注意力。'),
-		prereqs: ['tinygpt', 'tinyseq2seq']
+		hook: f('The same date task as the GRU, with self-attention instead of a recurrent state.', '和 GRU 同一个日期任务，用自注意力代替循环状态。'),
+		shows: f(
+			'Encoder self-attention in both directions, the decoder’s causal self-attention, one cross-attention score, softmax and mix worked out with real numbers, greedy decoding step by step, and a measured comparison with the GRU.',
+			'双向的编码器自注意力、解码器的因果自注意力、用真实数值算出的一个交叉注意力分数及其 softmax 和混合、一步一步的贪心解码，以及与 GRU 的实测对比。'
+		),
+		prereqs: ['tinygpt', 'tinyseq2seq'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'An encoder reads your whole date at once with self-attention; a decoder writes it as 2021-03-05, one symbol at a time, reading what it already wrote through a causal mask and your characters through cross-attention. Work one cross-attention step out with real numbers, watch the matrix fill in, then compare it with the GRU on formats it never saw.',
+				'编码器用自注意力一次读完你的整个日期；解码器把它写成 2021-03-05 的样子，一次写一个符号：通过因果掩码读自己已经写下的东西，通过交叉注意力读你的字符。用真实的数算出一步交叉注意力，看矩阵一行行填满，再在它没见过的格式上和 GRU 比一比。'
+			)
+		}
 	},
 	{
 		slug: 'tinymamba',
@@ -651,15 +684,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Tiny mixture of experts', '小型混合专家模型'),
 		family: f('Sparse MoE Transformer', '稀疏 MoE Transformer'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['text'],
 		own: true,
-		params: '<0.2M (design)',
-		runtime: 'Own JS + precomputed traces',
-		mode: 'both',
-		hook: f('Each token picks 2 of 4 experts. See who handles what.', '每个词元从 4 个专家中选 2 个。看看谁负责什么。'),
-		shows: f('Router logits, a layer × expert grid per token and a cumulative routing heatmap.', '路由 logits、每个词元的层×专家网格，以及累计路由热力图。'),
-		prereqs: ['tinygpt']
+		params: '49,418 (32,650 used per character)',
+		size: '193 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
+		mode: 'live',
+		hook: f('Each character picks 2 of 4 experts. See who handles what, and what a full expert drops.', '每个字符从 4 个专家里选 2 个。看看谁负责什么，以及专家满了会丢掉什么。'),
+		shows: f(
+			'The router’s 4 scores for your last character, softmax worked out, the top 2 experts and their gate-weighted sum, a layer × expert grid under every character of your text, which characters each expert takes, the load-balancing loss, the slots dropped when an expert is full, a dense MLP with about as many parameters per character compared, and the next-character chances.',
+			'路由器给你最后一个字符打的 4 个分数、算出来的 softmax、前 2 名专家和它们按门控加权的和、你文字每个字符下方的层×专家网格、每个专家接哪些字符、负载均衡损失、专家满了时被丢掉的位置、和每个字符用到的参数差不多的稠密 MLP 的比较，以及下一个字符的概率。'
+		),
+		prereqs: ['tinygpt'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Follow one character through a tiny Transformer whose MLPs are mixtures of 4 experts: the router scores the experts, softmax turns the scores into chances, the top 2 run and their outputs are mixed by the gates; then see which characters each expert takes, why training balances the load, what a capacity limit drops, and how the model compares with a dense MLP of about the same active size.',
+				'跟着一个字符走过一个小 Transformer，它的 MLP 换成了 4 个专家的混合：路由器给专家打分，softmax 把分数变成概率，前 2 名运行，它们的输出按门控混合；接着看每个专家接哪些字符、训练为什么要均衡负载、容量限制会丢掉什么，以及它和每个字符用到的参数差不多的稠密 MLP 比起来如何。'
+			)
+		}
 	},
 	{
 		slug: 'logit-lens',
@@ -996,18 +1040,32 @@ export const MODELS: ModelEntry[] = [
 	{
 		slug: 'tiny-tcn',
 		area: 'time-series',
-		name: f('Tiny TCN, Transformer and PatchTST-style forecasters', '小型 TCN、Transformer 与 PatchTST 式预测器'),
-		family: f('Convolutional and attention forecasters', '卷积与注意力预测器'),
+		name: f('Tiny TCN forecaster', '小型 TCN 预测器'),
+		family: f('Temporal convolutional network', '时间卷积网络'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['series'],
 		own: true,
-		params: '<50k (design)',
-		runtime: 'Own JS (plus an own ARIMA baseline)',
+		params: 'TCN with kernel 2, dilations 1, 2, 4, 8 and 8 features per layer + a 1×1 head (441 parameters)',
+		size: 'No files: the network trains in your browser',
+		runtime: 'Own autograd core in a worker (checked against PyTorch); own ARIMA (checked against a Python run)',
 		mode: 'live',
-		hook: f('Three ways to read the past: dilated convolutions, patches and attention.', '读取过去的三种方式：空洞卷积、切片与注意力。'),
-		shows: f('The receptive field of dilated convolutions, patching, attention over past steps and an ARIMA comparison.', '空洞卷积的感受野、切片、对过去时间步的注意力，以及与 ARIMA 的对比。'),
-		prereqs: ['tinyforecaster']
+		hook: f(
+			'Four causal convolutions that skip 1, 2, 4 and 8 steps back learn your series in the browser, against a classic ARIMA.',
+			'四层分别往回跳 1、2、4、8 步的因果卷积，在浏览器里学习你的序列，并和经典的 ARIMA 比一比。'
+		),
+		shows: f(
+			'Causal convolutions, dilations and the 16-change receptive field, the tree of nodes behind one forecast with real numbers, residual blocks and the head, training on every position at once, an ARIMA(p, 1, q) baseline chosen by AIC, a held-out comparison that each model wins on some series, and a square wave longer than the reach.',
+			'因果卷积、空洞率与 16 个变化量的感受野、一个预测背后带真实数值的节点树、残差块与输出头、在所有位置上同时训练、按 AIC 选阶的 ARIMA(p, 1, q) 基准、在留出值上的比较（两个模型各有胜场），以及一个比视野更长的方波。'
+		),
+		prereqs: ['tinyforecaster'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'A temporal convolutional network learns your series in the browser: causal convolutions, dilations and the receptive field, the tree behind one forecast, residual blocks, training on every position at once, an ARIMA baseline and a pattern longer than the network can see.',
+				'一个时间卷积网络在浏览器里学习你的序列：因果卷积、空洞率与感受野、一个预测背后的节点树、残差块、在所有位置上同时训练、ARIMA 基准，以及一种比网络视野更长的规律。'
+			)
+		}
 	},
 	{
 		slug: 'ts-foundation',
@@ -1119,15 +1177,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Sequential recommender (tiny SASRec)', '序列推荐（小型 SASRec）'),
 		family: f('Self-attentive recommender', '自注意力推荐'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['ratings'],
 		own: true,
-		size: '<0.5 MB (design)',
-		runtime: 'Own JS',
+		params: '2,144 learned numbers: a 31 × 16 item table, 12 position rows and one attention block',
+		size: 'About 25 KB: spec, weights and facts',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
 		hook: f('Your click history as a sequence, read with causal attention.', '把你的点击历史当作序列，用因果注意力来读。'),
-		shows: f('Causal attention over your history and next-item scores.', '对历史的因果注意力，以及下一个物品的分数。'),
-		prereqs: ['tinygpt', 'matrix-factorization']
+		shows: f(
+			'Your clicks as item and position rows, which past click matters (attention weights with real numbers), the causal mask and how it trains every position, the next-product scores against the same item table, the top 5, why order matters, and two limits: a new product and popularity bias.',
+			'作为商品行和位置行的你的点击、哪次过去的点击重要（带真实数值的注意力权重）、因果掩码以及它怎样让每个位置都参与训练、用同一张商品表算出的下一件商品的分数、前 5 名、为什么顺序重要，以及两个局限：新商品和流行度偏差。'
+		),
+		prereqs: ['two-tower', 'matrix-factorization'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Your clicks as a sequence, item and position rows, which past click matters (attention), one attention score worked out, the causal mask and how it trains every position, mixing the values, a product’s score against the same item table, the top 5, why order matters, and two limits: a new product and popularity bias.',
+				'作为序列的你的点击、商品行和位置行、哪次过去的点击重要（注意力）、算出一个注意力分数、因果掩码以及它怎样让每个位置都参与训练、混合值、用同一张商品表算出商品的分数、前 5 名、为什么顺序重要，以及两个局限：新商品和流行度偏差。'
+			)
+		}
 	},
 	{
 		slug: 'item-embedding-map',
@@ -1204,14 +1273,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Gaussian process regression', '高斯过程回归'),
 		family: f('Bayesian nonparametric', '贝叶斯非参数方法'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['points2d'],
 		own: true,
-		runtime: 'Pure JS',
+		params: 'none learned: the settings ℓ, σf² and the noise σn², and one weight per data point',
+		size: 'no files: the points are yours or presets made in your browser',
+		runtime: 'Own TypeScript, live in the browser (checked against a numpy run)',
 		mode: 'live',
-		hook: f('Click points and watch the uncertainty band shrink around them.', '点击添加数据点，看不确定性区间在它们周围收窄。'),
-		shows: f('The posterior mean and band, and the effect of the kernel.', '后验均值与区间，以及核函数的影响。'),
-		prereqs: ['classic-ml']
+		hook: f('Click points and watch the uncertainty band shrink around them.', '点击添加数据点，看误差带在这些点周围收窄。'),
+		shows: f(
+			'The prior and posterior band updating point by point on your own clicks, the RBF kernel and the kernel matrix with its numbers, functions drawn from the prior and the posterior, the marginal likelihood for choosing the length-scale, and the limits: cubic cost and one fixed smoothness.',
+			'在你自己点出的数据上逐点更新的先验与后验误差带、带数字的 RBF 核与核矩阵、从先验和后验中抽取的函数、用来挑选长度尺度的边缘似然，以及局限：立方级的计算量和固定的平滑程度。'
+		),
+		prereqs: ['classic-ml'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Start from a cloud of functions, add your points one by one and watch the mean and its uncertainty band follow: the kernel, the kernel matrix, functions drawn from the posterior, the marginal likelihood for choosing the length-scale, and where the method runs out.',
+				'从一团函数出发，把你的点一个一个加进去，看均值和它的误差带如何跟着变化：核函数、核矩阵、从后验中抽取的函数、用来挑选长度尺度的边缘似然，以及这个方法的局限。'
+			)
+		}
 	},
 	{
 		slug: 'hmm',
@@ -1219,14 +1300,29 @@ export const MODELS: ModelEntry[] = [
 		name: f('Hidden Markov model', '隐马尔可夫模型'),
 		family: f('Probabilistic sequence model', '概率序列模型'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['tokens'],
 		own: true,
-		runtime: 'Pure JS',
+		params: '7 free numbers in three small tables, set by you (nothing is learned)',
+		size: 'one small facts file; the tables and the days are made in your browser',
+		runtime: 'Own TypeScript, live in the browser (checked against a Python run)',
 		mode: 'live',
-		hook: f('Hidden states behind a sequence, decoded with the forward and Viterbi algorithms.', '序列背后的隐藏状态，用前向算法与维特比算法解码。'),
-		shows: f('Forward and Viterbi lattices filling in.', '逐步填充的前向格与维特比格。'),
-		prereqs: []
+		hook: f(
+			'Guess the hidden weather behind a friend’s activities, with the forward and Viterbi algorithms filling their lattices on your own days.',
+			'根据朋友的活动猜出背后隐藏的天气：前向算法和维特比算法在你自己的日子上逐格填出网格。'
+		),
+		shows: f(
+			'The transition and emission tables (editable), made-up days drawn from them, one path’s probability, the forward lattice cell by cell, Viterbi with back-pointers and the trace back, and what the Markov assumption cannot express, next to a recurrent network.',
+			'可编辑的转移表和发射表、由它们编出的日子、一条路径的概率、逐格填写的前向网格、带回溯指针和回溯过程的维特比算法，以及马尔可夫假设表达不了的东西，并与循环神经网络对比。'
+		),
+		prereqs: [],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Two tables describe hidden weather and the activities it causes. Make up days with them, add up every weather path with the forward algorithm, find the best one with Viterbi, change the tables until Viterbi changes its mind, and see what the Markov assumption cannot express.',
+				'两张表描述了隐藏的天气和它引起的活动。用它们编出日子，用前向算法把所有天气路径加起来，用维特比算法找出最好的那条，修改表格直到维特比改变主意，再看看马尔可夫假设表达不了什么。'
+			)
+		}
 	},
 	{
 		slug: 'siamese-metric',
@@ -1380,15 +1476,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('PPO on a 2D reacher', '二维机械臂上的 PPO'),
 		family: f('Policy optimization', '策略优化'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['game'],
 		own: true,
-		size: '<0.5 MB (design)',
-		runtime: 'Own JS',
+		params: 'Actor 6 → 32 → 2 plus 2 learned log σ (292 parameters) and critic 6 → 32 → 1 (257 parameters)',
+		size: 'No files: the arm and both networks run in your browser',
+		runtime: 'Own autograd core in a worker',
 		mode: 'live',
-		hook: f('Continuous control with clipped policy updates.', '用截断的策略更新做连续控制。'),
-		shows: f('The policy distribution over actions and the clipped objective.', '动作上的策略分布与截断目标。'),
-		prereqs: ['cart-pole']
+		hook: f('Teach a two-link arm to reach your target with PPO, and see which samples its clip stops from pulling.', '用 PPO 教一条两节机械臂够到你的目标，看看它的截断让哪些样本不再拉动策略。'),
+		shows: f(
+			'Your target for a two-link arm, the Gaussian policy’s bell curves over two torques, one sampled episode, the critic’s guesses with TD errors and GAE advantages worked backwards, a batch of 16 episodes split into minibatches, probability ratios and the clipped objective on real samples, the return over 100 iterations of training, your clip ε against ε = 0.2, and targets the arm never practised.',
+			'你给两节机械臂设的目标、高斯策略在两个力矩上的钟形曲线、采样出的一个回合、评论家的估计以及倒着算出的 TD 误差和 GAE 优势、拆成小批量的 16 个回合、真实样本上的概率比率和截断目标、100 次迭代训练中的回报、你的截断 ε 与 ε = 0.2 的对比，以及机械臂从没练过的目标。'
+		),
+		prereqs: ['cart-pole'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'A Gaussian policy picks two torques for a two-link arm. Follow one episode, judge its steps with a critic and GAE, see how PPO reuses a batch and what its clip stops, then train, change ε and find where the policy fails.',
+				'高斯策略为两节机械臂选出两个力矩。跟着一个回合走一遍，用评论家和 GAE 评判每一步，看 PPO 怎样反复使用一批数据、它的截断拦住了什么，然后训练、改变 ε，并找出策略失败的地方。'
+			)
+		}
 	},
 	{
 		slug: 'world-model',
@@ -1409,17 +1516,29 @@ export const MODELS: ModelEntry[] = [
 	{
 		slug: 'behavior-cloning',
 		area: 'rl',
-		name: f('Imitation learning and offline RL', '模仿学习与离线强化学习'),
+		name: f('Imitation learning: behavior cloning and DAgger', '模仿学习：行为克隆与 DAgger'),
 		family: f('Learning from demonstrations', '从示范中学习'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['game'],
 		own: true,
-		runtime: 'Own JS',
+		params: 'MLP 2 → 16 → 4 (116 parameters)',
+		size: 'No files: the network trains in your browser',
+		runtime: 'Own autograd core in a worker',
 		mode: 'live',
 		hook: f('Teach by demonstration, and see why small mistakes compound.', '通过示范来教，看看小错误为何会越积越大。'),
-		shows: f('Behavior cloning vs DAgger in the gridworld, with compounding error.', '网格世界中行为克隆与 DAgger 的对比，以及误差累积。'),
-		prereqs: ['gridworld']
+		shows: f(
+			'Your demonstrations on a windy grid as (cell, move) pairs, one forward pass of the policy network, the cloning loss, the policy’s arrow on every cell, 20 gusty episodes against the expert on the same gusts, one failed episode followed move by move, your own recovery demonstration, and DAgger rounds that grow the dataset.',
+			'你在刮风的网格上画的示范及其（格子，动作）对、策略网络的一次前向计算、克隆的损失曲线、每个格子上的策略箭头、在相同阵风下与专家各跑 20 个回合的对比、逐步跟踪的一次失败回合、你自己补上的纠正示范，以及一轮轮扩充数据集的 DAgger。'
+		),
+		prereqs: ['gridworld', 'mlp-playground'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Demonstrate a path across a windy field, train a policy network to copy your moves, watch it fail once a gust pushes it where you never went, then fix it with your own recovery demonstrations or with DAgger.',
+				'在刮风的空地上示范一条路线，训练策略网络照着你的动作学，看它在阵风把它吹到你没去过的地方后怎样失败，再用你自己的纠正示范或 DAgger 把它修好。'
+			)
+		}
 	},
 	{
 		slug: 'diffusion-policy',
@@ -1556,18 +1675,29 @@ export const MODELS: ModelEntry[] = [
 	{
 		slug: 'egnn',
 		area: 'graphs',
-		name: f('E(3)-equivariant GNN', 'E(3) 等变图神经网络'),
+		name: f('E(n)-equivariant GNN (EGNN)', 'E(n) 等变图神经网络（EGNN）'),
 		family: f('Geometric GNN', '几何图神经网络'),
 		tier: 'P2',
-		status: 'planned',
-		inputs: ['graph'],
+		status: 'live',
+		inputs: ['points2d'],
 		own: true,
-		size: '<200 KB (design)',
-		runtime: 'Own JS',
+		params: '3,619 (3 → 16 kind embedding, two EGNN layers of 1,633, 16 → 16 → 1 energy head)',
+		size: '14.1 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('Rotate a molecule, and the outputs rotate with it.', '旋转分子，输出也随之旋转。'),
-		shows: f('An equivariance check and coordinate updates.', '等变性检验与坐标更新。'),
-		prereqs: ['gcn']
+		hook: f('Turn a molecule you drew: the energy stays the same and every force arrow turns with it.', '转动你画的分子：能量保持不变，每个力箭头都跟着一起转。'),
+		shows: f(
+			'Your atoms as positions and one-hot kinds on a full graph, the table of squared distances, one message worked out with its numbers, the summed messages and the node update, the pushes that make up one atom’s coordinate update, the energy and forces against a made-up pair formula with test errors, a full turn in 30° steps and a turn slider, a stretch that a GCN cannot see, and the mirror image an EGNN cannot tell apart.',
+			'把你的原子写成全连接图上的位置和独热编码的种类、距离平方表、带数字算出的一条消息、消息之和与节点更新、拼成一个原子坐标更新的各个推动、与一个虚构的原子对公式对照的能量和力（附测试误差）、每次 30° 转一整圈和一个转动滑块、GCN 看不出的拉伸，以及 EGNN 分不清的镜像。'
+		),
+		prereqs: ['gcn'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Your atoms become positions and kinds, every pair exchanges a message built from its squared distance, each atom is pushed along the lines to the others, and the energy stays the same while the force arrows turn with the molecule.',
+				'你的原子变成位置和种类，每一对原子交换一条由距离平方算出的消息，每个原子沿着与其他原子的连线被推动；分子转动时，能量保持不变，力的箭头跟着一起转。'
+			)
+		}
 	},
 	{
 		slug: 'transe',
@@ -1575,15 +1705,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Knowledge-graph embeddings (TransE)', '知识图谱嵌入（TransE）'),
 		family: f('Relational embeddings', '关系嵌入'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['graph'],
 		own: true,
-		size: '<200 KB (design)',
-		runtime: 'Own JS',
+		params: '(34 entities + 3 relations) × 8 = 296 numbers',
+		size: 'No weights shipped; trained live',
+		runtime: 'Own autograd core in a worker',
 		mode: 'live',
 		hook: f('Facts as vector arithmetic: head + relation ≈ tail.', '把事实当作向量运算：头实体 + 关系 ≈ 尾实体。'),
-		shows: f('Head + relation ≈ tail drawn in 2D, and training on a small knowledge graph.', '在二维中画出“头 + 关系 ≈ 尾”，并在小型知识图谱上训练。'),
-		prereqs: ['word2vec']
+		shows: f(
+			'A small knowledge graph of countries, capitals, continents and languages; one margin-ranking step with a corrupted fact and real numbers; the entities (8 numbers each) and the relation arrows on a 2-D PCA map as TransE trains; every candidate ranked for a question; a question no fact answers before and after you add the fact; and why one-to-many relations are hard.',
+			'一个由国家、首都、大洲和语言组成的小知识图谱；带着真实数字、用一个损坏事实算一步间隔排序损失；TransE 训练时，实体（每个 8 个数）和关系箭头在二维 PCA 图上的样子；为一个问题给所有候选排名；一个没有事实回答的问题，在你加上事实前后的答案；以及一对多关系为什么难。'
+		),
+		prereqs: ['word2vec'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'A small knowledge graph of countries, capitals, continents and languages; TransE learns a point for every entity and an arrow for every relation so that head + relation lands near tail, ranks every entity to answer a question, guesses where Portugal is, and shows why one-to-many relations are hard.',
+				'一个由国家、首都、大洲和语言组成的小知识图谱；TransE 为每个实体学一个点、为每个关系学一支箭头，让头实体 + 关系落在尾实体附近；它给所有实体排名来回答问题，猜葡萄牙在哪里，并说明一对多的关系为什么难。'
+			)
+		}
 	},
 
 	// ------------------------------------------------------------------ 9. Generative
@@ -1705,15 +1846,26 @@ export const MODELS: ModelEntry[] = [
 		name: n('VQ-VAE'),
 		family: f('Discrete latent autoencoder', '离散隐变量自编码器'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['drawing'],
 		own: true,
-		size: '<0.5 MB (design)',
-		runtime: 'Own JS',
+		params: '15,993',
+		size: '62 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('Compress a drawing into a handful of codebook entries.', '把一幅画压缩成少量码本条目。'),
-		shows: f('Nearest-code lookup and codebook usage.', '最近码字查找与码本使用情况。'),
-		prereqs: ['vae-2d']
+		hook: f('Draw something and watch it become 16 code numbers, then swap one code and see what it redraws.', '画点什么，看它变成 16 个码字编号；再换掉一个码字，看它重画出什么。'),
+		shows: f(
+			'Nearest-code lookup with real distances, the codebook and its usage, code swaps, and how the straight-through estimator gets the gradient past the snap.',
+			'带真实距离的最近码字查找、码本及其使用情况、码字替换，以及直通估计器怎样让梯度越过“吸附”。'
+		),
+		prereqs: ['vae-2d'],
+		lesson: {
+			steps: 10,
+			summary: f(
+				'Cut your drawing into patches, turn each into a few numbers, snap them to the nearest code, redraw from the indices, swap a code, then see how training gets past the snap, how the codes are used, and the limits.',
+				'把你的画切成图块，每块变成几个数，再吸附到最近的码字；从编号重画，换一个码字；然后看训练怎样越过“吸附”这一步、码字用得怎样，以及局限。'
+			)
+		}
 	},
 	{
 		slug: 'realnvp-2d',
@@ -1721,15 +1873,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('RealNVP 2D flow', 'RealNVP 二维流模型'),
 		family: f('Normalizing flow', '归一化流'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['points2d'],
 		own: true,
-		size: '<0.5 MB (design)',
-		runtime: 'Own JS',
+		params: '8 coupling layers, each 1 → 24 → 24 → 2 (5,584 parameters)',
+		size: 'No files: the network trains in your browser',
+		runtime: 'Own autograd core in a worker',
 		mode: 'live',
 		hook: f('Invertible layers that warp the plane step by step.', '可逆层一步步扭曲平面。'),
-		shows: f('Coupling layers warping a grid.', '耦合层扭曲网格。'),
-		prereqs: ['flow-2d']
+		shows: f(
+			'One affine coupling layer worked out and undone, eight layers warping a grid over your points into noise, the log-determinant and the exact log-likelihood, maximum-likelihood training, sampling by inverting, and the two-rings limit.',
+			'算出并撤销一个仿射耦合层，八层把覆盖你的点的网格扭成噪声，对数行列式和精确的对数似然，最大似然训练，求逆采样，以及两个圆环的局限。'
+		),
+		prereqs: ['flow-2d'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Your points and a cloud of plain noise, one affine coupling layer worked out and undone, eight layers that bend your shape into the noise, the log-determinant and the exact log-likelihood, maximum-likelihood training, sampling by running the layers backwards, and why two separate rings are hard.',
+				'你的点和一团普通的噪声，算出并撤销一个仿射耦合层，八层把你的形状弯成噪声，对数行列式和精确的对数似然，最大似然训练，把各层倒着跑来采样，以及为什么两个分开的圆环很难学。'
+			)
+		}
 	},
 	{
 		slug: 'pixelcnn-maskgit',
@@ -1906,15 +2069,29 @@ export const MODELS: ModelEntry[] = [
 		name: f('LLaVA-style connector (toy)', 'LLaVA 式连接器（玩具）'),
 		family: f('Vision encoder + projector + LM', '视觉编码器 + 投影层 + 语言模型'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['drawing', 'text'],
 		own: true,
-		size: '<2 MB (design)',
-		runtime: 'Own JS',
+		params: '78,484 trained + 88,080 frozen',
+		size: '651 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch)',
 		mode: 'live',
-		hook: f('Glue TinyViT to TinyGPT with a small projector and ask about your drawing.', '用一个小投影层把 TinyViT 接到 TinyGPT 上，然后就你的画提问。'),
-		shows: f('Frozen TinyViT, the MLP projector and image tokens inside the TinyGPT sequence.', '冻结的 TinyViT、MLP 投影层，以及 TinyGPT 序列中的图像词元。'),
-		prereqs: ['tinyvit', 'tinygpt']
+		hook: f(
+			'Glue a frozen TinyViT to a tiny GPT-style language model with a small projector, then ask about your drawing.',
+			'用一个小投影层把冻结的 TinyViT 接到一个很小的 GPT 式语言模型上，然后就你的画提问。'
+		),
+		shows: f(
+			'A frozen TinyViT reading your drawing, the two-layer projector worked out for one number, the question’s word rows from the embedding table, image tokens and words in one sequence under a causal mask, where the answer row’s attention falls on your drawing, the one-word answer to your own question, and what a tiny vocabulary cannot say.',
+			'冻结的 TinyViT 读你的画、两层投影层中一个数的完整计算、从嵌入表查出的问题词行、在因果掩码下由图像词元和词组成的同一个序列、写答案的那一行的注意力落在你的画的哪里、对你自己的问题给出的一个词的答案，以及很小的词表说不出的东西。'
+		),
+		prereqs: ['tinyvit', 'tinygpt'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Follow your drawing through a frozen TinyViT and a small projector into the sequence of a tiny language model, see where the answer row looks, then ask your own question.',
+				'跟着你的画穿过冻结的 TinyViT 和一个小投影层，进入一个很小的语言模型的序列，看写答案的那一行看向哪里，再问你自己的问题。'
+			)
+		}
 	},
 	{
 		slug: 'clap-toy',
@@ -1999,15 +2176,26 @@ export const MODELS: ModelEntry[] = [
 		name: f('Fourier neural operator (1D)', '傅里叶神经算子（一维）'),
 		family: f('Neural operator', '神经算子'),
 		tier: 'P2',
-		status: 'planned',
+		status: 'live',
 		inputs: ['series'],
 		own: true,
-		size: '<2 MB (design)',
-		runtime: 'Own JS',
+		params: '1,077',
+		size: '4.3 KB of weights',
+		runtime: 'Own JS forward pass (checked against PyTorch); the heat solver in a worker',
 		mode: 'live',
-		hook: f('Learn to solve the heat equation by filtering in frequency space.', '通过在频域中滤波，学会求解热传导方程。'),
-		shows: f('The Fourier layer as a filter in frequency space, and a spectral truncation slider.', '把傅里叶层看作频域滤波器，以及频谱截断滑块。'),
-		prereqs: ['fourier-widget', 'mlp-playground']
+		hook: f('Draw a temperature curve; a neural operator predicts how heat spreads by filtering it in frequency space.', '画一条温度曲线；神经算子在频域里对它滤波，预测热量如何扩散。'),
+		shows: f(
+			'The numerical solver step by step, the Fourier layer (FFT, the kept modes, the learned complex weights, the inverse FFT, the pointwise path), the prediction against the solver, a slider for the number of kept modes, and the learned filter next to the solver’s.',
+			'逐步运行的数值求解器，傅里叶层（FFT、保留的模式、学来的复数权重、逆 FFT、逐点通路），预测与求解器的对比，保留模式数的滑块，以及学到的滤波器与求解器的对比。'
+		),
+		prereqs: ['fourier-widget', 'mlp-playground'],
+		lesson: {
+			steps: 11,
+			summary: f(
+				'Watch a solver spread heat around a ring in 50 small steps, then follow your curve through a Fourier neural operator that jumps to the same answer in one pass: FFT, the kept modes, learned complex weights, inverse FFT, a pointwise path; then compare the filter it learned with the solver’s, find how many modes your curve needs, and see where it fails.',
+				'先看求解器用 50 个小步让热量沿环扩散，再跟着你的曲线走过一个傅里叶神经算子，它一次就跳到同样的答案：FFT、保留的模式、学来的复数权重、逆 FFT、逐点通路；然后把它学到的滤波器和求解器的比一比，找出你的曲线需要多少个模式，最后看看它在哪里会出错。'
+			)
+		}
 	},
 	{
 		slug: 'weather-gnn',

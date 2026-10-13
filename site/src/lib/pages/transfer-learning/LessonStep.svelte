@@ -9,7 +9,6 @@
 	import RoleFrame from '$lib/kit/RoleFrame.svelte';
 	import Tex from '$lib/kit/Tex.svelte';
 	import Num from '$lib/kit/Num.svelte';
-	import ProvenanceBadge from '$lib/kit/ProvenanceBadge.svelte';
 	import { domainOf } from '$lib/kit/color';
 	import { sym } from '$lib/kit/tex';
 	import { t } from '$lib/i18n/i18n.svelte';
@@ -98,7 +97,6 @@
 					</button>
 				{/each}
 			</div>
-			<ProvenanceBadge mode="live" compact note={{ en: 'Computed here from the lesson’s head (step 0) and the frozen features of the 16 training drawings. The update is checked against the trainer’s own weights after step 1.', zh: '由课程里的输出头（第 0 步）和 16 张训练图的冻结特征在这里算出。更新结果已与训练器自己第 1 步之后的权重核对过。' }} />
 		</div>
 
 		<StepPlayer count={5} bind:step={sub} interval={2800} labels={STAGES} {autoplay} onend={ondone} label={{ en: 'One training step, stage by stage', zh: '一步训练，逐个阶段' }}>

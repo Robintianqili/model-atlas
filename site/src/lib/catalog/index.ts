@@ -17,7 +17,8 @@ export {
 	conceptCard
 } from './concepts.ts';
 export { modelCard } from './cards.ts';
-export { GLOSSARY, GLOSSARY_BY_ID } from './glossary.ts';
+// The glossary is not re-exported (redesign wave F, lazy glossary): pages show term names from glossary-names.ts
+// through <Term>, which loads glossary.ts on first use; only /glossary/, scripts and tests import glossary.ts.
 export { PATHS } from './paths.ts';
 
 import { MODELS } from './models.ts';

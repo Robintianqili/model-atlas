@@ -330,16 +330,18 @@ it (section 10).
 
 ```
 npm run atlas -- check my-xor --quick       # while you iterate: every gate except the build and the browser test
-npm run atlas -- e2e my-xor                 # the browser test: 2 passes, an axe scan, contact sheets, the lesson print
-npm run atlas -- check my-xor               # once, at the end: every gate, a package-only build and the e2e passes
+npm run atlas -- check my-xor               # once, at the end: every gate, a package-only build and the browser test
 ```
 
-Iterate with `--quick` and `e2e`; run the full `check` once, when the package is done. `--quick` builds nothing and
-opens no browser, and it takes the parity and op-test results from a cache while their inputs are unchanged, so after
-a lesson edit it takes seconds. `e2e` steps through the lesson at 1280 px in English (light) and at 390 px in Chinese
-(dark, with a horizontal-scroll probe at 360 px), runs an axe accessibility scan on every step (AK604), and writes a
-contact sheet per pass (every step, labelled) and `lesson-print.txt` (every narration with its numbers, in both
-languages) to `notes/shots/my-xor/contact/`: look at those before you click through the page yourself.
+Iterate with `--quick`; run the full `check` once, when the package is done. `--quick` builds nothing and opens no
+browser, and it takes the parity and op-test results from a cache while their inputs are unchanged, so after a lesson
+edit it takes seconds. The full check runs the browser test (`atlas e2e`) once, on its default 2 passes: it steps
+through the lesson at 1280 px in English (light) and at 390 px in Chinese (dark, with a horizontal-scroll probe at
+360 px), runs an axe accessibility scan on every step (AK604), and writes a contact sheet per pass (every step,
+labelled) and `lesson-print.txt` (every narration with its numbers, in both languages) to
+`notes/shots/my-xor/contact/`: look at those before you click through the page yourself. While you write a view, look
+at it on the dev server (section 4.6). When the full check fails, fix the cause and re-run only the gate that failed
+(`check my-xor --only e2e`, or `--only lesson`); a long-task warning (AK603) never fails a check and needs no re-run.
 
 `check` and `e2e` reuse a dev server of this site when one runs (yours on the package's port, or one they kept), else
 start one on your package's port (else on the first free port from 5210 up) and keep it for the next run; it stops
@@ -348,7 +350,9 @@ itself after 20 idle minutes, or now with `npm run atlas -- e2e --stop-server`. 
 
 Fix every AK error (section 13 explains each code). Fill `notes/my-xor.md`: What, Decisions, Final numbers (measured
 only), How to re-run, Kit issues. A draft is done when `check` is green; `quality: 'reviewed'` comes after the teaching
-review (`npm run atlas -- review my-xor` writes the reviewer's packet).
+review (`npm run atlas -- review my-xor` writes the reviewer's packet, with the last check's gates and mode and the
+catalog patch). Put what the catalog entry should say into `catalog` in `explainer.ts` (name, inputs, mode, hook,
+shows, runtime, params, size) and check it with `npm run atlas -- promote my-xor --verify` (section 11).
 
 ---
 
@@ -485,10 +489,15 @@ the model has no such tensor. An op moves into the core when a second model need
 | `defaults` | `TrainOpt`: `lr, batch, steps, snapshotEvery, optimizer: 'sgd' \| 'momentum' \| 'adam'`, plus your own fields. Extras the optimizer reads: `momentum`, `betas`, `eps`, `weightDecay`, `decoupled` |
 | `model(rng, opt)` | build the `Module`: `MLP` (`new MLP(name, sizes, act, rng, { bias?, outAct? })`: no activation after the last layer unless `outAct`; `logits()` stops before it), `Linear`, `Embedding`, `LSTMCell`, `Conv1d`, `LayerNorm` from `atlas/autograd/nn.ts`, or your own class with `params()`, `named()` and, for a `live-model` source, `toSpec()` (section 6.2) |
 | `batch(data, step, rng, opt, model)` | the batch for one step; `data` is the learner's **raw** input (`rt.input`): read it with the adapter's helper (`pointsOf(data)`, `seriesOf(data)`; section 4.1); `model` is the network being trained (an RL round that acts with it) |
-| `loss(m, b, rec, opt)` | `{ loss, parts? }` as autograd `Var`s (`atlas/autograd/loss.ts`: `mse`, `crossEntropy`, `bceWithLogits`, `infoNCE`; ops in `atlas/autograd/ops.ts` as `op.*`) |
+| `loss(m, b, rec, opt)` | `{ loss, parts? }` as autograd `Var`s (`atlas/autograd/loss.ts`: `mse`, `crossEntropy`, `bceWithLogits`, `infoNCE`; ops in `atlas/autograd/ops.ts` as `op.*`, among them `op.clamp(x, lo, hi)` and `op.minimum` / `op.maximum` with PyTorch's gradients: PPO's clipped objective needs no mask workaround) |
 | `optimizer?(m, opt)` | override the optimizer |
+| `project?(m, opt)` | a constraint applied after every optimizer step, outside the gradient (TransE's unit-length entity vectors, a max-norm): change the parameters in place. Fine `update` frames then carry `metrics.projected = 1`, so `updateOf` and `train-step` never claim "old − lr × g = new"; the twin mirrors it with `project(model, cfg)` in `twin.py` (run under `torch.no_grad()`) |
 | `metrics?(m, data)` | numbers recorded at init and snapshot frames (accuracy, ...) |
 | `twin?` | `{ sgd: { lr: 1e-3 } }`: the options of `atlas parity`'s plain-SGD twin run (section 6.3) |
+
+**The trained weights as a process input.** `lastParams(rt, 'train')` (`atlas/train/helpers.ts`) is the train source's
+last frame's parameters (null before it has run), for a process source that runs after it
+(`{ kind: 'process', after: 'train', input: (rt) => ({ params: lastParams(rt, 'train'), ... }) }`).
 
 **An empty input.** A train source does not run while the adapter says the input is empty (no points, no text): its
 steps show the adapter's empty note instead of the `init` frame of a network trained on nothing, and lint skips them on
@@ -713,6 +722,8 @@ const lesson: LessonDef = {
 | `view` | a view key (section 15), or `{ key, props: (rt, at) => ({...}) }` |
 | `provenance` | `'live'`, `'precomputed'`, or `{ mode: 'illustrative', note }` (required: AK502) |
 | `predict` | a question answered before the stage shows (`{ id, question, options, answer, explain }`) |
+| `predictAt` | `(rt, at) => ({ options?, answer?, explain? })`: the live parts of the question, from the learner's own input (the codes this patch may snap to; which expert takes this token; an explanation with live numbers, shown only after the answer), merged over `predict`, which keeps the question and the fallbacks. Lint checks it on every fixture (a valid answer index, en and zh) |
+| `lint` | `{ same: ['den', 'closer'] }`: placeholders that may print the same as another value without AK410 (two unrelated quantities that coincide on a fixture) |
 | `task` | `{ prompt, done(rt, at), hint?, waiting?, doneText? }`: the learner does something; `waiting` is the status line until `done` (default "Not yet: do what the task says."), `doneText` after it (default "Done.") |
 | `kindOf` | `'limits'` or `'breakIt'`: the honest-limits step |
 | `play` | `'view'` (the view animates itself), or `{ from, to, interval?, phases?, unit?, by? }`: a scrubber over a range of frames; `unit: { en: 'episode', zh: '回合' }` and `by: 'sub'` make its marks read "episode 12" from `frame.sub` (default "step k" from `frame.step`); on a scan, `unit: { en: 'patch', zh: '图块' }` makes it count "Patch 3 of 16" and mark "patch 2"; `unit` may be a template with `{n}` (`{ en: 'second', zh: '第 {n} 秒' }`). Until Play animates the range, the stage shows the step's own frame (its cursor, the one the narration describes); Play then runs the range from its start |
@@ -788,6 +799,8 @@ A non-finite `n` or `v` comes back as NaN, so lint still reports it (AK401). For
 | `n2`, `n4`, `n5`, `n6` | that many significant digits (`{loss\|n4}` -> "0.6991") |
 | `int` | a rounded integer with separators |
 | `pct` | a share as a percentage ("18.3%") |
+| `pct2` | a share with two decimals ("99.98%", where `pct` says "100.0%") |
+| `sci` | scientific notation as a person writes it ("1.71 × 10⁻⁴", where the default says "1.71e−4"); numbers from 0.001 to 99,999 print as `n3` |
 | `signed` | with a sign ("+0.12") |
 | `shape`, `label`, `tok` | text as is |
 
@@ -890,25 +903,54 @@ Notes on kit views:
 - `loss-curve`'s `compare: ['other']` runs the other sources as far as its own; `log: true` starts at the smallest
   positive value (a loss of exactly 0 sits on the axis); `refs: [{ y, label }]` draws dashed reference lines (an
   equilibrium value, a baseline). Its readout prints steps as counts ("step 50"), and with several lines "lowest" names
-  its line.
+  its line. `xLabel: { en, zh }` names the x axis when it does not count training steps; `lowest: false` leaves out the
+  "lowest … at step" line (a return, an accuracy: higher is better).
+- **Names of rows, keys and axes.** `props.tokens` names the positions (the queries of an attention layer): strings or
+  `{ en, zh }` names, at least as many as the layer's rows. `props.keys` names the keys of an attention layer, so an
+  encoder-decoder's cross-attention (decoder queries, encoder keys) reads right in `kit.attention`, `zoom.softmax` and
+  the attention mix of `zoom.weighted-sum`. Without props, the adapter's `pre.names` (bilingual names of the input
+  positions: items, clicks, nodes) or `pre.tokens` name only a layer exactly as long as the input; a layer of another
+  length (TinyViT's 17 rows, a decoder's) shows indices instead of borrowed tokens. `props.axisWords`
+  (`{ k: { en: 'mode', zh: '模式' } }`) and `props.axisItems` (`{ xy: [{ en: 'real part', zh: '实部' }, { en: 'imaginary part', zh: '虚部' }] }`)
+  name an axis the kit cannot name in the zoom headers ("mode 1, channel 2, real part"). `k` and `xy` have no default
+  names (`xy` is a pair of coordinates in egnn and a real/imaginary pair in fno): name them, or the header says "index".
+- **Digits.** `props.digits` (2-6) sets the significant digits of the numbers in an op's formula card (`zoom.*`) and in
+  `zoom.formula`; a short exact value (0.25, 1/√16) prints as itself, never padded to "0.250". `train-step` prints the
+  update with as many digits as it takes for the old and the new value to differ (3 to 6; `props.digits` overrides).
+- `zoom.softmax` names the entries by the classes or the vocabulary only when the softmax runs over a class, vocab or
+  feature axis (a softmax over experts no longer shows the characters of ids 0-3); `props.labels` (strings or
+  `{ en, zh }`) names them otherwise.
+- `zoom.reduce` says "the n numbers are added" for a plain sum and "the mean" for a mean, and lays a window without a
+  `layout` out as the most square grid that holds exactly its terms (no empty "NaN" cell).
 - `plane2d` reads the exact value at a data point from `pointValues` (a `[n]` tensor, e.g. a derived field) or
   `valueAt(x, y, state)`; without them its probe reads the grid between cell centres and says "≈".
 - `zoom.gate`: `props.gate: 'f' | 'i' | 'g' | 'o' | 'c' | 'h'` puts one gate (or the cell or output box) in focus, so
   steps about different gates do not show the same stage.
 - `zoom.weighted-sum`: `props.names: { x, w, p, i }` renames the product table's columns (when x and y mean something
-  else in your lesson).
+  else in your lesson); a name may be `{ en, zh }`.
 - `zoom.formula`: the numbers again under the formula only with `props.names: { key: { en, zh } }` (or `chips: true`).
 - `zoom.normalize` draws an L2 normalization (explain values `x` and `len`) as the row and its length, LayerNorm (`mean`,
   `std`) as before.
 - `curve1d`: `yLabel` is drawn along the y axis; `legend: true` gives a single curve a legend.
 - `kit.probbars`: `chosen` (above, section 5.5).
-- A long formula breaks after every second `+` of a long sum, so live numbers fit a phone.
+- A long formula breaks after every second `+` of a long sum, so live numbers fit a phone; on a card narrower than
+  520 px a long line of two terms ("= 0.744 × −6.27 + 0.256 × −3.74") breaks after its `+` too.
+- **Hiding the answer of a predict question.** While a predict question waits, the stage is `inert`; give the element
+  of your view that shows the answer `class="atlas-answer"` and it stays hidden until the learner answers (two-tower
+  and sasrec each wrote this rule).
 
 **Before you write a view.** Look for a kit view that already draws it (section 15, the gallery at `/dev/atlas/`), then a
 kit view with props (`layer.tensor`, `loss-curve`, `curve1d`, `plane2d`, `tape.table`, `compare`), then a local view
 that composes kit parts: `ViewSlot` (a kit view inside yours), the parts in `atlas/ui/views/kit.parts/` (`CurvePlot`,
-`RowBars`, `SumBars`, `TensorPanel`, `TermTable`, `Num`, `Notice`) and the components in `$lib/kit/` (`FormulaCard`,
-`ProbBars`, `TensorGrid`; KIT.md section 7). Write new drawing code last.
+`RowBars`, `SumBars`, `TensorPanel`, `TermTable`, `Num`, `Notice`, and since K4 `Cells`: a vector as a row of cells on
+the diverging scale, from two-tower and sasrec) and the components in `$lib/kit/` (`FormulaCard`, `ProbBars`,
+`TensorGrid`; KIT.md section 7). Write new drawing code last.
+
+**A control that edits the input keeps its focus.** `setInput` re-creates the stage, so the slider being moved lost the
+keyboard focus (kalman-filter, gaussian-process, hmm and ecg-autoencoder each carried a fix). The kit's
+`atlas/ui/views/kit.parts/refocus.ts`: put `use:refocus` on the controls' container, give the control
+`data-refocus="<key>"`, and call `rememberFocus('<key>')` right before `setInput`; the new stage gives that control the
+focus back (within 3 s).
 
 **Charts and colors** (KIT.md section 5). Use the kit's two numeric scales and nothing else:
 `makeScale('diverging', dom)` for signed values (blue below 0, gray at 0, orange above, a symmetric domain) and
@@ -961,28 +1003,51 @@ and `.md` files (unless a package test imports them), its static assets, `pipeli
 cached results, so `--quick` takes seconds then; a lesson fixture added meanwhile reaches parity and the op tests in the
 full check.
 
+**Who runs what.** Run few and cheap checks, never one that already passed, and spend the time on fixing and landing:
+
+- **The builder** iterates with `check <slug> --quick` and runs the full `check <slug>` once, at the end. Its e2e (the
+  default 2 passes) is the package's one browser test. When a gate fails, fix it and re-run that gate alone
+  (`--only e2e`, `--only lesson`), not the whole check.
+- **The reviewer** runs no e2e. The review packet (`notes/review-<slug>.md`, the contact sheets, `lesson-print.txt`
+  and `axe.txt`) shows what the browser saw, and `check <slug> --quick` follows the reviewer's own fixes. Only a
+  missing or stale packet (no contact sheets, or a view, adapter or layout change after the check it names) calls for
+  the full check again.
+- **The integrator** runs one `check --all` without packages after merging lanes and trusts the lanes' results.
+- **A kit or layout change** gets one e2e on the default passes over about 6 packages of different kinds (a trained
+  model, live training, a process, a concept, a text input and a drawing): `check --all <slug> <slug> ...`.
+- **A full-site browser sweep** (one screenshot of every page) happens only before a public release.
+- **A long task (AK603) only warns.** It never fails a check, and nobody re-runs e2e for it (the bar is
+  load-sensitive).
+
 **Several packages.** `check a b` gives the packages one package-only build and one e2e sequence. `check --all
 [<slug>...]` runs the fast gates of every package, the kit gates (honesty, the docs gate: DEVKIT.md's generated tables
 against the code, `node scripts/atlas/docs.ts --check`, which `npm run check:atlas` runs too; every Node test of the
 kit; both legacy parity scripts with `--no-write`), `npm run check`, one full build and one e2e sequence over the
-packages given (`--e2e a,b` or `--e2e all`; `--passes all` unless you say otherwise). Use it once at integration.
+packages given (`--e2e a,b` or `--e2e all`; the default passes unless `--passes` says otherwise). Use it once at
+integration, without packages: each lane's full check already ran its e2e.
 
-`--only a,b` picks gates; `--json` prints the report (also in `.atlas/<slug>/check.json`); `--port n`,
-`--keep-server`, `--no-keep-server` and `--stop-server` go to the dev server (below). A failed site step keeps its whole
-output in `.atlas/build-<slug>.<step>.log`.
+`--only a,b` picks gates; `--json` prints the report (also in `.atlas/<slug>/check.json`, which records the mode:
+quick, fast or full); `--port n`, `--keep-server`, `--no-keep-server` and `--stop-server` go to the dev server (below).
+With `--only`, the gates it does not run keep their result from the previous `check.json`, marked with that check's
+mode and date, so a partial re-run does not lose the full report (the review packet reads it). A failed site step keeps
+its whole output in `.atlas/build-<slug>.<step>.log`.
+
+**Time limits.** A package's test files (the op tests, the claims) run with a limit of 540 s. A file may raise it with a
+line `// atlas-timeout: <seconds>` (up to 3,600: claims that train every fixture at full length on a loaded machine),
+and a run that hits the limit says "timed out after N s" (AK408 for the claims), not "0 passed, 0 failed".
 
 | Gate | Passes when |
 |---|---|
 | schema | the manifest is complete (no TODO: AK501; credits: AK704; catalog slug: AK701, against `concepts.ts` for a concept package), spec/reference/facts/tapes validate (AK301), shapes hold at the dim extremes (AK302) |
 | parity | kind A ≤ the bar on every layer (AK201) and explain = trace (AK202); twins (AK203); references (AK204; "reference failed" when the reference did not run) |
-| op tests | the package's own tests (local ops, views, a concept package's `concept.test.ts`) pass |
+| op tests | the package's own tests (local ops, views, a concept package's `concept.test.ts`) pass, and the view contract holds for the package's own views (meta.ts default export, key `<slug>/<folder>`, `demo()` works in Node, `describe(demo)` in en and zh, provenance `'illustrative'`; before K4 only `check:atlas` ran it, AK504) |
 | lesson | lint is clean in en and zh; `claims.test.ts` passes (AK408) |
 | determinism | every process and train source (at the source's `detail`): same seed twice = same frames; keyframes every frame = every 64 frames; random replays agree |
 | honesty | every pure file loads in Node; the import rule and the `Math.random` ban hold (AK503) |
 | budgets | file ≤ 5 MB, model folder ≤ 15 MB, tape ≤ 2 MB, auto-loaded bytes ≤ 5 MB (AK303) |
 | types | svelte-check of the package's own files: 0 errors, 0 warnings (the whole site: `npm run check`, in `check --all`) |
 | site | `check:catalog`, a package-only build into `.atlas/build-<slug>/`, `check:build` |
-| e2e | `atlas e2e` (AK601 AK602 AK603 AK604) on the default passes |
+| e2e | `atlas e2e` on the default passes (AK601, AK602, AK604 and AK605 fail; AK603 and AK606 only warn) |
 | paperwork | `notes/<slug>.md` has the five sections (a warning for dev-only packages; a missing file is a warning, as in a fresh clone of the public repository, which has no `notes/`) |
 | ownership | inside a lane: nothing outside the owned paths changed (AK702) |
 
@@ -995,7 +1060,10 @@ the type check of the packages and `check:catalog` (`build --all`: `npm run chec
 
 **The browser test** (`atlas e2e`, section 12) runs the default passes: 1280 px in English (light) and 390 px in
 Chinese (dark), whose horizontal-scroll check also probes 360 px after every step (AK602). Each pass writes a contact
-sheet, and the run writes `lesson-print.txt` and the axe results to `notes/shots/<slug>/contact/`. **Accessibility
+sheet, and the run writes `lesson-print.txt` and the axe results to `notes/shots/<slug>/contact/` (a lane outside the
+repo writes them to `<lane folder>/shots/<slug>/contact/`, section 11). In the screenshots the lesson's control bar is
+not sticky, and a shot waits until the page stops scrolling, so the bar no longer covers the first step's title. A Vite
+error overlay on the page (a compile error, or a stale one on a kept server) fails the pass (AK601). **Accessibility
 (AK604):** axe scans every step of every pass against WCAG 2.1 A and AA; serious and critical violations fail, moderate
 and minor ones warn. `src/lib/atlas/ui/a11y.test.ts` (in `check:atlas`) guards the colors: `ink()` on both ramps and
 every text token at 4.5:1 in both themes, so a new text token needs a line there.
@@ -1004,12 +1072,14 @@ every text token at 4.5:1 in both themes, so a new text token needs a line there
 `.atlas/dev-server.json`), or one on the package's port that answers the site's identity probe (a token in
 `.svelte-kit/atlas-dev-probe.txt`; a server of another lane never matches). Else they start one and keep it: it stops
 itself after 20 idle minutes, or now with `npm run atlas -- e2e --stop-server`; `--no-keep-server` stops it when the
-command ends. A server they do not keep exits when the atlas process dies, so a killed command leaves nothing
+command ends. A server they start must answer the identity probe too: when another server took the port meanwhile
+(another lane's), they stop theirs and try the next free port (three tries; with `--port n`, AK003 at once). A server they do not keep exits when the atlas process dies, so a killed command leaves nothing
 listening. Builds may run beside it; on EBUSY or EPERM (a locked file) the site gate stops a server it kept and
 retries once.
 
 The report also counts the page's own lines of code (target ≤ 1,000): files under `explainers/<slug>/` except tests,
-without blank lines, comment-only lines and `<style>` blocks (it also prints all non-blank lines). The budgets gate
+without blank lines, comment-only lines, `<style>` blocks and the manifest's `catalog` block (data only promote reads;
+it prints all non-blank lines too). The budgets gate
 counts as auto-loaded the `assets.auto` files, the presets file and the spec and weights of a trace source on another
 model's folder (`{ kind: 'trace', assets: 'models/tinycnn' }`).
 
@@ -1020,14 +1090,16 @@ zh narration required, lint rules become errors), `flagship`.
 
 ## 11. Lanes, ports and merging
 
-Parallel builders each work in a **lane**: a copy of the site at `site/.work/<name>/site`, with its own dev-server port.
+Parallel builders each work in a **lane**: a copy of the site at `<lanes>/<name>/site`, with its own dev-server port.
+The lanes folder `<lanes>` is `site/.work` unless you move it (below).
 
 ```
 npm run atlas -- worktree tinyvit --from-git HEAD  # the lane, from the last commit (owns the model's paths, or --owns a,b)
-cd .work/tinyvit/site && npm run dev -- --port 5191
+cd .work/tinyvit/site && npm run dev -- --port 5191   # the folder worktree printed
 npm run atlas -- worktree tinyvit --sync           # take kit fixes from main (refused, AK703, if you edited a kit file)
 npm run atlas -- merge tinyvit --dry-run           # what would be copied back; AK702 for any change outside your paths
 npm run atlas -- merge tinyvit                     # (the main session) copy the owned files into main
+npm run atlas -- lanes --rm tinyvit                # (the main session) delete the merged lane
 ```
 
 - `--from-git <rev>` (HEAD, a branch, a commit) takes the lane's files from a committed revision: it reads
@@ -1037,15 +1109,49 @@ npm run atlas -- merge tinyvit                     # (the main session) copy the
 - The git-ignored `scripts/atlas/atlas.config.local.json` (the machine's Python) is copied from main into every lane;
   it is never synced, compared or merged.
 - The copy skips `node_modules`, `.svelte-kit`, `build`, `.work`, `.atlas` and `package-lock.json`
-  (no symlinks). Node finds the packages of the main `site/node_modules` upward.
-- Its `vite.config.ts` gets `server.fs.allow: ['.', '../../..']` and loses main's `.work` pattern in
+  (no symlinks). Node finds the packages upward: a lane in `site/.work` uses the main
+  `site/node_modules`, a lane outside the main site the shared `<lanes>/node_modules` (below).
+- Its `vite.config.ts` gets `server.fs.allow` (`['.', '../../..']` in `site/.work`: the lane and the main site;
+  `['.', '../../node_modules']` outside it: the lane and the shared packages) and loses main's `.work` pattern in
   `server.watch.ignored` (it matched every file of the lane, so the lane's dev server never reloaded; lane setup, never
   merged back). `worktree --sync` re-patches an older lane.
-- `site/.work/<name>/lane.json` records the owned paths and a hash snapshot, so `merge` and `--sync` know what the lane
-  changed and what main changed.
+- `<lanes>/<name>/lane.json` records the owned paths and a hash snapshot, so `merge` and `--sync` know what the lane
+  changed and what main changed, and the repo root and the main site (`root`, `main`).
+- **Where lanes live.** `site/.work` by default. To keep lanes off the repo's drive (a full disk, or one whose large
+  clusters make every small file expensive), set the lanes folder: the `ATLAS_LANES_DIR` environment variable, else
+  `"lanesDir"` in `site/scripts/atlas/atlas.config.local.json` (git-ignored, one machine) or `atlas.config.json`
+  (everyone). A relative path is relative to `site/`; `ATLAS_LANES_DIR` set but empty means the default.
+  `npm run atlas -- lanes` shows the folder, the shared packages and every lane with its size. A lane made in
+  `site/.work` before the setting changed stays there, and `--sync`, `merge` and `lanes --rm` still find it.
+- **Lanes outside the main site** cannot reach `site/node_modules` by walking up, so they share one next to them:
+  `npm run atlas -- lanes --deps` (from the main site) copies `package.json` (without its scripts) and
+  `package-lock.json` into the lanes folder and runs `npm ci` there once. Node, npm scripts, TypeScript and Vite find
+  `<lanes>/node_modules` from `<lanes>/<name>/site` by walking up. Run it again when `package-lock.json` changes;
+  `doctor` and `worktree` say when. Stop the lanes' dev servers first (`npm ci` replaces the folder).
+- **Finding the repo from outside it.** No walk up from such a lane reaches the repo, so every CLI command, the Python
+  helpers (`atlas_kit.paths`) and the `/devkit/` build read the repo root and the main site from `lane.json`, and
+  the CLI gives every child process `ATLAS_ROOT`. Git always runs on the main repo. A lane made from a revision older
+  than this support says so when it is made; `worktree <name> --sync` gives it the current CLI (or set `ATLAS_ROOT`).
+- **Screenshots of a lane outside the repo** (`atlas e2e`: the shots, contact sheets, lesson print and axe report) go
+  to `<lanes>/<name>/shots/<slug>/`, not to `notes/shots/<slug>/` in the repo, so such a lane writes nothing to the
+  repo's drive; `review` reads them there, and they go with the lane. A lane in `site/.work` keeps `notes/shots/`.
+- **Deleting a lane.** `npm run atlas -- lanes --rm <name>` stops the dev server the CLI kept for it and deletes its
+  folder, with its shots (and `notes/shots/<name>/` of the main tree, where older runs wrote them). It refuses (AK702)
+  while the lane holds owned changes that main does not have; `--force` deletes anyway. `pipeline/<slug>/` and
+  `notes/` are in the main tree and stay.
+- **Cleaning a lane you keep.** `npm run atlas -- lanes --clean <name>` (or `main` for the main site) stops its kept
+  dev server and deletes what builds and the dev server leave: `build/`, `.svelte-kit/`, `.atlas/build*/` and Vite's
+  dependency cache `node_modules/.vite/` (in a lane on the exFAT drive that cache alone was 67 files of at least 1 MiB).
+  The lane's files, `lane.json` and its gate caches stay.
 - A model lane owns `pipeline/<slug>/**`, `site/src/lib/explainers/<slug>/**`, `site/static/models/<slug>/**`,
-  `notes/<slug>.md` and `notes/shots/<slug>/**`. Python writes `pipeline/<slug>/` in the main tree directly (it is
-  yours alone); its assets go to the lane's `static/` (the CLI sets `ATLAS_SITE`).
+  `notes/<slug>.md`, `notes/review-<slug>.md` (the review packet `atlas review` writes) and `notes/shots/<slug>/**`.
+  `worktree --sync` adds the review packet to an older `lane.json`, and `merge --dry-run` lists it with the other paths
+  edited in place. Python writes `pipeline/<slug>/` in the main tree directly (it is yours alone); its assets go to the
+  lane's `static/` (the CLI sets `ATLAS_SITE`).
+- **The page as it will be live.** In a lane the catalog still lists an unmerged package as planned, so its page title
+  says "(Planned)" and the default provenance is "precomputed". `npm run atlas -- e2e <slug> --as-live` writes promote's
+  patch into the lane's catalog files for the run and puts them back afterwards, byte for byte (a run that was killed
+  is put back by the next `e2e`); the ownership gate never sees them changed.
 - Lanes never edit the kit. A blocking kit bug is worked around inside the package (local op, local view, author step,
   section override) and written under "Kit issues" in your notes.
 - The view table of this guide (section 15) lists kit views only, so merging a package with a local view needs no
@@ -1054,12 +1160,30 @@ npm run atlas -- merge tinyvit                     # (the main session) copy the
   `MSYS_NO_PATHCONV=1 ATLAS_BUILD_DIR=.atlas/build-x npm run build` in Git Bash); a dev server may keep running beside
   them (section 10).
 
+**The catalog patch** (`promote`). A package carries what its catalog entry should say in `manifest.catalog`: `name`
+(the page's h1 and title), `family`, `inputs`, `mode`, `hook`, `shows`, `runtime`, `params`, `size`, `prereqs` (a
+concept: `title`, `interaction`, `engine`, `mode`, `links`); the block is data only the CLI reads and is not counted as
+page code. `npm run atlas -- promote <slug> --dry-run` prints the whole patch: the entry's fields (with `status: 'live'`
+and the lesson), the tech-zh rows to add and the ones the patch leaves unused, and the new glossary terms. It adds to
+the site glossary only the terms another package or page also uses: every site term is in every page that uses `Term`,
+the flagships included (300 KB), while a package's own steps show its manifest terms anyway (`--all-terms` adds the
+rest). It also lists checks by hand: the weights file's measured size in the catalog's unit (1 KB = 1,024 bytes; a
+manifest size that differs by more than 6% is flagged), the measured parameters, the page's input kinds next to the
+entry's `inputs`, the entry's `mode`, the closest existing tech-zh rows (by shared words), and a manifest Chinese that
+an existing tech-zh row overrides. `--verify` applies the patch to a copy of the catalog in `.atlas/<slug>/verify/` and
+runs `check:catalog` on it (a lane can test its patch without touching a catalog file); `--apply` (the main tree only)
+writes it into the catalog files. Both keep each file's own line endings (`models.ts` is CRLF, the others LF) and add
+the comma a list's last row lacks. `npm run atlas -- glossary` lists the site terms only one package uses and also
+defines in its manifest: the candidates to take out of `glossary.ts` when the flagship budget runs short.
+
 **Integrating lanes** (the main session). `merge <lane> --dry-run` for each lane; `merge` the lanes whose owned files
-do not overlap, and copy an owned file that two lanes changed by hand. Then `promote` each package and apply the
-printed catalog patch; run `npm run check`, `npm run check:atlas`, `npm run check:catalog` and
-`node scripts/atlas/docs.ts --check`; `npm run atlas -- check <slugs> --quick`; and one
-`npm run atlas -- check --all --e2e <slug>,<slug>` over the merged packages (one full build, the five `all` passes).
-Commit one package per commit, then delete each merged lane and its builds.
+do not overlap, and copy an owned file that two lanes changed by hand. Then `promote <slug> --apply` each package (or
+apply the printed patch by hand); run `npm run check`, `npm run check:atlas`, `npm run check:catalog` and
+`node scripts/atlas/docs.ts --check`; `npm run atlas -- check <slugs> --quick`; and one `npm run atlas -- check --all`
+without packages (one full build; each lane's full check already ran its e2e, so the merged packages get none). When
+the batch also changed the kit or the layout, name about 6 packages of different kinds instead
+(`check --all <slug> <slug> ...`, the default passes; section 10). Commit one package per commit, then delete each
+merged lane (`lanes --rm <name>`) and its builds.
 
 **Ports.** A package or lane in the table runs on its row. Any other package gets a port from `atlas new`: the first
 free one from 5210 up that no table row and no other package's notes use, recorded in `notes/<slug>.md`
@@ -1098,20 +1222,23 @@ package's port when it is free, else on the first free port from 5210 up; the re
 <!-- atlas:generated commands -->
 | Command | Usage | What it does |
 |---|---|---|
-| `doctor` | `npm run atlas -- doctor [--node-only] [--json]` | check Node, the site packages, Python (+ torch, numpy, networkx, atlas_kit), playwright msedge, ports and git; print fixes |
+| `doctor` | `npm run atlas -- doctor [--node-only] [--json]` | check Node, the site packages, where lanes live and their shared packages, Python (+ torch, numpy, networkx, atlas_kit), playwright msedge, ports and git; print fixes |
 | `new` | `npm run atlas -- new model <slug> --kind trace\|train\|process[,...] [--input <adapter>] [--template <name>] [--dev] [--port n] \| new model <slug> --like <package> [--dev] [--port n] \| new concept <slug> [--kind trace\|train\|process[,...]] [--input <adapter>] [--dev] [--port n] \| new concept <slug> --like <package> \| new worker <slug> \| new op <name> [--local <slug>] [--like <op>] \| new view <key> [--local <slug>]` | scaffold a model package (manifest, lesson, trainer/process, Python side, notes with its dev-server port), a concept package (type concept with concept.ts, routed at /train/<slug>/; --like turns a model package into a concept), a renamed copy of an existing package, a worker entry, an op (TS + test + Python mirror) or a view (meta + component); never overwrites |
 | `py` | `npm run atlas -- py <script.py \| -m module \| -c code> [args...]` | run a pipeline script with the configured Python (the one export and parity use), PYTHONPATH=pipeline, ATLAS_SITE and ATLAS_ROOT set |
 | `export` | `npm run atlas -- export <slug> [--no-parity] [--no-draft] [-- <export.py args>]` | run pipeline/<slug>/export.py with the configured Python, then parity --write and lesson draft |
 | `parity` | `npm run atlas -- parity <slug> [--write] [--json] [--dir <folder under static/>] [--steps n] [--fixtures]` | kind A against reference.json, kind B against the twin (one run per trainer and options), kind C against the Python reference (--fixtures: on every fixture input; files in .atlas/<slug>/parity/); --write records spec.parity and explainers/<slug>/parity.json (the badge); legacy scripts with --no-write |
 | `run` | `npm run atlas -- run <slug> <source> [--fixture id] [--frames a..b] [--seed n] [--opt '<json>'] [--detail coarse\|fine] [--save] [--precompute]` | print a process or trainer tape in Node, its input from a real runtime on the fixture (--opt overrides source options, e.g. '{"hidden":3}') |
 | `lesson` | `npm run atlas -- lesson <slug> draft\|lint\|print [--lang en\|zh] [--fixture id] [--json] [--cap n]` | the auto plan, the lint over every fixture (identical runs shared between fixtures; --cap n caps training while you iterate, never a gate), or the narration tables |
-| `check` | `npm run atlas -- check <slug> [<slug>...] [--quick\|--fast] [--passes <list>] [--json] [--only gate,gate] [--port n] [--keep-server\|--no-keep-server] [--stop-server] \| check --all [<slug>...] [--e2e <slugs\|all>] [--passes <list>] [--fast] [--json]` | every gate (schema, parity, op tests, lesson, determinism, honesty, budgets, types, site, e2e, paperwork, ownership) with a package-only build and the default e2e passes; --quick while iterating (no build or browser; parity and op tests from a cache while their inputs are unchanged); --fast without types, site and e2e; several slugs share one build and one e2e sequence; --all runs the fast gates of every package, the kit tests, docs --check, legacy parity, one full build and one e2e sequence over the packages given (--passes all) |
+| `check` | `npm run atlas -- check <slug> [<slug>...] [--quick\|--fast] [--passes <list>] [--json] [--only gate,gate] [--port n] [--keep-server\|--no-keep-server] [--stop-server] \| check --all [<slug>...] [--e2e <slugs\|all>] [--passes <list>] [--fast] [--json]` | every gate (schema, parity, op tests, lesson, determinism, honesty, budgets, types, site, e2e, paperwork, ownership) with a package-only build and the default e2e passes; --quick while iterating (no build or browser; parity and op tests from a cache while their inputs are unchanged); --fast without types, site and e2e; several slugs share one build and one e2e sequence; --all runs the fast gates of every package, the kit tests, docs --check, legacy parity, one full build and one e2e sequence over the packages given (the default passes; the integrator gives none) |
 | `build` | `npm run atlas -- build <slug>[,<slug>...] [--no-types] \| build --all [--no-types]` | a package-only build (ATLAS_ONLY: the home page and the pages of the packages) into .atlas/build-<slug>/ after svelte-check of the packages and check:catalog, then check:build; --all: npm run check and the full build |
-| `e2e` | `npm run atlas -- e2e <slug>[,<slug>...] [--passes default\|all\|full\|<width>-<lang>-<scheme>[-reduced],...] [--full] [--phone px] [--url <path>] [--port n] [--base <url>] [--keep-server\|--no-keep-server] [--stop-server] [--axe fail\|warn\|off] [--no-contact] [--wait ms] [--shots <dir>] [--cap n\|off]` | Playwright (Edge, headless) through the lesson; default passes 1280 px en light and 390 px zh dark (with a 360 px scroll probe), all or full for more; an axe scan of every step (AK604); contact sheets, lesson-print.txt and axe.txt in notes/shots/<slug>/contact/; reuses a dev server of this site or starts one and keeps it (it stops itself after 20 idle minutes); training capped at 200 steps (--cap) |
-| `worktree` | `npm run atlas -- worktree <name> [--owns <glob,...>] [--from-git <rev>] \| worktree <name> --sync [--from-git <rev>]` | make a lane copy site/.work/<name>/site from the main tree or from a committed revision (hash snapshot; the local CLI config is copied, never merged), or refresh its non-owned files (AK703) |
+| `e2e` | `npm run atlas -- e2e <slug>[,<slug>...] [--passes default\|all\|full\|layout\|<width>[x<height>]-<lang>-<scheme>[-reduced],...] [--full] [--phone px] [--url <path>] [--port n] [--base <url> \| --build <dir>] [--keep-server\|--no-keep-server] [--stop-server] [--axe fail\|warn\|off] [--no-contact] [--wait ms] [--shots <dir>] [--cap n\|off] [--as-live]` | Playwright (Edge, headless) through the lesson; default passes 1280 px en light and 390 px zh dark (with a 360 px scroll probe), all or full for more, layout for the lesson app's windows (the app/flow mode check, AK605); an axe scan of every step (AK604); contact sheets, lesson-print.txt and axe.txt in notes/shots/<slug>/contact/ (a lane outside the repo: <lane>/shots/<slug>/contact/); reuses a dev server of this site or starts one and keeps it (it stops itself after 20 idle minutes); --build <dir> serves a built site instead and measures the JS the lesson loads (AK606); training capped at 200 steps (--cap); --as-live (a lane) shows the package as its promoted catalog entry for the run |
+| `worktree` | `npm run atlas -- worktree <name> [--owns <glob,...>] [--from-git <rev>] \| worktree <name> --sync [--from-git <rev>]` | make a lane copy <lanes>/<name>/site (the lanes folder: ATLAS_LANES_DIR or "lanesDir" in atlas.config(.local).json, default site/.work) from the main tree or from a committed revision (hash snapshot; lane.json records the repo root and the main site; the local CLI config is copied, never merged), or refresh its non-owned files (AK703) |
+| `lanes` | `npm run atlas -- lanes [--json] \| lanes --deps \| lanes --rm <name> [--force] \| lanes --clean <name\|main>` | where lanes live and the lanes there (size, source, merged or not); --deps installs the node_modules that lanes outside the main site share (npm ci from site/package.json and package-lock.json into <lanes>/node_modules); --rm deletes a lane with its e2e shots, refused while it holds owned changes main does not have (--force deletes anyway); --clean deletes the build output and caches of a lane or of main (build, .svelte-kit, .atlas/build*, node_modules/.vite) after stopping its kept dev server |
 | `merge` | `npm run atlas -- merge <name> [--dry-run]` | copy a lane's owned files back into the main tree; refuses (AK702) if the lane changed anything else |
-| `review` | `npm run atlas -- review <slug>` | write notes/review-<slug>.md (checklist, check summary, screenshots, every narration on 3 inputs in en and zh) |
-| `promote` | `npm run atlas -- promote <slug> [--dry-run]` | append credits to static/licenses.json, print the catalog patch (models.ts, tech-zh.ts, glossary.ts), run check:catalog |
+| `review` | `npm run atlas -- review <slug>` | write notes/review-<slug>.md (checklist, the last check with its mode, the catalog patch, contact sheets and screenshots, every narration on 3 inputs in en and zh) |
+| `promote` | `npm run atlas -- promote <slug> [--dry-run \| --verify \| --apply] [--all-terms]` | the catalog patch from the manifest (models.ts or concepts.ts entry: status, lesson and manifest.catalog's fields; tech-zh.ts rows to add and the rows it leaves unused; glossary.ts terms another page also uses) with checks by hand (measured weights size in 1,024-byte KB, params, the page's input kinds, mode, similar tech-zh rows); appends credits to static/licenses.json (not with --dry-run or --verify); --verify applies the patch to a copy of the catalog and runs check:catalog on it (a lane too); --apply writes it into the catalog files in the main tree, keeping each file's line endings |
+| `thumbs` | `npm run atlas -- thumbs [<slug>...] [--build <dir> \| --base <url>] [--port n] [--out <dir>] [--sheets <dir>] [--cols n]` | the catalog thumbnails: each live lesson's poster stage (manifest.page.poster, else the first step with a figure) in headless Edge at 960 x 600, light and dark, cropped to its largest figure, composed into 4 webp sprites (rows 224 x 140 for every lesson, cards 480 x 300 for the home set) and index.json in static/thumbs/, with labelled contact sheets for the review in .atlas/thumbs/ |
+| `glossary` | `npm run atlas -- glossary [--json]` | the site glossary's size (gzip, in every page that uses Term, the flagships too) and the terms only one package uses and also defines in its manifest (safe to take out of glossary.ts); read-only |
 <!-- /atlas:generated -->
 
 Notes:
@@ -1141,12 +1268,13 @@ Notes:
   - **Passes** are named `<width>-<lang>-<scheme>[-reduced]`: width `desktop` (1280 px), `phone` (390), `narrow` (360)
     or a number of px; `-reduced` is one pass over the step list with reduced motion. Presets: `default` (desktop-en-light
     and phone-zh-dark; the 390 px pass also probes horizontal scroll at 360 px after every step, so AK602 keeps its gate
-    width), `all` (+ narrow-en-dark, desktop-zh-light and desktop-en-light-reduced; use it at integration) and `full`
+    width), `all` (+ narrow-en-dark, desktop-zh-light and desktop-en-light-reduced; on request) and `full`
     (+ desktop-en-dark, narrow-zh-light and phone-en-light; also `--full`). `--passes` takes names and presets in a list;
     `--phone px` adds `<px>-en-light`. Several slugs (`e2e a,b`) run as one sequence on one server.
   - **Axe** scans every step of every pass (AK604): `--axe warn` reports without failing while you iterate, `--axe off`
     skips it; `check` always fails on it.
-  - **Output** in `notes/shots/<slug>/` (or `--shots <dir>`), replaced on each run: `e2e-<pass>-<nn>.png`, and in
+  - **Output** in `notes/shots/<slug>/` (a lane outside the repo: `<lane folder>/shots/<slug>/`; or `--shots <dir>`),
+    replaced on each run: `e2e-<pass>-<nn>.png`, and in
     `contact/` a sheet per pass with every step labelled (`<pass>.png`; `--no-contact` skips them), `lesson-print.txt`
     (title, narration and numbers per step and language), `axe.txt` and `axe-<pass>.json`. `atlas review` lists these
     first.
@@ -1157,7 +1285,10 @@ Notes:
     `--cap off` not at all.
 - **build** `build <slug>[,<slug>...]` makes the package-only build of section 10 (`--no-types` skips the type check;
   `build --all` the full build).
-- **worktree** `--from-git <rev>` makes the lane from a commit (section 11).
+- **worktree** `--from-git <rev>` makes the lane from a commit; the lane goes into the lanes folder (section 11).
+- **lanes** lists the lanes folder (and where it is set), the state of the shared packages and every lane with its size;
+  `--deps` installs the packages that lanes outside the main site share, `--rm <name>` deletes a merged lane
+  (section 11).
 - **lesson** `lint` and `print` share identical runs between fixtures; `--cap n` caps training while you iterate (not a
   gate).
 - **run** gets the source's input from a real runtime on the fixture (spec, model, presets, the adapter), so a process
@@ -1226,10 +1357,13 @@ AK201  parity: layer "B1.attn.weights" max |diff| 3.2e-02 > 1e-4
 | [AK502](#ak502) | step without provenance |
 | [AK503](#ak503) | dependency rule or Math.random |
 | [AK504](#ak504) | empty describe() |
+| [AK507](#ak507) | view meta.ts imports a Svelte module or another package |
 | [AK601](#ak601) | console error |
 | [AK602](#ak602) | horizontal scroll at 360 px |
 | [AK603](#ak603) | long task |
 | [AK604](#ak604) | accessibility violation (axe: serious or critical) |
+| [AK605](#ak605) | lesson layout mode (app or flow) wrong for the window |
+| [AK606](#ak606) | loaded JS over budget (warning) |
 | [AK701](#ak701) | slug not in catalog |
 | [AK702](#ak702) | change outside owned paths |
 | [AK703](#ak703) | sync refused |
@@ -1243,13 +1377,16 @@ Node or npm is missing or too old, or a site package is not installed. Install N
 ### AK002
 
 Python is not configured, too old (< 3.10), or lacks torch / numpy / networkx (or a data file is missing). Run
-`npm run atlas -- doctor` for the exact fix; set `"python"` in `site/scripts/atlas/atlas.config.local.json`.
+`npm run atlas -- doctor` for the exact fix; set `"python"` in `site/scripts/atlas/atlas.config.local.json`. Also
+when the CLI cannot find the repo root: a lane outside the repo whose `lane.json` has no `root` (made by an older CLI)
+gets it from `worktree <name> --sync`, run in the main site; or set `ATLAS_ROOT`.
 
 ### AK003
 
 A dev-server port is busy: `atlas e2e --port n` (or `check --port n`) names a port something already listens on, or the
 dev server did not answer. Stop the other server, pick another `--port`, or
-let e2e choose (omit `--port`).
+let e2e choose (omit `--port`). Without `--port`, a server that comes up but answers as another site (another lane
+took the port meanwhile) is stopped and the next free port is tried, three times before AK003.
 
 ### AK004
 
@@ -1332,7 +1469,9 @@ A size budget: a file over 5 MB, a model folder over 15 MB, a phone tape over 2 
 ### AK401
 
 A narration placeholder is unresolved or not a finite number on some fixture (the learner would read "…"), or a step
-function threw. Bind it in `vars()`, put the number in the frame's metrics, or guard the empty input.
+function threw. Bind it in `vars()`, put the number in the frame's metrics, or guard the empty input. Only a gap mark
+counts as "…": an ellipsis next to no letter or digit ("the loss is …."). A literal ellipsis inside a word or a range
+("是…的首都", "−1…1") is text, in lint and in the browser test (K4).
 
 ### AK402
 
@@ -1367,7 +1506,8 @@ warning in drafts; the step count, words and sentences stay warnings (a two-part
 
 ### AK408
 
-A claim test failed (`claims.test.ts`), or a `reviewed` lesson has none.
+A claim test failed (`claims.test.ts`), timed out ("timed out after N s": raise the limit with a line
+`// atlas-timeout: <seconds>` in the file, section 10), or a `reviewed` lesson has none.
 
 ### AK409
 
@@ -1379,13 +1519,14 @@ Two different numbers of one narration print the same text (warning), as "the lo
 went from 0.6991 to 0.6987, and no placeholder of the narration holds their difference. Narrate the change itself (a
 `vars()` entry such as `drop: before - after`, which silences the warning), or give both numbers more digits with
 `{name|n4}` (section 8.3). Values that print at a saturation bound (±1.00, 0%, 100%, "<0.1%") are left alone: two
-saturated gates that both print 1.00 are two quantities, not a hidden change.
+saturated gates that both print 1.00 are two quantities, not a hidden change. Two unrelated quantities that coincide on
+a fixture: name one of them in the step's `lint: { same: ['name'] }` (K4).
 
 ### AK411
 
 A step's `terms` names an id that is in neither the site glossary (`src/lib/catalog/glossary.ts`) nor the package's
-`manifest.glossary`. Use a glossary id, or add `{ id, term, def }` to `manifest.glossary` (the step shows it before
-`promote` proposes it for the site glossary).
+`manifest.glossary`. Use a glossary id, or add `{ id, term, def }` to `manifest.glossary` (the step shows it from
+there; `promote` proposes it for the site glossary only when another package or page uses it too, section 11).
 
 ### AK412
 
@@ -1415,6 +1556,13 @@ exempt.
 
 A view's `describe()` is empty (screen readers would get nothing).
 
+### AK507
+
+A view's `meta.ts` imports a Svelte module, or code from another package. The registry loads a package's view metas
+together with the package (`prepareViews`) and the kit's metas with every lesson, so a `meta.ts` imports only types,
+the kit's TypeScript modules and its own package's helpers. The component stays in `View.svelte`, which loads when the
+view is shown; what two packages share moves to the kit (the rule of two).
+
 ### AK601
 
 The browser test saw a console error, a page error, or a missing page or lesson.
@@ -1425,11 +1573,11 @@ Horizontal page scroll at 360 px. Use `grid-template-columns: minmax(0, 1fr)` an
 
 ### AK603
 
-A main-thread long task while stepping through the lesson: over 100 ms fails, over 50 ms warns. Move work to the worker
-(leave `run` unset, or `run: 'worker'`) or yield every ≤ 8 ms. The bar is load-sensitive: the same page shows 2-3×
-longer tasks while other processes keep the CPU busy, so re-run e2e on a quiet machine before you chase a 50-100 ms
-warning. A first formula used to cost a font-swap layout; the page now fetches the KaTeX fonts while idle, and e2e
-measures after they have loaded.
+A warning: a main-thread long task over 50 ms while stepping through the lesson. It never fails a check, and nobody
+re-runs e2e for it: the bar is load-sensitive, and the same page shows 2-3× longer tasks while other processes keep the
+CPU busy. When a large warning comes back on a quiet machine, move work to the worker (leave `run` unset, or
+`run: 'worker'`) or yield every ≤ 8 ms. A first formula used to cost a font-swap layout; the page now fetches the KaTeX
+fonts while idle, and e2e measures after they have loaded.
 
 ### AK604
 
@@ -1450,6 +1598,21 @@ failing; `atlas check` always fails on it. The kit has a fix for each common fin
 - **An ARIA table** (aria-required-parent, aria-required-children): its cells and headers sit inside `role="row"`; a
   CSS subgrid keeps the grid layout.
 - **A definition list** (definition-list): a `<dl>` holds only `<dt>`/`<dd>` groups; a label goes outside it.
+
+### AK605
+
+The lesson app is in the wrong layout mode for the window, or in app mode the page is taller than the window. A lesson
+root that carries `data-lesson-mode` must say `app` at 960 x 600 and up (one screen: the stage and the narration scroll
+in their own panes, the page never does) and `flow` below (the page scrolls, the stage first). e2e checks it on every
+step of every pass; the `layout` preset runs the lesson app's windows (1280 x 800, 1280 x 680, 1024 x 768, 390 x 844
+and 360 x 640).
+
+### AK606
+
+A warning: the lesson page has loaded more than 400 KB of JavaScript (gzip, counted as `check:build` counts the shells)
+once the lesson settled. e2e measures it only on a built site (`atlas e2e <slug> --build <dir>`, where `<dir>` is an
+`ATLAS_BUILD_DIR` build); a dev server serves unbundled modules, which cannot be compared. The summary line also gives
+the JS after the last step. Load panels, views and model code when they are shown (`import()`), not with the lesson.
 
 ### AK701
 
@@ -1572,6 +1735,8 @@ kind of arithmetic.
   scripts with `npm run atlas -- py <script>` (section 1).
 - **A lane's dev server does not see my edits**: the lane was made before K0; run `npm run atlas -- worktree <name>
   --sync` once (it re-patches the lane's `vite.config.ts`) and restart the dev server.
+- **A lane outside the main site cannot find vite or svelte** (`doctor`: "site packages not installed"): the packages
+  the lanes share are missing or older than `package-lock.json`. Run `npm run atlas -- lanes --deps` in the main site.
 - **Step 2 still shows the old weights after I changed the input**: fixed in K0 (a new input restarts every train
   source); a lesson that worked around it with a process source keeps working.
 - **A `live-model` step shows other numbers in the e2e screenshots than in your browser**: e2e caps training at 200 steps
@@ -1601,6 +1766,14 @@ kind of arithmetic.
   every gate without the build.
 - **AK604 on a kit component** (a badge, a code block, a formula): the kit fixed the known ones; a lane made from an older
   commit needs `worktree <name> --sync` (or a new lane `--from-git HEAD`).
+- **The e2e screenshots show a Vite error overlay** (AK601 since K4): the page has a compile error, or the kept dev
+  server still shows one from a moment when a file was half-written. Fix the error, or stop the server
+  (`npm run atlas -- e2e --stop-server`) and run e2e again.
+- **e2e ran against another lane's page** ("no guided lesson" on a page that has one): before K4 a server could take
+  the port between the free-port check and vite's start. The CLI now probes the server it started and moves on to the
+  next port; with `--port n` it stops with AK003.
+- **The catalog patch does not apply by script**: use `npm run atlas -- promote <slug> --verify` (a copy) or `--apply`
+  (the main tree); they keep `models.ts`'s CRLF line endings and add the comma the last glossary or tech-zh row lacks.
 
 ---
 
@@ -1647,7 +1820,7 @@ Two patterns from the example:
 npm run atlas -- new concept my-concept --kind process                 # also --input <adapter>, --dev, --port n
 npm run atlas -- new concept my-concept --like loss-gradient-descent   # or start from a renamed copy
 npm run atlas -- check my-concept --quick
-npm run atlas -- e2e my-concept                                        # opens /train/my-concept/
+npm run atlas -- check my-concept                                      # once, at the end; its e2e opens /train/my-concept/
 ```
 
 `--kind` takes `trace`, `train` and `process` in a list, as for a model. `--like` copies a concept package, or turns a
@@ -1660,6 +1833,6 @@ their own pages. The Lesson Lab shows a concept package with the model layout (n
 at `/train/<slug>/`.
 
 `promote` appends the credits and prints the `concepts.ts` patch (status live, `lesson: { steps, summary }`, plus
-interaction, engine, mode and links when the manifest's catalog block gives them), a tech-zh row for the engine, the
-glossary patch and the text cost: `concepts.ts` text reaches every `/train/` page and the list pages. It never touches
-`models.ts`.
+title, interaction, engine, mode and links when the manifest's catalog block gives them), a tech-zh row for the engine,
+the glossary patch and the text cost: `concepts.ts` text reaches every `/train/` page and the list pages. It never
+touches `models.ts`. `--verify` and `--apply` work as for a model (section 11).

@@ -1,7 +1,7 @@
 // zoom.elementwise (W1-D2): one number in, one number out (relu, tanh, sigmoid, silu, gelu, local activations), or
 // a cell-by-cell sum (add).
 import type { ViewMeta } from '../../../types/view.ts';
-import { axesOfId, fmt3, layerLabel, outLabels, resolveUnit, tokenIds, tokenTexts, unitWhere, type Props } from '../kit.parts/stage.ts';
+import { axesOfId, axisNames, fmt3, layerLabel, outLabels, type Props, resolveUnit, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 import { demoStage, type DemoVariant } from '../kit.parts/demo.ts';
 
 export function describeElementwise(p: Props) {
@@ -11,7 +11,7 @@ export function describeElementwise(p: Props) {
 	const out = r.trace?.t[e.layer];
 	const axes = out ? axesOfId(r.model, e.layer, out.shape) : [];
 	const T = out && axes[0] === 't' ? out.shape[0] : 0;
-	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined, outLabels(p, r.model));
+	const where = unitWhere(e.unit, axes, T ? tokenTexts(p, T, tokenIds(r.trace, r.model)) : undefined, outLabels(p, r.model), axisNames(p));
 	const name = layerLabel(r.model, e.layer);
 	if (e.curve) {
 		const fn = e.curve.fn.replace('_tanh', '');

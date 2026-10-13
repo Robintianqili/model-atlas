@@ -10,13 +10,13 @@
 <script lang="ts">
 	import Tex from '$lib/kit/Tex.svelte';
 	import Num from '../kit.parts/Num.svelte';
-	import { t } from '$lib/i18n/i18n.svelte';
+	import { i18n, t } from '$lib/i18n/i18n.svelte';
 	import type { StageProps } from '../../../types/view.ts';
 	import UnitHead from '../kit.parts/UnitHead.svelte';
 	import OpFormula from '../kit.parts/OpFormula.svelte';
 	import RowBars from '../kit.parts/RowBars.svelte';
 	import Notice from '../kit.parts/Notice.svelte';
-	import { axesOfId, layerLabel, maxAbs, resolveUnit, tensorOf, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
+	import { axesOfId, axisNames, layerLabel, maxAbs, resolveUnit, tensorOf, tokenIds, tokenTexts, unitWhere } from '../kit.parts/stage.ts';
 
 	let P: StageProps = $props();
 
@@ -31,8 +31,8 @@
 	const out = $derived(R.trace && id ? R.trace.t[id] : null);
 	const axes = $derived(out ? axesOfId(R.model, id, out.shape) : []);
 	const T = $derived(out && axes[0] === 't' ? out.shape[0] : 0);
-	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model)) : []);
-	const where = $derived(e ? unitWhere(e.unit, axes, tokens) : null);
+	const tokens = $derived(T ? tokenTexts(P, T, tokenIds(R.trace, R.model), i18n.lang) : []);
+	const where = $derived(e ? unitWhere(e.unit, axes, tokens, undefined, axisNames(P)) : null);
 	const cells = $derived(e?.reads[0]?.cells ?? []);
 	const xT = $derived(e && R.trace ? tensorOf(R.trace, e.reads[0]?.tensor ?? '') : null);
 	const rows = $derived.by(() => {
@@ -115,7 +115,7 @@
 				{/each}
 			</ol>
 		{/if}
-		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} />
+		<OpFormula tex={R.op?.def.formula} {e} caption={where ? { en: `${layerLabel(R.model, id).en}, ${where.en}`, zh: `${layerLabel(R.model, id).zh ?? id}，${where.zh}` } : undefined} provenance={P.provenance} digits={P.props.digits as number | undefined} />
 	</div>
 {/if}
 

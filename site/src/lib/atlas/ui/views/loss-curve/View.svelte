@@ -4,6 +4,8 @@
   ←/→ move the readout, Home/End jump. Divergence (non-finite values) is marked in words, not drawn.
   K2: steps print as counts ("step 50", was "step 50.0"); with several lines "lowest" names its line; props.refs draws
   dashed reference lines ([{ y, label }], e.g. a GAN's equilibrium losses 2 ln 2 and ln 2), kept inside the y range.
+  K4: props.xLabel ({ en, zh }) names the x axis when it does not count training steps (episodes, rounds), and
+  props.lowest: false leaves out the "lowest … at step" line (a metric where lower is not better).
 -->
 <script lang="ts">
 	import type { StageProps } from '../../../types/view.ts';
@@ -47,6 +49,9 @@
 		return lossSeries(p);
 	});
 	const sum = $derived(summarize(series[0], p.at.index));
+	/** K4: the x axis's name (default "training step") and whether the readout names the lowest value */
+	const xLabel = $derived(p.props?.xLabel && typeof (p.props.xLabel as I18n).en === 'string' ? (p.props.xLabel as I18n) : null);
+	const showLowest = $derived(p.props?.lowest !== false);
 	/** K2: dashed reference lines, props.refs: [{ y, label }] */
 	const refs = $derived(
 		(Array.isArray(p.props?.refs) ? (p.props.refs as { y: number; label?: I18n }[]) : []).filter((r) => r && typeof r.y === 'number' && Number.isFinite(r.y))
@@ -230,7 +235,7 @@
 				<text class="tick" x={W - m.r - 4} y={yOf(r.y) - 4} text-anchor="end">{r.label ? `${t(r.label)} ` : ''}{fmt3(r.y)}</text>
 			{/each}
 			<text class="axis" x={m.l + (W - m.l - m.r) / 2} y={H - 4} text-anchor="middle">
-				{t({ en: all.log ? 'training step (loss on a log scale)' : 'training step', zh: all.log ? '训练步数（损失为对数刻度）' : '训练步数' })}
+				{xLabel ? `${t(xLabel)}${all.log ? t({ en: ' (log scale)', zh: '（对数刻度）' }) : ''}` : t({ en: all.log ? 'training step (loss on a log scale)' : 'training step', zh: all.log ? '训练步数（损失为对数刻度）' : '训练步数' })}
 			</text>
 			{#each paths as q (q.key)}<path class="line" class:thin={q.thin} d={q.d} style:stroke={q.color} />{/each}
 			{#if smoothPath}<path class="line" d={smoothPath} style:stroke="var(--accent)" />{/if}
@@ -251,7 +256,7 @@
 			{#each probeAt.values as v, i (i)}<span><span class="lbl">{t(v.label)}</span> <span class="num">{Number.isFinite(v.v) ? fmt3(v.v) : '—'}</span></span>{/each}
 		{/if}
 		{#if smooth}<span class="muted">{t({ en: `thick line: average of the last ${smooth} steps`, zh: `粗线：最近 ${smooth} 步的平均` })}</span>{/if}
-		{#if sum && sum.n > 0}
+		{#if sum && sum.n > 0 && showLowest}
 			<span class="muted">{t({ en: 'lowest', zh: '最低' })}{series.length > 1 ? ` ${t(series[0].label)}` : ''} <span class="num">{fmt3(sum.min)}</span> {t({ en: 'at step', zh: '在第' })} <span class="num">{fmtNum(sum.minStep)}</span>{t({ en: '', zh: ' 步' })}</span>
 		{/if}
 		{#if sum && sum.diverged >= 0}

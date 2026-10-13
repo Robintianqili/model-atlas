@@ -1,0 +1,3328 @@
+{
+ "slug": "llava-toy",
+ "name": {
+  "en": "LLaVA-style connector (toy)",
+  "zh": "LLaVA 式连接器（玩具）"
+ },
+ "version": "2026-10-13",
+ "params": 166564,
+ "precision": "fp32",
+ "tensors": [
+  {
+   "name": "vit.patch.weight",
+   "shape": [
+    48,
+    1,
+    7,
+    7
+   ],
+   "offset": 0,
+   "length": 2352
+  },
+  {
+   "name": "vit.patch.bias",
+   "shape": [
+    48
+   ],
+   "offset": 2352,
+   "length": 48
+  },
+  {
+   "name": "vit.cls.weight",
+   "shape": [
+    48
+   ],
+   "offset": 2400,
+   "length": 48
+  },
+  {
+   "name": "vit.pos.weight",
+   "shape": [
+    17,
+    48
+   ],
+   "offset": 2448,
+   "length": 816
+  },
+  {
+   "name": "vit.B1.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 3264,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 3312,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 3360,
+   "length": 2304
+  },
+  {
+   "name": "vit.B1.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 5664,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 5712,
+   "length": 2304
+  },
+  {
+   "name": "vit.B1.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 8016,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 8064,
+   "length": 2304
+  },
+  {
+   "name": "vit.B1.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 10368,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 10416,
+   "length": 2304
+  },
+  {
+   "name": "vit.B1.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 12720,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 12768,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 12816,
+   "length": 48
+  },
+  {
+   "name": "vit.B1.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 12864,
+   "length": 9216
+  },
+  {
+   "name": "vit.B1.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 22080,
+   "length": 192
+  },
+  {
+   "name": "vit.B1.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 22272,
+   "length": 9216
+  },
+  {
+   "name": "vit.B1.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 31488,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 31536,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 31584,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 31632,
+   "length": 2304
+  },
+  {
+   "name": "vit.B2.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 33936,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 33984,
+   "length": 2304
+  },
+  {
+   "name": "vit.B2.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 36288,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 36336,
+   "length": 2304
+  },
+  {
+   "name": "vit.B2.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 38640,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 38688,
+   "length": 2304
+  },
+  {
+   "name": "vit.B2.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 40992,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 41040,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 41088,
+   "length": 48
+  },
+  {
+   "name": "vit.B2.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 41136,
+   "length": 9216
+  },
+  {
+   "name": "vit.B2.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 50352,
+   "length": 192
+  },
+  {
+   "name": "vit.B2.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 50544,
+   "length": 9216
+  },
+  {
+   "name": "vit.B2.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 59760,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.ln1.weight",
+   "shape": [
+    48
+   ],
+   "offset": 59808,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.ln1.bias",
+   "shape": [
+    48
+   ],
+   "offset": 59856,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.q.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 59904,
+   "length": 2304
+  },
+  {
+   "name": "vit.B3.q.bias",
+   "shape": [
+    48
+   ],
+   "offset": 62208,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.k.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 62256,
+   "length": 2304
+  },
+  {
+   "name": "vit.B3.k.bias",
+   "shape": [
+    48
+   ],
+   "offset": 64560,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.v.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 64608,
+   "length": 2304
+  },
+  {
+   "name": "vit.B3.v.bias",
+   "shape": [
+    48
+   ],
+   "offset": 66912,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.proj.weight",
+   "shape": [
+    48,
+    48
+   ],
+   "offset": 66960,
+   "length": 2304
+  },
+  {
+   "name": "vit.B3.proj.bias",
+   "shape": [
+    48
+   ],
+   "offset": 69264,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.ln2.weight",
+   "shape": [
+    48
+   ],
+   "offset": 69312,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.ln2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 69360,
+   "length": 48
+  },
+  {
+   "name": "vit.B3.fc1.weight",
+   "shape": [
+    192,
+    48
+   ],
+   "offset": 69408,
+   "length": 9216
+  },
+  {
+   "name": "vit.B3.fc1.bias",
+   "shape": [
+    192
+   ],
+   "offset": 78624,
+   "length": 192
+  },
+  {
+   "name": "vit.B3.fc2.weight",
+   "shape": [
+    48,
+    192
+   ],
+   "offset": 78816,
+   "length": 9216
+  },
+  {
+   "name": "vit.B3.fc2.bias",
+   "shape": [
+    48
+   ],
+   "offset": 88032,
+   "length": 48
+  },
+  {
+   "name": "proj.fc1.weight",
+   "shape": [
+    64,
+    48
+   ],
+   "offset": 88080,
+   "length": 3072
+  },
+  {
+   "name": "proj.fc1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 91152,
+   "length": 64
+  },
+  {
+   "name": "proj.fc2.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 91216,
+   "length": 4096
+  },
+  {
+   "name": "proj.fc2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 95312,
+   "length": 64
+  },
+  {
+   "name": "lm.tok.weight",
+   "shape": [
+    20,
+    64
+   ],
+   "offset": 95376,
+   "length": 1280
+  },
+  {
+   "name": "lm.pos.weight",
+   "shape": [
+    24,
+    64
+   ],
+   "offset": 96656,
+   "length": 1536
+  },
+  {
+   "name": "lm.L1.ln1.weight",
+   "shape": [
+    64
+   ],
+   "offset": 98192,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.ln1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 98256,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.q.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 98320,
+   "length": 4096
+  },
+  {
+   "name": "lm.L1.q.bias",
+   "shape": [
+    64
+   ],
+   "offset": 102416,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.k.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 102480,
+   "length": 4096
+  },
+  {
+   "name": "lm.L1.k.bias",
+   "shape": [
+    64
+   ],
+   "offset": 106576,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.v.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 106640,
+   "length": 4096
+  },
+  {
+   "name": "lm.L1.v.bias",
+   "shape": [
+    64
+   ],
+   "offset": 110736,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.proj.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 110800,
+   "length": 4096
+  },
+  {
+   "name": "lm.L1.proj.bias",
+   "shape": [
+    64
+   ],
+   "offset": 114896,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.ln2.weight",
+   "shape": [
+    64
+   ],
+   "offset": 114960,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.ln2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 115024,
+   "length": 64
+  },
+  {
+   "name": "lm.L1.fc1.weight",
+   "shape": [
+    128,
+    64
+   ],
+   "offset": 115088,
+   "length": 8192
+  },
+  {
+   "name": "lm.L1.fc1.bias",
+   "shape": [
+    128
+   ],
+   "offset": 123280,
+   "length": 128
+  },
+  {
+   "name": "lm.L1.fc2.weight",
+   "shape": [
+    64,
+    128
+   ],
+   "offset": 123408,
+   "length": 8192
+  },
+  {
+   "name": "lm.L1.fc2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 131600,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.ln1.weight",
+   "shape": [
+    64
+   ],
+   "offset": 131664,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.ln1.bias",
+   "shape": [
+    64
+   ],
+   "offset": 131728,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.q.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 131792,
+   "length": 4096
+  },
+  {
+   "name": "lm.L2.q.bias",
+   "shape": [
+    64
+   ],
+   "offset": 135888,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.k.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 135952,
+   "length": 4096
+  },
+  {
+   "name": "lm.L2.k.bias",
+   "shape": [
+    64
+   ],
+   "offset": 140048,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.v.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 140112,
+   "length": 4096
+  },
+  {
+   "name": "lm.L2.v.bias",
+   "shape": [
+    64
+   ],
+   "offset": 144208,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.proj.weight",
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 144272,
+   "length": 4096
+  },
+  {
+   "name": "lm.L2.proj.bias",
+   "shape": [
+    64
+   ],
+   "offset": 148368,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.ln2.weight",
+   "shape": [
+    64
+   ],
+   "offset": 148432,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.ln2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 148496,
+   "length": 64
+  },
+  {
+   "name": "lm.L2.fc1.weight",
+   "shape": [
+    128,
+    64
+   ],
+   "offset": 148560,
+   "length": 8192
+  },
+  {
+   "name": "lm.L2.fc1.bias",
+   "shape": [
+    128
+   ],
+   "offset": 156752,
+   "length": 128
+  },
+  {
+   "name": "lm.L2.fc2.weight",
+   "shape": [
+    64,
+    128
+   ],
+   "offset": 156880,
+   "length": 8192
+  },
+  {
+   "name": "lm.L2.fc2.bias",
+   "shape": [
+    64
+   ],
+   "offset": 165072,
+   "length": 64
+  },
+  {
+   "name": "lm.ln.weight",
+   "shape": [
+    64
+   ],
+   "offset": 165136,
+   "length": 64
+  },
+  {
+   "name": "lm.ln.bias",
+   "shape": [
+    64
+   ],
+   "offset": 165200,
+   "length": 64
+  },
+  {
+   "name": "lm.head.weight",
+   "shape": [
+    20,
+    64
+   ],
+   "offset": 165264,
+   "length": 1280
+  },
+  {
+   "name": "lm.head.bias",
+   "shape": [
+    20
+   ],
+   "offset": 166544,
+   "length": 20
+  }
+ ],
+ "layers": [
+  {
+   "id": "image",
+   "op": "input",
+   "label": {
+    "en": "Your drawing",
+    "zh": "你的画"
+   },
+   "in": [
+    "image"
+   ],
+   "outShape": [
+    1,
+    28,
+    28
+   ],
+   "desc": {
+    "en": "28×28 numbers: 0 is empty, 1 is full ink.",
+    "zh": "28×28 个数：0 是空白，1 是满墨。"
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "id": "vit.patch",
+   "op": "conv2d",
+   "label": {
+    "en": "TinyViT · Patch embedding",
+    "zh": "TinyViT · 图块嵌入"
+   },
+   "in": [
+    "image"
+   ],
+   "outShape": [
+    48,
+    4,
+    4
+   ],
+   "params": {
+    "kernel": 7,
+    "stride": 7,
+    "padding": 0,
+    "inChannels": 1,
+    "outChannels": 48
+   },
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 66
+   },
+   "teach": {
+    "lesson": "fold"
+   }
+  },
+  {
+   "id": "vit.tokens",
+   "op": "to_tokens",
+   "label": {
+    "en": "TinyViT · Patches become rows",
+    "zh": "TinyViT · 图块变成行"
+   },
+   "in": [
+    "vit.patch"
+   ],
+   "outShape": [
+    16,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 84
+   },
+   "teach": {
+    "lesson": "fold"
+   }
+  },
+  {
+   "id": "vit.cls",
+   "op": "cls_token",
+   "label": {
+    "en": "TinyViT · [CLS] row in front",
+    "zh": "TinyViT · 前面加上 [CLS] 行"
+   },
+   "in": [
+    "vit.tokens"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 67
+   },
+   "teach": {
+    "lesson": "fold"
+   }
+  },
+  {
+   "id": "vit.pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "TinyViT · Position rows",
+    "zh": "TinyViT · 位置行"
+   },
+   "in": [
+    "vit.cls"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 68
+   },
+   "teach": {
+    "lesson": "fold"
+   }
+  },
+  {
+   "id": "vit.embed",
+   "op": "add",
+   "label": {
+    "en": "TinyViT · Rows + positions",
+    "zh": "TinyViT · 行 + 位置"
+   },
+   "in": [
+    "vit.cls",
+    "vit.pos"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 86
+   },
+   "teach": {
+    "lesson": "fold"
+   }
+  },
+  {
+   "id": "vit.B1.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 1 · LayerNorm 1",
+    "zh": "TinyViT 第 1 块 · 层归一化 1"
+   },
+   "in": [
+    "vit.embed"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "vit.B1.q",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · Queries Q",
+    "zh": "TinyViT 第 1 块 · 查询 Q"
+   },
+   "in": [
+    "vit.B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "vit.B1.k",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · Keys K",
+    "zh": "TinyViT 第 1 块 · 键 K"
+   },
+   "in": [
+    "vit.B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "vit.B1.v",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · Values V",
+    "zh": "TinyViT 第 1 块 · 值 V"
+   },
+   "in": [
+    "vit.B1.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "vit.B1.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "TinyViT block 1 · Attention scores",
+    "zh": "TinyViT 第 1 块 · 注意力分数"
+   },
+   "in": [
+    "vit.B1.q",
+    "vit.B1.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "vit.B1.attn",
+   "op": "softmax",
+   "label": {
+    "en": "TinyViT block 1 · Attention weights",
+    "zh": "TinyViT 第 1 块 · 注意力权重"
+   },
+   "in": [
+    "vit.B1.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "vit.B1.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "TinyViT block 1 · Mix of values",
+    "zh": "TinyViT 第 1 块 · 值的混合"
+   },
+   "in": [
+    "vit.B1.attn",
+    "vit.B1.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "vit.B1.proj",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · Attention output",
+    "zh": "TinyViT 第 1 块 · 注意力输出"
+   },
+   "in": [
+    "vit.B1.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B1.add1",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 1 · Add attention",
+    "zh": "TinyViT 第 1 块 · 加上注意力"
+   },
+   "in": [
+    "vit.embed",
+    "vit.B1.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B1.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 1 · LayerNorm 2",
+    "zh": "TinyViT 第 1 块 · 层归一化 2"
+   },
+   "in": [
+    "vit.B1.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B1.fc1",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · MLP up",
+    "zh": "TinyViT 第 1 块 · MLP 放大"
+   },
+   "in": [
+    "vit.B1.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "vit.B1.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "TinyViT block 1 · GELU",
+    "zh": "TinyViT 第 1 块 · GELU"
+   },
+   "in": [
+    "vit.B1.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B1.fc2",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 1 · MLP down",
+    "zh": "TinyViT 第 1 块 · MLP 缩回"
+   },
+   "in": [
+    "vit.B1.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "vit.B1.add2",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 1 · Add MLP",
+    "zh": "TinyViT 第 1 块 · 加上 MLP"
+   },
+   "in": [
+    "vit.B1.add1",
+    "vit.B1.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B2.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 2 · LayerNorm 1",
+    "zh": "TinyViT 第 2 块 · 层归一化 1"
+   },
+   "in": [
+    "vit.B1.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "vit.B2.q",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · Queries Q",
+    "zh": "TinyViT 第 2 块 · 查询 Q"
+   },
+   "in": [
+    "vit.B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "vit.B2.k",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · Keys K",
+    "zh": "TinyViT 第 2 块 · 键 K"
+   },
+   "in": [
+    "vit.B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "vit.B2.v",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · Values V",
+    "zh": "TinyViT 第 2 块 · 值 V"
+   },
+   "in": [
+    "vit.B2.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "vit.B2.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "TinyViT block 2 · Attention scores",
+    "zh": "TinyViT 第 2 块 · 注意力分数"
+   },
+   "in": [
+    "vit.B2.q",
+    "vit.B2.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "vit.B2.attn",
+   "op": "softmax",
+   "label": {
+    "en": "TinyViT block 2 · Attention weights",
+    "zh": "TinyViT 第 2 块 · 注意力权重"
+   },
+   "in": [
+    "vit.B2.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "vit.B2.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "TinyViT block 2 · Mix of values",
+    "zh": "TinyViT 第 2 块 · 值的混合"
+   },
+   "in": [
+    "vit.B2.attn",
+    "vit.B2.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "vit.B2.proj",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · Attention output",
+    "zh": "TinyViT 第 2 块 · 注意力输出"
+   },
+   "in": [
+    "vit.B2.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B2.add1",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 2 · Add attention",
+    "zh": "TinyViT 第 2 块 · 加上注意力"
+   },
+   "in": [
+    "vit.B1.add2",
+    "vit.B2.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B2.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 2 · LayerNorm 2",
+    "zh": "TinyViT 第 2 块 · 层归一化 2"
+   },
+   "in": [
+    "vit.B2.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B2.fc1",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · MLP up",
+    "zh": "TinyViT 第 2 块 · MLP 放大"
+   },
+   "in": [
+    "vit.B2.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "vit.B2.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "TinyViT block 2 · GELU",
+    "zh": "TinyViT 第 2 块 · GELU"
+   },
+   "in": [
+    "vit.B2.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B2.fc2",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 2 · MLP down",
+    "zh": "TinyViT 第 2 块 · MLP 缩回"
+   },
+   "in": [
+    "vit.B2.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "vit.B2.add2",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 2 · Add MLP",
+    "zh": "TinyViT 第 2 块 · 加上 MLP"
+   },
+   "in": [
+    "vit.B2.add1",
+    "vit.B2.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B3.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 3 · LayerNorm 1",
+    "zh": "TinyViT 第 3 块 · 层归一化 1"
+   },
+   "in": [
+    "vit.B2.add2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 53
+   }
+  },
+  {
+   "id": "vit.B3.q",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · Queries Q",
+    "zh": "TinyViT 第 3 块 · 查询 Q"
+   },
+   "in": [
+    "vit.B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 46
+   }
+  },
+  {
+   "id": "vit.B3.k",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · Keys K",
+    "zh": "TinyViT 第 3 块 · 键 K"
+   },
+   "in": [
+    "vit.B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 47
+   }
+  },
+  {
+   "id": "vit.B3.v",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · Values V",
+    "zh": "TinyViT 第 3 块 · 值 V"
+   },
+   "in": [
+    "vit.B3.ln1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48,
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 57
+   }
+  },
+  {
+   "id": "vit.B3.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "TinyViT block 3 · Attention scores",
+    "zh": "TinyViT 第 3 块 · 注意力分数"
+   },
+   "in": [
+    "vit.B3.q",
+    "vit.B3.k"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 48
+   }
+  },
+  {
+   "id": "vit.B3.attn",
+   "op": "softmax",
+   "label": {
+    "en": "TinyViT block 3 · Attention weights",
+    "zh": "TinyViT 第 3 块 · 注意力权重"
+   },
+   "in": [
+    "vit.B3.scores"
+   ],
+   "outShape": [
+    4,
+    17,
+    17
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 49
+   }
+  },
+  {
+   "id": "vit.B3.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "TinyViT block 3 · Mix of values",
+    "zh": "TinyViT 第 3 块 · 值的混合"
+   },
+   "in": [
+    "vit.B3.attn",
+    "vit.B3.v"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 12
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 58
+   }
+  },
+  {
+   "id": "vit.B3.proj",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · Attention output",
+    "zh": "TinyViT 第 3 块 · 注意力输出"
+   },
+   "in": [
+    "vit.B3.mix"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B3.add1",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 3 · Add attention",
+    "zh": "TinyViT 第 3 块 · 加上注意力"
+   },
+   "in": [
+    "vit.B2.add2",
+    "vit.B3.proj"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 59
+   }
+  },
+  {
+   "id": "vit.B3.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "TinyViT block 3 · LayerNorm 2",
+    "zh": "TinyViT 第 3 块 · 层归一化 2"
+   },
+   "in": [
+    "vit.B3.add1"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B3.fc1",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · MLP up",
+    "zh": "TinyViT 第 3 块 · MLP 放大"
+   },
+   "in": [
+    "vit.B3.ln2"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 192
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 40
+   }
+  },
+  {
+   "id": "vit.B3.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "TinyViT block 3 · GELU",
+    "zh": "TinyViT 第 3 块 · GELU"
+   },
+   "in": [
+    "vit.B3.fc1"
+   ],
+   "outShape": [
+    17,
+    192
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "vit.B3.fc2",
+   "op": "linear",
+   "label": {
+    "en": "TinyViT block 3 · MLP down",
+    "zh": "TinyViT 第 3 块 · MLP 缩回"
+   },
+   "in": [
+    "vit.B3.gelu"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "params": {
+    "inFeatures": 192,
+    "outFeatures": 48
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 41
+   }
+  },
+  {
+   "id": "vit.B3.add2",
+   "op": "add",
+   "label": {
+    "en": "TinyViT block 3 · Add MLP",
+    "zh": "TinyViT 第 3 块 · 加上 MLP"
+   },
+   "in": [
+    "vit.B3.add1",
+    "vit.B3.fc2"
+   ],
+   "outShape": [
+    17,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/tinyvit/model.py",
+    "line": 60
+   }
+  },
+  {
+   "id": "feat",
+   "op": "drop_cls",
+   "label": {
+    "en": "Image features (16 patch rows)",
+    "zh": "图像特征（16 个图块行）"
+   },
+   "in": [
+    "vit.B3.add2"
+   ],
+   "outShape": [
+    16,
+    48
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 75
+   }
+  },
+  {
+   "id": "proj.fc1",
+   "op": "linear",
+   "label": {
+    "en": "Projector · Linear 48 → 64",
+    "zh": "投影层 · 线性 48 → 64"
+   },
+   "in": [
+    "feat"
+   ],
+   "outShape": [
+    16,
+    64
+   ],
+   "params": {
+    "inFeatures": 48,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 83
+   }
+  },
+  {
+   "id": "proj.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "Projector · GELU",
+    "zh": "投影层 · GELU"
+   },
+   "in": [
+    "proj.fc1"
+   ],
+   "outShape": [
+    16,
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 87
+   }
+  },
+  {
+   "id": "proj.fc2",
+   "op": "linear",
+   "label": {
+    "en": "Image tokens (64 each)",
+    "zh": "图像词元（每个 64 维）"
+   },
+   "in": [
+    "proj.gelu"
+   ],
+   "outShape": [
+    16,
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 84
+   }
+  },
+  {
+   "id": "lm.tok",
+   "op": "embedding",
+   "label": {
+    "en": "Word rows (16 placeholders, then the question)",
+    "zh": "词行（16 个占位符，然后是问题）"
+   },
+   "in": [
+    "text"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 123
+   }
+  },
+  {
+   "id": "lm.seq",
+   "op": "merge_image",
+   "label": {
+    "en": "Image tokens, then the words",
+    "zh": "先是图像词元，再是词"
+   },
+   "in": [
+    "proj.fc2",
+    "lm.tok"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 133
+   }
+  },
+  {
+   "id": "lm.pos",
+   "op": "position_embedding",
+   "label": {
+    "en": "LM position rows",
+    "zh": "语言模型的位置行"
+   },
+   "in": [
+    "lm.seq"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 124
+   }
+  },
+  {
+   "id": "lm.embed",
+   "op": "add",
+   "label": {
+    "en": "Sequence + positions",
+    "zh": "序列 + 位置"
+   },
+   "in": [
+    "lm.seq",
+    "lm.pos"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 134
+   }
+  },
+  {
+   "id": "lm.L1.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "LM block 1 · LayerNorm 1",
+    "zh": "语言模型第 1 块 · 层归一化 1"
+   },
+   "in": [
+    "lm.embed"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 106
+   }
+  },
+  {
+   "id": "lm.L1.q",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · Queries Q",
+    "zh": "语言模型第 1 块 · 查询 Q"
+   },
+   "in": [
+    "lm.L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 107
+   }
+  },
+  {
+   "id": "lm.L1.k",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · Keys K",
+    "zh": "语言模型第 1 块 · 键 K"
+   },
+   "in": [
+    "lm.L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 108
+   }
+  },
+  {
+   "id": "lm.L1.v",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · Values V",
+    "zh": "语言模型第 1 块 · 值 V"
+   },
+   "in": [
+    "lm.L1.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 109
+   }
+  },
+  {
+   "id": "lm.L1.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "LM block 1 · Attention scores",
+    "zh": "语言模型第 1 块 · 注意力分数"
+   },
+   "in": [
+    "lm.L1.q",
+    "lm.L1.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 16,
+    "causal": true
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 110
+   }
+  },
+  {
+   "id": "lm.L1.attn",
+   "op": "softmax",
+   "label": {
+    "en": "LM block 1 · Attention weights",
+    "zh": "语言模型第 1 块 · 注意力权重"
+   },
+   "in": [
+    "lm.L1.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "lm.L1.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "LM block 1 · Mix of values",
+    "zh": "语言模型第 1 块 · 值的混合"
+   },
+   "in": [
+    "lm.L1.attn",
+    "lm.L1.v"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 115
+   }
+  },
+  {
+   "id": "lm.L1.proj",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · Attention output",
+    "zh": "语言模型第 1 块 · 注意力输出"
+   },
+   "in": [
+    "lm.L1.mix"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 116
+   }
+  },
+  {
+   "id": "lm.L1.add1",
+   "op": "add",
+   "label": {
+    "en": "LM block 1 · Add attention",
+    "zh": "语言模型第 1 块 · 加上注意力"
+   },
+   "in": [
+    "lm.embed",
+    "lm.L1.proj"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 116
+   }
+  },
+  {
+   "id": "lm.L1.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "LM block 1 · LayerNorm 2",
+    "zh": "语言模型第 1 块 · 层归一化 2"
+   },
+   "in": [
+    "lm.L1.add1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.L1.fc1",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · MLP up",
+    "zh": "语言模型第 1 块 · MLP 放大"
+   },
+   "in": [
+    "lm.L1.ln2"
+   ],
+   "outShape": [
+    "T",
+    128
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 128
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 101
+   }
+  },
+  {
+   "id": "lm.L1.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "LM block 1 · GELU",
+    "zh": "语言模型第 1 块 · GELU"
+   },
+   "in": [
+    "lm.L1.fc1"
+   ],
+   "outShape": [
+    "T",
+    128
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.L1.fc2",
+   "op": "linear",
+   "label": {
+    "en": "LM block 1 · MLP down",
+    "zh": "语言模型第 1 块 · MLP 缩回"
+   },
+   "in": [
+    "lm.L1.gelu"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 128,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 102
+   }
+  },
+  {
+   "id": "lm.L1.add2",
+   "op": "add",
+   "label": {
+    "en": "LM block 1 · Add MLP",
+    "zh": "语言模型第 1 块 · 加上 MLP"
+   },
+   "in": [
+    "lm.L1.add1",
+    "lm.L1.fc2"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.L2.ln1",
+   "op": "layernorm",
+   "label": {
+    "en": "LM block 2 · LayerNorm 1",
+    "zh": "语言模型第 2 块 · 层归一化 1"
+   },
+   "in": [
+    "lm.L1.add2"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 106
+   }
+  },
+  {
+   "id": "lm.L2.q",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · Queries Q",
+    "zh": "语言模型第 2 块 · 查询 Q"
+   },
+   "in": [
+    "lm.L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 107
+   }
+  },
+  {
+   "id": "lm.L2.k",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · Keys K",
+    "zh": "语言模型第 2 块 · 键 K"
+   },
+   "in": [
+    "lm.L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 108
+   }
+  },
+  {
+   "id": "lm.L2.v",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · Values V",
+    "zh": "语言模型第 2 块 · 值 V"
+   },
+   "in": [
+    "lm.L2.ln1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64,
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 109
+   }
+  },
+  {
+   "id": "lm.L2.scores",
+   "op": "attention_scores",
+   "label": {
+    "en": "LM block 2 · Attention scores",
+    "zh": "语言模型第 2 块 · 注意力分数"
+   },
+   "in": [
+    "lm.L2.q",
+    "lm.L2.k"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 16,
+    "causal": true
+   },
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 110
+   }
+  },
+  {
+   "id": "lm.L2.attn",
+   "op": "softmax",
+   "label": {
+    "en": "LM block 2 · Attention weights",
+    "zh": "语言模型第 2 块 · 注意力权重"
+   },
+   "in": [
+    "lm.L2.scores"
+   ],
+   "outShape": [
+    4,
+    "T",
+    "T"
+   ],
+   "axes": [
+    "h",
+    "tq",
+    "tk"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 112
+   }
+  },
+  {
+   "id": "lm.L2.mix",
+   "op": "attention_mix",
+   "label": {
+    "en": "LM block 2 · Mix of values",
+    "zh": "语言模型第 2 块 · 值的混合"
+   },
+   "in": [
+    "lm.L2.attn",
+    "lm.L2.v"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "nHead": 4,
+    "dHead": 16
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 115
+   }
+  },
+  {
+   "id": "lm.L2.proj",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · Attention output",
+    "zh": "语言模型第 2 块 · 注意力输出"
+   },
+   "in": [
+    "lm.L2.mix"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 116
+   }
+  },
+  {
+   "id": "lm.L2.add1",
+   "op": "add",
+   "label": {
+    "en": "LM block 2 · Add attention",
+    "zh": "语言模型第 2 块 · 加上注意力"
+   },
+   "in": [
+    "lm.L1.add2",
+    "lm.L2.proj"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 116
+   }
+  },
+  {
+   "id": "lm.L2.ln2",
+   "op": "layernorm",
+   "label": {
+    "en": "LM block 2 · LayerNorm 2",
+    "zh": "语言模型第 2 块 · 层归一化 2"
+   },
+   "in": [
+    "lm.L2.add1"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.L2.fc1",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · MLP up",
+    "zh": "语言模型第 2 块 · MLP 放大"
+   },
+   "in": [
+    "lm.L2.ln2"
+   ],
+   "outShape": [
+    "T",
+    128
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 128
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 101
+   }
+  },
+  {
+   "id": "lm.L2.gelu",
+   "op": "gelu",
+   "label": {
+    "en": "LM block 2 · GELU",
+    "zh": "语言模型第 2 块 · GELU"
+   },
+   "in": [
+    "lm.L2.fc1"
+   ],
+   "outShape": [
+    "T",
+    128
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.L2.fc2",
+   "op": "linear",
+   "label": {
+    "en": "LM block 2 · MLP down",
+    "zh": "语言模型第 2 块 · MLP 缩回"
+   },
+   "in": [
+    "lm.L2.gelu"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "inFeatures": 128,
+    "outFeatures": 64
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 102
+   }
+  },
+  {
+   "id": "lm.L2.add2",
+   "op": "add",
+   "label": {
+    "en": "LM block 2 · Add MLP",
+    "zh": "语言模型第 2 块 · 加上 MLP"
+   },
+   "in": [
+    "lm.L2.add1",
+    "lm.L2.fc2"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 117
+   }
+  },
+  {
+   "id": "lm.ln",
+   "op": "layernorm",
+   "label": {
+    "en": "LM final LayerNorm",
+    "zh": "语言模型最后的层归一化"
+   },
+   "in": [
+    "lm.L2.add2"
+   ],
+   "outShape": [
+    "T",
+    64
+   ],
+   "params": {
+    "eps": 0.00001
+   },
+   "axes": [
+    "t",
+    "d"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 126
+   }
+  },
+  {
+   "id": "lm.head",
+   "op": "linear",
+   "label": {
+    "en": "Next-word scores",
+    "zh": "下一个词的分数"
+   },
+   "in": [
+    "lm.ln"
+   ],
+   "outShape": [
+    "T",
+    20
+   ],
+   "params": {
+    "inFeatures": 64,
+    "outFeatures": 20
+   },
+   "axes": [
+    "t",
+    "vocab"
+   ],
+   "code": {
+    "file": "pipeline/llava-toy/model.py",
+    "line": 127
+   }
+  },
+  {
+   "id": "probs",
+   "op": "softmax",
+   "label": {
+    "en": "Next-word shares",
+    "zh": "下一个词的份额"
+   },
+   "in": [
+    "lm.head"
+   ],
+   "outShape": [
+    "T",
+    20
+   ],
+   "axes": [
+    "t",
+    "vocab"
+   ]
+  }
+ ],
+ "training": {
+  "dataset": "Quick, Draw! numpy bitmaps (TinyCNN's 10 classes and split), one generated question per drawing per epoch",
+  "steps": 7050,
+  "batchSize": 512,
+  "epochs": 30,
+  "bestEpoch": 29,
+  "optimizer": "AdamW lr 0.001 (1 warm-up epoch, cosine), weight decay 0.01 on matrices",
+  "trained": "the projector and the language model only; TinyViT frozen",
+  "augmentation": "TinyCNN's augment(): shift, scale 0.8-1.1, rotation +-12 deg, stroke thickness jitter",
+  "hardware": "RTX 5090 Laptop GPU (training); CPU float32 (evaluation, export)",
+  "metrics": {
+   "test_what": 0.9637,
+   "test_yesno": 0.983,
+   "test_n": 15000,
+   "trainable_params": 78484
+  }
+ },
+ "parity": {
+  "against": "pytorch-fp32-cpu",
+  "max_abs_diff": 0.00000691,
+  "checked": "2026-10-13",
+  "bar": 0.0001,
+  "pass": true,
+  "scope": "forward",
+  "script": "atlas parity",
+  "cases": 8,
+  "edgeCases": [
+   "blank",
+   "dot-one-word",
+   "star-eight"
+  ],
+  "perLayer": {
+   "vit.patch": 3.58e-7,
+   "vit.tokens": 3.58e-7,
+   "vit.cls": 3.58e-7,
+   "vit.embed": 3.58e-7,
+   "vit.B1.ln1": 4.77e-7,
+   "vit.B1.q": 7.15e-7,
+   "vit.B1.k": 7.15e-7,
+   "vit.B1.v": 7.15e-7,
+   "vit.B1.scores": 0.00000191,
+   "vit.B1.attn": 3.58e-7,
+   "vit.B1.mix": 0.00000107,
+   "vit.B1.proj": 3.92e-7,
+   "vit.B1.add1": 3.87e-7,
+   "vit.B1.ln2": 0.00000143,
+   "vit.B1.fc1": 0.00000101,
+   "vit.B1.gelu": 9.54e-7,
+   "vit.B1.fc2": 4.77e-7,
+   "vit.B1.add2": 8.49e-7,
+   "vit.B2.ln1": 0.00000211,
+   "vit.B2.q": 0.00000113,
+   "vit.B2.k": 0.00000121,
+   "vit.B2.v": 0.00000113,
+   "vit.B2.scores": 0.00000143,
+   "vit.B2.attn": 2.09e-7,
+   "vit.B2.mix": 4.17e-7,
+   "vit.B2.proj": 2.98e-7,
+   "vit.B2.add1": 8.79e-7,
+   "vit.B2.ln2": 0.00000301,
+   "vit.B2.fc1": 0.00000185,
+   "vit.B2.gelu": 0.00000191,
+   "vit.B2.fc2": 7.15e-7,
+   "vit.B2.add2": 0.0000011,
+   "vit.B3.ln1": 0.00000179,
+   "vit.B3.q": 0.00000125,
+   "vit.B3.k": 9.54e-7,
+   "vit.B3.v": 0.00000106,
+   "vit.B3.scores": 0.00000191,
+   "vit.B3.attn": 3.87e-7,
+   "vit.B3.mix": 4.77e-7,
+   "vit.B3.proj": 2.83e-7,
+   "vit.B3.add1": 0.0000011,
+   "vit.B3.ln2": 0.00000215,
+   "vit.B3.fc1": 0.00000143,
+   "vit.B3.gelu": 0.00000143,
+   "vit.B3.fc2": 8.34e-7,
+   "vit.B3.add2": 0.0000013,
+   "feat": 0.0000013,
+   "proj.fc1": 0.00000107,
+   "proj.gelu": 0.00000101,
+   "proj.fc2": 3.28e-7,
+   "lm.seq": 3.28e-7,
+   "lm.embed": 3.28e-7,
+   "lm.L1.ln1": 0.0000017,
+   "lm.L1.q": 8.34e-7,
+   "lm.L1.k": 9.28e-7,
+   "lm.L1.v": 0.0000011,
+   "lm.L1.scores": 0.00000119,
+   "lm.L1.attn": 1.79e-7,
+   "lm.L1.mix": 7.15e-7,
+   "lm.L1.proj": 5.59e-7,
+   "lm.L1.add1": 5.59e-7,
+   "lm.L1.ln2": 0.00000218,
+   "lm.L1.fc1": 0.00000143,
+   "lm.L1.gelu": 0.00000128,
+   "lm.L1.fc2": 3.05e-7,
+   "lm.L1.add2": 7.75e-7,
+   "lm.L2.ln1": 0.00000235,
+   "lm.L2.q": 0.00000161,
+   "lm.L2.k": 0.00000131,
+   "lm.L2.v": 0.00000129,
+   "lm.L2.scores": 0.00000477,
+   "lm.L2.attn": 5.96e-7,
+   "lm.L2.mix": 0.00000109,
+   "lm.L2.proj": 6.93e-7,
+   "lm.L2.add1": 8.49e-7,
+   "lm.L2.ln2": 0.00000243,
+   "lm.L2.fc1": 0.00000215,
+   "lm.L2.gelu": 0.00000238,
+   "lm.L2.fc2": 0.00000119,
+   "lm.L2.add2": 0.00000155,
+   "lm.ln": 0.00000429,
+   "lm.head": 0.00000691,
+   "probs": 0.00000197
+  },
+  "details_max_abs_diff": 0
+ },
+ "atlas": {
+  "spec": "1.1",
+  "kinds": [
+   "trace"
+  ],
+  "exporter": "atlas_kit 0.1.0 (pipeline/llava-toy/export.py)"
+ },
+ "inputs": [
+  {
+   "name": "image",
+   "adapter": "drawing-question",
+   "kind": "drawing",
+   "shape": [
+    1,
+    28,
+    28
+   ],
+   "dtype": "f32",
+   "axes": [
+    "c",
+    "y",
+    "x"
+   ]
+  },
+  {
+   "name": "text",
+   "adapter": "drawing-question",
+   "kind": "text",
+   "shape": [
+    "T"
+   ],
+   "dtype": "i32",
+   "axes": [
+    "t"
+   ]
+  }
+ ],
+ "outputs": [
+  "probs"
+ ],
+ "dims": {
+  "T": {
+   "min": 17,
+   "max": 24,
+   "label": {
+    "en": "rows",
+    "zh": "行"
+   }
+  }
+ },
+ "files": {
+  "weights": "weights.bin",
+  "reference": "reference.json",
+  "facts": "facts.json",
+  "presets": "presets.json"
+ },
+ "vocab": [
+  "<image>",
+  "what",
+  "is",
+  "this",
+  "it",
+  "a",
+  "an",
+  "?",
+  "yes",
+  "no",
+  "apple",
+  "bicycle",
+  "car",
+  "clock",
+  "fish",
+  "house",
+  "star",
+  "sun",
+  "tree",
+  "umbrella"
+ ],
+ "vocabZh": [
+  "<image>",
+  "what",
+  "is",
+  "this",
+  "it",
+  "a",
+  "an",
+  "?",
+  "yes",
+  "no",
+  "苹果",
+  "自行车",
+  "汽车",
+  "时钟",
+  "鱼",
+  "房子",
+  "星星",
+  "太阳",
+  "树",
+  "雨伞"
+ ],
+ "imageTokens": 16,
+ "vitBlocks": 3
+}

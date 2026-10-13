@@ -1,30 +1,55 @@
 <!--
-  The next-token-prediction guided lesson: seven steps on the learner's own sentence, one focused
-  view at a time (kit Walkthrough). Every number is TinyGPT's, computed in the browser: the final
-  fp32 weights (steps 1-5, 7) and the fp16 training checkpoints (step 6); only the validation losses
-  are precomputed. The lesson follows its own window (NtpLesson), so it never moves the explore views.
+  The next-token-prediction guided lesson: seven steps on the learner's own sentence, one focused view at a time (kit
+  Walkthrough, the page's Lesson view; the sentence is edited in the input sheet the stage header's chip opens). Every
+  number is TinyGPT's, computed in the browser: the final fp32 weights (steps 1-5, 7) and the fp16 training checkpoints
+  (step 6); only the validation losses are precomputed. The lesson follows its own window (NtpLesson), so it never moves
+  the Explore views.
 -->
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { untrack, type Component } from 'svelte';
 	import Walkthrough from '$lib/kit/Walkthrough.svelte';
 	import { t } from '$lib/i18n/i18n.svelte';
 	import { fmt3 } from '$lib/kit/format';
 	import { pct, sci, tailText } from './lessonMath';
-	import type { WalkStep } from '$lib/kit/types';
+	import type { StageProv, WalkContext, WalkStep } from '$lib/kit/types';
+	import { FACTS } from './facts';
 	import type { NtpState } from './state.svelte';
 	import { NtpLesson } from './lessonState.svelte';
-	import LessonSentence from './LessonSentence.svelte';
 	import LessonTokens from './LessonTokens.svelte';
 	import LessonWindows from './LessonWindows.svelte';
-	import LessonDist from './LessonDist.svelte';
-	import LessonLoss from './LessonLoss.svelte';
-	import LessonAverage from './LessonAverage.svelte';
-	import LessonTrain from './LessonTrain.svelte';
-	import LessonSample from './LessonSample.svelte';
+	import CoverStage from './CoverStage.svelte';
 
 	let { S }: { S: NtpState } = $props();
 	const L = new NtpLesson(untrack(() => S));
 	let index = $state(0);
+
+	// Steps 3–7 run the model and typeset formulas (KaTeX), so their stages are separate chunks: the lesson shell stays
+	// small. They are fetched in the background once the tokenizer is in, and at once for the step on screen (a deep link).
+	type StageProps = { L: NtpLesson; ctx: WalkContext };
+	const LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
+		probs: () => import('./LessonDist.svelte'),
+		loss: () => import('./LessonLoss.svelte'),
+		average: () => import('./LessonAverage.svelte'),
+		training: () => import('./LessonTrain.svelte'),
+		sampling: () => import('./LessonSample.svelte')
+	};
+	let stages = $state.raw<Record<string, Component<StageProps>>>({});
+	const loading = new Set<string>();
+	function loadStage(id: string) {
+		if (stages[id] || loading.has(id) || !LOADERS[id]) return;
+		loading.add(id);
+		LOADERS[id]().then(
+			(m) => (stages = { ...stages, [id]: m.default as Component<StageProps> }),
+			() => loading.delete(id)
+		);
+	}
+	$effect(() => {
+		const id = steps[index]?.id;
+		if (id) loadStage(id);
+	});
+	$effect(() => {
+		if (S.tok) for (const id of Object.keys(LOADERS)) loadStage(id);
+	});
 
 	// the final model's full distribution for the followed window (cheap: one forward of ≤ 64 tokens)
 	$effect(() => {
@@ -184,9 +209,30 @@
 			}
 		}
 	];
+
+	// the stage header's one provenance label per step (the validation losses in steps 5 and 6 carry their own)
+	const TOK: StageProv = { mode: 'live', note: { en: 'TinyGPT’s own byte-level BPE tokenizer, running in your browser.', zh: 'TinyGPT 自己的字节级 BPE 分词器，在你的浏览器里运行。' }, short: { en: '· TinyGPT’s tokenizer on your sentence', zh: '· TinyGPT 的分词器处理你的句子' } };
+	const FP32: StageProv = { mode: 'live', precision: 'fp32', tolerance: FACTS.tolerance, against: 'PyTorch fp32', short: { en: '· TinyGPT on your sentence', zh: '· TinyGPT 处理你的句子' } };
+	const FP16: StageProv = {
+		mode: 'live',
+		precision: 'fp16',
+		note: {
+			en: 'Runs the fp16 checkpoint files in your browser. On the same fp16 weights the JS forward pass matches PyTorch within 1.2e-5. The validation losses were logged during training (precomputed).',
+			zh: '在你的浏览器里运行 fp16 检查点文件。在同样的 fp16 权重上，JS 前向计算与 PyTorch 的差距在 1.2e-5 以内。验证损失是训练时记录的（预先计算）。'
+		},
+		short: { en: '· training checkpoints on your sentence', zh: '· 训练检查点处理你的句子' }
+	};
+	for (const st of steps) st.prov = st.id === 'tokens' || st.id === 'windows' ? TOK : st.id === 'training' ? FP16 : FP32;
+
+	const chapters = [
+		{ title: { en: 'Data', zh: '数据' }, count: 2 },
+		{ title: { en: 'Loss', zh: '损失' }, count: 3 },
+		{ title: { en: 'Training and use', zh: '训练与使用' }, count: 2 }
+	];
 </script>
 
-<Walkthrough {steps} bind:index ready={!!S.tok} label={{ en: 'Next-token prediction, step by step', zh: '下一个词元预测：分步课程' }} stageMinHeight={420}>
+<Walkthrough {steps} bind:index {chapters} ready={!!S.tok} label={{ en: 'How a language model learns from plain text', zh: '语言模型怎样从普通文本中学习' }}>
+	{#snippet cover()}<CoverStage {S} />{/snippet}
 	{#snippet stage(step, ctx)}
 		{#if S.error}
 			<p class="err">{S.error}</p>
@@ -196,59 +242,49 @@
 			<LessonTokens {L} />
 		{:else if step.id === 'windows'}
 			<LessonWindows {L} {ctx} />
-		{:else if step.id === 'probs'}
-			<LessonDist {L} />
-		{:else if step.id === 'loss'}
-			<LessonLoss {L} />
-		{:else if step.id === 'average'}
-			<LessonAverage {L} {ctx} />
-		{:else if step.id === 'training'}
-			<LessonTrain {L} {ctx} />
-		{:else if step.id === 'sampling'}
-			<LessonSample {L} />
+		{:else if stages[step.id]}
+			{@const Stage = stages[step.id]}
+			<Stage {L} {ctx} />
+		{:else if LOADERS[step.id]}
+			<p class="muted">{t({ en: 'Loading this step…', zh: '正在加载这一步…' })}</p>
 		{/if}
 	{/snippet}
 
-	{#snippet aside()}<LessonSentence {L} />{/snippet}
+	{#snippet recap()}
+		{@const sc = S.fresh && S.score && S.score.scored > 0 ? S.score : null}
+		<ul class="recap">
+			<li>{t({ en: `Your ${L.n} tokens hold ${L.windows} (context → next token) exercises, with no human labels.`, zh: `你的 ${L.n} 个词元里藏着 ${L.windows} 道（上下文 → 下一个词元）练习题，不需要人工标注。` })}</li>
+			{#if sc}
+				<li>{t({ en: `TinyGPT’s loss on your sentence: ${fmt3(sc.meanNats)} nats per token, perplexity ${sci(sc.perplexity)}.`, zh: `TinyGPT 在你的句子上的损失：每个词元 ${fmt3(sc.meanNats)} 奈特，困惑度 ${sci(sc.perplexity)}。` })}</li>
+			{/if}
+			<li>{t({ en: `A blind guess costs ln 1,024 = ${FACTS.uniformLoss.toFixed(2)} nats; after ${FACTS.steps.toLocaleString('en-US')} training steps TinyGPT averages ${FACTS.valLoss.toFixed(2)} on stories it never saw.`, zh: `盲猜的代价是 ln 1,024 = ${FACTS.uniformLoss.toFixed(2)} 奈特；训练 ${FACTS.steps.toLocaleString('en-US')} 步之后，TinyGPT 在没见过的故事上平均为 ${FACTS.valLoss.toFixed(2)}。` })}</li>
+		</ul>
+	{/snippet}
 
 	{#snippet end()}
-		<div class="fin">
-			<p>
-				<strong>{t({ en: 'That is next-token prediction, end to end.', zh: '这就是下一个词元预测的全过程。' })}</strong>
-				{t({
-					en: 'The number a GPT’s pre-training pushes down is exactly this one: the average −log p over (context → next token) windows. Try another sentence and play the lesson again, or explore every part freely below.',
-					zh: 'GPT 预训练要压低的正是这个数：在（上下文 → 下一个词元）窗口上的平均 −log p。换一句话再播放一遍课程，或者在下面自由探索每个部分。'
-				})}
-			</p>
-			<a class="btn primary" href="#explore">{t({ en: 'Explore freely', zh: '自由探索' })} ↓</a>
-		</div>
+		<p class="fin">
+			<strong>{t({ en: 'That is next-token prediction, end to end.', zh: '这就是下一个词元预测的全过程。' })}</strong>
+			{t({
+				en: 'The number a GPT’s pre-training pushes down is exactly this one: the average −log p over (context → next token) windows. Try another sentence and play the lesson again, or open Explore to try every part freely.',
+				zh: 'GPT 预训练要压低的正是这个数：在（上下文 → 下一个词元）窗口上的平均 −log p。换一句话再播放一遍课程，或者打开“探索”自由地试每个部分。'
+			})}
+		</p>
 	{/snippet}
 </Walkthrough>
-<p class="foot muted">
-	{t({
-		en: 'Every number in the lesson is computed in your browser by TinyGPT from your sentence: the final weights (fp32) in steps 3–5 and 7, the fp16 training checkpoints in step 6. Only the validation losses (steps 5 and 6) were measured offline. The lesson follows its own window, so the views below stay where you left them.',
-		zh: '课程中的每个数都由 TinyGPT 在你的浏览器里根据你的句子算出：第 3–5 步和第 7 步用最终权重（fp32），第 6 步用 fp16 训练检查点。只有验证损失（第 5、6 步）是离线测得的。课程跟随自己的窗口，所以下面的视图会停在你离开时的位置。'
-	})}
-</p>
 
 <style>
+	.recap {
+		margin: 0;
+		padding-left: 1.2em;
+		display: grid;
+		gap: 4px;
+	}
 	.err {
-		color: var(--k-text);
+		color: var(--no);
 	}
 	.fin {
-		display: grid;
-		gap: 8px;
-		justify-items: start;
-		padding: 10px 12px;
-		border-radius: var(--r2);
-		background: var(--live-soft);
-	}
-	.fin p {
 		margin: 0;
-		font-size: var(--fs-sm);
-	}
-	.foot {
-		margin: 8px 0 0;
-		font-size: var(--fs-xs);
+		font-size: var(--t-sm);
+		line-height: var(--lh-sm);
 	}
 </style>

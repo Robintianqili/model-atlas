@@ -1,0 +1,79 @@
+{
+ "format": "atlas-parity/1",
+ "slug": "quantization",
+ "checked": "2026-10-08",
+ "sources": {
+  "formats": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 1,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "int8": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "int4": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "affine": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "outlier": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "fixes": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "toy": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0,
+   "frames": 10,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  },
+  "sweep": {
+   "scope": "process",
+   "against": "python-reference",
+   "pass": true,
+   "max": 0.00000147,
+   "frames": 11,
+   "fixtures": 0,
+   "checked": "2026-10-08"
+  }
+ }
+}
